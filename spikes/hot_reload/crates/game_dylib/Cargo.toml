@@ -1,0 +1,15 @@
+[package]
+name = "game_dylib"
+description = "specs/20 § 1 wrapper: `game` as a dylib. The spike shows why it is replaced by `cargo rustc -p game --crate-type dylib -- -C metadata=<gen>` (README)."
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[lib]
+crate-type = ["dylib"]
+
+[features]
+sim-persistent = ["game/sim-persistent"]
+
+[dependencies]
+game = { workspace = true, features = ["hot-reload"] }

@@ -1,0 +1,17 @@
+(
+    format: "voxel-far",
+    entries: [
+        (
+            version: 2,
+            file: "v2.bin",
+            origin: "registry fixture (version unknown) loaded and re-encoded by the loader at version 2",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+        (
+            version: 4,
+            file: "v4.bin",
+            origin: "frozen copy of the fuzz-target registry fixture",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+    ],
+)

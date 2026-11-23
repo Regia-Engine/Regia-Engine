@@ -1,0 +1,25 @@
+ProcGraph(
+    format_version: 1,
+    description: "Biome area tool preset: the Area tool's closed outline becomes a BiomeArea of the biome parameter; every generator bound to this graph places that biome's vegetation inside its areas (spec 65, spec 67 § 5)",
+    params: [
+        (name: "biome", ty: Asset, default: "starter/biomes/beech_forest.biome.ron", min: None, max: None, doc: "The .biome.ron the Area tool's BiomeArea names"),
+    ],
+    nodes: {
+        1: (ty: "in.self", settings: {}, at: (0.0, 0.0)),
+        2: (ty: "biome.areas", settings: {}, at: (220.0, 0.0)),
+        3: (ty: "in.ground", settings: {}, at: (220.0, 160.0)),
+        4: (ty: "biome.layer", settings: {}, at: (440.0, 0.0)),
+        5: (ty: "biome.resolve", settings: {}, at: (660.0, 0.0)),
+        6: (ty: "biome.exclude", settings: {}, at: (880.0, 0.0)),
+        7: (ty: "biome.spawn", settings: {}, at: (1100.0, 0.0)),
+    },
+    edges: [
+        (from: (1, "out"), to: (2, "bounds")),
+        (from: (2, "out"), to: (4, "claims")),
+        (from: (3, "out"), to: (4, "ground")),
+        (from: (4, "out"), to: (5, "in")),
+        (from: (5, "out"), to: (6, "in")),
+        (from: (6, "out"), to: (7, "in")),
+    ],
+    flags: (starter: true, tool: Some("area")),
+)

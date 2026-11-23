@@ -1,0 +1,33 @@
+# `cargo fuzz` target for regia_media (ADR-1593 § 4, ADR-1869 § 8). Nightly and owner-run, outside the workspace
+# (the empty `[workspace]` below): `cd crates/regia_media/fuzz && mkdir -p corpus/decode && cargo +nightly fuzz run decode corpus/decode
+# ../tests/fixtures`; the Opus packet gate: `cargo +nightly fuzz run opus_packet corpus/opus_packet seeds/opus_packet`.
+# The deterministic CI corpus is `crates/regia_media/tests/fuzz.rs`.
+[package]
+name = "regia_media_fuzz"
+version = "0.0.0"
+edition = "2024"
+publish = false
+license = "MPL-2.0"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+regia_media = { path = "..", features = ["video"] }
+
+[[bin]]
+name = "decode"
+path = "fuzz_targets/decode.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "opus_packet"
+path = "fuzz_targets/opus_packet.rs"
+test = false
+doc = false
+bench = false
+
+[workspace]

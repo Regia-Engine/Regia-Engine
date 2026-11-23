@@ -1,0 +1,19 @@
+// A two-lane country road (spec 64 § 7.1).
+RoadProfile(
+    format_version: 1,
+    width_m: 7.0,
+    shoulders_m: (0.8, 0.8),
+    surface_lift_m: 0.03,
+    cross_slope_pct: 2.0,
+    material: "materials/asphalt.material.ron",
+    shoulder_material: Some("materials/gravel.material.ron"),
+    uv_m_per_tile: 8.0,
+    samples_per_m: 0.5,
+    markings: [
+        (pattern: "dash(3, 9)", offset_m: 0.0, width_m: 0.15, color: (1.0, 1.0, 0.9)),
+        (pattern: "solid", offset_m: 3.2, width_m: 0.12, color: (1.0, 1.0, 1.0)),
+        (pattern: "solid", offset_m: -3.2, width_m: 0.12, color: (1.0, 1.0, 1.0)),
+    ],
+    terrain: (flatten: true, flatten_extra_m: 1.0, falloff_m: 8.0, carve_max_m: 3.0, fill_max_m: 3.0),
+    junction: (margin_m: 1.0, material: None),
+)

@@ -1,0 +1,5 @@
+(format_version: 1, name: "swipe", description: "The grunt's melee swipe",
+ kind_tags: ["Ability.Enemy.Swipe"], run_tags: ["State.Attacking"],
+ owner_forbids: Some(Has("Status.Staggered")),
+ cooldown: Some("combat/swipe_cooldown.effect.ron"),
+ charge: OnStart, max_run_ticks: Some(1))

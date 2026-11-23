@@ -1,0 +1,19 @@
+// `.terrain.layers.ron` fixture (format version 1) — from `docs/formats/terrain.md`.
+TerrainLayers(
+    version: 1,
+    wetness_default: 0.0,
+    layers: [
+        LayerDesc(
+            name: "ground",
+            albedo: (0.18, 0.28, 0.10),
+            roughness: 0.95,
+            tiling: 8.0,
+            slope_min: 0.0,
+            slope_max: 0.6,
+            altitude_min: -1000.0,
+            altitude_max: 1000.0,
+            blend_sharpness: 0.15,
+            triplanar: false,
+        ),
+    ],
+)

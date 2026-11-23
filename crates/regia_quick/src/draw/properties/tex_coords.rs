@@ -1,0 +1,48 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
+// Portions ported from nannou (https://github.com/nannou-org/nannou, commit bffa988),
+// nannou_draw/src/draw/properties/tex_coords.rs. Copyright (c) 2017 MindBuffer, Copyright (c) 2019 nannou-org; dual-licensed
+// MIT OR Apache-2.0, used here under the MIT licence (see docs/ported-sources.toml).
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+// and associated documentation files (the "Software"), to deal in the Software without restriction,
+// including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+// and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so,
+// subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all copies or substantial
+// portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+// LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+// WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+// SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+use regia_core::math::geom;
+
+use crate::draw::{Draw, drawing};
+
+/// Primitives whose texture coordinates can be set.
+pub trait SetTexCoords: Sized {
+    /// Mutable access to the texture coordinate area.
+    fn tex_coords_mut(&mut self) -> &mut Option<geom::Rect>;
+
+    /// Texture coordinates: sample `area` (in `0..1` texture space) of the image.
+    fn area(mut self, area: geom::Rect) -> Self {
+        *self.tex_coords_mut() = Some(area);
+        self
+    }
+}
+
+impl SetTexCoords for Option<geom::Rect> {
+    fn tex_coords_mut(&mut self) -> &mut Option<geom::Rect> {
+        self
+    }
+}
+
+// Set the texture coordinate area of the primitive being drawn at `index`.
+pub(crate) fn set_tex_coords_area(draw: &Draw, index: usize, area: geom::Rect) {
+    drawing::with_primitive(draw, index, |prim| match prim.tex_coords_mut() {
+        Some(tex_coords) => *tex_coords = Some(area),
+        None => crate::warn_once!("drawing primitive does not support `tex_coords`"),
+    })
+}

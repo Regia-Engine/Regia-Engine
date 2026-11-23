@@ -1,0 +1,16 @@
+# hello: a Unix-socket client
+# Laid out by hand from docs/formats/dcc-feed-protocol-v1.md (spec 60 section 8 test 1).
+42 00 00 00                                          # len = 66
+01 00                                                # msg_type 0x0001
+00 00                                                # flags
+01 00 00 00                                          # seq 1
+52 46 44 50                                          # magic "RFDP"
+01 00 00 00                                          # min_version 1
+01 00 00 00                                          # max_version 1
+0a 00 62 6c 65 6e 64 5f 66 65 65 64                  # client_name "blend_feed"
+03 00 30 2e 33                                       # client_version "0.3"
+0b 00 42 6c 65 6e 64 65 72 20 34 2e 32               # dcc "Blender 4.2"
+04 00 67 6c 74 66                                    # space "gltf"
+00 00 80 3f                                          # unit_scale 1.0
+1f 00 00 00                                          # caps 0x1f
+00 00                                                # token (empty on the Unix socket) ""

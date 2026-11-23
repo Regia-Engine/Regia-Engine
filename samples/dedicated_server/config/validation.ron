@@ -1,0 +1,7 @@
+// Asset validation for the dedicated-server sample (book agents/asset-validators.md). `regia package`
+// fails on findings here (ADR-4908). The game's code loads its data tables by name, so the tables are
+// roots next to the levels; without this the orphan check flags them.
+(
+    format_version: 1,
+    roots: ["assets/levels/**", "assets/data/**"],
+)

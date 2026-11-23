@@ -1,0 +1,9 @@
+FuncTestScript(
+    format_version: 1,
+    steps: [
+        (name: "walk to the door", do: [Inject(action: "Move", value: (0.0, 1.0), frames: 90)]),
+        (name: "door opens", wait_until: Some((condition: (entity: (name: "Door"), component: "Door", path: "state", op: "eq", value: "Open"),
+                                                 within_frames: 120))),
+        (name: "player is through", expect: [(name: "x", condition: (resource: "R", path: "n", op: "gt", value: 1))]),
+    ],
+)

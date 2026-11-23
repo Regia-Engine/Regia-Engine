@@ -1,0 +1,35 @@
+format_version = 1
+id = "lamp-row"
+title = "Extend one street lamp into a row of five"
+prompt = "There is one lamp, 'Lamp 1', at (0, 3, 0). Make a row of five lamps named 'Lamp 1' to 'Lamp 5' along the X axis, 4 m apart (x = 0, 4, 8, 12, 16), all at height 3."
+features = ["scene"]
+crates = ["regia_agent"]
+call_budget = 8
+
+[setup]
+target = "scene"
+
+[[setup.call]]
+method = "scene.spawn"
+params = { name = "Lamp 1", components = { Transform = { translation = [0, 3, 0] } } }
+
+[[check]]
+name = "five lamps"
+method = "scene.query_entities"
+params = { name = "Lamp*" }
+pointer = "/count"
+expect = { kind = "equals", value = 5 }
+
+[[check]]
+name = "all in the row"
+method = "scene.query_entities"
+params = { name = "Lamp*", box = { min = [-0.1, 2.9, -0.1], max = [16.1, 3.1, 0.1] } }
+pointer = "/count"
+expect = { kind = "equals", value = 5 }
+
+[[check]]
+name = "last lamp at 16"
+method = "scene.query_entities"
+params = { component = "Transform", near = { point = [16, 3, 0], radius = 0.1 } }
+pointer = "/count"
+expect = { kind = "equals", value = 1 }

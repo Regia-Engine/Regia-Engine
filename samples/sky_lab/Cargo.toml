@@ -1,0 +1,20 @@
+[package]
+name = "sky_lab"
+description = "Sky and cloud sample: a day cycle with weather presets, rendered headless (agent guide: agents/sky-lab)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia_render = { workspace = true }
+png = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+regia_test_utils = { workspace = true }

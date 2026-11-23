@@ -1,0 +1,40 @@
+// A 16 x 16 m courtyard closed by four 8 m blocks, with a 3 m passage through the south block.
+// The sun stands in the south at about 40 degrees, so the south half of the yard lies in the
+// south block's shadow while the north block's sandstone face is in full sun: the shadowed
+// floor is lit by that face's warm bounce and by the sky above the yard. A plinth and a
+// bush-like ellipsoid break up the floor. What it checks: bounce from a sunlit facade into an
+// open-sky shadow, without interior flags (only the terrain layer and one outdoor brick).
+// Look-review pack scene (ADR-1326), read by `cargo xtask gi-compare`.
+(
+    format_version: 1,
+    name: "courtyard",
+    purpose: "bounce from a sunlit facade into the shadowed half of an open courtyard",
+    sun: Some((toward: (0.2, 0.64, 0.74), color: (1.0, 0.95, 0.88), lux: 100000.0)),
+    sky_lux: 15000.0,
+    materials: [
+        (name: "paving", albedo: (0.42, 0.4, 0.37)),
+        (name: "sandstone", albedo: (0.72, 0.56, 0.38)),
+        (name: "plaster", albedo: (0.58, 0.58, 0.56)),
+        (name: "bush", albedo: (0.12, 0.28, 0.08)),
+    ],
+    terrain: Some((size: (128.0, 128.0), spacing: 2.0, height: 0.0, material: "paving")),
+    shapes: [
+        (name: "north", kind: Box(half: (14.0, 4.0, 3.0)), material: "sandstone", at: (0.0, 4.0, -11.0)),
+        (name: "west", kind: Box(half: (3.0, 4.0, 8.0)), material: "plaster", at: (-11.0, 4.0, 0.0)),
+        (name: "east", kind: Box(half: (3.0, 4.0, 8.0)), material: "plaster", at: (11.0, 4.0, 0.0)),
+        (name: "south_left", kind: Box(half: (6.25, 4.0, 3.0)), material: "plaster", at: (-7.75, 4.0, 11.0)),
+        (name: "south_right", kind: Box(half: (6.25, 4.0, 3.0)), material: "plaster", at: (7.75, 4.0, 11.0)),
+        (name: "passage_roof", kind: Box(half: (1.5, 1.5, 3.0)), material: "plaster", at: (0.0, 6.5, 11.0)),
+        (name: "plinth", kind: Box(half: (1.5, 0.5, 1.5)), material: "plaster", at: (0.0, 0.5, 0.0)),
+        (name: "bush", kind: Ellipsoid(radii: (1.2, 1.6, 1.2)), material: "bush", at: (-4.5, 1.2, -4.5)),
+    ],
+    layout: (
+        terrain: Some((spacing: (4.0, 4.0), levels: [0.5, 1.5, 3.0, 6.0, 12.0])),
+        // The yard's air.
+        bricks: [(min: (-7.75, 0.1, -7.75), max: (7.75, 7.9, 7.75), spacing: 0.75)],
+        moment_resolution: 8,
+        max_distance: 24.0,
+    ),
+    // regia bake-gi's defaults (ProbeTraceSettings::default): 256 rays x 16 samples, 8 bounces.
+    bake: (rays_per_probe: 256, samples: 16, max_bounces: 8, seed: 1),
+)

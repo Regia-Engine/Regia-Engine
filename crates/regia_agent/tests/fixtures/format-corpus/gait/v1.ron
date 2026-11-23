@@ -1,0 +1,25 @@
+// A six-leg tripod walker: the settings of regia_animation's tests/tripod_gait.rs as a file.
+(
+    format_version: 1,
+    patterns: [Tripod],
+    speeds: (forward: 2.4, reverse: 1.1, strafe: 0.8, acceleration: 3.0, idle: 0.02, yaw_rate: 0.8),
+    step_length: 0.6,
+    swing_lift: 0.18,
+    clearance: 0.7,
+    max_slope: 0.9,
+    max_reach: Some(5.0),
+    settle: (distance: 0.05, period: 0.3),
+    turn: (step_distance: 0.15, step_angle: 0.35),
+    ground_band: Some(50.0),
+    foothold: (candidates: 0, spacing: 0.25),
+    hang_drop: 0.3,
+    body: Some("thorax"),
+    legs: [
+        (root: "coxa_fl", tip: "foot_fl", hip_offset: Some((-0.4, 0.5))),
+        (root: "coxa_fr", tip: "foot_fr", hip_offset: Some((0.4, 0.5))),
+        (root: "coxa_ml", tip: "foot_ml", hip_offset: Some((-0.5, 0.0))),
+        (root: "coxa_mr", tip: "foot_mr", hip_offset: Some((0.5, 0.0))),
+        (root: "coxa_rl", tip: "foot_rl", hip_offset: Some((-0.4, -0.5))),
+        (root: "coxa_rr", tip: "foot_rr", hip_offset: Some((0.4, -0.5))),
+    ],
+)

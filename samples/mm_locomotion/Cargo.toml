@@ -1,0 +1,23 @@
+[package]
+name = "mm_locomotion"
+description = "Headless motion-matching locomotion sample (spec 52, ADR-2409): procedural root-motion clips, a database registered as an asset, matching played through the Animator, an agent dogfood test."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia_agent = { workspace = true }
+regia_animation = { workspace = true }
+regia_app = { workspace = true }
+regia_core = { workspace = true }
+regia_scene = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+regia_test_utils = { workspace = true }
+serde_json = { workspace = true }

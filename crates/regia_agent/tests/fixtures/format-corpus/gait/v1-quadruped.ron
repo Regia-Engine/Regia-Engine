@@ -1,0 +1,31 @@
+// A four-leg walker through every four-leg preset (walk, pace, trot, bound), a posture without a
+// height slew limit, no reach limit, no ground band, no body joint and no hip offset overrides.
+(
+    format_version: 1,
+    patterns: [QuadrupedWalk, Pace, Trot, Bound],
+    switch_speeds: [0.6, 1.2, 2.0],
+    hysteresis: 0.05,
+    speeds: (forward: 3.0, reverse: 1.0, strafe: 0.5, acceleration: 4.0, idle: 0.02, yaw_rate: 1.5),
+    step_length: 0.5,
+    swing_lift: 0.12,
+    clearance: 0.45,
+    max_slope: 0.8,
+    settle: (distance: 0.04, period: 0.3),
+    turn: (step_distance: 0.1, step_angle: 0.3),
+    foothold: (candidates: 8, spacing: 0.1),
+    hang_drop: 0.2,
+    posture: Some((
+        swing_weight: 0.25,
+        height_tau: 0.1,
+        attitude_weight: 0.5,
+        max_pitch: 0.3,
+        max_roll: 0.2,
+        attitude_tau: 0.15,
+    )),
+    legs: [
+        (root: "hip_lf", tip: "paw_lf"),
+        (root: "hip_rf", tip: "paw_rf"),
+        (root: "hip_lh", tip: "paw_lh"),
+        (root: "hip_rh", tip: "paw_rh"),
+    ],
+)

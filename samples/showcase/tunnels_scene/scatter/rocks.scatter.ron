@@ -1,0 +1,147 @@
+(
+    version: 2,
+    seed: 20261119,
+    classes: [
+        (
+            name: "rocks",
+            meshes: [
+                (
+                    mesh: "rock_a",
+                    weight: 2.0,
+                    min_scale: 0.5,
+                    max_scale: 2.6,
+                    scale_bias: 2.5,
+                ),
+                (
+                    mesh: "rock_b",
+                    weight: 1.0,
+                    min_scale: 0.6,
+                    max_scale: 3.2,
+                    scale_bias: 2.5,
+                ),
+            ],
+            cell_size: 9.0,
+            density: 0.5,
+            density_map: None,
+            noise_scale: 0.0,
+            noise_amount: 0.0,
+            slope_min: 0.0,
+            slope_max: 1.1,
+            height_min: -100000.0,
+            height_max: 100000.0,
+            layer_mask: 0,
+            layer_min_weight: 0.3,
+            avoid_holes: true,
+            exclusions: [
+                (
+                    points: [
+                        (-173.18, 103.33),
+                    ],
+                    radius: 43.0,
+                ),
+                (
+                    points: [
+                        (174.03, 116.52),
+                    ],
+                    radius: 27.0,
+                ),
+                (
+                    points: [
+                        (-41.29, -89.38),
+                    ],
+                    radius: 27.0,
+                ),
+                (
+                    points: [
+                        (32.99, -102.04),
+                    ],
+                    radius: 39.0,
+                ),
+            ],
+            yaw_jitter: 6.2831855,
+            align_to_normal: 0.6,
+            tilt_max: 0.6,
+            tilt_jitter: 0.12,
+            sink: 0.15,
+            tint: (1.0, 1.0, 1.0),
+            tint_jitter: 0.15,
+            base_tint: (0.5, 0.5, 0.5),
+            base_blend: 0.0,
+            contact_ao: 0.55,
+            contact_radius: 1.6,
+            lod_bias: 1.0,
+            fade_start: 420.0,
+            fade_end: 560.0,
+            cast_shadows: true,
+            shadow_max_lod: 3,
+            shadow_distance: 0.0,
+        ),
+        (
+            name: "boulders",
+            meshes: [
+                (
+                    mesh: "rock_b",
+                    weight: 1.0,
+                    min_scale: 3.0,
+                    max_scale: 7.0,
+                    scale_bias: 1.5,
+                ),
+            ],
+            cell_size: 40.0,
+            density: 0.35,
+            density_map: None,
+            noise_scale: 0.0,
+            noise_amount: 0.0,
+            slope_min: 0.0,
+            slope_max: 1.1,
+            height_min: -100000.0,
+            height_max: 100000.0,
+            layer_mask: 0,
+            layer_min_weight: 0.3,
+            avoid_holes: true,
+            exclusions: [
+                (
+                    points: [
+                        (-173.18, 103.33),
+                    ],
+                    radius: 43.0,
+                ),
+                (
+                    points: [
+                        (174.03, 116.52),
+                    ],
+                    radius: 27.0,
+                ),
+                (
+                    points: [
+                        (-41.29, -89.38),
+                    ],
+                    radius: 27.0,
+                ),
+                (
+                    points: [
+                        (32.99, -102.04),
+                    ],
+                    radius: 39.0,
+                ),
+            ],
+            yaw_jitter: 6.2831855,
+            align_to_normal: 0.6,
+            tilt_max: 0.6,
+            tilt_jitter: 0.12,
+            sink: 0.15,
+            tint: (1.0, 1.0, 1.0),
+            tint_jitter: 0.15,
+            base_tint: (0.5, 0.5, 0.5),
+            base_blend: 0.0,
+            contact_ao: 0.55,
+            contact_radius: 1.6,
+            lod_bias: 1.0,
+            fade_start: 700.0,
+            fade_end: 900.0,
+            cast_shadows: true,
+            shadow_max_lod: 3,
+            shadow_distance: 0.0,
+        ),
+    ],
+)

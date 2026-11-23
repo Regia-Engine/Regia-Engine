@@ -1,0 +1,24 @@
+// A v5 graph with parameter metadata (ADR-8105 (b)): two categories, a ranged Float with a step,
+// a ranged Color, an ungrouped parameter and tooltips. Seed of the `matgraph-params` fuzz target
+// and the `matgraph/v5-params.matgraph.ron` corpus entry.
+(
+    format_version: 5,
+    name: "painted_metal",
+    params: [
+        (name: "wear", value: Float(0.25), category: "Surface", tooltip: "How much paint has worn off", range: Some((min: 0.0, max: 1.0, step: 0.05))),
+        (name: "paint", value: Color((0.6, 0.1, 0.1)), category: "Color", tooltip: "Paint color", range: Some((min: 0.0, max: 1.0))),
+        (name: "metal", value: Color((0.8, 0.8, 0.85)), category: "Color"),
+        (name: "rough", value: Float(0.4), category: "Surface", range: Some((min: 0.05, max: 1.0))),
+        (name: "glow", value: Float(0.0)),
+    ],
+    nodes: {
+        "wear": Param("wear"),
+        "paint": Param("paint"),
+        "metal": Param("metal"),
+        "rough": Param("rough"),
+        "glow": Param("glow"),
+        "base": Lerp(a: "paint", b: "metal", t: "wear"),
+        "lit": Mul("paint", "glow"),
+    },
+    output: (base_color: Some("base"), metallic: Some("wear"), roughness: Some("rough"), emissive: Some("lit")),
+)

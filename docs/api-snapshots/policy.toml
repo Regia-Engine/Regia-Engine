@@ -1,0 +1,8 @@
+# API stability policy switches (spec 57 section 11.1, ADR-2527). Read by `cargo xtask api-snapshot`.
+#
+# freeze = false: removing a public item that was not `#[deprecated]` in the previous snapshot is
+# reported as `removed_without_deprecation` (a warning), and `--update --breaking "<why>"` can
+# still accept it (a deliberate break, allowed before 1.0).
+# freeze = true: the same finding is an error that no `--breaking` reason accepts. Set it in the
+# commit that cuts 1.0 (or earlier, once the owner declares the API frozen).
+freeze = false

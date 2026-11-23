@@ -1,0 +1,167 @@
+[package]
+name = "regia_editor"
+description = "The editor: docking UI, viewport, outliner, inspector, content browser, PIE, hot reload host."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+name = "regia_editor"
+path = "src/lib.rs"
+
+[[bin]]
+name = "regia-editor"
+path = "src/main.rs"
+doc = false   # binary; its docs would overwrite the library of the same name (cargo#6313)
+
+[[bin]]
+name = "regia-hot-host"
+path = "src/bin/hot_host.rs"
+doc = false
+
+[[bin]]
+name = "regia-ext-host"
+path = "src/bin/ext_host.rs"
+doc = false
+
+# A stand-in game for the separate-processes play-in-editor tests (`tests/pie_processes.rs`,
+# ADR-2682): a dev server on the engine's server host, or a UDP client that joins it.
+[[bin]]
+name = "regia-pie-fixture"
+path = "src/bin/pie_fixture.rs"
+doc = false
+
+[features]
+# Link the engine through `regia_dylib` so a hot-reloaded game shares one copy (specs/20 § 1).
+# The binary also needs `-C prefer-dynamic` and the toolchain lib dir on the dynamic loader path.
+hot-dylib = ["dep:regia_dylib"]
+# The editor window's screen-reader bridge (ADR-7746): egui's AccessKit tree to the runtime's OS
+# adapter (ADR-1998: AT-SPI, UI Automation, NSAccessibility) and reader requests back. No new crate:
+# the adapters are already in the lock for the runtime feature. `REGIA_ACCESSKIT=0` turns it off at run time.
+# Only the adapters (`accesskit-adapters`, ADR-7795): a workspace build unifies this default into every crate,
+# and the runtime's `accesskit` would add its adapter system to every game app the gate's tests build.
+accesskit = ["regia_platform/accesskit-adapters"]
+default = ["accesskit"]
+
+[lints]
+workspace = true
+
+[build-dependencies]
+# The icon and version info of regia-editor.exe on Windows targets (ADR-20000; docs/03 winresource row).
+winresource = { workspace = true }
+
+[dependencies]
+regia = { workspace = true }
+regia_core = { workspace = true }
+regia_ecs = { workspace = true }
+regia_app = { workspace = true }
+regia_scene = { workspace = true }
+regia_templates = { workspace = true }
+regia_animation = { workspace = true }
+regia_asset_pipeline = { workspace = true }
+regia_asset = { workspace = true }
+regia_terrain = { workspace = true }
+# The 2D mode edits tilemaps with the runtime 2D toolkit (ADR-1889).
+regia_2d = { workspace = true }
+regia_pick = { workspace = true }
+regia_framework = { workspace = true, features = ["functional-tests", "media", "visual-log"] }
+# The physics layer matrix editor writes config/physics.ron (ADR-7233).
+regia_physics = { workspace = true }
+# The Vehicle Tuning panel's proving ground steps an open .hoverhull.ron (ADR-8630).
+regia_detsim = { workspace = true, features = ["serde"] }
+# Show ▸ Navigation draws the baked nav mesh (ADR-7468; already in the graph via regia_framework).
+regia_nav = { workspace = true }
+# The gameplay debug panels read state trees and smart objects (ADR-2030).
+regia_ai = { workspace = true }
+# Script components in the inspector: the edit world loads a project's Lua mods (ADR-3356).
+regia_script_lua = { workspace = true }
+# The procedural graph editor (spec 67): graphs, generators, atomic graph writes.
+regia_procgen = { workspace = true, features = ["pipeline"] }
+# `dev-assets`: the live cooker watches the engine's WGSL (shader hot reload).
+regia_render = { workspace = true, features = ["dev-assets"] }
+# The DCC feed panel, read-only rules and bake (specs/60 § 6).
+regia_agent = { workspace = true, features = ["dcc-feed-assets"] }
+# `release.verify`, `release.diff`, `release.sign_status` and `release.upload_dry_run` stay on the
+# editor side because they need the pipeline-only release-packaging crate: a runtime crate must not
+# link the pipeline layer (ADR-10356).
+regia_release_chunks = { workspace = true }
+# Play-in-editor with several clients: the session host and the stats / bandwidth views (spec 77 § 10).
+regia_net = { workspace = true }
+regia_platform = { workspace = true }
+# SpaceMouse viewport navigation (specs/29): the shared nav::step and the device plugin.
+regia_input = { workspace = true }
+regia_media = { workspace = true }
+regia_dylib = { workspace = true, optional = true }
+regia_matgraph = { workspace = true }
+# The Look-dev panel traces the level with the reference path tracer (specs/27 § 1.1, ADR-5896). The
+# editor is a desktop tool; `xtask check-layers` keeps the tracer out of every runtime crate.
+regia_pt = { workspace = true }
+regia_vfx = { workspace = true }
+regia_audio = { workspace = true }
+# The Theme panel edits runtime UI themes (`.theme.ron`) through the UI crate's token model.
+regia_ui = { workspace = true }
+regia_xr = { workspace = true }
+# The cook's mesh simplifier, for the mesh viewer's LOD preview.
+meshopt = { workspace = true }
+# Leaf widgets for every reflected glam type (regia_core::math re-exports only a subset).
+glam = { workspace = true }
+egui = { workspace = true }
+egui-wgpu = { workspace = true }
+egui-winit = { workspace = true }
+egui_dock = { workspace = true }
+egui-snarl = { workspace = true }
+transform-gizmo-egui = { workspace = true }
+libloading = { workspace = true }
+notify = { workspace = true }
+wgpu = { workspace = true }
+winit = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+ron = { workspace = true }
+toml = { workspace = true }
+# Allowance definition digests (ADR-8399). The workspace already depends on blake3
+# (CC0 OR Apache-2.0). This is not a new crates.io crate, and the editor does not
+# depend on regia_cli.
+blake3 = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+png = { workspace = true }
+# Source-asset decoding for the viewport and the asset viewers (the pipeline's own glTF and image
+# decoders; desktop tool only, like the pipeline).
+gltf = { workspace = true }
+image = { workspace = true }
+
+# The Agent panel's Propose staging (P-369, ADR-8375) dispatches staged and approved calls with
+# their own reply channels (`regia_agent::protocol::Response` senders are crossbeam's). Approved
+# workspace utility (docs/03), already in the graph via regia_agent. MIT OR Apache-2.0.
+crossbeam-channel = { workspace = true }
+
+[target.'cfg(windows)'.dependencies]
+# Loaded-module enumeration for the hot-reload dynamic-std probe (`hot_reload::load`);
+# the workspace dependency already carries `Win32_System_ProcessStatus` and
+# `Win32_System_Threading` (docs/03-workspace-and-dependencies.md). MIT OR Apache-2.0.
+windows-sys = { workspace = true }
+
+[target.'cfg(not(target_os = "android"))'.dependencies]
+# Native file dialogs. rfd 0.17 implements its dialog traits on desktop targets only (12 E0277 on
+# aarch64-linux-android), and the Android workspace check compiles this crate: the dependency is
+# desktop-only and `file_dialog.rs` gives Android a no-op `FileDialog` (ADR-10356).
+rfd = { workspace = true }
+
+[dev-dependencies]
+# The undo smoke test drives the real dispatcher through an in-process inbox (no socket, no
+# wall-clock waits); scratch projects come from unique_temp_dir (crossbeam-channel is a normal
+# dependency above).
+regia_test_utils = { workspace = true }
+# The collider overlay test spawns a regia_physics::Collider (ADR-7217; already in the graph via regia_agent).
+regia_physics = { workspace = true }
+# The Profiler model tests record injected spans through a frame-profiler layer (ADR-9740).
+tracing-subscriber = { workspace = true }
+
+# The editor monkey test (ADR-3290) takes `--seed`/`--steps`, so it runs without libtest.
+[[test]]
+name = "monkey"
+path = "tests/monkey.rs"
+harness = false

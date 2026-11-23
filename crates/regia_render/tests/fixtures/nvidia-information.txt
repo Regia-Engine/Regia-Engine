@@ -1,0 +1,10 @@
+Model:           NVIDIA Test GPU
+IRQ:             42
+GPU UUID:        GPU-12345678-1234-5678-9abc-123456789abc
+Video BIOS:      00.00.00.00.00
+Bus Type:        PCIe
+DMA Size:        47 bits
+DMA Mask:        0x7fffffffffff
+Bus Location:    0000:21:00.0
+Device Minor:    5
+GPU Excluded:    No

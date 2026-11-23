@@ -1,0 +1,38 @@
+// Handwritten `.vfx.ron` v2 (from the ferrite_vfx v2 struct definitions at 3752bc19d): lit smoke with the
+// v2 render fields (emissive, lit, self_shadow, screen_floor_px) and a PuffAnim flipbook with random_start / blend_frames.
+(
+    version: 2,
+    name: "lit_smoke",
+    system: (budget: 128),
+    emitters: [
+        (
+            name: "smoke",
+            delay: 0.0,
+            spawn: (
+                mode: Burst(12),
+                lifetime: (min: 0.8, max: 1.6),
+            ),
+            init: (
+                shape: Sphere(radius: (min: 0.05, max: 0.15)),
+                velocity: (mode: Radial(speed: (min: 0.5, max: 2.0))),
+                size: (min: 0.3, max: 0.6),
+                color: [(t: 0.0, color: "#88888880")],
+            ),
+            update: (
+                gravity: (0.0, 0.5, 0.0),
+                drag: 2.0,
+                alpha_over_life: [(t: 0.0, v: 1.0), (t: 1.0, v: 0.0)],
+            ),
+            render: (
+                mode: Billboard,
+                sprite: PuffAnim,
+                flipbook: Some((cols: 4, rows: 4, frames: 16, mode: OverLife, random_start: true, blend_frames: true)),
+                blend: Alpha,
+                emissive: 1.5,
+                lit: true,
+                self_shadow: 0.5,
+                screen_floor_px: 2.0,
+            ),
+        ),
+    ],
+)

@@ -1,0 +1,16 @@
+(
+    format_version: 1,
+    resolved_hash: "5f0c9a",
+    extensions: [
+        (
+            id: "dialogue",
+            version: "1.4.2",
+            manifest_hash: "a31e",
+        ),
+        (
+            id: "weather",
+            version: "0.3.0",
+            manifest_hash: "77b0",
+        ),
+    ],
+)

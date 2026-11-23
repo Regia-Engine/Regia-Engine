@@ -1,0 +1,26 @@
+// `.decal.ron` v3 with a footstep surface (format batch 2 fold, ADR-8829).
+// A puddle prefab: wet dark albedo, world receivers only, footsteps on it play `puddle`.
+(
+    version: 3,
+    name: "puddle",
+    half_size: (1.2, 1.2, 0.3),
+    albedo: "#1c2226",
+    opacity: 0.8,
+    roughness: 0.05,
+    normal_strength: 0.0,
+    normal_xy: (0.0, 0.0),
+    emissive: "#000000",
+    angle_fade: (0.2, 0.55),
+    distance_fade: (40.0, 80.0),
+    priority: 1,
+    receiver_mask: 3,
+    atlas: "grime",
+    lifetime: None,
+    edge_softness: 0.9,
+    channels: "albedo+roughness",
+    blend: "modulate",
+    metallic: 0.0,
+    shading: "auto",
+    texture: None,
+    surface: Some("puddle"),
+)

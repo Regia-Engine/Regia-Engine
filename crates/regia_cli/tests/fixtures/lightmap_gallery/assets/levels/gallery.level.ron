@@ -1,0 +1,43 @@
+SceneFile(
+    format_version: 10,
+    entities: [
+        (guid: "00000000-0000-0000-0000-00000000f001", name: "Floor", components: {
+            "regia_scene::transform::Transform": (translation: (0.0, 0.0, 0.0)),
+            "regia_scene::components::GiMobility": Static,
+            "regia_render::runtime::MeshSource": (mesh: "assets/meshes/gallery_floor.gltf", material: ""),
+        }),
+        (guid: "00000000-0000-0000-0000-00000000f002", name: "Gallery", components: {
+            "regia_scene::transform::Transform": (translation: (0.0, 0.0, 0.0)),
+            "regia_scene::components::GiMobility": Static,
+            "regia_render::runtime::MeshSource": (mesh: "assets/meshes/gallery_rock.gltf", material: ""),
+        }),
+        (guid: "00000000-0000-0000-0000-00000000f003", name: "Skylight shaft", components: {
+            "regia_scene::transform::Transform": (translation: (0.0, 0.0, 0.0)),
+            "regia_scene::components::GiMobility": Static,
+            "regia_render::runtime::MeshSource": (mesh: "assets/meshes/gallery_shaft.gltf", material: ""),
+        }),
+        (guid: "00000000-0000-0000-0000-00000000f004", name: "Adit", components: {
+            "regia_scene::transform::Transform": (translation: (0.0, 0.0, 0.0)),
+            "regia_scene::components::GiMobility": Static,
+            "regia_render::runtime::MeshSource": (mesh: "assets/meshes/gallery_adit.gltf", material: ""),
+        }),
+        (guid: "00000000-0000-0000-0000-00000000f005", name: "Ramp", components: {
+            "regia_scene::transform::Transform": (translation: (0.0, 0.0, 0.0)),
+            "regia_scene::components::GiMobility": Static,
+            "regia_render::runtime::MeshSource": (mesh: "assets/meshes/gallery_ramp.gltf", material: ""),
+        }),
+        (guid: "00000000-0000-0000-0000-00000000f006", name: "Surface", components: {
+            "regia_scene::transform::Transform": (translation: (0.0, 0.0, 0.0)),
+            "regia_scene::components::GiMobility": Static,
+            "regia_render::runtime::MeshSource": (mesh: "assets/meshes/gallery_surface.gltf", material: ""),
+        }),
+        (guid: "00000000-0000-0000-0000-00000000f007", name: "Pillars", components: {
+            "regia_scene::transform::Transform": (translation: (0.0, 0.0, 0.0)),
+            "regia_scene::components::GiMobility": Static,
+            "regia_render::runtime::MeshSource": (mesh: "assets/meshes/gallery_pillars.gltf", material: ""),
+        }),
+    ],
+    resources: {
+        "regia_scene::level::LevelSettings": (atmosphere: (preset: Earth, time_of_day: Some((hour: 12.0, day_of_year: 172, latitude_deg: 40.0)))),
+    },
+)

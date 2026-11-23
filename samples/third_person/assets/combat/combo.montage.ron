@@ -1,0 +1,40 @@
+// The player's three-hit melee combo (samples/third_person, ADR-2596). `.montage.ron` v2.
+//
+// One track of three procedural clips (`slash_1` 0.45 s, `slash_2` 0.45 s, `slash_3` 0.6 s, built
+// in `src/melee.rs` for the sword-arm rig), one section per swing. Every section stops at its
+// end; pressing attack inside a swing's `combo` window links it to the next section
+// (`MontagePlayer::set_next_section`). The `hit` windows are the active frames: while one is open
+// the game sweeps a sphere in front of the player (a physics shape query). Their payload is the
+// damage of the swing.
+(
+    format_version: 2,
+    name: "combo",
+    rate: 1.0,
+    tracks: [
+        (
+            slot: "full_body",
+            segments: [
+                (clip: "slash_1"),
+                (clip: "slash_2"),
+                (clip: "slash_3"),
+            ],
+        ),
+    ],
+    sections: [
+        (name: "slash_1", start: 0.0, next: Stop),
+        (name: "slash_2", start: 0.45, next: Stop),
+        (name: "slash_3", start: 0.9, next: Stop),
+    ],
+    notifies: [
+        (name: "hit", time: 0.10, duration: 0.18, payload: Some("12")),
+        (name: "combo", time: 0.16, duration: 0.28),
+        (name: "hit", time: 0.55, duration: 0.18, payload: Some("12")),
+        (name: "combo", time: 0.61, duration: 0.28),
+        (name: "hit", time: 1.05, duration: 0.22, payload: Some("22")),
+    ],
+    blend_in: (time: 0.04),
+    blend_out: (time: 0.08),
+    // The blend-out starts when a swing ends unlinked, not before (a link stays possible to the end).
+    blend_out_lead: Some(0.0),
+    root_motion: false,
+)

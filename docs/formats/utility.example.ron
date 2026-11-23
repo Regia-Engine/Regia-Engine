@@ -1,0 +1,28 @@
+// A guard that fights while healthy, flees when the threat outweighs it, and sometimes calls for help.
+(
+    format_version: 1,
+    description: "guard",
+    seed: 7,
+    selection: WeightedRandom(top_n: 2, margin: 0.1),
+    actions: [
+        (name: "attack",
+         considerations: [
+            (key: "health", min: 0.0, max: 100.0),
+            (key: "enemy_distance", min: 0.0, max: 50.0,
+             curve: (kind: Quadratic, slope: -1.0, exponent: 2.0, y_shift: 1.0)),
+         ],
+         weight: 1.5, cooldown: 1.5, momentum: 0.25),
+        (name: "flee",
+         considerations: [
+            (key: "threat", min: 0.0, max: 100.0,
+             curve: (kind: Logistic, exponent: 8.0, x_shift: 0.5)),
+         ]),
+        (name: "call_for_help",
+         considerations: [
+            (key: "allies_near", min: 0.0, max: 4.0,
+             curve: (kind: Piecewise, points: [(x: 0.0, y: 0.0), (x: 0.25, y: 0.75), (x: 1.0, y: 0.25)])),
+            (key: "threat", min: 0.0, max: 100.0, curve: (kind: Step, x_shift: 0.5)),
+         ],
+         weight: 0.8, cooldown: 10.0),
+    ],
+)

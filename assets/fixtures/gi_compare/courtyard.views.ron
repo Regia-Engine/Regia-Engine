@@ -1,0 +1,19 @@
+// Views of courtyard.gi_compare.ron. The fly-through comes in through the south passage and
+// turns toward the shadowed west corner.
+(
+    format_version: 1,
+    size: (480, 270),
+    ev100: 14.5,
+    indirect_ev100: Some(12.5),
+    views: [
+        (name: "from_passage", eye: (0.0, 1.7, 9.0), target: (0.0, 3.0, -8.0), fov_y_deg: 65.0),
+        (name: "shadow_side", eye: (6.5, 1.7, 6.5), target: (-4.0, 1.2, -1.0), fov_y_deg: 70.0),
+        (name: "high_corner", eye: (7.0, 7.0, -7.0), target: (-3.0, 0.0, 3.0), fov_y_deg: 70.0),
+    ],
+    flythrough: [
+        (eye: (0.0, 1.7, 18.0), target: (0.0, 2.5, 0.0), fov_y_deg: 60.0),
+        (eye: (0.0, 1.7, 7.0), target: (0.0, 2.5, -8.0), fov_y_deg: 65.0),
+        (eye: (3.0, 1.7, 2.0), target: (-6.0, 1.5, 5.0), fov_y_deg: 70.0),
+        (eye: (5.0, 2.5, -3.0), target: (-6.0, 1.0, 6.0), fov_y_deg: 70.0),
+    ],
+)

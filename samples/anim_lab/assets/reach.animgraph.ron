@@ -1,0 +1,32 @@
+// anim_lab: the moving-target reach case (spec 17 § 6, ADR-7216). A two-bone IK on the right arm
+// over a look-at on the head over an idle clip; the lab moves HandTarget and LookTarget every frame.
+// The rig is built in code (`anim_lab::reach::character_skeleton`), so no download is needed.
+(
+    format_version: 3,
+    parameters: [
+        ("IkWeight", Float(1.0)),
+        ("HandTarget", Vec3((0.45, 1.2, -0.2))),
+        ("Pole", Vec3((0.2, 0.8, 0.3))),
+        ("LookWeight", Float(1.0)),
+        ("LookTarget", Vec3((0.0, 1.5, -2.0))),
+    ],
+    root: TwoBoneIK((
+        inner: LookAt((
+            inner: Clip((
+                clip: "Idle",
+                looping: true,
+                speed: 1.0,
+                sync_group: None,
+            )),
+            joint: "head",
+            target: Param("LookTarget"),
+            max_yaw: 1.2,
+            max_pitch: 1.0,
+            weight_param: Some("LookWeight"),
+        )),
+        chain: ("upper_arm", "fore_arm", "hand"),
+        target: Param("HandTarget"),
+        pole: Some("Pole"),
+        weight_param: Some("IkWeight"),
+    )),
+)

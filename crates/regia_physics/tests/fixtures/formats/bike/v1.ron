@@ -1,0 +1,15 @@
+(
+    format_version: 1,
+    name: "city",
+    config: (
+        wheelbase: 1.4,
+        gravity: 9.81,
+        max_lean: 1.05,
+        max_lean_rate: 3.0,
+        upright_speed: 2.0,
+        upright_rate: 4.0,
+        lean_response: 5.0,
+        contact_reach: 0.7,
+    ),
+    notes: Some("a light commuter: quick to lean"),
+)

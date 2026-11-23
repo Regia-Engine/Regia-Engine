@@ -1,0 +1,11 @@
+(
+    format_version: 1,
+    groups: [
+        // Clip graph nodes with `sync_group: Some("gait")` join this group.
+        (name: "gait", roles: [("StartWalk", AlwaysLead), ("Limp", NeverLead)]),   // others: MayLead
+    ],
+    markers: [
+        (clip: "Walk", markers: [(name: "left", time: 0.0), (name: "right", time: 0.52)]),
+        (clip: "Run", markers: [(name: "left", time: 0.05), (name: "right", time: 0.33)]),
+    ],
+)

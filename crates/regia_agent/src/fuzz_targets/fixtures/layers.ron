@@ -1,0 +1,9 @@
+LayerDefs(
+  format_version: 1,
+  layers: [
+    (name: "night_props", kind: Runtime, debug_color: (0.1, 0.1, 0.5), parent: None),
+    (name: "quest_a",     kind: Runtime, debug_color: (0.8, 0.3, 0.1), parent: None),
+    (name: "quest_a_boss",kind: Runtime, debug_color: (0.9, 0.1, 0.1), parent: Some("quest_a")),
+    (name: "blockout",    kind: EditorOnly, debug_color: (0.5, 0.5, 0.5), parent: None),
+  ],
+)

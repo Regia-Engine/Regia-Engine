@@ -1,0 +1,6 @@
+[project]
+name = "First import fixture"
+id = "com.regiaengine.tests.first_import"
+version = "0.1.0"
+build_number = 1
+engine = "0.6"

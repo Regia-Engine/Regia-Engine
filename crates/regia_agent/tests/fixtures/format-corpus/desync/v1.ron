@@ -1,0 +1,309 @@
+DesyncBundle(
+    format_version: 1,
+    game: BundleGame(
+        game_id: "regia.desync_sample",
+        protocol_version: 1,
+        protocol_id: 6707335595869040735,
+        engine_version: "0.5.0",
+    ),
+    writer: host,
+    checkpoint: 11,
+    snapshot: BundleSnapshot(
+        tick: None,
+        data: "",
+    ),
+    frames: [
+        BundleFrame(
+            tick: 0,
+            inputs: [
+                BundleInput(
+                    seat: 0,
+                    input: None,
+                ),
+                BundleInput(
+                    seat: 1,
+                    input: Some("01"),
+                ),
+                BundleInput(
+                    seat: 2,
+                    input: Some("02"),
+                ),
+            ],
+        ),
+        BundleFrame(
+            tick: 1,
+            inputs: [
+                BundleInput(
+                    seat: 0,
+                    input: Some("00"),
+                ),
+                BundleInput(
+                    seat: 1,
+                    input: Some("01"),
+                ),
+                BundleInput(
+                    seat: 2,
+                    input: Some("02"),
+                ),
+            ],
+        ),
+        BundleFrame(
+            tick: 2,
+            inputs: [
+                BundleInput(
+                    seat: 0,
+                    input: Some("00"),
+                ),
+                BundleInput(
+                    seat: 1,
+                    input: Some("01"),
+                ),
+                BundleInput(
+                    seat: 2,
+                    input: Some("02"),
+                ),
+            ],
+        ),
+        BundleFrame(
+            tick: 3,
+            inputs: [
+                BundleInput(
+                    seat: 0,
+                    input: Some("00"),
+                ),
+                BundleInput(
+                    seat: 1,
+                    input: Some("01"),
+                ),
+                BundleInput(
+                    seat: 2,
+                    input: Some("02"),
+                ),
+            ],
+        ),
+        BundleFrame(
+            tick: 4,
+            inputs: [
+                BundleInput(
+                    seat: 0,
+                    input: Some("00"),
+                ),
+                BundleInput(
+                    seat: 1,
+                    input: Some("01"),
+                ),
+                BundleInput(
+                    seat: 2,
+                    input: Some("02"),
+                ),
+            ],
+        ),
+        BundleFrame(
+            tick: 5,
+            inputs: [
+                BundleInput(
+                    seat: 0,
+                    input: Some("00"),
+                ),
+                BundleInput(
+                    seat: 1,
+                    input: Some("01"),
+                ),
+                BundleInput(
+                    seat: 2,
+                    input: Some("02"),
+                ),
+            ],
+        ),
+        BundleFrame(
+            tick: 6,
+            inputs: [
+                BundleInput(
+                    seat: 0,
+                    input: Some("00"),
+                ),
+                BundleInput(
+                    seat: 1,
+                    input: Some("01"),
+                ),
+                BundleInput(
+                    seat: 2,
+                    input: Some("02"),
+                ),
+            ],
+        ),
+        BundleFrame(
+            tick: 7,
+            inputs: [
+                BundleInput(
+                    seat: 0,
+                    input: Some("00"),
+                ),
+                BundleInput(
+                    seat: 1,
+                    input: Some("01"),
+                ),
+                BundleInput(
+                    seat: 2,
+                    input: Some("02"),
+                ),
+            ],
+        ),
+        BundleFrame(
+            tick: 8,
+            inputs: [
+                BundleInput(
+                    seat: 0,
+                    input: Some("00"),
+                ),
+                BundleInput(
+                    seat: 1,
+                    input: Some("01"),
+                ),
+                BundleInput(
+                    seat: 2,
+                    input: Some("02"),
+                ),
+            ],
+        ),
+        BundleFrame(
+            tick: 9,
+            inputs: [
+                BundleInput(
+                    seat: 0,
+                    input: Some("01"),
+                ),
+                BundleInput(
+                    seat: 1,
+                    input: Some("00"),
+                ),
+                BundleInput(
+                    seat: 2,
+                    input: Some("03"),
+                ),
+            ],
+        ),
+        BundleFrame(
+            tick: 10,
+            inputs: [
+                BundleInput(
+                    seat: 0,
+                    input: Some("01"),
+                ),
+                BundleInput(
+                    seat: 1,
+                    input: Some("00"),
+                ),
+                BundleInput(
+                    seat: 2,
+                    input: Some("03"),
+                ),
+            ],
+        ),
+        BundleFrame(
+            tick: 11,
+            inputs: [
+                BundleInput(
+                    seat: 0,
+                    input: Some("01"),
+                ),
+                BundleInput(
+                    seat: 1,
+                    input: Some("00"),
+                ),
+                BundleInput(
+                    seat: 2,
+                    input: None,
+                ),
+            ],
+        ),
+    ],
+    peers: [
+        BundlePeer(
+            voter: seat(SeatId(0)),
+            rows: ProbeRows(
+                names: [
+                    "units",
+                    "economy",
+                    "orders",
+                    "rng",
+                ],
+                rows: [
+                    SubsystemRow(tick: 0, world: 1731336310308402703, hashes: [12592064818164566297, 8613533496627285290, 4794724216169467746, 2503978523384928175]),
+                    SubsystemRow(tick: 1, world: 5461223955967974064, hashes: [10726440099826666433, 2625017421649447677, 9774374367282575237, 12642449627033532650]),
+                    SubsystemRow(tick: 2, world: 9872775234869698559, hashes: [17509333492578279220, 2652231305201952041, 3523481004922074225, 15904973797101021249]),
+                    SubsystemRow(tick: 3, world: 12652169827672904840, hashes: [16829244062300634103, 17085922378702907256, 2107560547531012037, 15526012168886329259]),
+                    SubsystemRow(tick: 4, world: 9579678312569814202, hashes: [8320835026584263082, 9676543188340547875, 6994906269601851707, 12145093082440569784]),
+                    SubsystemRow(tick: 5, world: 15417105925626914915, hashes: [7891689618613062375, 17929496330954009510, 11201625996885955325, 159102282185752336]),
+                    SubsystemRow(tick: 6, world: 14007514140535219681, hashes: [14849175041180246508, 12327729010093632262, 11138643722797996083, 16349326359669591997]),
+                    SubsystemRow(tick: 7, world: 12548391842527823244, hashes: [13816504605182967829, 15951347430851963828, 11267605478153173010, 3464934106121662978]),
+                    SubsystemRow(tick: 8, world: 16413114941875176854, hashes: [5732424220938794744, 1976348934151072642, 9383871179152979744, 10157599663572256173]),
+                    SubsystemRow(tick: 9, world: 16467135030091698369, hashes: [15332808610846099823, 14710217841648396709, 14041245420694512424, 7006519016206491884]),
+                    SubsystemRow(tick: 10, world: 9178321357315848834, hashes: [5821747053058234930, 9869105283407219093, 7869703460990706326, 1417278244977570370]),
+                    SubsystemRow(tick: 11, world: 17348584733296025044, hashes: [15035865697979207279, 4976227884336489483, 1196329623405973864, 3296166005385921206]),
+                ],
+            ),
+        ),
+        BundlePeer(
+            voter: seat(SeatId(1)),
+            rows: ProbeRows(
+                names: [
+                    "units",
+                    "economy",
+                    "orders",
+                    "rng",
+                ],
+                rows: [
+                    SubsystemRow(tick: 0, world: 1731336310308402703, hashes: [12592064818164566297, 8613533496627285290, 4794724216169467746, 2503978523384928175]),
+                    SubsystemRow(tick: 1, world: 5461223955967974064, hashes: [10726440099826666433, 2625017421649447677, 9774374367282575237, 12642449627033532650]),
+                    SubsystemRow(tick: 2, world: 9872775234869698559, hashes: [17509333492578279220, 2652231305201952041, 3523481004922074225, 15904973797101021249]),
+                    SubsystemRow(tick: 3, world: 12652169827672904840, hashes: [16829244062300634103, 17085922378702907256, 2107560547531012037, 15526012168886329259]),
+                    SubsystemRow(tick: 4, world: 9579678312569814202, hashes: [8320835026584263082, 9676543188340547875, 6994906269601851707, 12145093082440569784]),
+                    SubsystemRow(tick: 5, world: 15417105925626914915, hashes: [7891689618613062375, 17929496330954009510, 11201625996885955325, 159102282185752336]),
+                    SubsystemRow(tick: 6, world: 14007514140535219681, hashes: [14849175041180246508, 12327729010093632262, 11138643722797996083, 16349326359669591997]),
+                    SubsystemRow(tick: 7, world: 1285101879778428397, hashes: [13816504605182967829, 9728991506098486562, 11267605478153173010, 3464934106121662978]),
+                    SubsystemRow(tick: 8, world: 6428169260358038457, hashes: [5732424220938794744, 864093568339388813, 9383871179152979744, 10157599663572256173]),
+                    SubsystemRow(tick: 9, world: 2025235287997456776, hashes: [15332808610846099823, 3282375442185809919, 14041245420694512424, 7006519016206491884]),
+                    SubsystemRow(tick: 10, world: 199817398420437576, hashes: [5821747053058234930, 1705594853794643445, 7869703460990706326, 1417278244977570370]),
+                    SubsystemRow(tick: 11, world: 3390966235878481062, hashes: [15035865697979207279, 10273800991574852275, 1196329623405973864, 3296166005385921206]),
+                ],
+            ),
+        ),
+        BundlePeer(
+            voter: seat(SeatId(2)),
+            rows: ProbeRows(
+                names: [
+                    "units",
+                    "economy",
+                    "orders",
+                    "rng",
+                ],
+                rows: [
+                    SubsystemRow(tick: 0, world: 1731336310308402703, hashes: [12592064818164566297, 8613533496627285290, 4794724216169467746, 2503978523384928175]),
+                    SubsystemRow(tick: 1, world: 5461223955967974064, hashes: [10726440099826666433, 2625017421649447677, 9774374367282575237, 12642449627033532650]),
+                    SubsystemRow(tick: 2, world: 9872775234869698559, hashes: [17509333492578279220, 2652231305201952041, 3523481004922074225, 15904973797101021249]),
+                    SubsystemRow(tick: 3, world: 12652169827672904840, hashes: [16829244062300634103, 17085922378702907256, 2107560547531012037, 15526012168886329259]),
+                    SubsystemRow(tick: 4, world: 9579678312569814202, hashes: [8320835026584263082, 9676543188340547875, 6994906269601851707, 12145093082440569784]),
+                    SubsystemRow(tick: 5, world: 15417105925626914915, hashes: [7891689618613062375, 17929496330954009510, 11201625996885955325, 159102282185752336]),
+                    SubsystemRow(tick: 6, world: 14007514140535219681, hashes: [14849175041180246508, 12327729010093632262, 11138643722797996083, 16349326359669591997]),
+                    SubsystemRow(tick: 7, world: 12548391842527823244, hashes: [13816504605182967829, 15951347430851963828, 11267605478153173010, 3464934106121662978]),
+                    SubsystemRow(tick: 8, world: 16413114941875176854, hashes: [5732424220938794744, 1976348934151072642, 9383871179152979744, 10157599663572256173]),
+                    SubsystemRow(tick: 9, world: 16467135030091698369, hashes: [15332808610846099823, 14710217841648396709, 14041245420694512424, 7006519016206491884]),
+                    SubsystemRow(tick: 10, world: 9178321357315848834, hashes: [5821747053058234930, 9869105283407219093, 7869703460990706326, 1417278244977570370]),
+                    SubsystemRow(tick: 11, world: 17348584733296025044, hashes: [15035865697979207279, 4976227884336489483, 1196329623405973864, 3296166005385921206]),
+                ],
+            ),
+        ),
+    ],
+    verdict: Some(DesyncReport(
+        checkpoint: 11,
+        voter: seat(SeatId(1)),
+        reference: seat(SeatId(0)),
+        first_diverged_tick: Some(7),
+        last_agreed_tick: Some(6),
+        subsystem: Some("economy"),
+        subsystems: [
+            "economy",
+        ],
+    )),
+)

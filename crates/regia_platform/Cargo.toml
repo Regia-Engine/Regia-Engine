@@ -1,0 +1,78 @@
+[package]
+name = "regia_platform"
+description = "Windowing, event loop, surface lifecycle, VFS, Android glue."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+# `window` (spec 76 § 2.1, ADR-1886) owns winit, the event loop and the clipboard backend. Without it the
+# crate keeps paths, user dirs, the VFS, crash handling and the platform services a headless server reads.
+# Android always has it (`winit` is unconditional there, see `build.rs`).
+[features]
+default = ["window"]
+window = ["dep:winit", "dep:arboard"]
+# The screen-reader OS bridge (ADR-1998, Android TalkBack ADR-3454): `accessibility::AccessKitBridge`
+# and one AccessKit adapter per OS (AT-SPI, UI Automation, NSAccessibility, TalkBack).
+# The adapters attach to the winit window, so it needs `window`. On top of `accesskit-adapters`, it hooks the
+# runner's primary window: `PlatformPlugin` drives its adapter in `Last`.
+accesskit = ["accesskit-adapters"]
+# The bridge and the per-OS adapters alone (ADR-7795): `accessibility::WindowAdapter` for a host that creates
+# and drives its own window (the editor). It adds no system to `PlatformPlugin` and does not touch the runner,
+# so a workspace build that unifies it in (the editor turns it on by default) leaves game apps unchanged.
+accesskit-adapters = ["window", "dep:accesskit", "dep:accesskit_unix", "dep:accesskit_windows", "dep:accesskit_macos", "dep:accesskit_android"]
+
+[dependencies]
+regia_core = { workspace = true }
+regia_ecs = { workspace = true }
+regia_app = { workspace = true }
+winit = { workspace = true, optional = true }
+dirs = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+# The screen-reader OS bridge's tree and action types (`accessibility`, ADR-1998); `accesskit` feature only.
+accesskit = { workspace = true, optional = true }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+# The AT-SPI adapter of the screen-reader bridge (`accesskit` feature, ADR-1998).
+accesskit_unix = { workspace = true, optional = true }
+# Native crash capture: the signal handler (`native_crash`, ADR-158).
+crash-handler = { workspace = true }
+# The crash-path watchdog (raw clone/kill/alarm, async-signal-safe).
+libc = { workspace = true }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+# The NSAccessibility adapter of the screen-reader bridge (`accesskit` feature, ADR-1998).
+accesskit_macos = { workspace = true, optional = true }
+# `_exit` for the clean exit's watchdog (`platform/macos.rs`).
+libc = { workspace = true }
+
+[target.'cfg(target_os = "android")'.dependencies]
+libc = { workspace = true }
+# Native crash records: the in-process signal handler (`native_crash`, ADR-328).
+crash-handler = { workspace = true }
+winit = { workspace = true }
+android-activity = { workspace = true }
+ndk = { workspace = true }
+jni = { workspace = true }
+# TalkBack adapter (`accesskit` feature, ADR-3454). Call sites use `accesskit_android::jni` (0.21)
+# and do not mix those types with the workspace `jni` 0.22 above.
+accesskit_android = { workspace = true, optional = true }
+
+[target.'cfg(not(target_os = "android"))'.dependencies]
+arboard = { workspace = true, optional = true }
+
+[target.'cfg(windows)'.dependencies]
+# The UI Automation adapter of the screen-reader bridge (`accesskit` feature, ADR-1998).
+accesskit_windows = { workspace = true, optional = true }
+windows-sys = { workspace = true }
+# Native crash capture on Windows: the exception filter (`native_crash`, ADR-158).
+crash-handler = { workspace = true }
+
+[dev-dependencies]
+regia_test_utils = { workspace = true }

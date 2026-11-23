@@ -1,0 +1,419 @@
+// regia-dark: the engine's default theme (docs/specs/ui-default-design.md section 2).
+// Tokens are comfortable-density values; `densities.compact` overlays the size tokens.
+// Derived colors are expressions, so a child theme that changes `color.accent` restyles them.
+(
+    format_version: 2,
+    name: "regia-dark",
+    extends: None,
+    scheme: dark,
+    density: comfortable,
+    tokens: {
+        // Color roles
+        "color.bg": "#0f1318",
+        "color.surface": "#171c23",
+        "color.surface-raised": "#1f2630",
+        "color.surface-overlay": "#262e3a",
+        "color.surface-sunken": "#0b0e12",
+        "color.border": "#2e3744",
+        "color.border-strong": "#5f6b7c",
+        "color.text": "#e8edf4",
+        "color.text-muted": "#9aa4b2",
+        "color.text-disabled": "#5d6673",
+        "color.accent": "#3d9df0",
+        "color.accent-hover": "lighten(@color.accent, 0.06)",
+        "color.accent-pressed": "darken(@color.accent, 0.08)",
+        "color.on-accent": "#0b1220",
+        "color.selection": "alpha(@color.accent, 0.28)",
+        "color.focus-ring": "#9cd3ff",
+        "color.danger": "#e5534b",
+        "color.on-danger": "#1a0806",
+        "color.warning": "#e0a33a",
+        "color.success": "#3fb950",
+        "color.info": "@color.accent",
+        "color.scrim": "#000000a6",
+        "color.shadow": "#000000",
+
+        // Captions (spec 36 § 8.3, ADR-7208): text while the player keeps the default color, and
+        // the box plate (its alpha multiplies the player's box opacity). Light themes keep the dark
+        // plate: captions sit over the game scene, not over the UI surface.
+        "subtitle.text": "#ffffff",
+        "subtitle.plate": "#000000",
+        // Caption size multiplier (on top of the player's text scale) and the `Outline`
+        // background's stroke (ADR-9340). `subtitle.font` is unset: captions use the UI font.
+        "subtitle.size": 1,
+        "subtitle.outline": "#000000",
+        "subtitle.outline-width": 2,
+
+        // Spacing (UI px, 4 px base)
+        "space.0": 0,
+        "space.1": 2,
+        "space.2": 4,
+        "space.3": 8,
+        "space.4": 12,
+        "space.5": 16,
+        "space.6": 24,
+        "space.7": 32,
+        "space.8": 48,
+        "space.9": 64,
+
+        // Radius
+        "radius.none": 0,
+        "radius.sm": 4,
+        "radius.md": 8,
+        "radius.lg": 12,
+        "radius.xl": 16,
+        "radius.pill": 9999,
+
+        // Border and focus ring
+        "border.width.hairline": 1,
+        "border.width.thick": 2,
+        "border.width.focus": 2,
+        "border.width.focus-offset": 2,
+        // Ring offset for rows inside scroll clips: minus the ring width, so the band lies just
+        // inside the row's border box (spec section 3, List).
+        "border.width.focus-inset": -2,
+
+        // Type
+        "font.body": "Inter",
+        "font.display": "@font.body",
+        "font.mono": "JetBrains Mono",
+        "type.caption.size": 14,
+        "type.caption.line": 20,
+        "type.caption.weight": 400,
+        "type.body.size": 18,
+        "type.body.line": 26,
+        "type.body.weight": 400,
+        "type.label.size": 18,
+        "type.label.line": 24,
+        "type.label.weight": 700,
+        "type.title.size": 24,
+        "type.title.line": 32,
+        "type.title.weight": 700,
+        "type.headline.size": 32,
+        "type.headline.line": 40,
+        "type.headline.weight": 700,
+        "type.display.size": 48,
+        "type.display.line": 56,
+        "type.display.weight": 700,
+        "type.mono.size": 16,
+        "type.mono.line": 24,
+        "type.mono.weight": 400,
+
+        // Sizes
+        "size.control.sm": 32,
+        "size.control.md": 44,
+        "size.control.lg": 56,
+        "size.icon.sm": 16,
+        "size.icon.md": 24,
+        "size.icon.lg": 32,
+        "size.touch-min": 44,
+        "size.pad-x.sm": 12,
+        "size.pad-x.md": 16,
+        "size.pad-x.lg": 24,
+        "size.row": 44,
+        "size.scrollbar": 10,
+        "size.scrollbar-hover": 14,
+        "size.tree-indent": 16,
+
+        // Elevation: y offset, blur (UI px) and alpha of elevation.color
+        "elevation.0.y": 0,
+        "elevation.0.blur": 0,
+        "elevation.0.alpha": 0,
+        "elevation.1.y": 1,
+        "elevation.1.blur": 2,
+        "elevation.1.alpha": 0.35,
+        "elevation.2.y": 4,
+        "elevation.2.blur": 12,
+        "elevation.2.alpha": 0.45,
+        "elevation.3.y": 12,
+        "elevation.3.blur": 32,
+        "elevation.3.alpha": 0.55,
+        "elevation.color": "@color.shadow",
+
+        // Motion
+        "motion.instant": "0ms",
+        "motion.fast": "80ms",
+        "motion.base": "160ms",
+        "motion.slow": "240ms",
+        "motion.page": "320ms",
+        "ease.standard": "cubic-bezier(0.2, 0, 0, 1)",
+        "ease.enter": "cubic-bezier(0, 0, 0, 1)",
+        "ease.exit": "cubic-bezier(0.3, 0, 1, 1)",
+        "ease.linear": "linear",
+    },
+    densities: {
+        "compact": {
+            // Compact sizes and type
+            "size.control.sm": 22,
+            "size.control.md": 28,
+            "size.control.lg": 36,
+            "size.icon.sm": 12,
+            "size.icon.md": 16,
+            "size.icon.lg": 20,
+            "size.touch-min": 28,
+            "size.pad-x.sm": 6,
+            "size.pad-x.md": 8,
+            "size.pad-x.lg": 12,
+            "size.row": 24,
+            "size.scrollbar": 8,
+            "size.scrollbar-hover": 10,
+            "size.tree-indent": 12,
+            "type.caption.size": 11,
+            "type.caption.line": 16,
+            "type.body.size": 13,
+            "type.body.line": 18,
+            "type.label.size": 13,
+            "type.label.line": 18,
+            "type.title.size": 16,
+            "type.title.line": 22,
+            "type.headline.size": 20,
+            "type.headline.line": 28,
+            "type.display.size": 28,
+            "type.display.line": 36,
+            "type.mono.size": 12,
+            "type.mono.line": 18,
+        },
+    },
+    fonts: {
+        "Inter": (files: ["fonts/Inter-Regular.ttf", "fonts/Inter-Bold.ttf", "fonts/Inter-Italic.ttf"]),
+        // The TTF arrives with lane D4; until then the platform monospace is used.
+        "JetBrains Mono": (files: []),
+    },
+    // Widget looks (spec section 3), resolved by `apply_themes` (lane D6). A node's classes pick
+    // them: `button` is `Button`, `primary` is `Button.primary`, `surface` is `Panel.surface`
+    // (`theme_migrate::class_target`). Properties left out here come from the theme defaults:
+    // text `@color.text`, border color `@color.border`, radius `@radius.md`, disabled text
+    // `@color.text-disabled` at the disabled opacity. Control height and inline padding come from
+    // `size.control.*` / `size.pad-x.*` for nodes that carry a `WidgetSize`.
+    types: {
+        "Button": (
+            props: {
+                "background": "@color.surface-raised",
+                "border_width": "@border.width.hairline",
+                "border_color": "@color.border",
+                "radius": "@radius.md",
+                "text_color": "@color.text",
+                "transition": ["@motion.fast", "@ease.standard"],
+            },
+            hover: {
+                "background": "lighten(@color.surface-raised, 0.04)",
+                "border_color": "@color.border-strong",
+            },
+            pressed: {
+                "background": "@color.surface-sunken",
+                "translate": [0, 1],
+            },
+            selected: {
+                "background": "@color.selection",
+                "border_color": "@color.accent",
+            },
+            error: {
+                "border_color": "@color.danger",
+            },
+        ),
+        "Panel": (
+            props: {
+                "background": "@color.surface",
+                "border_width": "@border.width.hairline",
+                "border_color": "@color.border",
+                "radius": "@radius.md",
+            },
+        ),
+        "List.row": (
+            props: {
+                "radius": "@radius.sm",
+                "focus_ring_offset": "@border.width.focus-inset",
+                "transition": ["@motion.fast", "@ease.standard"],
+            },
+            hover: {
+                "background": "alpha(@color.text, 0.05)",
+            },
+            pressed: {
+                "background": "alpha(@color.text, 0.08)",
+            },
+            selected: {
+                "background": "@color.selection",
+            },
+            error: {
+                "text_color": "@color.danger",
+            },
+        ),
+        "Toggle": (
+            props: {
+                "background": "@color.surface-sunken",
+                "border_width": "@border.width.hairline",
+                "border_color": "@color.border-strong",
+                "radius": "@radius.xl",
+                "transition": ["@motion.base", "@ease.standard"],
+            },
+            hover: {
+                "border_color": "@color.text-muted",
+            },
+            error: {
+                "border_color": "@color.danger",
+            },
+        ),
+        "Slider.track": (
+            props: {
+                "background": "@color.surface-sunken",
+                "border_width": "@border.width.hairline",
+                // Its edge is all that shows where the track runs: 3:1 (WCAG 2.2 SC 1.4.11).
+                "border_color": "@color.border-strong",
+                "radius": "@radius.md",
+            },
+            error: {
+                "border_color": "@color.danger",
+            },
+        ),
+        // Popup layer and menus (ADR-273 lane 5): menu panels, dropdown lists, rows and tooltips.
+        "Menu": (
+            props: {
+                "background": "@color.surface-overlay",
+                "border_width": "@border.width.hairline",
+                "border_color": "@color.border",
+                "radius": "@radius.md",
+                "elevation": 2,
+            },
+        ),
+        "MenuBar": (
+            props: {
+                "background": "@color.surface",
+                "border_width": 0,
+                "radius": "@radius.none",
+            },
+        ),
+        "MenuItem": (
+            props: {
+                "background": "#00000000",
+                "border_width": 0,
+                "radius": "@radius.sm",
+                "text_color": "@color.text",
+                "transition": ["@motion.fast", "@ease.standard"],
+            },
+            hover: {
+                "background": "alpha(@color.text, 0.07)",
+            },
+            pressed: {
+                "background": "alpha(@color.text, 0.10)",
+            },
+            focused: {
+                "background": "@color.selection",
+            },
+            disabled: {
+                "text_color": "@color.text-disabled",
+            },
+        ),
+        "Separator": (
+            props: {
+                "background": "@color.border",
+                "border_width": 0,
+                "radius": "@radius.none",
+            },
+        ),
+        "Tooltip": (
+            props: {
+                "background": "@color.surface-overlay",
+                "border_width": "@border.width.hairline",
+                "border_color": "@color.border",
+                "radius": "@radius.sm",
+                "elevation": 2,
+            },
+        ),
+    },
+    variations: {
+        "Button.primary": (
+            extends: "Button",
+            props: {
+                "background": "@color.accent",
+                "text_color": "@color.on-accent",
+                "border_width": 0,
+            },
+            hover: {
+                "background": "@color.accent-hover",
+            },
+            pressed: {
+                "background": "@color.accent-pressed",
+            },
+        ),
+        "Button.danger": (
+            extends: "Button.primary",
+            props: {
+                "background": "@color.danger",
+                "text_color": "@color.on-danger",
+            },
+            hover: {
+                "background": "lighten(@color.danger, 0.05)",
+            },
+            pressed: {
+                "background": "darken(@color.danger, 0.08)",
+            },
+        ),
+        "Button.ghost": (
+            extends: "Button",
+            props: {
+                "background": "#00000000",
+                "border_width": 0,
+            },
+            hover: {
+                "background": "alpha(@color.text, 0.08)",
+            },
+        ),
+        "Button.secondary": (extends: "Button"),
+        "Button.nav": (extends: "Button"),
+        "Panel.surface": (extends: "Panel"),
+        // A text field or a combo box: the edge shows where to type or press, so it needs 3:1
+        // against the surface (WCAG 2.2 SC 1.4.11). A button's text identifies it; a field may be
+        // empty.
+        "Panel.field": (
+            extends: "Panel",
+            props: {
+                "border_color": "@color.border-strong",
+            },
+        ),
+        // Drawn on its parent's surface, with the theme's text color (a bare unknown class has none).
+        "Panel.data-grid-heading": (
+            extends: "Panel",
+            props: {
+                "background": "#00000000",
+                "border_width": 0,
+            },
+        ),
+        "Button.field": (
+            extends: "Button",
+            props: {
+                "border_color": "@color.border-strong",
+            },
+        ),
+        "Panel.overlay": (
+            extends: "Panel",
+            props: {
+                "background": "@color.scrim",
+                "border_width": 0,
+                "radius": "@radius.none",
+            },
+        ),
+        "Panel.list-item": (extends: "List.row"),
+        "Panel.dropdown-item": (extends: "List.row"),
+        "MenuItem.checked": (
+            extends: "MenuItem",
+            props: {
+                "icon_color": "@color.accent",
+            },
+        ),
+        "MenuItem.shortcut": (
+            extends: "MenuItem",
+            props: {
+                "text_color": "@color.text-muted",
+            },
+            hover: {
+                "background": "#00000000",
+            },
+            pressed: {
+                "background": "#00000000",
+            },
+            focused: {
+                "background": "#00000000",
+            },
+        ),
+    },
+)

@@ -1,0 +1,22 @@
+# The engine's example editor extension (ADR-9850 (5)). Not a workspace member: the editor's
+# `example_extension` test compiles `src/hello.rs` directly; `regia plugin build` builds the
+# library a running editor loads (`bin/<target-triple>/`).
+[package]
+name = "regia_ext_hello_panel"
+version = "0.1.0"
+edition = "2024"
+publish = false
+license = "MPL-2.0"
+
+[lib]
+crate-type = ["rlib", "dylib"]
+
+[features]
+dynamic-extension = []
+
+[dependencies]
+regia_editor = { path = "../../crates/regia_editor" }
+regia_framework = { path = "../../crates/regia_framework" }
+regia_ecs = { path = "../../crates/regia_ecs" }
+egui = "0.36.2"
+serde_json = "1"

@@ -1,0 +1,31 @@
+BiomeDef(
+    format_version: 1,                  // default 1
+    name: "Pine forest",                // default ""; the first part of `biome/layer/entry`
+    color: (0.15, 0.45, 0.2),           // default (0.5, 0.5, 0.5); debug tint and the default map key
+    map_key: None,                      // Some((r, g, b)): 8-bit key in biome map textures
+    priority: 20,                       // default 0; higher wins where areas overlap
+    layers: [(
+        name: "canopy",                 // required, unique in the biome
+        rank: 30,                       // default 0; higher-rank layers keep their spots in the resolve
+        sharing: Exclusive,             // Exclusive (default) | Shared
+        source: Ground(spacing_m: 6.0, jitter: 0.9, noise: Some((scale_m: 60.0, octaves: 3, min: 0.2, max: 1.0))),
+        channels: [ (name: "steep", rule: Slope(min_deg: 25.0, max_deg: 90.0)), (name: "flat", rule: Rest) ],
+        entries: [(
+            name: "pine_tall",          // required, unique in the layer
+            spawn: Mesh("trees/pine_a.glb"),   // None (default: a spacer) | Mesh(path) | Prefab(path)
+            weight: 3.0,                // default 1.0; weight 0 and no channels = child-only
+            channels: ["flat"],         // default []: every channel (when weight > 0)
+            enabled: true,              // default true
+            filters: [ Altitude(min: 0.0, max: 1400.0, feather: 50.0) ],   // default []
+            filters_off: false,         // default false
+            footprint: (core_m: Some(0.6), spread_m: Some(3.5)),  // None: from the mesh bounds
+            placement: (upright: 1.0, yaw: Random, scale: Range(0.8, 1.25), scale_from_source: false,
+                        sink_m: 0.15, offset: None),
+            render: (cast_shadows: true, draw_distance_m: 1500.0, fade_m: 100.0, collision: Simple),
+            children: [ (entry: "fern", count: (2, 5), radius_m: (1.0, 3.0), rate: 0.6,
+                         keep_clear_of_parent: Core, scale_with_parent: false, graph: None) ],
+        ), (name: "fern", spawn: Mesh("plants/fern.glb"), weight: 0.0)],
+        max_child_depth: 2,             // default 1; 0 = no children
+    )],
+    grass: [ (class: "forest_floor", density: 0.6, outside: Keep) ],   // default []
+)

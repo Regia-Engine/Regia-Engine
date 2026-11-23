@@ -1,0 +1,6 @@
+// `docs/formats/cloth-ron.md` (spec 55 § 4).
+(format_version: 1, name: "ball",
+ model: Pressure(pressure: 1.0, volume_compliance: 0.0),
+ surface: (source: "ball.glb", node: "Ball"),
+ params: (substeps: 8, particle_mass: 0.01),
+ maps: {"reach": Sparse(default: 0.0, entries: [(1, 0.5)])})

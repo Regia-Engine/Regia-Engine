@@ -1,0 +1,36 @@
+{
+  "camera_default": {
+    "distance_mm": 60,
+    "focal_length_mm": 100
+  },
+  "design_key": "house-a/d0001",
+  "house": "house-a",
+  "product_keys": [
+    "house-a/p0001"
+  ],
+  "recipe_version": 1,
+  "schema": "jewelry.piece_recipe/1",
+  "units": "mm",
+  "view_range": {
+    "back": "plausible",
+    "front_axis": [
+      0,
+      0,
+      1
+    ],
+    "max_px_per_mm": 400,
+    "pan_bounds_mm": [
+      [
+        -3,
+        3
+      ],
+      [
+        -3,
+        3
+      ]
+    ],
+    "rock_max_deg": null,
+    "spin": "none",
+    "tilt_max_deg": 30
+  }
+}

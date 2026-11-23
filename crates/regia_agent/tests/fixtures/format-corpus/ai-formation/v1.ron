@@ -1,0 +1,21 @@
+(
+    format_version: 1,
+    name: "wedge-custom",
+    spacing_scale: 1.0,
+    fill_order: [
+        "left",
+        "right",
+    ],
+    slots: [
+        (
+            name: "left",
+            offset: (x: -1.0, y: 0.0, z: 2.0),
+            role: Some("flanker"),
+        ),
+        (
+            name: "right",
+            offset: (x: 1.0, y: 0.0, z: 2.0),
+            role: None,
+        ),
+    ],
+)

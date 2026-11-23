@@ -1,0 +1,17 @@
+(
+    format: "scatter",
+    entries: [
+        (
+            version: 1,
+            file: "v1.scatter.ron",
+            origin: "git de2994381548e09cf43d973a4457ab7a7b0ab9f2:crates/ferrite_terrain/tests/fixtures/rocks.scatter.ron (pre-rename path)",
+            exercises: "The first shape: one ScatterRule per file, no v2 classes.",
+        ),
+        (
+            version: 2,
+            file: "v2.ron",
+            origin: "registry fixture (version 1) loaded and re-encoded by the loader at version 2",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+    ],
+)

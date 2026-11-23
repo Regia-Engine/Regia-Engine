@@ -1,0 +1,39 @@
+(
+    version: 3,
+    name: "trimmed",
+    fps: 24.0,
+    shots: [
+        (
+            name: "dolly",
+            duration: 2.5,
+            camera: (
+                path: (
+                    interp: CatmullRom,
+                    keys: [
+                        (time: 0.0, position: (0.0, 2.0, 12.0)),
+                        (time: 2.0, position: (3.0, 2.0, 8.0)),
+                        // v3 (ADR-8640): a key past the shot's end, kept as the spline's control
+                        // key when the shot was shortened from 4 s.
+                        (time: 4.0, position: (5.0, 1.5, 4.0)),
+                    ],
+                    look_at: Track([
+                        (time: 0.0, position: (0.0, 1.0, 0.0)),
+                        (time: 4.0, position: (1.0, 1.2, 0.0)),
+                    ]),
+                ),
+                fov: [(time: 0.0, value: 40.0)],
+            ),
+            fade_out: 0.5,
+        ),
+        (
+            name: "hold",
+            duration: 1.0,
+            camera: (
+                path: (
+                    keys: [(time: 0.0, position: (5.0, 1.5, 4.0))],
+                    look_at: Point((0.0, 1.0, 0.0)),
+                ),
+            ),
+        ),
+    ],
+)

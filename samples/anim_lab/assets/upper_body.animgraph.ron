@@ -1,0 +1,36 @@
+// anim_lab: an upper-body graph with a montage Slot node (spec 34 M9, animgraph v3).
+// The Slot node plays the "upper" slot's montage under the Grip layer, so the layer (above the
+// montage) still pins the hand while a wave plays on the arm.
+(
+    format_version: 4,
+    parameters: [
+        ("Grip", Float(1.0)),
+    ],
+    root: Layer((
+        base: Slot((
+            name: "upper",
+            source: Clip((
+                clip: "Idle",
+                looping: true,
+                speed: 1.0,
+                sync_group: None,
+            )),
+        )),
+        layers: [
+            (
+                graph: Clip((
+                    clip: "Grip",
+                    looping: true,
+                    speed: 1.0,
+                    sync_group: None,
+                )),
+                mask: (
+                    joints: ["hand"],
+                    include_children: true,
+                ),
+                mode: Override,
+                weight_param: "Grip",
+            ),
+        ],
+    )),
+)

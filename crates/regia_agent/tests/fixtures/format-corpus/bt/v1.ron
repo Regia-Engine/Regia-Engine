@@ -1,0 +1,50 @@
+(
+    root: 0,
+    nodes: [
+        (
+            name: "root",
+            kind: selector,
+            children: [
+                1,
+                2,
+            ],
+            key: "",
+            seconds: 0.0,
+            times: None,
+            task: "",
+            policy: require_all,
+        ),
+        (
+            name: "sees",
+            kind: condition,
+            children: [],
+            key: "enemy_visible",
+            seconds: 0.0,
+            times: None,
+            task: "",
+            policy: require_all,
+        ),
+        (
+            name: "rest",
+            kind: cooldown,
+            children: [
+                3,
+            ],
+            key: "",
+            seconds: 2.0,
+            times: None,
+            task: "",
+            policy: require_all,
+        ),
+        (
+            name: "patrol",
+            kind: leaf,
+            children: [],
+            key: "",
+            seconds: 0.0,
+            times: None,
+            task: "game::Patrol",
+            policy: require_all,
+        ),
+    ],
+)

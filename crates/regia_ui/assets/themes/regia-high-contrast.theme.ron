@@ -1,0 +1,19 @@
+// regia-high-contrast: dark with stronger text, borders and focus ring (gap L01).
+// Contrast: text-muted 11.7:1 and border 5.9:1 on surface, focus-ring 13:1 on bg.
+(
+    format_version: 2,
+    name: "regia-high-contrast",
+    extends: Some("regia-dark"),
+    scheme: dark,
+    tokens: {
+        "color.text": "#ffffff",
+        "color.text-muted": "#d0d6de",
+        "color.border": "#8d98a7",
+        "color.focus-ring": "#ffd400",
+        "border.width.hairline": 2,
+        "border.width.focus": 3,
+        // The high-contrast caption theme (ADR-7208): an opaque plate behind white text.
+        "subtitle.plate-opacity": 1,
+        "border.width.focus-inset": -3,
+    },
+)

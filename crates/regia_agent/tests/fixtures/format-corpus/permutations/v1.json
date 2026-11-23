@@ -1,0 +1,20 @@
+{
+  "format_version": 1,
+  "platform": "linux",
+  "graphs": 1,
+  "profiles": [
+    {
+      "profile": "DesktopHigh",
+      "target": { "format": "Rgba16Float", "samples": 1, "instanced": true },
+      "entries": [
+        { "key": "00000000000000ab", "name": "bark.matgraph.ron", "double_sided": false, "passes": ["depth", "color"] }
+      ],
+      "pipelines": 2,
+      "modules": 2,
+      "code_bytes": 128,
+      "estimated_compile_ms": 90,
+      "budget": { "max_pipelines": 4096, "max_compile_ms": 120000 },
+      "over_budget": false
+    }
+  ]
+}

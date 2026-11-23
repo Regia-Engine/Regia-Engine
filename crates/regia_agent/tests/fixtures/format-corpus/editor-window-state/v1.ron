@@ -1,0 +1,15 @@
+(
+    format_version: 1,
+    projects: {
+        "/home/user/games/arena": (
+            monitor: Some("DP-1"),
+            position: Some((120, 80)),
+            size: (1600, 900),
+            fullscreen: false,
+            maximized: true,
+            level: Some("assets/maps/arena.level.ron"),
+            asset_tabs: ["assets/materials/rock.matgraph.ron"],
+        ),
+    },
+    order: ["/home/user/games/arena"],
+)

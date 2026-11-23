@@ -1,0 +1,10 @@
+{
+  "terrain_source_tiles": 1,
+  "grid": { "cols": 2049, "rows": 1025, "cell_m": 1.0, "sample0_m": [-1024.0, -512.0] },
+  "units": { "meters_per_count": 0.0078125, "zero_counts": 32768 },
+  "max_overlap": 1,
+  "tiles": [
+    { "path": "tiles/west.png", "origin": [0, 0], "size": [1025, 1025] },
+    { "path": "tiles/east.png", "origin": [1024, 0], "size": [1025, 1025] }
+  ]
+}

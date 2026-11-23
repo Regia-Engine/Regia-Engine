@@ -1,0 +1,473 @@
+# Nightly and periodic job registry (ADR-1035). Read by `cargo xtask nightly`; the policy is
+# book/user-guide/flaky-tests.md ("Nightly and periodic jobs").
+#
+# One [[job]] per job outside the merge gate. `command` is the in-repo command, run from the workspace root;
+# `wrapper` is the build machines script that schedules it, takes the card locks and copies results (gitignored, under
+# maintainer-scripts/). `cargo xtask nightly --check` fails when a job runs an xtask sub-command, package, test
+# target or test function that does not exist. A `planned` job may name an xtask sub-command another branch adds.
+#
+# status:   scheduled (a cron or CI schedule runs it) | manual (a person runs it at the named times) | planned
+# schedule: daily HH:MM | weekly <mon..sun> HH:MM | per-tag | on-demand   (local time on the host; CI cron is UTC)
+# needs:    gpu | gpu-exclusive | do27-content | device | display | network | windows | mac | deck
+# Farm rules for every GPU job: never Vulkan 6 / nvidia 6-7 on the build server; build with no GPU lock held, run under the
+# card's lock (the GPU job wrapper); skip while a merge gate holds <scratch>
+
+version = 1
+
+[[job]]
+id = "player-sweep"
+what = "Nightly player sweep: cold first launch, a replay, quits and a crash test of do27_chase at the high, mid and low profiles; CSV and JSON per night."
+command = "cargo xtask nightly-sweep --profiles high,mid,low --replay-seconds 120 --out target/nightly-sweep"
+wrapper = "maintainer-scripts/nightly-sweep.sh"
+host = "the build server card 2 (bench, exclusive, /tmp/ferrite-gpu-2.lock through the GPU job wrapper)"
+schedule = "daily 03:30"
+status = "planned"
+needs = ["gpu-exclusive", "do27-content"]
+results = "<scratch>>/ (sweep.csv, sweep.json, per-scene folders)"
+owner = "the lead"
+refs = ["ADR-199", "sprint C29 (lane/sprint-nightly-sweep adds the sub-command)", "the cron line in nightly-sweep.sh", ".github/workflows/nightly.yml player-sweep (self-hosted, off until vars.FERRITE_GPU_RUNNER=true), ADR-1379"]
+
+[[job]]
+id = "player-sweep-four-gpu"
+what = "The v0.2.0 definition-of-done sweep on four GPUs (5080, 3080 Ti, GTX 1080, Arc), 10-minute replay; posts a markdown table."
+command = "cargo xtask player-sweep"
+host = "the rig (5080) plus the owner's 3080 Ti, GTX 1080 and Arc machines"
+schedule = "on-demand"
+status = "planned"
+needs = ["gpu-exclusive", "do27-content"]
+results = "maintainer-scripts/reports/sweep-<date>.md"
+owner = "the lead; the owner for the hardware"
+refs = ["ADR-199", "sprint plan B7"]
+
+[[job]]
+id = "look-ci"
+what = "Renders a green tag's twelve parity plates (Desktop High and Deck) and the six do27_chase --plates timing runs, compares them with the previous green tag."
+command = "cargo build --release -p lookdev --bin look_ci --bin do27_chase --bin look_r2"
+wrapper = "maintainer-scripts/lookci.sh <tag>"
+host = "the build server bench 5090 (card lock through the GPU job wrapper)"
+schedule = "per-tag"
+status = "manual"
+needs = ["gpu-exclusive", "do27-content"]
+results = "maintainer-scripts/lookci/<tag>.md"
+owner = "the lead (judged by eye against the reference plates)"
+
+[[job]]
+id = "pt-plates"
+what = "Ground truth: all twelve parity plates path traced at 1280x720, 2048 spp, with scores and contact sheets."
+command = "cargo run --release -p lookdev --bin pt_plates -- --evidence docs/evidence/pt"
+host = "the build server bench 5090"
+schedule = "on-demand"
+status = "manual"
+needs = ["gpu-exclusive", "do27-content"]
+results = "docs/evidence/pt/<date>/ (scores.json, README.md, contact sheets)"
+owner = "the lead"
+refs = ["book/agents/renderer-excellence.md"]
+
+[[job]]
+id = "adr-276-loaded-soak"
+what = "60 runs of the device-lost exit variants on a loaded NVIDIA card; proves or disproves the ADR-269/276 exit mitigations (flake nvidia-exit-sigsegv)."
+command = "cargo test -p regia --test device_lost_exit"
+wrapper = "the procedure in <scratch> section 4"
+host = "the build server card 2 under /tmp/ferrite-gpu-2.lock, with a build running beside it"
+schedule = "on-demand"
+status = "planned"
+needs = ["gpu-exclusive"]
+results = "a lane report; then update the flake's status in docs/ci/flaky-tests.toml"
+owner = "the lead"
+refs = ["ADR-269", "ADR-276"]
+
+[[job]]
+id = "android-lint"
+what = "Android clippy -D warnings on main (AGENTS.md rule 10) for the facade and the sample APK crates."
+command = "cargo ndk -t arm64-v8a clippy -p regia -p hello_window -p hello_window_android --locked -- -D warnings"
+wrapper = ".github/workflows/nightly.yml"
+host = "GitHub Actions ubuntu-24.04 (cargo-ndk, the runner's latest NDK)"
+schedule = "daily 07:30"
+status = "scheduled"
+results = "the workflow run (job android-lint)"
+owner = "the lead"
+refs = ["AGENTS.md rule 10", "the ci.yml android job runs the same check on every push", "ADR-1379 (replaced maintainer-scripts/android-daily.sh, which targeted the workstation)"]
+
+[[job]]
+id = "build-times"
+what = "Clean and incremental build times against the budgets of docs/03 section 6."
+command = "cargo xtask build-times"
+wrapper = ".github/workflows/build-times.yml"
+host = "GitHub Actions ubuntu-24.04"
+schedule = "weekly mon 06:00"
+status = "scheduled"
+needs = ["network"]
+results = "target/build-times/report.md and report.json (workflow artifact)"
+owner = "the lead"
+refs = ["docs/06-testing-and-ci.md section 5"]
+
+[[job]]
+id = "desktop-soak"
+what = "30-minute sessions of a built sample with bot input, checked against budgets/default.ron (docs/06 section 1: nightly on desktop)."
+command = "cargo xtask soak --exe target/release/sim_bridge --minutes 30"
+host = "a quiet desktop GPU box (the rig, or a the build server card under its lock)"
+schedule = "on-demand"
+status = "manual"
+needs = ["gpu", "display"]
+results = "target/soak/<session>/ (report.json, report.md)"
+owner = "the lead, before a milestone sign-off"
+refs = ["docs/06-testing-and-ci.md section 4", "M18"]
+
+[[job]]
+id = "shuffle-check"
+what = "The headless smoke scene under many seeded system orders; fails when a seed changes the observable state."
+command = "cargo xtask shuffle-check --seeds 32"
+wrapper = ".github/workflows/nightly.yml"
+host = "GitHub Actions ubuntu-24.04 (no GPU)"
+schedule = "weekly sun 09:00"
+status = "scheduled"
+results = "the workflow run's log (the diverging seeds and components)"
+owner = "the lead"
+refs = ["ADR-255", "docs/04-conventions.md section 12"]
+
+[[job]]
+id = "perf-micro-framework"
+what = "Replay and camera-path microbenchmarks (p50/p99/max per operation; asserts only that the work happened)."
+command = "cargo test -p regia_framework --release --test perf_micro -- --ignored --nocapture"
+host = "one quiet machine; compare numbers only between runs on the same machine"
+schedule = "on-demand"
+status = "manual"
+results = "stdout `perf-micro <name>` lines"
+owner = "whoever changes ReplaySim or ShotSequence"
+test_fns = ["replay_sim_tick", "camera_path_sampling"]
+refs = ["docs/06-testing-and-ci.md section 9"]
+
+[[job]]
+id = "perf-micro-render-out"
+what = "Render-out writer pool frames per second on a synthetic 4K source (ADR-1412), and the shutter accumulator's add and resolve cost at 1440p and 4K (ADR-1404)."
+command = "cargo test -p regia_agent --release --lib perf_micro -- --ignored --nocapture"
+host = "one quiet machine"
+schedule = "on-demand"
+status = "manual"
+results = "stdout `perf-micro <name>` lines"
+owner = "whoever changes the render-out sink"
+test_fns = ["perf_micro_writer_pool_4k", "perf_micro_accumulate_and_resolve"]
+refs = ["docs/06-testing-and-ci.md section 9"]
+
+[[job]]
+id = "hot-reload-speed"
+what = "Incremental hot reload end to end under 10 s (the wall-clock half moved out of the gate's correctness test)."
+command = "cargo test -p regia_editor --test hot_reload -- --ignored hot_fixture_reload_stays_fast"
+host = "an idle desktop (wall time is the signal)"
+schedule = "on-demand"
+status = "manual"
+results = "the test result"
+owner = "whoever changes hot reload"
+test_fns = ["hot_fixture_reload_stays_fast"]
+refs = ["docs/evidence/flaky-tests/README.md fix 3", "docs/06-testing-and-ci.md section 4"]
+
+[[job]]
+id = "alpha-smoke"
+what = "Engine side of the DO27 alpha smoke list (PASS / FAIL / N-A / REPORT), under 15 minutes on the 5080."
+command = "cargo xtask smoke"
+host = "the rig (5080)"
+schedule = "per-tag"
+status = "manual"
+needs = ["gpu-exclusive", "do27-content"]
+results = "alpha-smoke.json and alpha-smoke.md"
+owner = "the lead"
+
+[[job]]
+id = "android-device-pass"
+what = "The owner's one-command real-device pass: install, lifecycle, presets, DO27 map, thermal run."
+command = "cargo xtask android-pass --package com.regiaengine.samples.hello_window --project samples/hello_window"
+host = "the workstation over adb (no build there: the APK is built on the build server or the rig)"
+schedule = "on-demand"
+status = "manual"
+needs = ["device"]
+results = "target/android-pass/<unix seconds>/"
+owner = "the lead; the owner for the device"
+
+[[job]]
+id = "windows-pass"
+what = "The one-command Windows pass: toolchain, test subset, Vulkan and DX12 runs, quits, pipeline-compile times; --read gives the verdict anywhere."
+command = "cargo xtask windows-pass"
+host = "the owner's Windows box"
+schedule = "on-demand"
+status = "planned"
+needs = ["windows", "gpu"]
+results = "docs/evidence/windows/<date>/"
+owner = "the owner (blocked on hardware since 2026-10-14)"
+refs = ["ADR-296", "book/user-guide/windows.md"]
+
+[[job]]
+id = "fuzz"
+what = "Coverage-guided fuzzing of the fuzz registry under libFuzzer and ASan (ADR-2723, spec 97 section 10): every target, among them the pak reader, cooked headers, RON scene loader and save loader (docs/06 section 1), then the regia_media decode target. A finding is minimized into fuzz/findings/<target>/<hash>; the job fails and uploads it. Committed findings replay on stable in regia_agent/tests/fuzz_findings.rs."
+command = "cargo xtask fuzz run-all --seconds-per-target 60 --parallel 4"
+wrapper = ".github/workflows/nightly.yml"
+host = "GitHub Actions ubuntu-24.04 with a nightly toolchain (no GPU)"
+schedule = "daily 07:30"
+status = "scheduled"
+results = "workflow artifact fuzz-findings: fuzz/findings/, fuzz/logs/summary.json"
+owner = "the lead"
+refs = ["docs/06-testing-and-ci.md sections 1 and 5", "book/agents/fuzzing.md", "ADR-2723"]
+
+[[job]]
+id = "sweep-plan"
+what = "The nightly player sweep's plan and its CSV/JSON writers, without a GPU or DO27 content (nightly-sweep --dry-run): catches a broken sub-command before the build machines run does."
+command = "cargo xtask nightly-sweep --dry-run --out target/nightly-sweep-plan"
+wrapper = ".github/workflows/nightly.yml"
+host = "GitHub Actions ubuntu-24.04 (no GPU)"
+schedule = "daily 07:30"
+status = "scheduled"
+results = "workflow artifact nightly-sweep-plan (sweep.csv, sweep.json with every row `planned`)"
+owner = "the lead"
+refs = ["ADR-1379", "book/user-guide/nightly-sweep.md"]
+
+[[job]]
+id = "miri-unsafe-subset"
+what = "Miri over the tests of every unsafe site that is plain Rust memory work (the inventory in docs/06 section 14), including the Windows and Android code through Miri's cross targets: undefined behavior in that unsafe."
+command = "bash scripts/miri-unsafe-subset.sh"
+host = "the build server (no GPU; a nightly toolchain with miri and rust-src; the Android NDK for the Android target)"
+schedule = "on-demand"
+status = "manual"
+results = "the command's output; a failure is a bug to fix, recorded in the lane report"
+owner = "the lane that touches those modules; the lead at a toolchain bump"
+refs = ["ADR-2086", "ADR-2726", "docs/06-testing-and-ci.md"]
+
+[[job]]
+id = "plate-floors-measure"
+what = "Re-measures a vendor's golden plate floors after an intended look change: two runs of the golden test binaries with REGIA_PLATE_DIR, then writes the vendor's row in docs/ci/plate-floors.toml for review."
+command = "cargo xtask plate-floors measure --plates <run1> --plates <run2> --vendor <vendor> --note <card, driver, date, commit>"
+host = "the build server cards 0/2/4 and the Arc under their card locks; lavapipe on the build server; the AMD row needs a coordinated RX 7900 run"
+schedule = "on-demand"
+status = "manual"
+needs = ["gpu"]
+results = "docs/ci/plate-floors.toml (a reviewed commit); frames in each REGIA_PLATE_DIR"
+owner = "the lead"
+refs = ["ADR-2089", "docs/06-testing-and-ci.md section 13"]
+
+[[job]]
+id = "public-bench"
+what = "Runs the public benchmark scene set headless and prints frame stats per scene."
+command = "cargo run --release -p regia_cli --bin regia -- bench --json"
+host = "the build server exclusive card under its lock"
+schedule = "per-tag"
+status = "manual"
+needs = ["gpu-exclusive", "network"]
+results = "docs/perf-log.md, naming the scene id, card, load and build"
+owner = "the lead"
+refs = ["ADR-2089", "docs/benchmark-scenes.md"]
+
+[[job]]
+id = "web-player-browser"
+what = "The web player in headless Chromium on software rendering (WebGL2, WebGPU, auto both ways, no graphics, the demo page), after `cargo xtask web-player --out <dist>`; set REGIA_WEB_DIST=<dist> REGIA_JW_REQUIRE_BROWSER=1."
+command = "cargo test -p regia_web --test browser_smoke the_player_runs_in_a_browser"
+wrapper = "none"
+host = "the build server (no GPU card), headless Chromium from ~/.cache/ms-playwright"
+schedule = "per-tag"
+status = "manual"
+needs = []
+results = "the test's output; screenshots in REGIA_WEB_EVIDENCE"
+owner = "the jewelry track's integrator"
+refs = ["ADR-2541", "book/agents/web-player.md"]
+
+[[job]]
+id = "web-player-firefox"
+what = "The web player in Firefox on a private Xvfb display, software rendering only (WebGL2 on llvmpipe, WebGPU on lavapipe, auto both ways, no graphics, a 2x screen, the demo page), after `cargo xtask web-player --out <dist>`; set REGIA_WEB_DIST=<dist> REGIA_FIREFOX=<firefox binary> REGIA_JW_REQUIRE_FIREFOX=1."
+command = "cargo test -p regia_web --test browser_smoke the_player_runs_in_firefox"
+wrapper = "none"
+host = "the build server (no GPU card), a Firefox release tarball and Xvfb"
+schedule = "per-tag"
+status = "manual"
+needs = []
+results = "the test's output; screenshots (firefox-*) in REGIA_WEB_EVIDENCE"
+owner = "the jewelry track's integrator"
+refs = ["ADR-2541", "book/agents/web-player.md"]
+
+[[job]]
+id = "two-tag-upgrade"
+what = "Spec 94 section 9: the regia of the older tag makes every template, the newer tag's regia upgrades it, and cargo check builds the result against the newer tag. Run over the two newest v0.* tags."
+command = "cargo xtask two-tag-upgrade --from \"$TWO_TAG_FROM\" --to \"$TWO_TAG_TO\" --templates all"
+wrapper = ".github/workflows/nightly.yml"
+host = "GitHub Actions ubuntu-24.04 (builds two regia CLIs and every template: long, cache-dependent); the build server for the lead's runs"
+schedule = "weekly sun 09:00"
+status = "scheduled"
+needs = ["network"]
+results = "the workflow run's log (one row per template)"
+owner = "the lead"
+refs = ["ADR-2610", "docs/specs/94-distribution-upgrade.md section 9", "book/agents/distribution-upgrade.md"]
+
+[[job]]
+id = "templates-compile"
+what = "Nightly compile of every template generated by regia new (distribution_upgrade's ignored test: cargo check of the project and, for net-game, of its server)."
+command = "cargo test -p regia_cli --test distribution_upgrade -- --ignored"
+host = "GitHub Actions ubuntu-24.04 (nightly.yml job templates)"
+schedule = "daily 07:30"
+status = "scheduled"
+results = "the workflow run's log (job templates)"
+owner = "the lead"
+test_fns = ["every_template_compiles_against_this_engine"]
+refs = ["docs/06-testing-and-ci.md section 5", "docs/specs/94-distribution-upgrade.md section 8", "the ci.yml templates job builds and runs the same templates on every push (xtask templates-check)"]
+
+[[job]]
+id = "perf-budgets"
+what = "Runs the release CPU measurements behind every spec budget in docs/perf/budgets.ron and compares them with the budgets and this host's baseline; a miss or a regression is a table row to read, not a failed job."
+command = "cargo xtask perf-budgets --host the build server"
+host = "the build server (CPU only, no GPU; nice 15, ionice idle), on a quiet window: times from a loaded host only flag order-of-magnitude changes"
+schedule = "per-tag"
+status = "manual"
+results = "docs/perf-log.md (a table naming the host, the load and the commit); target/perf-budgets/report.json"
+owner = "the lead"
+refs = ["ADR-2704", "docs/06-testing-and-ci.md section 9", "book/agents/perf-budgets.md"]
+
+[[job]]
+id = "perf-budget-counts"
+what = "Runs only the allocation counts of docs/perf/budgets.ron against docs/perf/budget-counts.json. A count does not depend on the machine or its load, so this one can fail a build: any growth fails."
+command = "cargo xtask perf-budgets --counts-only --enforce"
+host = "any Linux host with the workspace (CPU only); the build server today"
+schedule = "per-tag"
+status = "manual" # timed measurements stay manual; the preflight gate runs the same counts-only enforce command.
+results = "the exit code and the table; target/perf-budgets/report.json"
+owner = "the lead"
+refs = ["ADR-2704", "docs/06-testing-and-ci.md section 9"]
+
+[[job]]
+id = "coverage-measure"
+what = "Measured line and function coverage of named crates through cargo-llvm-cov (instrumented build, own target dir), with the lowest-covered public functions."
+command = "cargo xtask coverage --crate regia_net --crate regia_world --crate regia_procgen --json target-coverage/summary.json"
+host = "the build server, lane-private cargo-llvm-cov and RUSTUP_HOME (docs/06 section 15)"
+schedule = "on-demand"
+status = "manual"
+needs = []
+results = "the printed table; target-coverage/summary.json; quote before and after in a test-quality report"
+owner = "the lead"
+refs = ["ADR-2705", "docs/06-testing-and-ci.md section 15"]
+
+[[job]]
+id = "binary-size"
+what = "Shipping binary size of the blank and third_person templates by crate against docs/ci/size-budgets.toml, on Linux x86_64 and Android aarch64."
+command = "cargo xtask binary-size --check && cargo xtask binary-size --check --target aarch64-linux-android"
+wrapper = "maintainer-scripts/binary-size.sh"
+host = "the build server (CPU only, two fat-LTO shipping builds per target; Android needs cargo-ndk and the NDK)"
+schedule = "daily 05:00"
+status = "planned"
+needs = []
+results = "the exit code and the per-crate lines on stderr; re-record with --update when growth is intended"
+owner = "the lead"
+refs = ["ADR-3188", "book/user-guide/binary-size.md"]
+
+[[job]]
+id = "toolchain-canary"
+what = "Builds the workspace clean on the toolchains after the gate's pinned one (newest stable, beta, nightly) before either becomes the gate's toolchain: cargo check and clippy -D warnings --all-targets per toolchain, cargo report future-incompatibilities, plus the Android (cargo ndk) and Windows (x86_64-pc-windows-gnu check) cross-builds on the newest stable. Run in a lane-private RUSTUP_HOME/CARGO_HOME (minimal profile, clippy); never touch the shared ~/.rustup."
+command = "rustup toolchain install stable beta nightly --profile minimal -c clippy && for t in stable beta nightly; do export CARGO_TARGET_DIR=target-canary/$t RUSTUP_TOOLCHAIN=$t; cargo check --workspace --all-targets && cargo clippy --workspace --all-targets -- -D warnings && cargo report future-incompatibilities || exit 1; done"
+host = "the test machine (per-toolchain CARGO_TARGET_DIR); the Android and Windows checks on the workstation (the workstation-build.sh) with the same private toolchain home"
+schedule = "per-tag"
+status = "manual"
+needs = []
+results = "<scratch>>.md (a per-toolchain table: version, check, clippy, future-incompat count); the findings go to the lane that owns the files"
+owner = "the lead (or the toolchain-forward-compat lane)"
+refs = ["ADR-3388", "docs/06-testing-and-ci.md section 19", "<scratch>"]
+
+[[job]]
+id = "mutants-core"
+what = "Mutation testing of the core runtime crates through cargo-mutants (own scratch dir, jobs capped at 6, per-mutant timeouts, checked-in skip list): caught, missed, timeout and unviable per file and the missed list."
+command = "cargo xtask mutants --crate regia_core --file 'crates/regia_core/src/math/geom/*.rs' --file crates/regia_core/src/project_path.rs --file crates/regia_core/src/memory.rs --file 'crates/regia_core/src/memory/*.rs' --json target/mutants/regia_core.json"
+host = "the test machine in one build slot (rig-slot.sh), lane-private cargo-mutants (docs/06 section 20); CPU only"
+schedule = "on-demand"
+status = "manual"
+needs = []
+results = "the printed table; target/mutants/regia_core.json; quote the score before and after in a test-quality report. The same command with --crate regia_ecs or --crate regia_input and their files covers the other two crates"
+owner = "the lead"
+refs = ["ADR-3389", "docs/06-testing-and-ci.md section 20", "book/agents/mutation-testing.md"]
+
+[[job]]
+id = "editor-monkey"
+what = "The editor monkey soak: 50 seeds x 5,000 steps of random input over every editor panel (no panic, finite transforms, bounded undo stack, no egui ID clash, undo-all restores the scene). A failure prints its seed and the replay command."
+command = "cargo test -p regia_editor --release --test monkey -- --seeds 50 --steps 5000"
+host = "any Linux host with the workspace (CPU only, no GPU or display); the build server today"
+schedule = "daily 04:30"
+status = "planned"
+needs = []
+results = "the exit code and stdout (one line per seed; a failure's report names the seed, step and last actions)"
+owner = "the lead"
+refs = ["ADR-3290", "book/agents/editor.md (Monkey test)"]
+
+[[job]]
+id = "licensee-walkthrough"
+what = "The book's getting-started path run as a stranger (temporary HOME, a working directory outside the repo, no REGIA_*/FERRITE_* variables, no repo path on PATH): engine archive, install, verify, doctor, then for every template new, smoke, cook, package, run the package elsewhere, upgrade-project as a no-op, and the Android check. The commands are the book's `sh,walkthrough=<stage>` fences. A rehearsal, not the outside-tester proof of the v1.0 row." # rename-keep: both spellings are dropped
+command = "cargo xtask walkthrough"
+host = "the build server under xvfb-run -a, on lavapipe (VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/lvp_icd.json), the tree on <build-dir>; ANDROID_HOME set for the android stage"
+schedule = "per-tag"
+status = "manual"
+needs = ["display"]
+results = "target/walkthrough/report.json and one log per stage and template"
+owner = "the lead"
+refs = ["ADR-2954", "docs/06-testing-and-ci.md section 5", "book/agents/walkthrough.md"]
+
+[[job]]
+id = "package-smoke-windows"
+what = "Windows zip package smoke of samples/sim_bridge: dev and shipping profiles, scripted input playback, a JSON log with no ERROR record and a clean summary.json."
+command = "cargo xtask package-smoke --windows"
+host = "the owner's Windows a test machine"
+schedule = "on-demand"
+status = "manual"
+needs = ["windows"]
+results = "target/package-smoke/package-smoke.json and the size table on stdout"
+owner = "the lead"
+refs = ["ADR-3968", "docs/specs/21-tooling-and-packaging.md section 6", "docs/06-testing-and-ci.md section 5"]
+
+[[job]]
+id = "tsan-subset"
+what = "ThreadSanitizer over the threaded tests (schedule, asset server, telemetry writer, platform exit paths, agent job queue; docs/06 section 14). A report is a finding: a real race is a bug, a report that is not one gets a line with its reason in docs/ci/tsan-suppressions.txt."
+command = "bash scripts/tsan-subset.sh"
+host = "the build server (no GPU; a nightly toolchain with rust-src, which -Zbuild-std needs)"
+schedule = "on-demand"
+status = "manual"
+results = "the logs the script writes, one per group; a real race is a bug to fix, recorded in the lane report"
+owner = "the lane that touches threaded code; the lead at a toolchain bump"
+refs = ["ADR-2726", "docs/06-testing-and-ci.md"]
+
+[[job]]
+id = "det-golden-nightly"
+what = "Determinism goldens on x86-64 Linux, aarch64 under qemu-aarch64 user mode and the TEST Pixel 9 Pro: the clean scenarios must hash equal on all three and the planted glam SIMD scenario must differ on both aarch64 legs (ADR-8081)."
+command = "cargo xtask det-golden stage --legs host,qemu,android --out target/det-golden/nightly"
+wrapper = "on the gate host: cargo xtask det-golden run --legs host,qemu --out target/det-golden/nightly; then copy the stage to the workstation, run `sh scripts/android.sh > logs/android.log 2>&1` there (adb only), copy logs/android.log back and run cargo xtask det-golden verify target/det-golden/nightly --require host,qemu,android"
+host = "the build server (build, host and qemu legs; needs qemu-user installed and NDK r27 as ANDROID_NDK_HOME), the workstation (adb to 54101FDAP0015H)"
+schedule = "daily 04:30"
+status = "manual"
+needs = ["device"]
+results = "target/det-golden/nightly/summary.md and summary.json (one row per scenario, one column per leg)"
+owner = "the lead"
+refs = ["ADR-8081", "ADR-8046", "docs/06-testing-and-ci.md section 28", "book/agents/det-golden-runners.md"]
+
+[[job]]
+id = "det-golden-rc"
+what = "Determinism goldens on all six legs at every release candidate: host and Deck (x86-64 Linux), qemu-aarch64, the Android device, the Mac M5 and the Windows rig. A row of docs/release/rc-checklist.md (ADR-8081)."
+command = "cargo xtask det-golden run --legs host,qemu,android,mac,windows,deck --adb 54101FDAP0015H --out target/det-golden/rc"
+wrapper = "where adb and the ssh keys are not on the build host: stage there (`cargo xtask det-golden stage --legs ...`), run each scripts/<leg>.sh where its tool is, put the logs in logs/<leg>.log and run `cargo xtask det-golden verify <dir> --require host,qemu,android,mac,windows,deck`"
+host = "the build server (stage, host and qemu legs) plus the TEST Pixel 9 Pro, the test Mac, the Windows a test machine and the Steam Deck"
+schedule = "per-tag"
+status = "manual"
+needs = ["device", "mac", "windows", "deck", "network"]
+results = "target/det-golden/rc/summary.md (attach it to the release-candidate checklist row)"
+owner = "the lead"
+refs = ["ADR-8081", "docs/release/rc-checklist.md", "book/agents/det-golden-runners.md"]
+
+[[job]]
+id = "net-soak-nightly"
+what = "regia_net's server and clients under every bad-network profile (clean, good-wifi, bad-wifi, mobile-4g, transatlantic, congested, flappy, hostile) at 8, 32, 64 and 128 clients, dedicated and listen server, 300 virtual seconds each; fails on a bar (involuntary disconnect, rejoin grace, wedged client, hostile peer, congested bandwidth)."
+command = "cargo xtask net-soak --plan nightly --jobs 16"
+host = "the build server (CPU only, nice 15, ionice idle, at most 16 threads)"
+schedule = "daily 02:30"
+status = "planned"
+results = "target/net-soak/<UTC time>/ (result.json, summary.md); a failed bar's reproduction command is in summary.md"
+owner = "the lead; the net lanes for findings"
+refs = ["ADR-7899", "book/agents/net-soak.md", "docs/06-testing-and-ci.md section 27"]
+
+[[job]]
+id = "det-golden-gate-qemu"
+what = "The merge gate's determinism leg with the qemu hook (ADR-8838): the x86-64 host leg always, the aarch64 qemu leg as soon as `qemu-aarch64` is on the gate host. Until then the summary says OWED and lists the qemu leg (exit 0); once qemu-user is installed the same command runs the leg and any aarch64 difference fails it."
+command = "cargo xtask det-golden gate --qemu-when-present --out target/det-golden/gate"
+wrapper = "the build machines gate's CPU stage (the gate script, outside the repo), from the gate tree, with ANDROID_NDK_HOME set to NDK r27 for the static aarch64 link"
+host = "the build server (the gate host; qemu-user is an owner install)"
+schedule = "daily 04:00"
+status = "manual"
+results = "target/det-golden/gate/summary.md and summary.json (`status` PASS, OWED or FAIL; `owed` lists the qemu leg while qemu-aarch64 is missing)"
+owner = "the lead"
+refs = ["ADR-8838", "ADR-8081", "book/agents/det-golden-runners.md"]

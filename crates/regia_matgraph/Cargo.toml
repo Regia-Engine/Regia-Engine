@@ -1,0 +1,32 @@
+[package]
+name = "regia_matgraph"
+description = "Material graphs: a versioned node format that compiles to the forward pass's WGSL surface function, with instances and a permutation cache."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia_core = { workspace = true }
+regia_ecs = { workspace = true }
+regia_app = { workspace = true }
+regia_render = { workspace = true }
+regia_asset = { workspace = true }
+regia_scene = { workspace = true }
+# Code nodes (ADR-7852): standalone parse and validation with line and column diagnostics.
+naga = { workspace = true, features = ["wgsl-in"] }
+postcard = { workspace = true }
+serde = { workspace = true }
+ron = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+# Parity tests rebuild the scatter stand-in rock and render with the terrain rock layer bake.
+regia_terrain = { workspace = true }
+regia_test_utils = { workspace = true }
+png = { workspace = true }

@@ -1,0 +1,22 @@
+format_version = 1
+id = "light-theme-large-text"
+title = "Switch the UI to the light theme with larger text"
+prompt = "Switch the runtime UI to the 'regia-light' theme and set the text scale to 1.5. Let the change apply before you finish."
+features = ["ui"]
+crates = ["regia_agent", "regia_ui"]
+call_budget = 6
+
+[setup]
+target = "ui"
+
+[[check]]
+name = "light theme active"
+method = "ui.theme_mode"
+pointer = "/active"
+expect = { kind = "equals", value = "regia-light" }
+
+[[check]]
+name = "text scale 1.5"
+method = "ui.accessibility"
+pointer = "/text_scale"
+expect = { kind = "equals", value = 1.5 }

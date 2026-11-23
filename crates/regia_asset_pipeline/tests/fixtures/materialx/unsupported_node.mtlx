@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!-- Hand-written fixture (ADR-3341): two nodes the importer does not map (cellnoise2d, hsvtocolor)
+     and one it maps (multiply); the material still imports and compiles. -->
+<materialx version="1.38">
+  <nodegraph name="NG_cells">
+    <texcoord name="uv" type="vector2" />
+    <cellnoise2d name="cells" type="float">
+      <input name="texcoord" type="vector2" nodename="uv" />
+    </cellnoise2d>
+    <hsvtocolor name="hue" type="color3">
+      <input name="in" type="color3" value="0.3, 0.8, 0.9" />
+    </hsvtocolor>
+    <multiply name="tinted" type="color3">
+      <input name="in1" type="color3" nodename="hue" />
+      <input name="in2" type="float" nodename="cells" />
+    </multiply>
+    <output name="out" type="color3" nodename="tinted" />
+  </nodegraph>
+  <standard_surface name="SR_cells" type="surfaceshader">
+    <input name="base_color" type="color3" nodegraph="NG_cells" output="out" />
+  </standard_surface>
+  <surfacematerial name="M_cells" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="SR_cells" />
+  </surfacematerial>
+</materialx>

@@ -1,0 +1,2 @@
+# Oracle for exposure-and-saturation: the calls a careful agent makes after the setup.
+{"method":"level.set_look","params":{"look":{"exposure_bias_ev":1.0,"saturation":0.8}}}

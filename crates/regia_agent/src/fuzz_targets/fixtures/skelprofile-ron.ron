@@ -1,0 +1,12 @@
+(
+    format_version: 1,
+    name: "arm-rig",
+    humanoid: false,             // true (default): the required VRM humanoid roles must all be assigned
+    allow_extra_joints: true,    // false: a skeleton with joints the profile does not list fails
+    rest_pose: TPose(tolerance_deg: 8.0),   // Any (default) | TPose { tolerance_deg } | APose { angle_deg, tolerance_deg }
+    joints: [                    // parents are listed before their children
+        (name: "root", role: Some("hips")),
+        (name: "upper", role: Some("leftUpperArm"), parent: Some("root"), aliases: ["upperarm_l"]),
+        (name: "pad", parent: Some("root"), required: false),
+    ],
+)

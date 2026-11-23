@@ -1,0 +1,30 @@
+[package]
+name = "anim_lab"
+description = "Headless animation lab: Fox and CesiumMan clips, blend space, state machine, IK, sockets."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia_animation = { workspace = true }
+regia_app = { workspace = true }
+regia_asset = { workspace = true }
+regia_audio = { workspace = true }
+regia_core = { workspace = true }
+regia_ecs = { workspace = true }
+regia_scene = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+[dev-dependencies]
+png = { workspace = true }
+regia_agent = { workspace = true }
+regia_platform = { workspace = true }
+regia_render = { workspace = true }
+regia_test_utils = { workspace = true }
+serde_json = { workspace = true }

@@ -1,0 +1,14 @@
+gallery-title = معرض الواجهة
+gallery-theme = السمة
+gallery-language = اللغة
+gallery-widgets = العناصر
+gallery-text = نص (عربي / صيني / إيموجي)
+gallery-list = قائمة افتراضية
+menu-start = ابدأ
+btn-toggle-theme = تبديل السمة
+btn-cycle-locale = تبديل اللغة
+label-slider = الصوت
+label-progress = التحميل
+label-input = الاسم
+label-toggle = الموسيقى
+item-row = عنصر { $n }

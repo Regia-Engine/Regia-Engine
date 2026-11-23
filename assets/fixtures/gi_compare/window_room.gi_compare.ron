@@ -1,0 +1,43 @@
+// A closed 6 x 3 x 5 m room on sunlit ground with one window (2 x 1.4 m, sill at 0.9 m) in its
+// south wall. The sun shines through the window onto the wooden floor and the foot of the north
+// wall; the east wall is red, so the room shows colour bleeding. What it checks: a room lit
+// almost only by a sun patch and the sky through one window (the commonest interior), and
+// leaks through the closed walls. Look-review pack scene (ADR-1326), read by
+// `cargo xtask gi-compare`.
+(
+    format_version: 1,
+    name: "window_room",
+    purpose: "a room lit through one window by the sun patch and the sky",
+    sun: Some((toward: (0.25, 0.6, 0.76), color: (1.0, 0.95, 0.88), lux: 100000.0)),
+    sky_lux: 15000.0,
+    materials: [
+        (name: "ground", albedo: (0.3, 0.28, 0.25)),
+        (name: "wall", albedo: (0.7, 0.7, 0.68)),
+        (name: "red", albedo: (0.6, 0.12, 0.08)),
+        (name: "wood", albedo: (0.45, 0.3, 0.18)),
+    ],
+    terrain: Some((size: (96.0, 96.0), spacing: 2.0, height: 0.0, material: "ground")),
+    shapes: [
+        (name: "floor", kind: Box(half: (3.0, 0.02, 2.5)), material: "wood", at: (0.0, 0.02, 0.0)),
+        (name: "roof", kind: Box(half: (3.2, 0.1, 2.7)), material: "wall", at: (0.0, 3.1, 0.0)),
+        (name: "west", kind: Box(half: (0.1, 1.5, 2.7)), material: "wall", at: (-3.1, 1.5, 0.0)),
+        (name: "east", kind: Box(half: (0.1, 1.5, 2.7)), material: "red", at: (3.1, 1.5, 0.0)),
+        (name: "north", kind: Box(half: (3.0, 1.5, 0.1)), material: "wall", at: (0.0, 1.5, -2.6)),
+        (name: "south_left", kind: Box(half: (1.0, 1.5, 0.1)), material: "wall", at: (-2.0, 1.5, 2.6)),
+        (name: "south_right", kind: Box(half: (1.0, 1.5, 0.1)), material: "wall", at: (2.0, 1.5, 2.6)),
+        (name: "sill", kind: Box(half: (1.0, 0.45, 0.1)), material: "wall", at: (0.0, 0.45, 2.6)),
+        (name: "lintel", kind: Box(half: (1.0, 0.35, 0.1)), material: "wall", at: (0.0, 2.65, 2.6)),
+        (name: "table", kind: Box(half: (0.6, 0.4, 0.4)), material: "wood", at: (-1.6, 0.44, -1.4)),
+    ],
+    layout: (
+        terrain: Some((spacing: (4.0, 4.0), levels: [0.5, 1.5, 3.0, 6.0])),
+        // The probe lattice lies on the interior's box (the walls' inner faces), as
+        // `regia bake-gi --from-scene` places an interior brick (ADR-1364).
+        bricks: [(min: (-3.0, 0.0, -2.5), max: (3.0, 3.0, 2.5), spacing: 0.4)],
+        interiors: [(min: (-3.0, 0.0, -2.5), max: (3.0, 3.0, 2.5))],
+        moment_resolution: 8,
+        max_distance: 16.0,
+    ),
+    // regia bake-gi's defaults (ProbeTraceSettings::default): 256 rays x 16 samples, 8 bounces.
+    bake: (rays_per_probe: 256, samples: 16, max_bounces: 8, seed: 1),
+)

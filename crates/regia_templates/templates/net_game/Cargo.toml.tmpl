@@ -1,0 +1,30 @@
+[workspace]
+resolver = "3"
+# `game` is the simulation both sides run; `server` is the headless dedicated server (no renderer,
+# no audio); `client` is the windowed game.
+members = ["game", "server", "client"]
+# `regia` needs its `client` or its `server` feature, and with both `regia::run` hosts a server: so the
+# server and the client are never built in one cargo invocation. `cargo build` / `cargo run` here build
+# the client; build the server with `cargo build -p {{crate_name}}_server`. Avoid `--workspace`.
+default-members = ["game", "client"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+# Keep the game debuggable while the engine and renderer sustain the fixed-rate simulation.
+# Debug assertions stay enabled, including the development network conditioner.
+[profile.dev.package."*"]
+opt-level = 2
+
+# `regia package --profile shipping` builds with this profile (specs/21 § 4): fat LTO, one codegen
+# unit, abort on panic, line tables kept and nothing stripped by cargo. `regia package` extracts the
+# symbols into `dist/<platform>/symbols/` and strips the shipped copy itself.
+[profile.shipping]
+inherits = "release"
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+debug = "line-tables-only"
+strip = "none"

@@ -1,0 +1,10 @@
+// A data table (format v1, docs/formats/data-table-ron.md): weapons by key.
+(
+    format_version: 1,
+    row_type: "game::WeaponRow",
+    rows: {
+        "rifle": (damage: 30, spread: 0.5, kind: Rifle, icon: "ui/rifle.png"),
+        "pistol": (damage: 12, spread: 1.5, kind: Pistol, icon: "ui/pistol.png", tags: ["sidearm"]),
+        "smg": (damage: 9, spread: 2.0, kind: Burst(3), icon: "ui/smg.png", muzzle: Some((x: 1, y: -2))),
+    },
+)

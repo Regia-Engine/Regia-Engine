@@ -1,0 +1,197 @@
+# Binary size budgets (ADR-3188). Written by `cargo xtask binary-size --update`; checked by `--check`.
+# total_bytes is the loaded size (text + rodata + data + bss) of the shipping build; crates are the biggest
+# crates by attributed symbol bytes. Growth above tolerance_percent fails; re-record deliberately.
+
+format_version = 1
+
+[[budget]]
+template = "blank"
+target = "aarch64-linux-android"
+total_bytes = 73991847
+tolerance_percent = 3
+
+[budget.crates]
+"(native)" = 587094
+"(no symbol)" = 18270091
+alloc = 1726868
+bevy_ecs = 6073856
+bevy_reflect = 744456
+core = 6189298
+erased_serde = 278148
+exr = 438908
+harfrust = 363670
+hashbrown = 653172
+naga = 1560887
+read_fonts = 243428
+regex_automata = 365592
+regia_agent = 6916920
+regia_ai = 358004
+regia_animation = 897940
+regia_asset = 705553
+regia_audio = 744800
+regia_framework = 2271824
+regia_nav = 213844
+regia_net = 1086036
+regia_physics = 413368
+regia_platform = 461838
+regia_procgen = 2089860
+regia_render = 3377882
+regia_scene = 973024
+regia_telemetry = 234352
+regia_terrain = 357332
+regia_ui = 2575392
+regia_vfx = 308476
+regia_world = 242856
+ron = 4220368
+rustfft = 324028
+serde_core = 343132
+serde_json = 406744
+skrifa = 264416
+std = 647090
+taffy = 217872
+wgpu_core = 628660
+wgpu_hal = 368200
+
+[[budget]]
+template = "blank"
+target = "x86_64-unknown-linux-gnu"
+total_bytes = 89973291
+tolerance_percent = 3
+
+[budget.crates]
+"(native)" = 444660
+"(no symbol)" = 19330655
+alloc = 2258565
+bevy_ecs = 7124285
+bevy_reflect = 794768
+core = 7503267
+erased_serde = 303170
+exr = 481975
+harfrust = 389639
+hashbrown = 815573
+naga = 1849050
+regex_automata = 415395
+regia_agent = 9136820
+regia_ai = 470838
+regia_animation = 1229289
+regia_asset = 892733
+regia_audio = 948096
+regia_framework = 2961644
+regia_nav = 288758
+regia_net = 1394862
+regia_physics = 562790
+regia_platform = 490060
+regia_procgen = 2788472
+regia_render = 4332536
+regia_scene = 1187685
+regia_telemetry = 304621
+regia_terrain = 478604
+regia_ui = 3348866
+regia_vfx = 420920
+regia_world = 329209
+ron = 4939886
+rustfft = 801452
+serde_core = 436270
+serde_json = 491819
+skrifa = 326757
+std = 768045
+taffy = 285924
+wgpu_core = 705352
+wgpu_hal = 428268
+winit = 519960
+
+[[budget]]
+template = "third_person"
+target = "aarch64-linux-android"
+total_bytes = 81331503
+tolerance_percent = 3
+
+[budget.crates]
+"(native)" = 616658
+"(no symbol)" = 19824719
+alloc = 1883212
+bevy_ecs = 8054584
+bevy_reflect = 917868
+core = 6489374
+erased_serde = 519480
+exr = 438908
+harfrust = 363670
+hashbrown = 702388
+naga = 1560887
+parry3d = 468836
+rapier3d = 724668
+read_fonts = 243428
+regex_automata = 365592
+regia_agent = 6910956
+regia_ai = 358004
+regia_animation = 897940
+regia_asset = 705553
+regia_audio = 744784
+regia_framework = 2748232
+regia_input = 361696
+regia_net = 1086036
+regia_physics = 884540
+regia_platform = 462006
+regia_procgen = 2088804
+regia_render = 3376874
+regia_scene = 1466216
+regia_terrain = 357332
+regia_ui = 2575392
+regia_vfx = 308476
+regia_world = 242908
+ron = 4220368
+rustfft = 324028
+serde_core = 343132
+serde_json = 406744
+skrifa = 264416
+std = 687894
+wgpu_core = 628660
+wgpu_hal = 368200
+
+[[budget]]
+template = "third_person"
+target = "x86_64-unknown-linux-gnu"
+total_bytes = 99140162
+tolerance_percent = 3
+
+[budget.crates]
+"(native)" = 482958
+"(no symbol)" = 21200126
+alloc = 2464924
+bevy_ecs = 9511965
+bevy_reflect = 976893
+core = 7881989
+erased_serde = 571230
+exr = 481975
+harfrust = 389639
+hashbrown = 878666
+naga = 1849050
+parry3d = 605941
+rapier3d = 1000039
+regex_automata = 415395
+regia_agent = 9130942
+regia_ai = 470838
+regia_animation = 1229289
+regia_asset = 892733
+regia_audio = 948084
+regia_framework = 3541958
+regia_input = 549604
+regia_net = 1394862
+regia_physics = 1126994
+regia_platform = 490752
+regia_procgen = 2787230
+regia_render = 4332211
+regia_scene = 1739631
+regia_terrain = 478604
+regia_ui = 3348866
+regia_vfx = 420920
+regia_world = 329250
+ron = 4939886
+rustfft = 801452
+serde_core = 436270
+serde_json = 491819
+skrifa = 326757
+std = 875111
+wgpu_core = 705392
+wgpu_hal = 428275
+winit = 519960

@@ -1,0 +1,87 @@
+// Base-rich beech forest on limestone brown earth: beech casts deep shade, so the floor carries shade herbs and spring plants and almost no shrubs.
+// Shipped preset (ADR-2456); its ecology profile is the `.ecology.ron` beside it.
+BiomeDef(
+    format_version: 1,
+    name: "Beech forest",
+    color: (0.3, 0.5, 0.18),
+    priority: 20,
+    layers: [
+        (
+            name: "canopy",
+            rank: 30,
+            sharing: Exclusive,
+            source: Ground(spacing_m: 6.0, jitter: 0.9, noise: Some((scale_m: 90.0, octaves: 3, min: 0.35, max: 1.0))),
+            entries: [
+                (
+                    name: "beech",
+                    spawn: Mesh("plants/beech"),
+                    weight: 8.0,
+                    filters: [Slope(min_deg: 0.0, max_deg: 40.0, feather: 4.0)],
+                    footprint: (core_m: Some(0.5), spread_m: Some(5.0)),
+                    placement: (upright: 1.0, scale: Range(0.7, 1.25), yaw: Random, sink_m: 0.2),
+                    render: (cast_shadows: true, draw_distance_m: 1200.0, fade_m: 80.0, collision: Simple),
+                ),
+                (
+                    name: "sycamore_maple",
+                    spawn: Mesh("plants/sycamore_maple"),
+                    weight: 1.2,
+                    filters: [Slope(min_deg: 0.0, max_deg: 40.0, feather: 4.0)],
+                    footprint: (core_m: Some(0.5), spread_m: Some(4.0)),
+                    placement: (upright: 1.0, scale: Range(0.7, 1.25), yaw: Random, sink_m: 0.2),
+                    render: (cast_shadows: true, draw_distance_m: 1200.0, fade_m: 80.0, collision: Simple),
+                ),
+                (
+                    name: "ash",
+                    spawn: Mesh("plants/ash"),
+                    weight: 0.8,
+                    filters: [Slope(min_deg: 0.0, max_deg: 40.0, feather: 4.0)],
+                    footprint: (core_m: Some(0.5), spread_m: Some(3.5)),
+                    placement: (upright: 1.0, scale: Range(0.7, 1.25), yaw: Random, sink_m: 0.2),
+                    render: (cast_shadows: true, draw_distance_m: 1200.0, fade_m: 80.0, collision: Simple),
+                ),
+            ],
+            max_child_depth: 0,
+        ),
+        (
+            name: "field",
+            rank: 0,
+            sharing: Shared,
+            source: Ground(spacing_m: 1.4, jitter: 1.0, noise: Some((scale_m: 25.0, octaves: 2, min: 0.2, max: 1.0))),
+            entries: [
+                (
+                    name: "woodruff",
+                    spawn: Mesh("plants/woodruff"),
+                    weight: 3.5,
+                    footprint: (core_m: Some(0.05), spread_m: Some(0.2)),
+                    placement: (upright: 0.4, scale: Range(0.6, 1.2), yaw: Random),
+                    render: (cast_shadows: false, draw_distance_m: 150.0, fade_m: 20.0, collision: None),
+                ),
+                (
+                    name: "dogs_mercury",
+                    spawn: Mesh("plants/dogs_mercury"),
+                    weight: 3.0,
+                    footprint: (core_m: Some(0.05), spread_m: Some(0.25)),
+                    placement: (upright: 0.4, scale: Range(0.6, 1.2), yaw: Random),
+                    render: (cast_shadows: false, draw_distance_m: 150.0, fade_m: 20.0, collision: None),
+                ),
+                (
+                    name: "wood_anemone",
+                    spawn: Mesh("plants/wood_anemone"),
+                    weight: 2.5,
+                    footprint: (core_m: Some(0.05), spread_m: Some(0.15)),
+                    placement: (upright: 0.4, scale: Range(0.6, 1.2), yaw: Random),
+                    render: (cast_shadows: false, draw_distance_m: 150.0, fade_m: 20.0, collision: None),
+                ),
+                (
+                    name: "male_fern",
+                    spawn: Mesh("plants/male_fern"),
+                    weight: 1.0,
+                    footprint: (core_m: Some(0.05), spread_m: Some(0.6)),
+                    placement: (upright: 0.4, scale: Range(0.6, 1.2), yaw: Random),
+                    render: (cast_shadows: false, draw_distance_m: 150.0, fade_m: 20.0, collision: None),
+                ),
+            ],
+            max_child_depth: 0,
+        ),
+    ],
+)

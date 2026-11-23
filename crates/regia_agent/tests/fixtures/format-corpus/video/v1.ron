@@ -1,0 +1,7 @@
+(
+    format_version: 1,
+    file: "video/intro.webm",
+    variants: {"android": "video/intro_small.webm"},
+    volume: 0.8,
+    clear_color: (0.0, 0.0, 0.0, 1.0),
+)

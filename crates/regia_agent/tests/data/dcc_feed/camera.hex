@@ -1,0 +1,21 @@
+# camera: perspective with a timecode and a physical block
+# Laid out by hand from docs/formats/dcc-feed-protocol-v1.md (spec 60 section 8 test 1).
+74 00 00 00                                          # len = 116
+21 00                                                # msg_type 0x0021
+00 00                                                # flags
+01 00 00 00                                          # seq 1
+04 00 00 00                                          # handle 4
+01 00 00 00 00 00 00 00                              # frame_id 1
+0a 00 00 00 00 00 00 00                              # source_time_ns 10
+01                                                   # has_timecode 1
+01 02 03 04                                          # hh mm ss ff
+18 00                                                # rate_num
+01 00                                                # rate_den
+00                                                   # drop_frame
+00 00 00 00 00 00 80 3f 00 00 a0 40                  # translation (0, 1, 5)
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 80 3f      # rotation (0, 0, 0, 1)
+00 00 80 3f 00 00 80 3f 00 00 80 3f                  # scale (1, 1, 1)
+00                                                   # space_flags 0
+00                                                   # mode 0 perspective
+00 00 00 3f 00 00 00 00 00 00 80 3e 00 00 00 00      # yfov_rad aspect near far
+00 00 0c 42 00 00 10 42 00 00 c0 41 00 00 00 40 00 00 20 40 # focal_mm sensor_w_mm sensor_h_mm focus_m f_stop

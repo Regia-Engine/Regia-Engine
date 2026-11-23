@@ -1,0 +1,3 @@
+# Vendored upstream source (kira 0.12.5 with the Regia patches in REGIA-PATCHES.md, ADR-8830):
+# `cargo fmt --all` reaches it as a path dependency, so keep upstream formatting byte for byte.
+disable_all_formatting = true

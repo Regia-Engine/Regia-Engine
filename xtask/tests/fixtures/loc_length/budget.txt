@@ -1,0 +1,3 @@
+# characters after pseudo-localization
+short = 80
+long = 12

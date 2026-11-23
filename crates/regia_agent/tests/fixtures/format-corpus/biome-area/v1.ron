@@ -1,0 +1,12 @@
+{
+    "regia_procgen::biome::ecs::BiomeArea": (
+        biome: Some("biomes/pine.biome.ron"),
+        shape: FromShape,
+        blend_m: 8.0,
+        blend_noise: None,
+        priority_offset: 0,
+        preview_alone: false,
+        map_biomes: [],
+        format_version: 1,
+    ),
+}

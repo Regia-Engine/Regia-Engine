@@ -1,0 +1,494 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://regiaengine.com/schemas/material-ron-v4.json",
+  "title": "Regia Engine .material.ron v1 to v4",
+  "description": "Standard and layered PBR material (specs/12, specs/13 §7, specs/26 §4). v1 documents omit hard_surface, v2 documents the v3 glass fields, v3 documents the thin film and v4 documents the weather response; the loader migrates all four.",
+  "type": "object",
+  "required": [
+    "format_version",
+    "shader",
+    "base"
+  ],
+  "properties": {
+    "format_version": {
+      "enum": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    "name": {
+      "type": "string"
+    },
+    "shader": {
+      "oneOf": [
+        {
+          "const": "standard"
+        },
+        {
+          "type": "object",
+          "required": [
+            "Custom"
+          ],
+          "properties": {
+            "Custom": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "base": {
+      "$ref": "#/$defs/standardParams"
+    },
+    "clearcoat": {
+      "type": "object",
+      "required": [
+        "factor",
+        "roughness"
+      ],
+      "properties": {
+        "factor": {
+          "type": "number"
+        },
+        "roughness": {
+          "type": "number"
+        },
+        "normal_map": {
+          "$ref": "#/$defs/textureSlot"
+        }
+      }
+    },
+    "anisotropy": {
+      "type": "object",
+      "required": [
+        "strength",
+        "direction"
+      ],
+      "properties": {
+        "strength": {
+          "type": "number"
+        },
+        "direction": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 2,
+          "maxItems": 2
+        }
+      }
+    },
+    "layers": {
+      "type": "array",
+      "maxItems": 4,
+      "items": {
+        "$ref": "#/$defs/layer"
+      }
+    },
+    "render_state": {
+      "$ref": "#/$defs/renderState"
+    },
+    "parent": {
+      "type": "string"
+    },
+    "hard_surface": {
+      "$ref": "#/$defs/hardSurface"
+    },
+    "transmission": {
+      "$ref": "#/$defs/transmission"
+    },
+    "thin_film": {
+      "$ref": "#/$defs/thinFilm"
+    },
+    "weather": {
+      "$ref": "#/$defs/weather"
+    },
+    "subsurface": {
+      "$ref": "#/$defs/subsurface"
+    },
+    "transmission_roughness": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "v7: perceptual roughness of the transmitted lobe (frosted glass); absent or 0 is clear glass."
+    }
+  },
+  "$defs": {
+    "textureSlot": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "string",
+          "description": "AssetId"
+        }
+      ]
+    },
+    "standardParams": {
+      "type": "object",
+      "properties": {
+        "base_color": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "metallic": {
+          "type": "number"
+        },
+        "roughness": {
+          "type": "number"
+        },
+        "normal_map": {
+          "$ref": "#/$defs/textureSlot"
+        },
+        "orm_map": {
+          "$ref": "#/$defs/textureSlot"
+        },
+        "base_color_map": {
+          "$ref": "#/$defs/textureSlot"
+        },
+        "emissive": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "emissive_map": {
+          "$ref": "#/$defs/textureSlot"
+        },
+        "emissive_strength": {
+          "type": "number",
+          "minimum": 0,
+          "description": "v3: KHR_materials_emissive_strength; luminance = emissive × emissive_strength × texture, nits. Default 1."
+        },
+        "orm_packed": {
+          "type": "boolean",
+          "description": "v3: orm_map's G scales roughness and B scales metallic (glTF metallic-roughness). Default true."
+        },
+        "ior": {
+          "type": "number",
+          "minimum": 1,
+          "description": "v3: index of refraction (KHR_materials_ior); F0 = ((ior−1)/(ior+1))². Default 1.5."
+        }
+      }
+    },
+    "layer": {
+      "type": "object",
+      "required": [
+        "name",
+        "mask"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "mask": {
+          "$ref": "#/$defs/textureSlot"
+        },
+        "base_color": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "roughness": {
+          "type": "number"
+        },
+        "metallic": {
+          "type": "number"
+        },
+        "triplanar": {
+          "type": "boolean"
+        },
+        "normal_map": {
+          "$ref": "#/$defs/textureSlot"
+        }
+      }
+    },
+    "renderState": {
+      "type": "object",
+      "properties": {
+        "alpha_mode": {
+          "enum": [
+            "opaque",
+            "mask",
+            "blend"
+          ]
+        },
+        "cull_mode": {
+          "enum": [
+            "back",
+            "front",
+            "none"
+          ]
+        },
+        "depth_write": {
+          "type": "boolean"
+        },
+        "queue_offset": {
+          "type": "integer"
+        },
+        "alpha_cutoff": {
+          "type": "number",
+          "description": "v3: glTF alphaCutoff for alpha_mode mask. Default 0.5."
+        }
+      }
+    },
+    "hardSurface": {
+      "type": "object",
+      "properties": {
+        "detail": {
+          "$ref": "#/$defs/detail"
+        },
+        "parallax": {
+          "$ref": "#/$defs/parallax"
+        },
+        "edge_wear": {
+          "$ref": "#/$defs/edgeWear"
+        },
+        "multi_scatter": {
+          "type": "boolean",
+          "default": true
+        },
+        "specular_occlusion": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "detail": {
+      "type": "object",
+      "properties": {
+        "albedo": {
+          "$ref": "#/$defs/textureSlot"
+        },
+        "normal": {
+          "$ref": "#/$defs/textureSlot"
+        },
+        "roughness": {
+          "$ref": "#/$defs/textureSlot"
+        },
+        "mask": {
+          "$ref": "#/$defs/textureSlot"
+        },
+        "uv_scale": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "albedo_strength": {
+          "type": "number"
+        },
+        "normal_strength": {
+          "type": "number"
+        },
+        "roughness_strength": {
+          "type": "number"
+        },
+        "fade_start": {
+          "type": "number"
+        },
+        "fade_end": {
+          "type": "number"
+        }
+      }
+    },
+    "parallax": {
+      "type": "object",
+      "properties": {
+        "height_map": {
+          "$ref": "#/$defs/textureSlot"
+        },
+        "scale": {
+          "type": "number"
+        },
+        "min_steps": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "max_steps": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "edgeWear": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "enum": [
+            "curvature",
+            "ao"
+          ]
+        },
+        "curvature_map": {
+          "$ref": "#/$defs/textureSlot"
+        },
+        "intensity": {
+          "type": "number"
+        },
+        "roughness_bias": {
+          "type": "number"
+        },
+        "metallic_bias": {
+          "type": "number"
+        },
+        "tint": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "bias": {
+          "type": "number"
+        },
+        "contrast": {
+          "type": "number"
+        }
+      }
+    },
+    "transmission": {
+      "type": "object",
+      "description": "v3: KHR_materials_transmission + KHR_materials_volume.",
+      "properties": {
+        "factor": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "thickness": {
+          "type": "number",
+          "minimum": 0,
+          "description": "metres; 0 = thin wall"
+        },
+        "attenuation_color": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "attenuation_distance": {
+          "type": "number",
+          "description": "metres; 0 or less = no absorption"
+        }
+      }
+    },
+    "subsurface": {
+      "type": "object",
+      "description": "v5: screen-space subsurface scattering of the diffuse light.",
+      "properties": {
+        "profile": {
+          "enum": [
+            "skin",
+            "foliage"
+          ],
+          "description": "Diffusion profile (default skin)."
+        },
+        "radius": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Reach in millimeters on a world in meters; 0 takes the profile's own reach (default 0)."
+        },
+        "tint": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Share of the light that scatters per channel, linear RGB, 0..1 (default white)."
+        }
+      },
+      "additionalProperties": false
+    },
+    "thinFilm": {
+      "type": "object",
+      "description": "v4: KHR_materials_iridescence. Thickness is mix(thickness_min, thickness_max, thickness_map.g), or thickness_max without a map.",
+      "properties": {
+        "factor": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Coverage; 0 = no film (default 0)."
+        },
+        "factor_map": {
+          "$ref": "#/$defs/textureSlot",
+          "description": "Coverage, read from R."
+        },
+        "ior": {
+          "type": "number",
+          "minimum": 1,
+          "description": "Film index of refraction (default 1.3)."
+        },
+        "thickness_min": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Nanometres where the map reads 0 (default 100)."
+        },
+        "thickness_max": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Nanometres where the map reads 1, and without a map (default 400)."
+        },
+        "thickness_map": {
+          "$ref": "#/$defs/textureSlot",
+          "description": "Thickness, read from G."
+        }
+      },
+      "additionalProperties": false
+    },
+    "weather": {
+      "type": "object",
+      "description": "v5 (spec 99 § 7.3): how rain and snow change the material. Absent: porosity from roughness and metallic, full wetness and snow, no puddles.",
+      "properties": {
+        "porosity": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1,
+          "description": "How much a wet surface darkens; null derives it from roughness and metallic."
+        },
+        "wet": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 1.0,
+          "description": "Scales the wetness."
+        },
+        "snow": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 1.0,
+          "description": "Scales the snow cover."
+        },
+        "puddles": {
+          "type": "boolean",
+          "default": false,
+          "description": "Flat, upward parts may hold puddles."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

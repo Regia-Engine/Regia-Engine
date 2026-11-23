@@ -1,0 +1,150 @@
+# Owner-review data only. This is not pack.ron, an installer input, or a license grant.
+document_kind = "owner_review_inventory"
+evidence_row = "X06"
+review_date = "2026-11-08"
+source_revision = "75e1a779454ac96ab40810c1adb3081d4de7a6b9"
+source_set = "all tracked template asset files plus three explicitly selected sample sources"
+owner_placement = "unplaced"
+packaging_authorized = false
+package_assets = []
+proposed_pack_assets = ["room_mesh", "wind_bed", "music_pad"]
+proposed_pack_source_bytes = 5043
+starter_license_status = "superseded by ADR-10225: starter and template code is MIT-0, starter assets CC0-1.0 (LicenseRef-Regia-Starter is withdrawn)"
+runtime_platforms_verified_by_this_review = []
+
+[[licenses]]
+id = "repository_license"
+description = "Starter-template licences (ADR-10225): code MIT-0, assets CC0-1.0; the engine itself is MPL-2.0 (LICENSE)"
+path = "crates/regia_templates/templates/LICENSE-MIT-0.txt"
+assets_path = "crates/regia_templates/templates/LICENSE-CC0-1.0.txt"
+copyright_holder_as_named_in_license = "Sphenisca Regia LLC"
+notice_policy = "No notice required (MIT-0, CC0-1.0); the texts ship beside the templates"
+standalone_pack_clearance = "not established"
+
+[[assets]]
+id = "blank_level"
+role = "existing_template_baseline"
+source = "crates/regia_templates/templates/blank/assets/levels/main.level.ron"
+sha256 = "00ad1a3ac9e0de4aa8b6b2ca1c8994e7f55d1890e50671f48af29184bee04594"
+bytes = 786
+license = "repository_license"
+source_commit = "0833bc41b160efff22ad40b49c7ef1b987332cd4"
+provenance = "Repo-authored transform-only RON; compiled-in template file list in crates/regia_templates/src/lib.rs"
+project_path = "assets/levels/main.level.ron"
+templates = ["blank"]
+source_format = "level.ron, format_version 1"
+dependencies = []
+compatibility = "existing template destination; migration/runtime not exercised by this review"
+redistribution = "not cleared as a standalone starter pack"
+
+[[assets]]
+id = "first_person_level"
+role = "existing_template_baseline"
+source = "crates/regia_templates/templates/first_person/assets/levels/main.level.ron"
+sha256 = "00ad1a3ac9e0de4aa8b6b2ca1c8994e7f55d1890e50671f48af29184bee04594"
+bytes = 786
+license = "repository_license"
+source_commit = "0833bc41b160efff22ad40b49c7ef1b987332cd4"
+provenance = "Repo-authored transform-only RON; identical bytes to blank_level, separate template destination"
+project_path = "assets/levels/main.level.ron"
+templates = ["first_person"]
+source_format = "level.ron, format_version 1"
+dependencies = []
+compatibility = "existing template destination; migration/runtime not exercised by this review"
+redistribution = "not cleared as a standalone starter pack"
+
+[[assets]]
+id = "third_person_level"
+role = "existing_template_baseline"
+source = "crates/regia_templates/templates/third_person/assets/levels/main.level.ron"
+sha256 = "4c2f7d1768d56a6b391372fb13dd0d1cde5477591793b26c0bc387b7e866e42a"
+bytes = 418
+license = "repository_license"
+source_commit = "0833bc41b160efff22ad40b49c7ef1b987332cd4"
+provenance = "Repo-authored transform-only marker RON; compiled-in template file list in crates/regia_templates/src/lib.rs"
+project_path = "assets/levels/main.level.ron"
+templates = ["third_person"]
+source_format = "level.ron, format_version 1"
+dependencies = []
+compatibility = "existing template destination; migration/runtime not exercised by this review"
+redistribution = "not cleared as a standalone starter pack"
+
+[[assets]]
+id = "top_down_level"
+role = "existing_template_baseline"
+source = "crates/regia_templates/templates/top_down/assets/levels/main.level.ron"
+sha256 = "7da47306e733dd123df15773d4d3fc3a7c208558abe460a0f91afee80cdeed54"
+bytes = 418
+license = "repository_license"
+source_commit = "44818b91b6fa01ef5e44a296d1227a40e1cfb63e"
+provenance = "Repo-authored transform-only marker RON; compiled-in template file list in crates/regia_templates/src/lib.rs"
+project_path = "assets/levels/main.level.ron"
+templates = ["top_down"]
+source_format = "level.ron, format_version 1"
+dependencies = []
+compatibility = "existing template destination; migration/runtime not exercised by this review"
+redistribution = "not cleared as a standalone starter pack"
+
+[[assets]]
+id = "net_game_level"
+role = "existing_template_baseline"
+source = "crates/regia_templates/templates/net_game/assets/levels/arena.level.ron"
+sha256 = "10e42e03d0958a8299a2921e8fa7f1cce3965f1f27e34dd0353b74618926acc3"
+bytes = 34
+license = "repository_license"
+source_commit = "3edb2fb6d9de4bfb6fb67cf59e002ea97cad0f48"
+provenance = "Repo-authored empty RON scene; net-game/net_game aliases select the same compiled-in template"
+project_path = "assets/levels/arena.level.ron"
+templates = ["net-game", "net_game"]
+source_format = "level.ron, format_version 1"
+dependencies = []
+compatibility = "existing template destination; no client rendering or Android shim implied"
+redistribution = "not cleared as a standalone starter pack"
+
+[[assets]]
+id = "room_mesh"
+role = "proposed_minimal_pack"
+source = "samples/render_lab/lightmap_room/assets/meshes/room.gltf"
+sha256 = "74a88bb0360dcb4eb2e36452a6fc7ee6a8e5b07e13bc7c214ec0f6ac39d6ada5"
+bytes = 3287
+license = "repository_license"
+source_commit = "337e4e822be3d4cf4654a407f5116b57a87ac8f8"
+provenance = "glTF asset.generator identifies a hand-written Regia bake_e2e fixture; sample README and crates/regia_cli/tests/lightmap_sample.rs identify its use"
+project_path = "assets/starter/meshes/room.gltf"
+templates = ["blank", "first_person", "third_person", "top_down"]
+source_format = "glTF 2.0"
+dependencies = []
+compatibility = "proposed import destination; embedded buffer and flat material; host must instantiate mesh"
+redistribution = "not cleared as a standalone starter pack"
+
+[[assets]]
+id = "wind_bed"
+role = "proposed_minimal_pack"
+source = "samples/third_person/assets/audio/ambient.loopgen.ron"
+sha256 = "2923922c73ca9ceabee183bc4b35694862d7537e02542d6c79dc2d7c343a9994"
+bytes = 789
+license = "repository_license"
+source_commit = "537736bd8e51c5811223d8e5093b38585c5ae38f"
+provenance = "Repo-authored procedural graph, seed 2522; ADR-2596; samples/third_person/src/sound.rs AMBIENT_LOOP_TEXT; loopgen algorithm provenance in docs/provenance.md (ADR-299)"
+project_path = "assets/starter/audio/ambient.loopgen.ron"
+templates = ["blank", "first_person", "third_person", "top_down"]
+source_format = "loopgen.ron, version 1"
+dependencies = []
+compatibility = "proposed destination; requires AudioPlugin and LoopGenDef rendering/playback wiring; copying alone does not play audio"
+redistribution = "not cleared as a standalone starter pack"
+
+[[assets]]
+id = "music_pad"
+role = "proposed_minimal_pack"
+source = "samples/third_person/assets/audio/music.loopgen.ron"
+sha256 = "a95b3eda3813517b5b6f7f3dabc7c6937b62a8dc3fdc095415a652f4c9bacc2a"
+bytes = 967
+license = "repository_license"
+source_commit = "537736bd8e51c5811223d8e5093b38585c5ae38f"
+provenance = "Repo-authored procedural graph, seed 7; ADR-2596; samples/third_person/src/sound.rs MUSIC_LOOP_TEXT; loopgen algorithm provenance in docs/provenance.md (ADR-299)"
+project_path = "assets/starter/audio/music.loopgen.ron"
+templates = ["blank", "first_person", "third_person", "top_down"]
+source_format = "loopgen.ron, version 1"
+dependencies = []
+compatibility = "proposed destination; requires AudioPlugin and LoopGenDef rendering/playback wiring; copying alone does not play audio"
+redistribution = "not cleared as a standalone starter pack"

@@ -1,0 +1,16 @@
+[package]
+name = "regia_viewer_view"
+description = "Product viewer drag view: a platform-free, damped camera controller clamped to a recipe's view_range."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+glam = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }

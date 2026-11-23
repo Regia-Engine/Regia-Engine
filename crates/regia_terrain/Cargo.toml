@@ -1,0 +1,62 @@
+[package]
+name = "regia_terrain"
+description = "Terrain and tunnels: CDLOD heightfield rendering, layered materials, seeded scatter, deformation hooks, water."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia_core = { workspace = true }
+regia_ecs = { workspace = true }
+regia_app = { workspace = true }
+regia_asset = { workspace = true }
+# Streaming request points (`stream_hooks`, spec 78 § 13.1); the weather's scene wind (spec 99 § 3.3)
+# steers `TerrainWind` (`wind::couple_scene_wind`).
+regia_scene = { workspace = true }
+# Canonical mesh-layer triangles the seam cook reads (spec 121 § 1-2, ADR-8291). The `fixtures`
+# feature stays on the dev-dependency below; library code does not use it.
+regia_world_geom = { workspace = true }
+regia_render = { workspace = true }
+ktx2 = { workspace = true }
+wgpu = { workspace = true }
+bytemuck = { workspace = true }
+glam = { workspace = true }
+serde = { workspace = true }
+# Count-based source import and CPU overview encoding (ADR-8063).
+serde_json = { workspace = true }
+png = { workspace = true }
+# Registered overview artifacts (ADR-8596): cache keys and the PNG hash the descriptor records.
+# Already a workspace package (regia_agent, regia_asset_pipeline); no new package or version.
+blake3 = { workspace = true }
+ron = { workspace = true }
+postcard = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+# The lattice ground cut (tests/lattice_cut.rs, ADR-8214): the sim cut and the render mask agree cell for
+# cell. Dev-only for now; the presentation half that reads the cooked file (W-14/W-15) adds the runtime edge.
+# The W-07 bore plate (tests/passage_plate.rs) cooks the Switchbacks fixture's render mesh with it too (ADR-8175).
+regia_world_geom = { workspace = true, features = ["fixtures"] }
+# The tunnel acceptance scene's slots (tests/tunnel_scene/fills.rs): the reverb zone, the world-pick
+# layers and the CPU probe bake of the tube. Dev-only: the runtime crate does not depend on them
+# (regia_pick and regia_pt depend on regia_terrain; a dev-dependency cycle builds one rlib).
+regia_audio = { workspace = true }
+regia_pick = { workspace = true }
+regia_pt = { workspace = true }
+# The hot-reload test drives the dev source watcher.
+regia_asset = { workspace = true, features = ["dev-assets"] }
+regia_test_utils = { workspace = true }
+# Offscreen shading tests encode/decode a DO27-style 16-bit grayscale PNG heightfield.
+png = { workspace = true }
+# Terrain streaming round-trip tests build a minimal valid KTX2 `CookedTexture` to read back
+# through `PakTileSource::load` (the same container the cooker writes).
+ktx2 = { workspace = true }
+# ADR-026 gate for the terrain shaders: parse the WGSL, emit SPIR-V 1.6 the way wgpu-hal
+# does, and run `spirv-val` (the same workspace naga `regia_render`'s check uses).
+naga = { workspace = true, features = ["wgsl-in", "spv-out"] }

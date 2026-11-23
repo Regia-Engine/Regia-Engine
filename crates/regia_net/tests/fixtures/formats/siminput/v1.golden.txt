@@ -1,0 +1,6 @@
+format_version: 1
+frames: 4
+frame 0: [1, 0, 0, 0]
+frame 1: [1, 0, 1, 0]
+frame 2: []
+frame 3: [255, 254, 253]

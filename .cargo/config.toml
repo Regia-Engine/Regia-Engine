@@ -1,0 +1,105 @@
+[alias]
+xtask = "run --quiet --package xtask --"
+
+# Build speed (docs/03-workspace-and-dependencies.md § 6).
+# x86_64 Linux: rustup toolchains link with rust-lld by default since Rust 1.90; nothing to set.
+#
+# Privacy (ADR-10354): no build-machine directory may survive into a built artifact's printable
+# strings. rustc applies `--remap-path-prefix` to `file!()`/panic locations, including dependency
+# and standard-library paths monomorphized into the build, so any path under these roots (which
+# cover every host this workspace builds on) becomes `/builder/…`, which matches no private-host
+# pattern. `env!`-expanded values are NOT remapped: never put `env!("CARGO_MANIFEST_DIR")` in
+# runtime code. Debuggers undo this per session with `set substitute-path /builder <real root>`.
+# Setting `RUSTFLAGS` in the environment replaces these flags: restate them there and put the
+# build account's home directory LAST (rustc applies the last matching prefix); `regia package`'s
+# own remaps and the packaging host-string gate still backstop a build made that way.
+#
+# Split debuginfo is a profile setting (`Cargo.toml` `[profile.dev] split-debuginfo`), not a flag here:
+# rustflags come after the profile's flags, so a flag here would overrule every per-package override
+# (ADR-10394: `regia_test_utils` keeps its DWARF in its objects, where a capture finds it under the
+# remaps below; the `.dwo` paths a binary names are remapped too and exist on no host).
+[target.x86_64-unknown-linux-gnu]
+rustflags = [
+    "--remap-path-prefix=/home=/builder",
+    "--remap-path-prefix=/media=/builder",
+    "--remap-path-prefix=/srv=/builder",
+    "--remap-path-prefix=/models=/builder",
+    "--remap-path-prefix=/root=/builder",
+    "--remap-path-prefix=/mnt=/builder",
+    "--remap-path-prefix=/Users=/builder",
+]
+
+# Every engine exe (regia.exe, the editor, the samples, tools) asks Windows for an 8 MiB main-thread
+# stack, the size Linux gives it; Windows reserves 1 MiB otherwise (ADR-5181, ADR-5617). Game
+# projects get the same from their build.rs (crates/regia_templates/templates/windows_build.rs).
+# The remap lines carry ADR-10354's privacy rule over to Windows cross builds: a Linux host's
+# `/home/…` dependency paths land in the PE the same way.
+[target.x86_64-pc-windows-msvc]
+linker = "rust-lld"
+rustflags = [
+    "-Clink-arg=/STACK:8388608",
+    "--remap-path-prefix=/home=/builder",
+    "--remap-path-prefix=/media=/builder",
+    "--remap-path-prefix=/srv=/builder",
+    "--remap-path-prefix=/models=/builder",
+    "--remap-path-prefix=/root=/builder",
+    "--remap-path-prefix=/mnt=/builder",
+    "--remap-path-prefix=/Users=/builder",
+]
+
+[target.x86_64-pc-windows-gnu]
+rustflags = [
+    "-Clink-arg=-Wl,--stack,8388608",
+    "--remap-path-prefix=/home=/builder",
+    "--remap-path-prefix=/media=/builder",
+    "--remap-path-prefix=/srv=/builder",
+    "--remap-path-prefix=/models=/builder",
+    "--remap-path-prefix=/root=/builder",
+    "--remap-path-prefix=/mnt=/builder",
+    "--remap-path-prefix=/Users=/builder",
+]
+
+# macOS: Cargo's own default for every profile with debuginfo (the objects stay, named by the executable's
+# debug map; no dsymutil), restated as a rustflag so it overrules `regia_test_utils`'s "off" profile override,
+# which on macOS would make rustc delete those objects (ADR-10394). A profile without debuginfo ignores it.
+[target.aarch64-apple-darwin]
+rustflags = ["-Csplit-debuginfo=unpacked"]
+
+[target.x86_64-apple-darwin]
+rustflags = ["-Csplit-debuginfo=unpacked"]
+
+# The web player is built from this workspace with plain cargo (ADR-2541); its dependency paths
+# need the same privacy remap as the native targets (ADR-10354).
+[target.wasm32-unknown-unknown]
+rustflags = [
+    "--remap-path-prefix=/home=/builder",
+    "--remap-path-prefix=/media=/builder",
+    "--remap-path-prefix=/srv=/builder",
+    "--remap-path-prefix=/models=/builder",
+    "--remap-path-prefix=/root=/builder",
+    "--remap-path-prefix=/mnt=/builder",
+    "--remap-path-prefix=/Users=/builder",
+]
+
+
+
+# Cook determinism across ISAs (ADR-7878). The cook's C++ dependencies (meshoptimizer through
+# `meshopt`, ARM astcenc through `ctt-astcenc`) are built by `cc`, which appends these per-target
+# variables after each crate's own flags and defines, so they win. `-ffp-contract=off`: aarch64
+# compilers fuse `a * b + c` into one FMA by default and x86_64 (no `-mfma`) rounds twice, so the
+# simplifier and the encoder took different branches on identical input. `-UASTCENC_NO_INVARIANCE`
+# undoes `ctt-astcenc`'s performance define, which picks ISA-specific dot products and
+# accumulator widths, so its SSE2/SSE4.1/AVX2/NEON builds write the same blocks. Only C++ builds
+# read CXXFLAGS (the C media codecs are untouched). A game project built outside this workspace
+# needs the same lines in its own `.cargo/config.toml` to cook the same bytes as this one.
+[env]
+CXXFLAGS_x86_64_unknown_linux_gnu = "-ffp-contract=off -UASTCENC_NO_INVARIANCE"
+CXXFLAGS_aarch64_unknown_linux_gnu = "-ffp-contract=off -UASTCENC_NO_INVARIANCE"
+CXXFLAGS_aarch64_apple_darwin = "-ffp-contract=off -UASTCENC_NO_INVARIANCE"
+CXXFLAGS_x86_64_apple_darwin = "-ffp-contract=off -UASTCENC_NO_INVARIANCE"
+CXXFLAGS_aarch64_linux_android = "-ffp-contract=off -UASTCENC_NO_INVARIANCE"
+CXXFLAGS_x86_64_linux_android = "-ffp-contract=off -UASTCENC_NO_INVARIANCE"
+CXXFLAGS_x86_64_pc_windows_gnu = "-ffp-contract=off -UASTCENC_NO_INVARIANCE"
+CXXFLAGS_wasm32_unknown_unknown = "-ffp-contract=off -UASTCENC_NO_INVARIANCE"
+# MSVC: cl does not contract under `/fp:precise` (astcenc sets it); only the define is undone.
+CXXFLAGS_x86_64_pc_windows_msvc = "/UASTCENC_NO_INVARIANCE"

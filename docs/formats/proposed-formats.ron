@@ -1,0 +1,18 @@
+// Content formats an ADR designs before any crate defines them (ADR-8019; `xtask/src/proposed_formats.rs`).
+// `check-formats` hashes built formats only. Each row here must have a `docs/specs/12-assets.md` § 4a row naming the
+// file in backticks, its ADR and `proposed`; its spec page must name the file and the registry name. The build lane
+// that registers the live format (and its `format-hashes.ron` row) removes the row here in the same commit.
+(
+    // terrain-mesh-layers and terrain-mesh-layers-cooked left this list when lane W-06 built them (ADR-8112).
+    formats: [
+        (
+            name: "voxel-field",
+            file: "<map>.voxfield",
+            kind: "source",
+            version: 1,
+            adr: "ADR-8116",
+            spec: "docs/specs/122-voxel-core.md",
+            lane: "V-02 do27-voxel-core-format",
+        ),
+    ],
+)

@@ -1,0 +1,10 @@
+[project]
+name = "{{name}}"
+id = "{{id}}"
+version = "0.1.0"
+build_number = 1
+engine = "{{engine_line}}"
+organization = "Regia Engine"
+
+[platforms.linux]
+formats = ["tar"]

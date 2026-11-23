@@ -1,0 +1,41 @@
+(
+    format: "matgraph",
+    entries: [
+        (
+            version: 1,
+            file: "v1.matgraph.ron",
+            origin: "git 3c7313fdc643d25af996793adb437b31baa8675b:docs/formats/matgraph.example.ron",
+            exercises: "baseline: params, textures, node map, outputs; comments carry the ferrite_ brand",
+        ),
+        (
+            version: 2,
+            file: "v2.matgraph.ron",
+            origin: "handwritten from 56252c2eb3b9f9abe198fa77665d5e025caa583a",
+            exercises: "adds switches, inline functions with Call and Input, Switch node, TexCoord1, ObjectPosition, Sin, Frac, world_position_offset output and shading.max_vertex_offset",
+        ),
+        (
+            version: 3,
+            file: "v3.matgraph.ron",
+            origin: "git 9371ad5b237eac0611038266323c45417f1c643e:crates/regia_agent/src/fuzz_targets/fixtures/matgraph-wind.example.ron",
+            exercises: "adds the Wind node (v3 is the Wind lane after the ADR-2355 renumber; v4 is Noise)",
+        ),
+        (
+            version: 4,
+            file: "v4.ron",
+            origin: "registry fixture (version 1) loaded and re-encoded by the loader at version 4",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+        (
+            version: 5,
+            file: "v5.matgraph.ron",
+            origin: "handwritten on lane w12-shader-code-node (ADR-7852)",
+            exercises: "the current version; adds the Code node: typed inputs (one unwired), a texture input, a Vec3 output and a WGSL body",
+        ),
+        (
+            version: 5,
+            file: "v5-params.matgraph.ron",
+            origin: "handwritten on lane w13-ui-matgraph-finish (ADR-8105 (b)); also the matgraph-params fuzz seed",
+            exercises: "the v5 parameter metadata fold: two categories, a ranged Float with a step, a ranged Color, an ungrouped parameter and tooltips",
+        ),
+    ],
+)

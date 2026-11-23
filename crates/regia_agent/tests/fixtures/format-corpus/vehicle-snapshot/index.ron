@@ -1,0 +1,17 @@
+(
+    format: "vehicle-snapshot",
+    entries: [
+        (
+            version: 1,
+            file: "v1.vehicle-snapshot.ron",
+            origin: "handwritten from c48d40eae (the v1 writer's output is the v2 text with format_version 1: the bump changed only the version number, the TireSnapshot fields were already serde-defaulted; modeled on the bump test's own v1 construction)",
+            exercises: "v1: the pre-bump version number; the tire transient fields default to zero",
+        ),
+        (
+            version: 2,
+            file: "v2.vehicle-snapshot.ron",
+            origin: "frozen copy of the fuzz-target registry fixture",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+    ],
+)

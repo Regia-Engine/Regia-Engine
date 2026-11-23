@@ -1,0 +1,22 @@
+// Music pad of samples/third_person (ADR-2596): a slow, quiet minor-seventh chord with a gentle
+// swell, rendered in memory by `regia_audio::LoopGenDef`. Plays looped on the `Music` bus.
+(
+    version: 1,
+    name: "tp_music_pad",
+    sample_rate: 48000,
+    length_secs: 8.0,
+    channels: 1,
+    seed: 7,
+    crossfade_secs: 0.0,
+    output_gain_db: -20.0,
+    nodes: [
+        (id: "root", node: Osc(shape: Triangle, hz: 110.0, gain: 0.5)),
+        (id: "third", node: Osc(shape: Sine, hz: 130.75, gain: 0.35)),
+        (id: "fifth", node: Osc(shape: Sine, hz: 165.0, gain: 0.35)),
+        (id: "seventh", node: Osc(shape: Sine, hz: 196.0, gain: 0.2)),
+        (id: "chord", node: Mix(inputs: [(input: "root"), (input: "third"), (input: "fifth"), (input: "seventh")])),
+        (id: "soft", node: OnePole(input: "chord", mode: LowPass, cutoff_hz: 1200.0)),
+        (id: "swell", node: Am(input: "soft", rate_hz: 0.25, depth: 0.4)),
+    ],
+    output: "swell",
+)

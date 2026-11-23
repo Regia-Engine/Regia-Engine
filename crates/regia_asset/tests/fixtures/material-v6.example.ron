@@ -1,0 +1,24 @@
+(
+    format_version: 6,
+    name: "M_Skin",
+    shader: Standard,
+    base: (
+        base_color: (0.72, 0.53, 0.45, 1.0),
+        metallic: 0.0,
+        roughness: 0.45,
+        emissive: (0.0, 0.0, 0.0),
+        emissive_strength: 1.0,
+        orm_packed: true,
+        ior: 1.4,
+    ),
+    hard_surface: (
+        multi_scatter: true,
+        specular_occlusion: true,
+    ),
+    subsurface: (
+        profile: skin,
+        radius: 6.0,
+        tint: (1.0, 0.95, 0.9),
+    ),
+    render_state: (alpha_mode: opaque, queue_offset: 0, alpha_cutoff: 0.5),
+)

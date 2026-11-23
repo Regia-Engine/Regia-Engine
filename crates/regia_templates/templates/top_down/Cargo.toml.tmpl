@@ -1,0 +1,19 @@
+[workspace]
+resolver = "3"
+members = ["game", "editor", "launcher", "android"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+# `regia package --profile shipping` builds with this profile (specs/21 § 4): fat LTO, one codegen
+# unit, abort on panic, line tables kept and nothing stripped by cargo. `regia package` extracts the
+# symbols into `dist/<platform>/symbols/` and strips the shipped copy itself.
+[profile.shipping]
+inherits = "release"
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+debug = "line-tables-only"
+strip = "none"

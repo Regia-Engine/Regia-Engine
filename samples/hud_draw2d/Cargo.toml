@@ -1,0 +1,22 @@
+[package]
+name = "hud_draw2d"
+description = "P-06 sample: a generic game HUD (health bar, ammo count, minimap frame, crosshair, kill feed) on the instanced 2D draw list with dirty regions."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia = { workspace = true }
+regia_app = { workspace = true }
+regia_core = { workspace = true }
+regia_platform = { workspace = true }
+regia_quick = { workspace = true }
+regia_render = { workspace = true }
+regia_ui = { workspace = true }
+tracing = { workspace = true }
+wgpu = { workspace = true }

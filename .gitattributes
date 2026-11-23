@@ -1,0 +1,6 @@
+# Append-only docs: keep both sides when parallel lanes add rows/links.
+docs/provenance.md merge=union
+book/SUMMARY.md merge=union
+
+# Golden test vectors hashed byte for byte (SHA-256): never convert line ends.
+crates/regia_net_soak/tests/fixtures/do27/*.txt -text

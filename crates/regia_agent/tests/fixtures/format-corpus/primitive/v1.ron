@@ -1,0 +1,11 @@
+{
+    "regia_render::primitives::Primitive": (
+        format_version: 1,
+        shape: Cuboid(
+            size: (1.0, 1.0, 1.0),
+        ),
+        color: (0.72, 0.72, 0.72, 1.0),
+        roughness: 0.65,
+        metallic: 0.0,
+    ),
+}

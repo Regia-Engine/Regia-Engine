@@ -1,0 +1,35 @@
+(
+    version: 3,
+    name: "impact_flesh",
+    bus: Some("World"),
+    sounds: [
+        (
+            sound: "audio/impacts/flesh_a.ogg",
+            weight: 1.0,
+        ),
+        (
+            sound: "audio/impacts/flesh_b.ogg",
+            weight: 1.0,
+        ),
+        (
+            sound: "audio/impacts/flesh_c.ogg",
+            weight: 0.5,
+        ),
+    ],
+    mode: Random,
+    no_repeat_last: 2,
+    pitch_min: 0.95,
+    pitch_max: 1.05,
+    volume_db_min: -2.0,
+    volume_db_max: 0.0,
+    max_concurrent: Some(4),
+    steal: Oldest,
+    cooldown: (
+        secs: 0,
+        nanos: 50000000,
+    ),
+    volume_db: 0.0,
+    filter_cutoff_hz: None,
+    filter_offset_octaves: 0.0,
+    caption: None,
+)

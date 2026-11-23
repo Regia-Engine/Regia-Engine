@@ -1,0 +1,195 @@
+# Flaky-test registry (ADR-1035). Read by `cargo xtask flaky`; the policy is book/user-guide/flaky-tests.md.
+#
+# One [[flake]] per known flaky or load-sensitive test binary (or family). `tests` are the gate runner's binary
+# keys `package:target:kind`, as gate-runtests.py prints them (`FAILED <key>`, `FLAKY UNDER LOAD <key>`).
+# `cargo xtask flaky --check` fails when a package, target or `test_fns` entry does not exist, so a rename
+# cannot leave a stale row. `cargo xtask flaky --gate-args lvp|gpu` prints the runner's `--solo` and
+# `--quarantine` arguments; the gate scripts take their lists from there.
+#
+# status:   open | mitigated | fixed | latent (load-sensitive shape, not seen failing)
+# handling: none (the runner's rerun-alone rule only) | solo (runs alone after the pool) |
+#           quarantine (real-GPU pass only: reported, not counted) | exit-crash (the runner's exit-crash rule)
+# History of the fixed 2026-10-06/07 flakes: docs/evidence/flaky-tests/README.md.
+
+version = 1
+
+[[flake]]
+id = "nvidia-exit-sigsegv"
+tests = ["lookdev:warm_coverage:test", "regia:device_lost_exit:test"]
+symptom = "The process dies with signal 11 at exit after every test printed ok (warm_coverage), or exits with a signal instead of code 3 (device_lost_exit). RTX 5090, driver 615.71.09, under gate or build load; idle it passed 30 of 30."
+cause = "A worker thread (material-graph, pipeline warm, telemetry probe) is still inside the NVIDIA driver when exit() runs the process-exit handlers. No Rust-side defect found (docs/notes/heap-trace.md)."
+status = "mitigated"
+handling = "exit-crash"
+passes = ["gpu"]
+owner = "sprint lane 05 exit-workers (normal-quit leftovers); the lead runs the loaded 60-run soak"
+seen = ["2026-10-17"]
+review_by = "2026-10-28"
+refs = ["ADR-269", "ADR-276", "docs/notes/heap-trace.md", "reports/exit-race-devicelost.md"]
+
+[[flake]]
+id = "deck-check-frame-count"
+tests = ["vfx_lab:deck_check:test"]
+symptom = "Counted 3 frames or fewer in a 1.5 s run: about 1 in 3 alone on the 5090, every gate run beside others."
+cause = "On a real GPU the first frames compile pipelines; a short fixed-time run does not reach the frame count."
+status = "mitigated"
+handling = "none"
+owner = "the lead"
+seen = ["2026-10-17"]
+review_by = "2026-10-28"
+refs = ["599ad2c6"]
+
+[[flake]]
+id = "scene-formats-load-budget"
+tests = ["regia_scene:formats:test"]
+test_fns = ["ten_thousand_entity_level_loads_within_budget"]
+symptom = "The 10k-entity load asserts elapsed milliseconds (debug 250 ms cooked / 5000 ms text); pooled on the build server at load 120-170 it measured 396 ms, alone 73 ms."
+cause = "A wall-clock assertion measures machine load, not correctness."
+status = "open"
+handling = "solo"
+passes = ["lvp"]
+owner = "the lead (next lane in regia_scene/tests/formats.rs moves the budget to an #[ignore] perf check)"
+seen = ["2026-10-08"]
+review_by = "2026-10-31"
+refs = ["the gate script --solo", "docs/evidence/flaky-tests/README.md"]
+
+# Solo since ADR-5908 (2026-11-11): the 1 ms landing-frame bar stays as it is. A landing frame measured beside 60
+# compilers is not the product's budget, so the binary runs alone after the pool, like agent_expect and
+# desktop_high_timings. The card stage too since ADR-8598: pregate 0f89ab970 card 6 failed it beside the pool at
+# the build server load ~400 (lavapipe recheck red as well); alone on the test machine RTX 5080 its landing frames were
+# 0.39-0.50 ms. The gate's and the pregate's GPU passes read `passes` through gaterig_gpu_solo (tools/gaterig/lib.sh).
+[[flake]]
+id = "emissive-hitch-wall-clock"
+tests = ["regia_render:emissive_hitch:test"]
+test_fns = ["a_large_new_emissive_mesh_costs_its_landing_frame_less_than_the_budget"]
+symptom = "Asserts every frame's cpu_ms under 1.0 ms; one preempted frame on a loaded box failed a gate on 2026-10-20. On the build server's lavapipe at load 320-390 (128 threads) it failed 2 of 2 runs on 2026-11-11, the landing frame itself at 2.13, 1.09 and 4.93 ms; at load 60 its worst frame was 0.26-0.33 ms."
+cause = "Wall-clock budget measured on an oversubscribed host."
+status = "mitigated"
+handling = "solo"
+passes = ["lvp", "gpu"]
+owner = "the lead"
+seen = ["2026-10-20", "2026-11-11", "2026-11-18"]
+review_by = "2026-12-16"
+refs = ["0240c762", "ADR-5908", "the gate script --solo", "reports/sprint-gpu-reds-root-cause.md"]
+
+[[flake]]
+id = "resize-memory-allocator"
+tests = ["regia_render:resize_memory:test"]
+test_fns = ["resizing_the_main_view_returns_its_memory"]
+symptom = "Not seen failing. Asserts allocator bytes within a margin."
+cause = "Another test in the same process can move the allocator counters."
+status = "latent"
+handling = "none"
+owner = "the lead (capture the `grew {label}` lines if it fails on hardware)"
+refs = ["docs/evidence/baseline-triage-1020.md"]
+
+[[flake]]
+id = "agent-expect-wall-clock"
+tests = ["third_person:agent_expect:test"]
+symptom = "Not seen failing alone. Waits up to 20 s of wall time for gameplay states."
+cause = "Wall-clock waits starve beside 12 parallel binaries."
+status = "latent"
+handling = "solo"
+passes = ["lvp"]
+owner = "the lead"
+refs = ["the gate script --solo"]
+
+[[flake]]
+id = "desktop-high-timings"
+tests = ["regia_render:desktop_high_timings:test"]
+symptom = "Not seen failing alone. Compares GPU pass timestamps."
+cause = "Timestamp ratios move when other binaries share the device."
+status = "latent"
+handling = "solo"
+passes = ["lvp"]
+owner = "the lead"
+refs = ["the gate script --solo"]
+
+[[flake]]
+id = "editor-pie-start"
+tests = ["regia_editor:regia_editor:lib"]
+symptom = "Not seen failing alone. A play-in-editor start must take under 1 s."
+cause = "Wall-clock bound."
+status = "latent"
+handling = "solo"
+passes = ["lvp"]
+owner = "the lead"
+refs = ["the gate script --solo"]
+
+[[flake]]
+id = "goap-fixed-deadline-thread-name"
+tests = ["regia_ai:goap_ecs:test"]
+test_fns = ["the_search_runs_on_a_pool_thread"]
+symptom = "On the build server on 2026-11-08, cargo test -p regia_ai observed regia-compute (120) where this assertion requires regia-async. The complete cargo test -p regia_ai --no-fail-fast rerun passed all 20 GOAP ECS tests and the full AI suite."
+cause = "Candidate cause: GoapAgent::harvest permits inline planning at its fixed deadline when the async task is unfinished, while this test requires every cost callback to run on regia-async. The observed compute-thread callback is consistent with that fallback; the test contract needs review."
+status = "open"
+handling = "none"
+owner = "the lead (GOAP ECS thread-name and fixed-deadline contract review)"
+seen = ["2026-11-08"]
+review_by = "2026-11-15"
+refs = ["docs/releases/v0.1.28-bt-v1-trace-oracle.md", "book/agents/bt-v1-trace-oracle.md"]
+
+# ADR-8599 (v06-pregate-reds-e): the regia_render lib test process fills a the build server RTX 5090's BAR1 by itself (256 MiB,
+# resizable BAR off; 253 MiB at its peak, the integ-v038 measurement), so every other GPU test process that creates a
+# device on that card while it runs gets "Parent device is lost". The pregate on integ-v06r 0f89ab970 put it on card 7
+# beside regia_editor viewport_render, which then failed all 10 tests in vkCreateDevice (green alone in 22 s).
+[[flake]]
+id = "render-lib-bar1-card"
+tests = ["regia_render:regia_render:lib"]
+symptom = "Other binaries on the same card fail every test in vkCreateDevice ('Parent device is lost'; the kernel logs NVRM dmaAllocMapping_GM107: can't alloc VA space). Pregate integ-v06r 0f89ab970 card 7, 2026-11-18 10:46: regia_editor viewport_render 0 of 10 while regia_render lib ran (10 failed device creations of its own, also alone on the card)."
+cause = "BAR1 exhaustion on an RTX 5090 with resizable BAR off: the regia_render lib binary keeps about 5 MiB of BAR1 per kept device and peaks at 253 of 256 MiB."
+status = "open"
+handling = "solo"
+passes = ["gpu"]
+owner = "the lead (wire `--solo regia_render:regia_render:lib` into the GPU pass of the gate script and the pregate; resizable BAR is an owner hardware option)"
+seen = ["2026-11-18"]
+review_by = "2026-12-16"
+refs = ["ADR-8599", "integ-v038 decisions (5): BAR1 measurement", "pregate 0f89ab970 card 7"]
+
+# ADR-8599 (v06-pregate-reds-e): a CPU-only determinism stress (120 record/replay runs of the arena match, 240 fixed steps
+# each, one after another) whose time follows host load. Not a hang and not a regression: interleaved on the test machine at
+# load 28-37, integ-v06r 6fe730622 took 53.2 / 61.9 / 39.8 s and integ-v06n c7cacd5db 52.1 / 43.1 / 60.4 s.
+[[flake]]
+id = "arena-repro-check-load"
+tests = ["arena:repro_check:test"]
+test_fns = ["twenty_seeds_of_the_bot_match_replay_identically"]
+symptom = "No result after 600 s beside other binaries and alone on the pregate (integ-v06r 0f89ab970 card 3, integ-v06r-net 3793fd1be); the lavapipe recheck passed in 589 s and the 6fe730622 card run in 495 s. Pregate times since 11-15 run from 96 s to over 600 s with the host's load (the build server 1-minute load about 450 on 128 threads on 11-18)."
+cause = "Host load: 28,800 app updates through the multi-threaded executor plus a reflected-state snapshot every checkpoint, about 10 times slower at the build server's load than on the test machine."
+status = "open"
+handling = "solo"
+passes = ["lvp", "gpu"]
+owner = "the lead"
+seen = ["2026-11-18"]
+review_by = "2026-12-16"
+refs = ["ADR-8599", "pregate 0f89ab970 card 3", "pregate 3793fd1be"]
+
+# Solo on the card stage (ADR-8598): the 50 ms spawn-frame bar stays as it is. It applies to hardware adapters only
+# (a CPU rasterizer prints its frames), so the lavapipe pass needs no solo.
+[[flake]]
+id = "spawn-hitch-wall-clock"
+tests = ["arena:spawn_hitch:test"]
+test_fns = ["spawns_do_not_hitch_through_the_runtime_frame"]
+symptom = "Fails when a spawn frame on a hardware adapter takes over 50 ms (spawn_hitch.rs `long_spawn`): pregate 0f89ab970 card 7 beside the pool at the build server load ~400, lavapipe recheck green. On the test machine RTX 5080 at load ~35, 6 of 6 runs (old and new tree) had no spawn frame over 50 ms (spawn p99 17.8-38.6 ms)."
+cause = "Wall-clock frame budget measured beside the pool's other binaries on an oversubscribed host; the same frames are under the bar when the binary runs alone."
+status = "mitigated"
+handling = "solo"
+passes = ["gpu"]
+owner = "the lead"
+seen = ["2026-11-16", "2026-11-18"]
+review_by = "2026-12-16"
+refs = ["ADR-8598", "reports/sprint-v06-pregate-reds-c-review.md", "tools/gaterig/lib.sh gaterig_gpu_solo"]
+
+# Solo on the card stage (ADR-8635): no wall-clock bar, only the runner's per-binary hang limit. The binary is CPU
+# bound (about 2 CPU-minutes on an idle host), so beside the pool on an oversubscribed host it ran past the limit.
+[[flake]]
+id = "dispatch-fuzz-cpu-time"
+tests = ["regia_agent:dispatch_fuzz:test"]
+test_fns = ["every_parameter_survives_hostile_values"]
+symptom = "HANG in the pregate GPU pool (no result after 600 s beside the other binaries); alone it passed in 517 s at the build server load ~450 and 137.7 s at load 415-462, and in 118 s on the idle the test machine."
+cause = "CPU time, not a stuck call: the hostile-values sweep is about 2 CPU-minutes, and the pool's nice +10 on a host at load 400+ starves it past the hang limit."
+status = "mitigated"
+handling = "solo"
+passes = ["gpu"]
+owner = "the lead"
+seen = ["2026-11-18"]
+review_by = "2026-12-16"
+refs = ["ADR-8635", "ADR-8598", "reports/sprint-v06-pregate-reds-d.md", "tools/gaterig/pregate-lib.sh pregate_patch_runtests"]

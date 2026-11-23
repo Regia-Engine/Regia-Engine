@@ -1,0 +1,19 @@
+// A two-leg walker with one preset pattern and only the required fields: no pattern switching,
+// no reach limit, no ground band, the upright body, no body joint and no leg overrides.
+(
+    format_version: 1,
+    patterns: [BipedWalk],
+    speeds: (forward: 1.4, reverse: 0.6, strafe: 0.4, acceleration: 2.0, idle: 0.02, yaw_rate: 2.0),
+    step_length: 0.7,
+    swing_lift: 0.1,
+    clearance: 0.9,
+    max_slope: 0.6,
+    settle: (distance: 0.03, period: 0.35),
+    turn: (step_distance: 0.1, step_angle: 0.4),
+    foothold: (candidates: 0, spacing: 0.1),
+    hang_drop: 0.3,
+    legs: [
+        (root: "thigh_l", tip: "foot_l"),
+        (root: "thigh_r", tip: "foot_r"),
+    ],
+)

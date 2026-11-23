@@ -1,0 +1,136 @@
+[package]
+name = "regia_cli"
+description = "The `regia` command: new, editor, run, cook, package, prepare, doctor."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+# Two binaries since the lobby hub (ADR-8648): `cargo run -p regia_cli` keeps meaning the `regia` command.
+default-run = "regia"
+
+[lib]
+name = "regia_cli"
+path = "src/lib.rs"
+
+[[bin]]
+name = "regia"
+path = "src/main.rs"
+doc = false   # binary; its docs would overwrite the library of the same name (cargo#6313)
+
+[[bin]]
+name = "regia-lobby-hub"
+path = "src/bin/regia-lobby-hub.rs"
+doc = false
+
+[lints]
+workspace = true
+
+[features]
+# `regia media encode` links the AV1/Opus encoder (regia_media `media-encode`, ADR-3369). On by default: the
+# CLI is a desktop tool, and encoders are allowed for tools (ADR-1593 § 1).
+default = ["media-encode"]
+media-encode = ["regia_media/media-encode"]
+# `regia bake-lightmaps --gpu` (ADR-2024). Off by default.
+lightmap-gpu = ["regia_pt/lightmap-gpu"]
+
+[dependencies]
+regia_terrain = { workspace = true }
+# `regia engine chunk` and `upgrade-project` for `release-chunks.json` (ADR-8404).
+regia_release_chunks = { workspace = true }
+regia_media = { workspace = true }
+# `regia upgrade-project` lists `.renv` environment files (ADR-2539).
+regia_viewer = { workspace = true }
+regia_templates = { workspace = true }
+rmcp = { workspace = true }
+# `net` and `io-util`: the `regia mcp --http` listener and its in-memory session pipes (ADR-2346).
+tokio = { workspace = true, features = ["net", "io-util"] }
+serde_json = { workspace = true }
+# `regia dcc-feed`, the feed's reference client (specs/60 § 5.1), uses the wire codec.
+regia_agent = { workspace = true, features = ["dcc-feed"] }
+gltf = { workspace = true }
+regia_ai = { workspace = true }
+# `upgrade-project` knows the procedural graph formats (specs/62); `pipeline`: the CLI writes bakes.
+regia_procgen = { workspace = true, features = ["pipeline"] }
+# `regia viewer pack | verify | standin` (ADR-2540).
+regia_viewer_pack = { workspace = true, features = ["cook"] }
+regia_nav = { workspace = true }
+# `content-signing`: `regia assets keygen` / `regia assets sign` (ADR-2710).
+regia_asset = { workspace = true, features = ["content-signing"] }
+regia_asset_pipeline = { workspace = true }
+regia = { workspace = true }
+# `regia package --server`, `regia server`: `net-manifest.ron`, `server.toml`, `bans.ron` (spec 76).
+regia_net = { workspace = true }
+# `upgrade-project` knows the XR file formats (`config/xr.ron`, the action manifest, `.xrsim.ron`; ADR-2316).
+regia_xr = { workspace = true }
+# `upgrade-project` migrates `input_overrides.ron` v1 → v2 (ADR-2316).
+regia_input = { workspace = true }
+regia_core = { workspace = true }
+regia_ecs = { workspace = true }
+regia_animation = { workspace = true }
+regia_matgraph = { workspace = true }
+regia_render = { workspace = true }
+# `regia bench` creates its offscreen target and writes what it drew.
+wgpu = { workspace = true }
+image = { workspace = true }
+# `regia bake-gi`: the reference path tracer bakes GI probe volumes (desktop tool only).
+regia_pt = { workspace = true }
+regia_scene = { workspace = true }
+regia_world = { workspace = true }
+# `regia terrain passages import|export` (spec 121 § 9.1, ADR-8112) and the meshlayers rows of `upgrade-project`.
+regia_world_geom = { workspace = true }
+# `regia upgrade-project` probes `.fluidcache` files (regia_fluid::cache, ADR-2441).
+regia_fluid = { workspace = true }
+# `regia procgen bake` / `verify` run the level's generators in a headless app (ADR-2422).
+regia_app = { workspace = true }
+# `regia trace export` reads `.regiatrace` files (spec 54): Tools over Gameplay.
+regia_telemetry = { workspace = true }
+# `upgrade-project` lists the product viewer contract files (ADR-2480).
+regia_configurator = { workspace = true }
+# `regia test`: the report types and JUnit writer of the functional-test runner (spec 41).
+regia_framework = { workspace = true, features = ["functional-tests"] }
+regia_ui = { workspace = true }
+# `regia upgrade-project` migrates `.vfx.ron` through the crate's own v1 → v4 chain.
+regia_vfx = { workspace = true }
+# Steam packaging bits of `regia package`/`regia steam upload` (specs/24 § 3): the
+# `steam_appid.txt` name and the Auto-Cloud configuration doc. Desktop tool; the crate's
+# `steamworks` feature stays off here (no SDK, no runtime Steam code in the CLI).
+regia_steam = { workspace = true }
+clap = { workspace = true }
+toml = { workspace = true }
+ron = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+anyhow = { workspace = true }
+blake3 = { workspace = true }
+walkdir = { workspace = true }
+# Package hygiene (ADR-8062) and key-track expect patterns (`regia play-gate`, ADR-8403) use the existing
+# workspace regex package (MIT OR Apache-2.0).
+regex = { workspace = true }
+# `regia logs triage` reads deflated ZIP members in memory (ADR-8035), and final-artifact audits decode
+# ZIP deflate and gzip entries in memory (ADR-8348); already in the tree via regia_viewer_pack `cook`.
+flate2 = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+# `regia server` passes a SIGTERM on to the server it started.
+[target.'cfg(unix)'.dependencies]
+signal-hook = { workspace = true }
+
+[dev-dependencies]
+# The `terrain passages import` ground summary test cooks DO27's Switchbacks fixture layout (ADR-8214).
+regia_world_geom = { workspace = true, features = ["fixtures"] }
+# `bake_gi` tests: unique temp dirs.
+regia_test_utils = { workspace = true }
+# Reads a written subset back (`assets_font_subset` tests).
+skrifa = { workspace = true }
+# `dcc_feed_client`: replays the client's take, mesh items included, in a headless world.
+regia_agent = { workspace = true, features = ["dcc-feed-assets"] }
+rmcp = { workspace = true, features = ["client", "transport-child-process"] }
+uuid = { workspace = true }
+# package_e2e decodes the agent's `png_base64` screenshot of the packaged arena.
+base64 = { workspace = true }
+
+[[test]]
+name = "closure_integrity"
+path = "tests/closure_integrity.rs"

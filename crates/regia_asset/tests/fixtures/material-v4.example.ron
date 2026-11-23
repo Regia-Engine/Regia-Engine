@@ -1,0 +1,27 @@
+(
+    format_version: 4,
+    name: "M_Feather",
+    shader: Standard,
+    base: (
+        base_color: (0.02, 0.03, 0.05, 1.0),
+        metallic: 0.0,
+        roughness: 0.35,
+        emissive: (0.0, 0.0, 0.0),
+        emissive_strength: 1.0,
+        orm_packed: true,
+        ior: 1.5,
+    ),
+    hard_surface: (
+        multi_scatter: true,
+        specular_occlusion: true,
+    ),
+    thin_film: (
+        factor: 0.9,
+        factor_map: "textures/feather_film.png",
+        ior: 1.56,
+        thickness_min: 180.0,
+        thickness_max: 520.0,
+        thickness_map: "textures/feather_thickness.png",
+    ),
+    render_state: (alpha_mode: opaque, queue_offset: 0, alpha_cutoff: 0.5),
+)

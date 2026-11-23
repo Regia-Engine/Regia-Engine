@@ -1,0 +1,27 @@
+format_version = 1
+id = "wall-blocks-the-ray"
+title = "Build a wall in the path of a ray"
+prompt = "A static floor is in the level. Build a static wall (a box collider, 1 m thick, 3 m high, 4 m wide) so that a ray cast from (0, 1, 0) along +X hits it between 4 m and 6 m away. Make sure the physics world has seen the wall before you check."
+features = ["physics", "scene"]
+crates = ["regia_agent", "regia_physics"]
+call_budget = 10
+
+[setup]
+target = "physics"
+
+[[setup.call]]
+method = "scene.spawn"
+params = { name = "Floor", components = { Transform = { translation = [0, -0.5, 0] }, RigidBody = { kind = "Static" }, Collider = { shape = { Box = { half_extents = [10, 0.5, 10] } } } } }
+
+[[check]]
+name = "the ray hits the wall"
+method = "physics.raycast"
+params = { origin = [0, 1, 0], direction = [1, 0, 0] }
+pointer = "/hit/distance"
+expect = { kind = "number_range", min = 4.0, max = 6.0 }
+
+[[check]]
+name = "floor and wall are static bodies"
+method = "physics.stats"
+pointer = "/fixed"
+expect = { kind = "equals", value = 2 }

@@ -1,0 +1,31 @@
+# Dynamic-symbol budget for regia_dylib (ADR-015, docs/06 § 5).
+# Warn at 50,000, fail at 60,000. Runs when dependencies change, and on demand at each milestone.
+name: export-count
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - Cargo.toml
+      - Cargo.lock
+      - crates/regia_dylib/**
+      - crates/regia/**
+      - xtask/src/exports.rs
+      - .github/workflows/export-count.yml
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  linux:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install system libraries
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends pkg-config libasound2-dev libudev-dev libdbus-1-dev libxkbcommon-dev libwayland-dev binutils
+      - name: Toolchain
+        run: rustup show active-toolchain || rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo xtask check-exports
+

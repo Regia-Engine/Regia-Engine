@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<!-- Hand-written fixture (ADR-3341): a node graph with interface inputs (exposed as material
+     parameters), mix, multiply, noise and a static ifgreater. -->
+<materialx version="1.38">
+  <nodegraph name="NG_paint">
+    <input name="tint" type="color3" value="0.9, 0.2, 0.1" />
+    <input name="dirt_amount" type="float" value="0.35" />
+    <constant name="dirt_color" type="color3">
+      <input name="value" type="color3" value="0.2, 0.15, 0.1" />
+    </constant>
+    <texcoord name="uv" type="vector2" />
+    <noise2d name="dirt_noise" type="float">
+      <input name="texcoord" type="vector2" nodename="uv" />
+      <input name="amplitude" type="float" value="0.5" />
+      <input name="pivot" type="float" value="0.5" />
+    </noise2d>
+    <multiply name="mask" type="float">
+      <input name="in1" type="float" nodename="dirt_noise" />
+      <input name="in2" type="float" interfacename="dirt_amount" />
+    </multiply>
+    <mix name="painted" type="color3">
+      <input name="fg" type="color3" nodename="dirt_color" />
+      <input name="bg" type="color3" interfacename="tint" />
+      <input name="mix" type="float" nodename="mask" />
+    </mix>
+    <multiply name="shaded" type="color3">
+      <input name="in1" type="color3" nodename="painted" />
+      <input name="in2" type="float" value="0.9" />
+    </multiply>
+    <ifgreater name="rough_pick" type="float">
+      <input name="value1" type="float" value="2.0" />
+      <input name="value2" type="float" value="1.0" />
+      <input name="in1" type="float" value="0.45" />
+      <input name="in2" type="float" value="0.9" />
+    </ifgreater>
+    <output name="out_color" type="color3" nodename="shaded" />
+    <output name="out_rough" type="float" nodename="rough_pick" />
+  </nodegraph>
+  <standard_surface name="SR_paint" type="surfaceshader">
+    <input name="base_color" type="color3" nodegraph="NG_paint" output="out_color" />
+    <input name="specular_roughness" type="float" nodegraph="NG_paint" output="out_rough" />
+  </standard_surface>
+  <surfacematerial name="M_paint" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="SR_paint" />
+  </surfacematerial>
+</materialx>

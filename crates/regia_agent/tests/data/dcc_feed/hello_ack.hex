@@ -1,0 +1,23 @@
+# hello_ack: session 7 accepted, default limits, 32 MiB window
+# Laid out by hand from docs/formats/dcc-feed-protocol-v1.md (spec 60 section 8 test 1).
+54 00 00 00                                          # len = 84
+81 00                                                # msg_type 0x0081
+00 00                                                # flags
+01 00 00 00                                          # seq 1
+01 00 00 00                                          # version 1
+07 00 00 00 00 00 00 00                              # session_id 7
+01                                                   # accepted
+1f 00 00 00                                          # caps 0x1f
+00 00 00 04                                          # max_message_bytes
+80 84 1e 00                                          # max_vertices
+00 1b b7 00                                          # max_indices
+00 08 00 00                                          # max_items
+00 04 00 00                                          # max_joints
+00 10 00 00                                          # max_clip_tracks
+a0 86 01 00                                          # max_keys_per_track
+00 20 00 00                                          # max_texture_dim
+00 00 00 10                                          # max_texture_bytes
+00 00 00 20 00 00 00 00                              # max_transient_texture_bytes (u64)
+80 00 00 00                                          # max_key_len
+00 00 00 02                                          # window_bytes
+05 00 72 65 67 69 61                                 # server_name "regia"

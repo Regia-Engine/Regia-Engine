@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://regia.engine/schemas/terrain-overview-descriptor.schema.json",
+  "title": "Terrain overview descriptor",
+  "description": "Engine-owned record of a published terrain overview PNG (CT-23, ADR-8596, docs/formats/terrain.md § 16), written beside it as <name>.overview.json: source identity, settings, image-to-world mapping, orientation, legend, markers, cache key and the cross-architecture comparison tolerance. Overviews are presentation-only. Kept in step with the writer by regia_terrain's test `the_json_schema_names_every_descriptor_field`.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["overview_descriptor", "algorithm", "cache_key", "image", "source", "settings", "mapping", "orientation", "legend", "markers", "tolerance", "presentation_only", "descriptor_digest"],
+  "properties": {
+    "overview_descriptor": {
+      "const": 2,
+      "description": "Descriptor version. A reader that sees another version treats the pair as not cached and bakes again."
+    },
+    "algorithm": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Version of the pixels a source and settings bake to (OVERVIEW_ALGORITHM_VERSION). Part of the cache key."
+    },
+    "cache_key": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "BLAKE3 (hex) of the algorithm version, the input digest, the decoded source, the settings and the markers."
+    },
+    "descriptor_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "BLAKE3 (hex) of the compact JSON of every other field, object keys sorted (version 2, ADR-8871). A reader that finds another value treats the pair as not cached: an edited or added field anywhere bakes again."
+    },
+    "presentation_only": {
+      "const": true,
+      "description": "Overview images are never simulation input."
+    },
+    "image": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "file": { "type": "string", "description": "The PNG's file name, in the descriptor's folder." },
+        "width": { "type": "integer", "minimum": 2 },
+        "height": { "type": "integer", "minimum": 2 },
+        "bytes": { "type": "integer", "minimum": 1 },
+        "blake3": { "type": "string", "pattern": "^[0-9a-f]{64}$", "description": "BLAKE3 of the PNG file. A PNG that does not hash to it is not the published overview." },
+        "missing_pixels": { "type": "integer", "minimum": 0, "description": "Pixels painted missing_rgb (no source data under them)." }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": { "type": "string", "description": "Project-relative source path." },
+        "input_digest": { "type": "string", "description": "BLAKE3 of the source, mapping and raster descriptor files as terrain.inspect_source reads them; empty when the caller had none." },
+        "content_digest": { "type": "string", "pattern": "^[0-9a-f]{64}$", "description": "BLAKE3 of the decoded grid, datum, scale, spacing, first sample, counts and valid mask." },
+        "cols": { "type": "integer", "minimum": 1 },
+        "rows": { "type": "integer", "minimum": 1 },
+        "spacing_m": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+        "sample0_m": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2, "description": "World X/Z of the south-west sample's center." },
+        "missing_samples": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "settings": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "size": { "type": "array", "items": { "type": "integer", "minimum": 2 }, "minItems": 2, "maxItems": 2 },
+        "fit": { "enum": ["stretch", "preserve_aspect"], "description": "stretch: the source fills the image (legacy); preserve_aspect: one scale, centered, letterbox_rgb around it." },
+        "relief": { "type": "number", "minimum": 0 },
+        "contour_step_m": { "type": ["number", "null"] },
+        "blur_passes": { "type": "integer", "minimum": 0, "maximum": 8 },
+        "light": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3, "description": "Direction from the ground to the light, [X, up, Z]." },
+        "ambient": { "type": "number", "minimum": 0, "maximum": 1 },
+        "contrast": { "type": "number", "minimum": 0 },
+        "frame_pixels": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "mapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "World X/Z = world_min.x + (u - content_px.x) * meters_per_pixel.x, world_max.z - (v - content_px.y) * meters_per_pixel.z, with (u, v) continuous pixel coordinates.",
+      "properties": {
+        "image_size": { "type": "array", "items": { "type": "integer" }, "minItems": 2, "maxItems": 2 },
+        "content_px": { "type": "array", "items": { "type": "integer" }, "minItems": 4, "maxItems": 4, "description": "[x, y, width, height] of the source rectangle in the image." },
+        "world_min": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2, "description": "World X/Z of the source rectangle's west and south edges (half a spacing beyond the first sample)." },
+        "world_max": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2, "description": "World X/Z of its east and north edges." },
+        "meters_per_pixel": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+        "pixel_origin": { "type": "string" },
+        "u_axis": { "type": "string" },
+        "v_axis": { "type": "string" }
+      }
+    },
+    "orientation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "north_up": { "const": true },
+        "row0": { "const": "north" },
+        "col0": { "const": "west" }
+      }
+    },
+    "legend": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "elevation_range_m": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2, "description": "1st and 99th percentile pixel heights, meters." },
+        "brightness": { "type": "string" },
+        "contour_step_m": { "type": ["number", "null"] },
+        "missing_rgb": { "type": "array", "items": { "type": "integer" }, "minItems": 3, "maxItems": 3 },
+        "letterbox_rgb": { "type": "array", "items": { "type": "integer" }, "minItems": 3, "maxItems": 3 },
+        "scale_bar_m": { "type": "number", "description": "A round length (1, 2 or 5 times a power of ten meters), at most a quarter of the source rectangle's width." },
+        "scale_bar_px": { "type": "number" }
+      }
+    },
+    "markers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "label": { "type": "string" },
+          "world_xz": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+          "rgb": { "type": "array", "items": { "type": "integer" }, "minItems": 3, "maxItems": 3 },
+          "pixel": { "type": ["array", "null"], "items": { "type": "integer" }, "description": "The pixel holding the marker's center; null outside the source rectangle (not drawn)." }
+        }
+      }
+    },
+    "tolerance": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "How far two bakes of one source and settings may differ across architectures.",
+      "properties": {
+        "max_channel_delta": { "type": "integer", "minimum": 0 },
+        "max_differing_fraction": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    }
+  }
+}

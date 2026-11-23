@@ -1,0 +1,2 @@
+# Oracle for close-the-gate: the calls a careful agent makes after the setup.
+{"method":"nav.add_obstacle","params":{"min":[-0.5,-1,-4],"max":[0.5,2,4]}}

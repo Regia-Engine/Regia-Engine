@@ -1,0 +1,54 @@
+// A `.rules.ron` v1 rule set with every genre section (ADR-8748): co-op waves, a race course, a
+// shrinking zone, elimination with an alliance, and strategy victory conditions with a surrender vote.
+(
+    format_version: 1,
+    id: "every_section",
+    name_key: "mode.every_section",
+    skeleton: "custom",
+    session: (
+        flow: (max_teams: 3, start_delay_ticks: 0),
+        objectives: (max_teams: 3),
+        respawn: (default: (kind: "lives", lives: 2)),
+        waves: (
+            waves: [
+                (groups: [(archetype: "grunt", count: 6, spawn_tag: "north")], alive_cap: 4),
+                (at: (kind: "at_tick", tick: 1800), groups: [(archetype: "boss", count: 1)]),
+            ],
+            difficulty: [(players: 1, count_percent: 100, cap_percent: 100), (players: 4, count_percent: 175, cap_percent: 150)],
+            players_team: 1,
+            shared_lives: Some(None),
+            fail_on_team_wipe: false,
+            success: objective_reached,
+        ),
+        race: (
+            checkpoints: [
+                (id: 1, volume: (min: (-2.5, -1.0, -2.5), max: (2.5, 3.0, 2.5)), next: [2, 3]),
+                (id: 2, volume: (min: (40.0, -1.0, -2.5), max: (45.0, 3.0, 2.5)), next: [1]),
+                (id: 3, volume: (min: (20.0, -1.0, 30.0), max: (25.0, 3.0, 35.0)), next: [1]),
+            ],
+            laps: 3,
+            finish_window_ticks: 600,
+            wrong_way_ticks: 45,
+        ),
+        zone: (
+            center: (12.5, -40.25),
+            radius: 750.0,
+            phases: [
+                (wait_ticks: 1200, shrink_ticks: 1800, end_radius: 300.0, damage_per_tick: 1),
+                (wait_ticks: 900, shrink_ticks: 0, end_radius: 0.0, damage_per_tick: 10),
+            ],
+            seed: 2701,
+        ),
+        elimination: (last_standing: true, alliances: [(teams: [2, 3])]),
+        victory: (
+            conditions: [
+                (kind: "destroy_all_tagged", tag: "commander"),
+                (kind: "hold_for", objective: 4, ticks: 3600),
+                (kind: "score_threshold", score: -1),
+                (kind: "team_elimination"),
+                (kind: "surrender"),
+            ],
+            surrender: (threshold_percent: 75, window_ticks: 600, cooldown_ticks: 3600),
+        ),
+    ),
+)

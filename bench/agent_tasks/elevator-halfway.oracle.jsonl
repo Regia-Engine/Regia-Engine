@@ -1,0 +1,6 @@
+# Oracle for elevator-halfway: the calls a careful agent makes after the setup.
+{"method":"play.pause"}
+{"method":"sequence.player","params":{"action":"load","seq_ron":"(version: 2, name: \"lift\", fps: 30.0, tracks: [(name: \"rise\", target: \"lift\", property: \"transform.position\", keys: Vec3([(time: 0.0, value: (0.0, 0.0, 0.0)), (time: 3.0, value: (0.0, 6.0, 0.0))]))], markers: [])","bindings":{"lift":"$e"},"end":"hold"}}
+{"method":"sequence.player","params":{"action":"play","time":1.5}}
+{"method":"sequence.player","params":{"action":"pause"}}
+{"method":"play.step","params":{"frames":3}}

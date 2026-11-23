@@ -1,0 +1,18 @@
+[package]
+name = "hello_window"
+description = "M1 sample: a window cleared to a colour driven by elapsed time, logging every input event."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia = { workspace = true }
+
+[dev-dependencies]
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }

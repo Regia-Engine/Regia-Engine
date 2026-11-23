@@ -1,0 +1,32 @@
+// Views of window_room.gi_compare.ron. The interior views carry the room's air as the leak mask;
+// the fly-through comes in from the yard through the window.
+(
+    format_version: 1,
+    size: (480, 270),
+    ev100: 11.5,
+    indirect_ev100: Some(10.5),
+    views: [
+        (
+            name: "facing_window",
+            eye: (0.0, 1.6, -2.1),
+            target: (0.0, 1.3, 2.5),
+            fov_y_deg: 75.0,
+            interior: Some((min: (-3.0, 0.0, -2.5), max: (3.0, 3.0, 2.5))),
+        ),
+        (
+            name: "sun_patch",
+            eye: (2.5, 2.3, 2.1),
+            target: (-0.8, 0.3, -1.6),
+            fov_y_deg: 70.0,
+            interior: Some((min: (-3.0, 0.0, -2.5), max: (3.0, 3.0, 2.5))),
+        ),
+        (name: "outside", eye: (6.0, 2.0, 11.0), target: (0.0, 1.5, 2.5), fov_y_deg: 50.0, ev100: Some(15.0), indirect_ev100: Some(12.5)),
+    ],
+    // Keys chosen so no frame lands inside the 0.2 m south wall (frames at z = 10, 7.7, 5.4,
+    // 3.1, 0.8 and the last key).
+    flythrough: [
+        (eye: (0.0, 1.6, 10.0), target: (0.0, 1.5, 2.5), fov_y_deg: 55.0, ev100: Some(14.5)),
+        (eye: (0.0, 1.6, 0.8), target: (-1.0, 0.8, -2.5), fov_y_deg: 70.0, ev100: Some(12.0)),
+        (eye: (-1.5, 1.7, -1.0), target: (1.5, 1.2, 1.5), fov_y_deg: 75.0, ev100: Some(11.5)),
+    ],
+)

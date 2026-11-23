@@ -1,0 +1,21 @@
+{
+  "ground": "#131316ff",
+  "raised": "#18181bff",
+  "panel": "#1f1f23ff",
+  "well": "#0f0f12ff",
+  "line": "#2b2b30ff",
+  "shade": "#ffffff40",
+  "muted": "#a8a8b0ff",
+  "strong": "#ffffffcc",
+  "text": "#e7e7e8ff",
+  "signal": "#ffffffff",
+  "on_signal": "#131316ff",
+  "warn": "#fdba74ff",
+  "error": "#ff6767ff",
+  "flat": true,
+  "fonts": {
+    "proportional": "JetBrains Mono",
+    "monospace": "JetBrains Mono",
+    "display": "Space Mono"
+  }
+}

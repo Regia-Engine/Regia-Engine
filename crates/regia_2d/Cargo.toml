@@ -1,0 +1,31 @@
+[package]
+name = "regia_2d"
+description = "2D toolkit: sprite atlases (pivot, 9-slice), sprite-sheet animation, tilemaps, the ortho pixel-perfect camera math and the instanced sprite pass."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia_core = { workspace = true }
+regia_app = { workspace = true }
+regia_ecs = { workspace = true }
+regia_asset = { workspace = true }
+regia_scene = { workspace = true }
+regia_render = { workspace = true }
+wgpu = { workspace = true }
+bytemuck = { workspace = true }
+serde = { workspace = true }
+ron = { workspace = true }
+postcard = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+regia_test_utils = { workspace = true }
+regia_ecs = { workspace = true }
+png = { workspace = true }

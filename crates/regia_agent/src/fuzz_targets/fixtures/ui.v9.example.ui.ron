@@ -1,0 +1,40 @@
+// `.ui.ron` v9 (ADR-3148): images and masks named by asset path or icon, nine-slice insets.
+(
+    version: 9,
+    root: (
+        name: "hud",
+        style: (direction: column, gap: (8, 8)),
+        children: [
+            (
+                name: "logo",
+                style: (size: (128, 64)),
+                image: (asset: "assets/ui/logo.png"),
+            ),
+            (
+                name: "settings",
+                style: (size: (24, 24)),
+                image: (icon: "gear", tint: "#c0c0c0ff"),
+            ),
+            (
+                name: "panel",
+                style: (size: (300, 120)),
+                image: (asset: "assets/ui/panel.png", nine_slice: (12.0, 12.0, 12.0, 12.0)),
+            ),
+            (
+                name: "portrait",
+                style: (size: (96, 96)),
+                group_opacity: 0.9,
+                mask: (icon: "ring", fit: contain),
+                children: [
+                    (name: "face", style: (size: (96, 96)), image: (id: 7)),
+                ],
+            ),
+            (
+                name: "badge",
+                style: (size: (48, 48)),
+                mask: (asset: "assets/ui/star.png"),
+                background: "#ffd040ff",
+            ),
+        ],
+    ),
+)

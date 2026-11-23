@@ -1,0 +1,32 @@
+(
+    version: 11,
+    root: (
+        name: "hud",
+        safe_area: true,
+        style: (direction: column, padding: 16, gap: (8, 8)),
+        children: [
+            (
+                name: "score",
+                classes: ["surface"],
+                style: (padding: 8, size: (200, Auto)),
+                text: (spans: ["Score: 0"], style: (font_px: 22)),
+                bind: (source: "Score.value", format: "Score: {:03}"),
+            ),
+            (
+                name: "health",
+                widget: progress(1.0),
+                style: (size: (200, 10)),
+                bindings: [(source: "HudVm.health", target: progress)],
+            ),
+            (
+                widget: button,
+                interactable: true,
+                style: (padding: 10),
+                command: "menu.start",
+                children: [(
+                    text: (spans: [Loc("menu-start")]),
+                )],
+            ),
+        ],
+    ),
+)

@@ -1,0 +1,7 @@
+(format_version: 1, profiles: [
+    (name: "Desktop review", target: "standalone", build_profile: "dev", cook: "incremental",
+     package: false, device: None, start_level: Some("levels/review.level.ron"),
+     extra_arguments: ["--review", "two words"]),
+    (name: "Phone", target: "android", build_profile: "shipping", cook: "full",
+     package: true, device: Some("test-device"), start_level: None, extra_arguments: []),
+])

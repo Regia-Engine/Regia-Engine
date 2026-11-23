@@ -1,0 +1,26 @@
+// Input script for soaks of `samples/arena` (`cargo xtask soak --input ...`), exercising the
+// sample's own bindings: WASD drive "Move", cursor drags drive "Look", Space is "Jump", and the
+// left mouse button fires "Fire" (raw `mouse_button` events). The timeline loops until the
+// session ends. In a pure bot-vs-bot match (`--no-local-player`) the local-player movement and
+// firing are inert, but the injections still exercise the input → action → camera/weapon path.
+(
+    loop: true,
+    steps: [
+        // Strafe around the arena.
+        (at: 0.0, action: Hold(key: "KeyW", until: 2.0)),
+        (at: 2.0, action: Hold(key: "KeyA", until: 3.5)),
+        (at: 3.5, action: Hold(key: "KeyS", until: 5.0)),
+        (at: 5.0, action: Hold(key: "KeyD", until: 6.5)),
+        // Jump now and then.
+        (at: 1.0, action: Press(key: "Space")),
+        (at: 4.0, action: Press(key: "Space")),
+        // Look around between the holds: 30 Hz cursor drags.
+        (at: 0.5, action: Look(from: (640.0, 360.0), delta: (240.0, -100.0), for_secs: 2.0)),
+        (at: 3.0, action: Look(from: (400.0, 360.0), delta: (-300.0, 120.0), for_secs: 2.5)),
+        // Fire the rifle in short bursts.
+        (at: 1.5, action: Raw([(type: "mouse_button", button: "left", state: "pressed")])),
+        (at: 1.6, action: Raw([(type: "mouse_button", button: "left", state: "released")])),
+        (at: 4.5, action: Raw([(type: "mouse_button", button: "left", state: "pressed")])),
+        (at: 4.6, action: Raw([(type: "mouse_button", button: "left", state: "released")])),
+    ],
+)

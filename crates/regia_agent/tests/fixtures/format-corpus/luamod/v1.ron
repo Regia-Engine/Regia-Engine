@@ -1,0 +1,10 @@
+(
+    format_version: 1,
+    id: "example.lights",
+    name: "Blinking lights",
+    version: "1.0.0",
+    entry: "main.lua",
+    api_version: 1,
+    instruction_budget: Some(200000),
+    memory_limit_bytes: Some(8388608),
+)

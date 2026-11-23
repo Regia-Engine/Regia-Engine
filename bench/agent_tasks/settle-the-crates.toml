@@ -1,0 +1,26 @@
+format_version = 1
+id = "settle-the-crates"
+title = "Drop five crates and let them all fall asleep"
+prompt = "A static floor is in the level. Spawn five dynamic crates (box colliders, half extent 0.5) named 'Crate 1' to 'Crate 5' about 1 m above the floor, at least 3 m apart from each other, then run the physics until every body is asleep."
+features = ["physics"]
+crates = ["regia_agent", "regia_physics"]
+call_budget = 12
+
+[setup]
+target = "physics"
+
+[[setup.call]]
+method = "scene.spawn"
+params = { name = "Floor", components = { Transform = { translation = [0, -0.5, 0] }, RigidBody = { kind = "Static" }, Collider = { shape = { Box = { half_extents = [10, 0.5, 10] } } } } }
+
+[[check]]
+name = "five dynamic bodies"
+method = "physics.stats"
+pointer = "/dynamic"
+expect = { kind = "equals", value = 5 }
+
+[[check]]
+name = "all asleep"
+method = "physics.stats"
+pointer = "/awake"
+expect = { kind = "equals", value = 0 }

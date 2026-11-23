@@ -1,0 +1,29 @@
+SceneFile(
+    format_version: 8,
+    entities: [
+        (
+            guid: "0b6f3f6a-5c1e-4a07-9f3e-2f3b7a1d0c01",
+            name: "Arena",
+            components: {
+                "regia_scene::transform::Transform": (
+                    translation: (0.0, 0.0, 0.0),
+                    rotation: (0.0, 0.0, 0.0, 1.0),
+                    scale: (1.0, 1.0, 1.0),
+                ),
+            },
+        ),
+        (
+            guid: "0b6f3f6a-5c1e-4a07-9f3e-2f3b7a1d0c11",
+            name: "Spawn A",
+            parent: Some("0b6f3f6a-5c1e-4a07-9f3e-2f3b7a1d0c01"),
+            components: {
+                "regia_scene::transform::Transform": (
+                    translation: (4.0, 0.0, 0.0),
+                    rotation: (0.0, 0.0, 0.0, 1.0),
+                    scale: (1.0, 1.0, 1.0),
+                ),
+                "dedicated_server::SpawnPoint": (),
+            },
+        ),
+    ],
+)

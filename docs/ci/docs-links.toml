@@ -1,0 +1,121 @@
+format_version = 1
+
+[[miss]]
+file = "docs/decisions.md"
+target = "../crates/ferrite_render/src/lab_frame.rs"
+reason = "referenced source file is missing"
+
+[[miss]]
+file = "docs/decisions.md"
+target = "../crates/ferrite_render/src/light_budget.rs"
+reason = "referenced source file is missing"
+
+[[miss]]
+file = "docs/evidence/cleanroom/public-sources-2026-11-08.md"
+target = "<workspace>"
+reason = "absolute link to a scratch report outside the repository (already on integ-v048 when the link check was merged, integ-v049-recover-assets-tools)"
+
+[[miss]]
+file = "docs/evidence/cleanroom/public-sources-2026-11-08.md"
+target = "<workspace>"
+reason = "absolute link to a scratch report outside the repository (already on integ-v048 when the link check was merged, integ-v049-recover-assets-tools)"
+
+[[miss]]
+file = "docs/evidence/cleanroom/public-sources-2026-11-08.md"
+target = "<workspace>"
+reason = "absolute link to a scratch report outside the repository (already on integ-v048 when the link check was merged, integ-v049-recover-assets-tools)"
+
+[[miss]]
+file = "docs/evidence/cleanroom/public-sources-2026-11-08.md"
+target = "<workspace>"
+reason = "absolute link to a scratch report outside the repository (already on integ-v048 when the link check was merged, integ-v049-recover-assets-tools)"
+
+[[miss]]
+file = "docs/provenance.md"
+target = "<workspace>"
+reason = "absolute link to a scratch report outside the repository (already on integ-v048 when the link check was merged, integ-v049-recover-assets-tools)"
+
+[[miss]]
+file = "docs/provenance.md"
+target = "<workspace>"
+reason = "absolute link to a scratch report outside the repository (already on integ-v048 when the link check was merged, integ-v049-recover-assets-tools)"
+
+[[miss]]
+file = "docs/provenance.md"
+target = "<workspace>"
+reason = "absolute link to a scratch report outside the repository (already on integ-v048 when the link check was merged, integ-v049-recover-assets-tools)"
+
+[[miss]]
+file = "docs/provenance.md"
+target = "<workspace>"
+reason = "absolute link to a scratch report outside the repository (already on integ-v048 when the link check was merged, integ-v049-recover-assets-tools)"
+
+[[miss]]
+file = "docs/releases/v0.1.28-integ-kbatch3.md"
+target = "book/agents/content-chunks.md"
+reason = "referenced file is missing (already on integ-v048 when the link check was merged, integ-v049-recover-assets-tools)"
+
+[[miss]]
+file = "docs/releases/v0.1.28-integ-v044.md"
+target = "book/agents/content-chunks.md"
+reason = "referenced file is missing (already on integ-v048 when the link check was merged, integ-v049-recover-assets-tools)"
+
+[[miss]]
+file = "docs/releases/v0.1.28-pak-diff-report.md"
+target = "book/agents/content-chunks.md"
+reason = "referenced file is missing (already on integ-v048 when the link check was merged, integ-v049-recover-assets-tools)"
+
+[[miss]]
+file = "docs/v05-owner-release-packet.md"
+target = "<workspace>"
+reason = "absolute link to a scratch report outside the repository (already on integ-v048 when the link check was merged, integ-v049-recover-assets-tools)"
+
+[[miss]]
+file = "docs/v05-owner-release-packet.md"
+target = "<workspace>"
+reason = "absolute link to a scratch report outside the repository (already on integ-v048 when the link check was merged, integ-v049-recover-assets-tools)"
+
+[[miss]]
+file = "docs/v05-owner-release-packet.md"
+target = "<workspace>"
+reason = "absolute link to a scratch report outside the repository (already on integ-v048 when the link check was merged, integ-v049-recover-assets-tools)"
+
+[[miss]]
+file = "docs/v05-owner-release-packet.md"
+target = "<workspace>"
+reason = "absolute link to a scratch report outside the repository (already on integ-v048 when the link check was merged, integ-v049-recover-assets-tools)"
+
+[[miss]]
+file = "docs/v05-owner-release-packet.md"
+target = "<workspace>"
+reason = "absolute link to a scratch report outside the repository (already on integ-v048 when the link check was merged, integ-v049-recover-assets-tools)"
+
+[[miss]]
+file = "docs/v05-owner-release-packet.md"
+target = "<workspace>"
+reason = "absolute link to a scratch report outside the repository (already on integ-v048 when the link check was merged, integ-v049-recover-assets-tools)"
+
+[[miss]]
+file = "docs/v05-owner-release-packet.md"
+target = "<workspace>"
+reason = "absolute link to a scratch report outside the repository (already on integ-v048 when the link check was merged, integ-v049-recover-assets-tools)"
+
+[[miss]]
+file = "docs/v05-owner-release-packet.md"
+target = "<workspace>"
+reason = "absolute link to a scratch report outside the repository (already on integ-v048 when the link check was merged, integ-v049-recover-assets-tools)"
+
+[[miss]]
+file = "docs/v05-owner-release-packet.md"
+target = "<workspace>"
+reason = "absolute link to a scratch report outside the repository (already on integ-v048 when the link check was merged, integ-v049-recover-assets-tools)"
+
+[[miss]]
+file = "docs/v05-owner-release-packet.md"
+target = "<workspace>"
+reason = "absolute link to a scratch report outside the repository (already on integ-v048 when the link check was merged, integ-v049-recover-assets-tools)"
+
+[[miss]]
+file = "docs/v05-owner-release-packet.md"
+target = "<workspace>"
+reason = "absolute link to a scratch report outside the repository (already on integ-v048 when the link check was merged, integ-v049-recover-assets-tools)"

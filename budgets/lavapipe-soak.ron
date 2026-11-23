@@ -1,0 +1,25 @@
+// Soak budgets for headless runs on Mesa lavapipe (software rasterisation), where frame times
+// are *real* (the Xvfb surface presents at full rate) but not representative of a reference GPU.
+// `check_frames: false` keeps `frame_p99_ms`/`frame_max_ms` measured and reported — they do not
+// gate the verdict. Crashes, errors, start latency and the RSS ceiling still gate (what lavapipe
+// *can* assert, `docs/06-testing-and-ci.md` § 4). The frame budgets below are the desktop
+// reference numbers; run `cargo xtask soak` with `budgets/default.ron` on the real GPU for those.
+(
+    frame_p99_ms: 6.9,
+    frame_max_ms: 50.0,
+    warmup_secs: 10.0,
+    rss_mb: 1536.0,
+    // Cold start is unrepresentative on lavapipe: the first frame compiles shaders and creates
+    // the software surface (~1.5 s), and `agent.hello` is answered in that frame's `PreUpdate`.
+    // Relaxed from the 3.0 s desktop budget; the number is still recorded and reported.
+    start_secs: 15.0,
+    errors: 0,
+    // Two warnings are environment-specific to Xvfb (winit XSETTINGS + XRandR "0mm" on the
+    // virtual display). No cpal underrun is expected: the audio-output gate (ADR-028) pauses the
+    // stream while surfaces are hidden *and* while a slow frame loop starves the realtime callback,
+    // so a CPU-bound lavapipe run no longer produces "buffer underrun or overrun" lines. Allowance
+    // is exactly those two Xvfb warnings.
+    warns: 2,
+    crashes: 0,
+    check_frames: false,
+)

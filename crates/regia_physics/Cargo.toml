@@ -1,0 +1,42 @@
+[package]
+name = "regia_physics"
+description = "rapier3d integration: bodies, colliders, joints, queries, character controller."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia_core = { workspace = true }
+regia_ecs = { workspace = true }
+regia_app = { workspace = true }
+regia_asset = { workspace = true }
+regia_scene = { workspace = true }
+# `vehicle_track` steps through the lockstep tracked model (ADR-8551). Foundation crate: no ECS, GPU or
+# platform dependency of its own.
+regia_detsim = { workspace = true }
+# DVec3 for the f64 geometry in `convex_decomposition` (glam is regia_core's math re-export).
+glam = { workspace = true }
+rapier3d = { workspace = true }
+# 2D physics (specs/22 § T2.10), behind the `physics2d` feature.
+rapier2d = { workspace = true, optional = true }
+ron = { workspace = true }
+serde = { workspace = true }
+tracing = { workspace = true }
+thiserror = { workspace = true }
+
+[features]
+# rapier2d bodies/colliders/queries mirroring the 3D wrapper (`regia_physics::physics2d`, specs/22 § T2.10).
+physics2d = ["dep:rapier2d"]
+# Cross-platform lockstep determinism (specs/15 § 5): rapier's `enhanced-determinism`
+# replaces platform-dependent floating-point reductions. Costs speed; off by default.
+physics-cross-platform-determinism = ["rapier3d/enhanced-determinism", "rapier2d?/enhanced-determinism"]
+
+[dev-dependencies]
+regia_terrain = { workspace = true }
+# The shared counting allocator of the allocation tests (ADR-3291).
+regia_test_utils = { workspace = true }

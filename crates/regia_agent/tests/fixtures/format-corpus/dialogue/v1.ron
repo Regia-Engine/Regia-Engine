@@ -1,0 +1,54 @@
+(
+    format_version: 1,
+    name: "gate",
+    lines: [
+        (
+            id: "halt",
+            speaker: "guard_captain",
+            listeners: [
+                "player",
+            ],
+            note: "Shouted from the wall.",
+            text_key: None,
+            display_key: None,
+            mature: false,
+            variants: [
+                (
+                    speaker: None,
+                    listener: None,
+                    sound: "audio/vo/halt.ogg",
+                    cues: None,
+                ),
+                (
+                    speaker: Some("guard_captain"),
+                    listener: Some("player"),
+                    sound: "audio/vo/halt_player.ogg",
+                    cues: Some([
+                        (
+                            at: 0.0,
+                            until: Some(1.25),
+                            text_key: Some("dlg-gate-halt-1"),
+                            text: None,
+                        ),
+                        (
+                            at: 1.25,
+                            until: None,
+                            text_key: Some("dlg-gate-halt-2"),
+                            text: None,
+                        ),
+                    ]),
+                ),
+            ],
+        ),
+        (
+            id: "pass",
+            speaker: "guard_captain",
+            listeners: [],
+            note: "",
+            text_key: Some("dlg-gate-pass-custom"),
+            display_key: Some("dlg-gate-pass-short"),
+            mature: true,
+            variants: [],
+        ),
+    ],
+)

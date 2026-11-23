@@ -1,0 +1,47 @@
+(
+    format: "lightmap",
+    entries: [
+        (
+            version: 1,
+            file: "v1.flmap",
+            origin: "git 9c51cf02f915e84e1ea6ccaa4c192914bed39174:crates/regia_asset/tests/fixtures/lightmap-v1.flmap",
+            exercises: "baseline: RGB9E5 texels, coverage and geometry sections, no direction section",
+        ),
+        (
+            version: 2,
+            file: "v2.flmap",
+            origin: "git 810f30fdabe54bc9b3780ac37caad26bc6977cc3:crates/regia_asset/tests/fixtures/lightmap-v2.flmap",
+            exercises: "adds the direction section (RGBA8 per texel)",
+        ),
+        (
+            version: 3,
+            file: "v3.flmap",
+            origin: "git 5ba99e57af05842a9aca27f40b25c58369d673d0:crates/regia_asset/tests/fixtures/lightmap-v3.flmap",
+            exercises: "adds atlas UV2 unwrap geometry and chart-seam data (lightmaps-tools)",
+        ),
+        (
+            version: 4,
+            file: "v4.flmap",
+            origin: "git 34f44dde67bbd1ed98dd536df9d1cb9adcc4c1aa:crates/regia_asset/tests/fixtures/lightmap-v4.flmap",
+            exercises: "adds clusters baked over the unwrap (lightmaps-renderer; written by the v4 encoder at f612a1ada)",
+        ),
+        (
+            version: 5,
+            file: "v5.flmap",
+            origin: "registry fixture (version 1) loaded and re-encoded by the loader at version 5 (v5 was current at the corpus branch base)",
+            exercises: "v5: what v5 froze",
+        ),
+        (
+            version: 6,
+            file: "v6.flmap",
+            origin: "git 8624220d0:crates/regia_asset/tests/fixtures/lightmap-v6.flmap (the v6 fixture written for the v7 bump\'s migrator test)",
+            exercises: "v6: the last single-page atlas layout before v7\'s pages",
+        ),
+        (
+            version: 7,
+            file: "v7.bin",
+            origin: "registry fixture (version 1) loaded and re-encoded by the loader at version 7",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+    ],
+)

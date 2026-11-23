@@ -1,0 +1,41 @@
+[package]
+name = "regia_crash"
+description = "Opt-in crash-report and match-log uploader (specs/21 § 5)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+# `tls` enables `https://` upload endpoints via ureq + rustls (`ring` provider). Off by default so the
+# default build stays free of a TLS stack; production crash-report endpoints must use `https://`, so
+# games that opt into uploading enable this (docs/03 § 7, specs/21 § 5).
+default = []
+tls = ["dep:ureq", "dep:webpki-roots"]
+
+[dependencies]
+regia_app = { workspace = true }
+# `regia_core::ron_pretty()`: the outbox ledger is written with `\n` line ends on every host (the
+# `ron_pretty_lint` test). Already in this crate's build through regia_app and regia_platform.
+regia_core = { workspace = true }
+regia_platform = { path = "../regia_platform", default-features = false }
+# The report outbox ledger (`outbox.ron`, src/outbox.rs, ADR-8402); both already workspace dependencies.
+ron = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+ureq = { workspace = true, optional = true }
+# The Mozilla root list ureq itself uses (same 0.26 line, already in the lock); needed here to build the
+# guarded TLS connector (src/tls_guard.rs, ADR-2151).
+webpki-roots = { version = "0.26", optional = true }
+
+[dev-dependencies]
+regia_test_utils = { workspace = true }
+# The self-signed-cert TLS round-trip test builds a rustls server and a ureq agent that trusts only
+# that certificate (trusted in the test only).
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
+rcgen = "0.14"

@@ -1,0 +1,26 @@
+(
+    header: (
+        format_version: 3,
+        engine_version: "9.9.9",
+        build_hash: "c0ffee1",
+        content_hash: "",
+        seed: 42,
+        level: "arena",
+        tick_rate_hz: 60,
+        step_count: 4,
+        keyframe_interval: 2,
+    ),
+    actions: ["Fire", "Move"],
+    steps: [
+        [(0.0, 0.0, 0.0), (0.25, 0.0, 0.0)],
+        [(1.0, 0.0, 0.0), (0.5, -0.5, 0.0)],
+        [(1.0, 0.0, 0.0), (-1.0, 0.0, 1.0)],
+        [(0.0, 0.0, 0.0), (0.0, 0.0, 0.0)],
+    ],
+    keyframes: [
+        (tick: 0, state_hash: 1234567890, snapshot_hex: ""),
+        (tick: 2, state_hash: 987654321, snapshot_hex: "0a01ff"),
+        (tick: 4, state_hash: 18446744073709551615, snapshot_hex: ""),
+    ],
+)
+// regia-demo-end

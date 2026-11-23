@@ -1,0 +1,17 @@
+(
+    format_version: 1,
+    animations: {
+        "pop": (
+            tracks: [
+                (property: "opacity", keys: [(time: 0.0, value: 0.0), (time: 0.2, value: 1.0, ease: "quad_out")]),
+                (property: "scale", keys: [(time: 0.0, value: 0.9), (time: 0.2, value: 1.0, ease: "back_out")]),
+            ],
+        ),
+        "blink": (
+            tracks: [(property: "opacity", keys: [(time: 0.0, value: 1.0), (time: 0.5, value: 0.2)])],
+            mode: ping_pong,
+            loops: 3,
+            speed: 2.0,
+        ),
+    },
+)

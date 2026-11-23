@@ -1,0 +1,11 @@
+BanList(
+    format_version: 2,
+    entries: [
+        (id: 1, kind: PlatformId, value: "steam:76561190000000000", until: None, reason: "cheating", added: 1793000000),
+        (id: 2, kind: Address, value: "203.0.113.7", until: Some(1793600000), reason: "spam", added: 1793000000),
+        (id: 3, kind: Address, value: "198.51.100.0/24", until: None, reason: "botnet", added: 1793000000),
+        (id: 4, kind: Address, value: "2001:db8::7/128", until: None, reason: "one exact IPv6 address", added: 1793000000),
+        (id: 5, kind: Address, value: "2001:db8:1::/64", until: None, reason: "an IPv6 /64", added: 1793000000),
+        (id: 6, kind: Name, value: "griefer", until: Some(1793600000), reason: "griefing", added: 1793000000),
+    ],
+)

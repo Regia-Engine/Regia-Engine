@@ -1,0 +1,572 @@
+/* Regia Engine Manual — PiercingXX brand.
+   Tokens match piercingxx-branding/branding/tokens/colors.css and
+   piercing-graphite.css (BRAND-GUIDE.md §3; resynced 2026-11-18, ADR-8585):
+   Graphite ground, Signal reserved, body at the 90% stop. `cargo xtask manual` substitutes the three font url
+   tokens in this file with data: URIs and writes book/theme/piercing.css. */
+
+@font-face {
+  font-family: "Space Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("__SPACE400__") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Space Mono";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("__SPACE700__") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 300 800;
+  font-display: swap;
+  src: url("__JETBRAINS__") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Piercing Graphite (BRAND-GUIDE §3.8, tokens/piercing-graphite.css) — the dark default: the manual is a
+   product web page, and product surfaces use Graphite or AMOLED Night (dark) and Paper (light). In this
+   file --pxx-ink is the page ground and the three ramp steps are the Graphite roles: --pxx-ink-raised
+   cards and code (pg-panel), --pxx-graphite dialogs and menus (pg-raised), --pxx-slate fields (pg-field).
+   Opacity stops and functional colors are tokens/colors.css (§§ 3.2, 3.5); muted is pg-quiet. */
+:root {
+  --pxx-ink: #131316;
+  --pxx-signal: #ffffff;
+  --pxx-emphasis-bg: #ffffff;
+  --pxx-emphasis-fg: #131316;
+  --pxx-sidebar: #09090b;
+  --pxx-ink-raised: #18181b;
+  --pxx-graphite: #1f1f23;
+  --pxx-slate: #0f0f12;
+  --pxx-hover: #26262b;
+  --pxx-line: #2b2b30;
+  --pxx-shade: rgba(255, 255, 255, 0.25);
+  --pxx-edge: #7c7c84;
+  --pxx-muted: #a8a8b0;
+  --pxx-faint: #92929b;
+  --pxx-strong: rgba(255, 255, 255, 0.80);
+  --pxx-text: #e7e7e8;
+  --pxx-ok: rgba(255, 255, 255, 0.90);
+  --pxx-success: #61ffca;
+  --pxx-warn: #fdba74;
+  --pxx-error: #ff6767;
+  --pxx-info: #7aa2ff;
+  --pxx-highlight: rgba(255, 255, 255, 0.06);
+  --pxx-inv-muted: rgba(0, 0, 0, 0.55);
+  --pxx-inv-line: rgba(0, 0, 0, 0.15);
+  --pxx-font-display: "Space Mono", ui-monospace, monospace;
+  --pxx-font-body: "JetBrains Mono", ui-monospace, monospace;
+  --bg: var(--pxx-ink);
+  --fg: var(--pxx-text);
+  --muted: var(--pxx-muted);
+  --side: var(--pxx-sidebar);
+  --line: var(--pxx-line);
+  --link: var(--pxx-signal);
+  --accent: var(--pxx-signal);
+  --code-bg: var(--pxx-ink-raised);
+  --code-fg: var(--pxx-text);
+  color-scheme: dark;
+}
+
+/* Paper — the brand's light preset (#F3EEE2, BRAND-GUIDE §3.3). Signal on Paper is Ink (#000000) and
+   emphasis inverts to an ink block with paper text; text and lines are ink at the opacity stops; the
+   surfaces and the light functional colors (§3.5: success #255F4C, info #3F5485, warn #6D5032, error
+   #8F3939, each 4.5:1 on Paper) are the UI kit's piercingxx-paper values. The mark stays Signal on an
+   Ink tile. */
+html[data-theme="light"],
+html.light,
+html.rust {
+  --pxx-ink: #f3eee2;
+  --pxx-signal: #000000;
+  --pxx-emphasis-bg: #000000;
+  --pxx-emphasis-fg: #f3eee2;
+  --pxx-sidebar: #ece7db;
+  --pxx-ink-raised: #ece7db;
+  --pxx-graphite: #e6e1d6;
+  --pxx-slate: #e1dcd1;
+  --pxx-hover: #e4e0d4;
+  --pxx-line: rgba(0, 0, 0, 0.12);
+  --pxx-shade: rgba(0, 0, 0, 0.38);
+  --pxx-edge: rgba(0, 0, 0, 0.48);
+  --pxx-muted: rgba(0, 0, 0, 0.64);
+  --pxx-faint: rgba(0, 0, 0, 0.56);
+  --pxx-strong: rgba(0, 0, 0, 0.82);
+  --pxx-text: rgba(0, 0, 0, 0.90);
+  --pxx-ok: rgba(0, 0, 0, 0.90);
+  --pxx-success: #255f4c;
+  --pxx-warn: #6d5032;
+  --pxx-error: #8f3939;
+  --pxx-info: #3f5485;
+  --pxx-highlight: rgba(255, 255, 255, 0.60);
+  --pxx-inv-muted: rgba(243, 238, 226, 0.55);
+  --pxx-inv-line: rgba(243, 238, 226, 0.15);
+  --bg: var(--pxx-ink);
+  --fg: var(--pxx-text);
+  --muted: var(--pxx-muted);
+  --side: var(--pxx-sidebar);
+  --line: var(--pxx-line);
+  --link: var(--pxx-signal);
+  --accent: var(--pxx-signal);
+  --code-bg: var(--pxx-ink-raised);
+  --code-fg: var(--pxx-text);
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+html { scroll-padding-top: 1rem; }
+body {
+  margin: 0;
+  background: var(--pxx-ink);
+  color: var(--pxx-text);
+  font: 400 16px/1.55 var(--pxx-font-body);
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--pxx-signal); text-decoration: none; }
+a:hover { text-decoration: underline; }
+:focus-visible { outline: 2px solid var(--pxx-signal); outline-offset: 2px; }
+::selection { background: var(--pxx-emphasis-bg); color: var(--pxx-emphasis-fg); }
+::placeholder { color: var(--pxx-shade); opacity: 1; }
+
+/* Single-file manual layout. Scoped so it does not restyle mdBook's own
+   `#sidebar`, `main`, or `body.js` chapter list. */
+html.pxx-manual #sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 300px;
+  overflow-y: auto;
+  background: var(--pxx-sidebar);
+  border-right: 1px solid var(--pxx-line);
+  padding: 0 0 2rem;
+}
+html.pxx-manual .brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 16px 12px;
+}
+html.pxx-manual .lockup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  color: var(--pxx-signal);
+  text-decoration: none;
+}
+html.pxx-manual .lockup:hover { text-decoration: none; }
+html.pxx-manual .mark-slot {
+  display: inline-flex;
+  flex: none;
+  line-height: 0;
+}
+html.pxx-manual .mark-slot svg,
+html.pxx-manual svg.mark {
+  width: 40px;
+  height: 40px;
+  min-width: 24px;
+  min-height: 24px;
+  display: block;
+}
+html.pxx-manual .wordmark {
+  font-family: var(--pxx-font-display);
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 0;
+  color: var(--pxx-signal);
+  line-height: 1;
+}
+/* Theme and menu buttons invert: Signal block, Ink text (BRAND-GUIDE §3.1). */
+html.pxx-manual #theme,
+html.pxx-manual #menu {
+  background: var(--pxx-emphasis-bg);
+  border: 1px solid var(--pxx-emphasis-bg);
+  color: var(--pxx-emphasis-fg);
+  border-radius: 0;
+  cursor: pointer;
+  font: 500 11px/1 var(--pxx-font-body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 8px 10px;
+}
+html.pxx-manual #theme:hover,
+html.pxx-manual #menu:hover { text-decoration: underline; }
+html.pxx-manual #menu {
+  display: none;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 20;
+}
+html.pxx-manual #search {
+  display: block;
+  width: calc(100% - 32px);
+  margin: 8px 16px 12px;
+  padding: 8px 10px;
+  border: 1px solid var(--pxx-line);
+  border-radius: 0;
+  background: var(--pxx-ink);
+  color: var(--pxx-text);
+  font: inherit;
+  font-size: 14px;
+}
+html.pxx-manual #results { padding: 0 8px 16px; }
+html.pxx-manual #results a {
+  display: block;
+  padding: 8px 10px;
+  color: var(--pxx-text);
+  border-left: 2px solid transparent;
+}
+html.pxx-manual #results a:hover,
+html.pxx-manual #results a.sel {
+  background: var(--pxx-line);
+  border-left-color: var(--pxx-signal);
+  text-decoration: none;
+}
+html.pxx-manual #results .rt { font-family: var(--pxx-font-display); font-size: 14px; color: var(--pxx-text); }
+html.pxx-manual #results .rp { color: var(--pxx-muted); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+html.pxx-manual #results .rs { color: var(--pxx-muted); font-size: 13px; line-height: 1.4; }
+html.pxx-manual #results .none { color: var(--pxx-muted); padding: 8px 10px; font-size: 14px; }
+mark { background: var(--pxx-emphasis-bg); color: var(--pxx-emphasis-fg); border-radius: 0; }
+
+html.pxx-manual .toc,
+html.pxx-manual .toc ul { list-style: none; margin: 0; padding: 0; }
+html.pxx-manual .toc .part {
+  margin: 18px 16px 6px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pxx-muted);
+  font-weight: 500;
+}
+html.pxx-manual .toc .chap > a {
+  display: block;
+  padding: 4px 16px;
+  color: var(--pxx-text);
+  font-size: 13px;
+  border-left: 2px solid transparent;
+}
+html.pxx-manual .toc .depth1 > a { padding-left: 28px; }
+html.pxx-manual .toc .depth2 > a { padding-left: 40px; }
+html.pxx-manual .toc .depth3 > a { padding-left: 52px; }
+html.pxx-manual .toc .chap.active > a {
+  background: var(--pxx-emphasis-bg);
+  color: var(--pxx-emphasis-fg);
+  border-left-color: var(--pxx-emphasis-bg);
+  font-weight: 700;
+  text-decoration: none;
+}
+html.pxx-manual .toc .sub { display: none; margin: 2px 0 6px; }
+html.pxx-manual .toc .chap.active > .sub { display: block; }
+html.pxx-manual .toc .sub a {
+  display: block;
+  padding: 2px 16px 2px 28px;
+  font-size: 12px;
+  color: var(--pxx-muted);
+}
+html.pxx-manual .toc .depth1 .sub a { padding-left: 40px; }
+html.pxx-manual .toc .chap.active > .sub a {
+  color: var(--pxx-muted);
+  background: transparent;
+  border-left-color: transparent;
+  font-weight: 400;
+}
+
+html.pxx-manual main {
+  margin-left: 300px;
+  padding: 28px 48px 64px;
+  max-width: calc(300px + 58rem);
+}
+html.pxx-manual .chapter { max-width: 52rem; }
+html.pxx-manual.js .chapter { display: none; }
+html.pxx-manual.js .chapter.active { display: block; }
+html.pxx-manual .chapter + .chapter { border-top: 1px solid var(--pxx-line); }
+html.pxx-manual.js .chapter + .chapter { border-top: 0; }
+html.pxx-manual .crumb {
+  color: var(--pxx-muted);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+html.pxx-manual .title-page { padding: 12px 0 8px; }
+html.pxx-manual .title-page .lockup { gap: 24px; }
+html.pxx-manual .title-page .mark-slot svg { width: 96px; height: 96px; }
+html.pxx-manual .title-page .wordmark { font-size: 40px; }
+html.pxx-manual .title-kicker {
+  margin: 8px 0 0;
+  font-family: var(--pxx-font-body);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pxx-muted);
+}
+
+h1, h2, h3, h4, .menu-title {
+  font-family: var(--pxx-font-display);
+  font-weight: 400;
+  line-height: 1.25;
+}
+html.pxx-manual h1,
+html.pxx-manual h2,
+html.pxx-manual h3,
+html.pxx-manual h4 {
+  color: var(--pxx-text);
+  margin: 1.6em 0 0.6em;
+}
+html.pxx-manual h1 { font-size: 32px; font-weight: 700; margin-top: 0.4em; }
+html.pxx-manual h2 {
+  font-size: 22px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--pxx-line);
+}
+html.pxx-manual h3 { font-size: 18px; }
+html.pxx-manual h4 { font-size: 16px; }
+html.pxx-manual p { margin: 0.7em 0; }
+/* Strong emphasis inverts: Signal block, Ink text (BRAND-GUIDE §3.1). */
+strong {
+  background: var(--pxx-emphasis-bg);
+  color: var(--pxx-emphasis-fg);
+  font-weight: 700;
+  padding: 0 0.15em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+em { font-style: normal; }
+strong.status.planned {
+  background: transparent;
+  color: var(--pxx-info);
+  font-weight: 500;
+  border-bottom: 1px dashed var(--pxx-info);
+}
+
+code, kbd, samp {
+  font-family: var(--pxx-font-body);
+  font-size: 0.86em;
+  font-variant-numeric: tabular-nums;
+}
+:not(pre) > code {
+  background: var(--pxx-ink-raised);
+  padding: 0.1em 0.35em;
+  border-radius: 0;
+}
+pre.code, pre {
+  position: relative;
+  background: var(--pxx-ink-raised);
+  color: var(--pxx-text);
+  padding: 14px 16px;
+  border-radius: 0;
+  overflow-x: auto;
+  border: 1px solid var(--pxx-line);
+  line-height: 1.45;
+}
+pre.code code, pre code { background: none; padding: 0; font-size: 13.5px; }
+pre.code::after {
+  content: attr(data-lang);
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pxx-muted);
+  font-family: var(--pxx-font-body);
+}
+.kw, .mac { color: var(--pxx-signal); font-weight: 700; }
+.str, .ty { color: var(--pxx-text); }
+.num, .lit, .fn, .field, .attr, .life { color: var(--pxx-strong); }
+.com, .prompt, .out { color: var(--pxx-muted); font-style: normal; }
+.prompt { user-select: none; }
+
+.table { overflow-x: auto; margin: 1rem 0; }
+table { border-collapse: collapse; font-size: 14px; width: 100%; }
+th, td {
+  border: 1px solid var(--pxx-line);
+  padding: 6px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+th { background: var(--pxx-ink-raised); color: var(--pxx-strong); font-weight: 500; }
+
+blockquote.callout {
+  margin: 1rem 0;
+  padding: 8px 14px;
+  background: transparent;
+  border: 0;
+  border-left: 3px solid var(--pxx-info);
+  border-radius: 0;
+}
+blockquote.callout p { margin: 0.3rem 0; }
+blockquote.callout.warn { border-left-color: var(--pxx-warn); }
+blockquote.callout.warn strong {
+  background: transparent;
+  color: var(--pxx-warn);
+}
+blockquote.callout.planned { border-left-color: var(--pxx-info); }
+blockquote.callout.note { border-left-color: var(--pxx-ok); }
+
+img { max-width: 100%; }
+hr { border: 0; border-top: 1px solid var(--pxx-line); }
+html.pxx-manual .pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 48px;
+  padding-top: 16px;
+  border-top: 1px solid var(--pxx-line);
+  font-size: 14px;
+}
+html.pxx-manual .pager .next { margin-left: auto; text-align: right; }
+
+@media (max-width: 900px) {
+  html.pxx-manual #sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.16s;
+    z-index: 10;
+    width: 85vw;
+    max-width: 320px;
+  }
+  html.pxx-manual body.open #sidebar { transform: none; }
+  html.pxx-manual #menu { display: block; }
+  html.pxx-manual main { margin-left: 0; padding: 56px 18px 48px; }
+  html.pxx-manual .title-page .wordmark { font-size: 32px; }
+  html.pxx-manual .title-page .mark-slot svg { width: 72px; height: 72px; }
+}
+
+@media print {
+  html.pxx-manual,
+  html.pxx-manual body {
+    background: #f3eee2 !important;
+    color: rgba(26, 26, 26, 0.9) !important;
+  }
+  html.pxx-manual #sidebar,
+  html.pxx-manual #menu,
+  html.pxx-manual .pager,
+  html.pxx-manual #search,
+  html.pxx-manual #theme,
+  html.pxx-manual #results { display: none !important; }
+  html.pxx-manual main { margin: 0 !important; padding: 0 !important; max-width: none !important; }
+  html.pxx-manual.js .chapter { display: block !important; page-break-before: always; }
+  html.pxx-manual .chapter,
+  html.pxx-manual h1,
+  html.pxx-manual h2,
+  html.pxx-manual h3,
+  html.pxx-manual p,
+  html.pxx-manual li,
+  html.pxx-manual td,
+  html.pxx-manual th { color: rgba(26, 26, 26, 0.9) !important; }
+  html.pxx-manual a { color: #1a1a1a !important; text-decoration: underline; }
+  html.pxx-manual pre.code,
+  html.pxx-manual pre,
+  html.pxx-manual :not(pre) > code,
+  html.pxx-manual th {
+    background: #eae6da !important;
+    color: rgba(26, 26, 26, 0.9) !important;
+    border-color: rgba(26, 26, 26, 0.15) !important;
+  }
+  html.pxx-manual .kw,
+  html.pxx-manual .mac,
+  html.pxx-manual .str,
+  html.pxx-manual .ty,
+  html.pxx-manual .num,
+  html.pxx-manual .lit,
+  html.pxx-manual .fn,
+  html.pxx-manual .field,
+  html.pxx-manual .attr { color: #1a1a1a !important; }
+  html.pxx-manual .mark-slot svg { width: 64px; height: 64px; }
+}
+
+/* mdBook. Variable names are the theme hooks; the values are the brand.
+   Dark themes collapse to AMOLED Night. Light and Rust collapse to Paper.
+   Not a copy of an mdBook theme. */
+:root { --mono-font: var(--pxx-font-body); --code-font-size: 0.875em; }
+html.navy, html.coal, html.ayu, html.light, html.rust { --mono-font: "JetBrains Mono", ui-monospace, monospace; }
+html.navy, html.coal, html.ayu {
+  --bg: #000000;
+  --fg: rgba(255, 255, 255, 0.90);
+  --sidebar-bg: #000000;
+  --sidebar-fg: rgba(255, 255, 255, 0.90);
+  --sidebar-non-existant: rgba(255, 255, 255, 0.50);
+  --sidebar-active: #ffffff;
+  --sidebar-spacer: rgba(255, 255, 255, 0.10);
+  --scrollbar: rgba(255, 255, 255, 0.25);
+  --icons: rgba(255, 255, 255, 0.50);
+  --icons-hover: #ffffff;
+  --links: #ffffff;
+  --inline-code-color: rgba(255, 255, 255, 0.90);
+  --theme-popup-bg: #000000;
+  --theme-popup-border: rgba(255, 255, 255, 0.25);
+  --theme-hover: rgba(255, 255, 255, 0.10);
+  --quote-bg: #000000;
+  --quote-border: rgba(255, 255, 255, 0.50);
+  --warning-border: #fdba74;
+  --table-border-color: rgba(255, 255, 255, 0.10);
+  --table-header-bg: #09090b;
+  --table-alternate-bg: #000000;
+  --searchbar-border-color: rgba(255, 255, 255, 0.25);
+  --searchbar-bg: #000000;
+  --searchbar-fg: rgba(255, 255, 255, 0.90);
+  --searchbar-shadow-color: transparent;
+  --searchresults-header-fg: rgba(255, 255, 255, 0.50);
+  --searchresults-border-color: rgba(255, 255, 255, 0.10);
+  --searchresults-li-bg: #09090b;
+  --search-mark-bg: #ffffff;
+  --color-scheme: dark;
+}
+html.light, html.rust {
+  --bg: #f3eee2;
+  --fg: rgba(26, 26, 26, 0.90);
+  --sidebar-bg: #f3eee2;
+  --sidebar-fg: rgba(26, 26, 26, 0.90);
+  --sidebar-non-existant: rgba(26, 26, 26, 0.50);
+  --sidebar-active: #1a1a1a;
+  --sidebar-spacer: rgba(26, 26, 26, 0.10);
+  --scrollbar: rgba(26, 26, 26, 0.25);
+  --icons: rgba(26, 26, 26, 0.50);
+  --icons-hover: #1a1a1a;
+  --links: #1a1a1a;
+  --inline-code-color: rgba(26, 26, 26, 0.90);
+  --theme-popup-bg: #f3eee2;
+  --theme-popup-border: rgba(26, 26, 26, 0.25);
+  --theme-hover: rgba(26, 26, 26, 0.10);
+  --quote-bg: #f3eee2;
+  --quote-border: rgba(26, 26, 26, 0.50);
+  --warning-border: #b45309;
+  --table-border-color: rgba(26, 26, 26, 0.10);
+  --table-header-bg: #eae6da;
+  --table-alternate-bg: #f3eee2;
+  --searchbar-border-color: rgba(26, 26, 26, 0.25);
+  --searchbar-bg: #f3eee2;
+  --searchbar-fg: rgba(26, 26, 26, 0.90);
+  --searchbar-shadow-color: transparent;
+  --searchresults-header-fg: rgba(26, 26, 26, 0.50);
+  --searchresults-border-color: rgba(26, 26, 26, 0.10);
+  --searchresults-li-bg: #eae6da;
+  --search-mark-bg: #1a1a1a;
+  --color-scheme: light;
+}
+html.navy body, html.coal body, html.ayu body, html.light body, html.rust body,
+.menu-bar, #menu-bar, .sidebar, #sidebar, #content, .content {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+}
+.menu-title, h1.menu-title,
+#content h1, #content h2, #content h3, #content h4,
+.chapter h1, .chapter h2, .chapter h3, .chapter h4 {
+  font-family: "Space Mono", ui-monospace, monospace;
+}
+h1.menu-title.pxx-lockup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 700;
+}
+.pxx-mark { display: inline-flex; flex: none; line-height: 0; }
+.pxx-mark svg { width: 36px; height: 36px; min-width: 24px; min-height: 24px; }
+.chapter code, #content code { font-family: "JetBrains Mono", ui-monospace, monospace; }

@@ -1,0 +1,33 @@
+ProcGraph(
+    format_version: 1,
+    description: "Starter: a bush (several seeds in a small cluster, low apical control; spec 68). Bark and leaf placeholders from the default content.",
+    params: [
+        (name: "growth_steps", ty: Int, default: 8, min: Some(1.0), max: Some(64.0), doc: "Growth steps"),
+    ],
+    inputs: [],
+    outputs: [ (name: "skeleton", kinds: ["PlantSkeleton"]), (name: "mesh", kinds: ["PlantMesh"]) ],
+    nodes: {
+        1: (ty: "gen.grid", settings: { "count": (3.0, 1.0, 2.0), "step_m": (0.25, 1.0, 0.25) }, at: (-220.0, 0.0)),
+        2: (ty: "points.jitter", settings: { "offset": [(-0.08, 0.0, -0.08), (0.08, 0.0, 0.08)] }, at: (-110.0, 0.0)),
+        3: (ty: "plant.seed", settings: { "tilt_deg": [10.0, 30.0], "start_radius_m": 0.006 }, at: (0.0, 0.0)),
+        4: (ty: "plant.grow", settings: { "growth_steps": Bind("growth_steps"), "apical": 0.4, "internode_m": 0.18, "branch_angle_deg": 50.0, "max_order": 3 }, at: (220.0, 0.0)),
+        5: (ty: "plant.radius", settings: { "tip_m": 0.003, "base_swell": [(0.0, 1.0), (1.0, 1.0)] }, at: (440.0, 0.0)),
+        6: (ty: "plant.mesh", settings: { "materials": by_order(["materials/default_bark.material.ron"]), "min_radius_m": 0.002 }, at: (660.0, 0.0)),
+        7: (ty: "plant.leaves", settings: { "choices": [(card: true, material: "materials/default_leaf.material.ron", weight: 1.0, size_m: [0.06, 0.1], rules: [])], "orders": [1.0, 16.0] }, at: (880.0, 0.0)),
+        8: (ty: "plant.export", settings: { "name": "plant_bush" }, at: (1100.0, 0.0)),
+        9: (ty: "graph.output", settings: { "pin": "skeleton" }, at: (660.0, 200.0)),
+        10: (ty: "graph.output", settings: { "pin": "mesh" }, at: (1320.0, 0.0)),
+    },
+    edges: [
+        (from: (1, "out"), to: (2, "in")),
+        (from: (2, "out"), to: (3, "in")),
+        (from: (3, "out"), to: (4, "in")),
+        (from: (4, "out"), to: (5, "in")),
+        (from: (5, "out"), to: (6, "in")),
+        (from: (6, "out"), to: (7, "in")),
+        (from: (7, "out"), to: (8, "in")),
+        (from: (5, "out"), to: (9, "in")),
+        (from: (8, "out"), to: (10, "in")),
+    ],
+    flags: (starter: true, tool: None, domain: Plant),
+)

@@ -1,0 +1,28 @@
+format_version = 1
+id = "accessible-ui-profile"
+title = "Set up an accessible compact UI"
+prompt = "Configure the runtime UI for accessibility: reduced motion on, high contrast on, and the compact density. Let the change apply before you finish."
+features = ["ui"]
+crates = ["regia_agent", "regia_ui"]
+call_budget = 6
+
+[setup]
+target = "ui"
+
+[[check]]
+name = "reduced motion"
+method = "ui.theme_mode"
+pointer = "/reduced_motion"
+expect = { kind = "equals", value = true }
+
+[[check]]
+name = "high contrast"
+method = "ui.theme_mode"
+pointer = "/high_contrast"
+expect = { kind = "equals", value = true }
+
+[[check]]
+name = "compact density"
+method = "ui.theme_list"
+pointer = "/density"
+expect = { kind = "equals", value = "compact" }

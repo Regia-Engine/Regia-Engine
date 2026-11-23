@@ -1,0 +1,687 @@
+{
+  "$defs": {
+    "bbox": {
+      "additionalProperties": false,
+      "properties": {
+        "max": {
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "type": "array"
+        },
+        "min": {
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "type": "array"
+        }
+      },
+      "required": [
+        "max",
+        "min"
+      ],
+      "type": "object"
+    },
+    "facet": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "table",
+            "crown",
+            "star",
+            "bezel",
+            "upper_girdle",
+            "girdle",
+            "lower_girdle",
+            "pavilion",
+            "culet",
+            "step",
+            "other"
+          ],
+          "type": "string"
+        },
+        "normal": {
+          "description": "Outward unit normal in the gem-local frame.",
+          "items": {
+            "maximum": 1,
+            "minimum": -1,
+            "type": "number"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "type": "array"
+        },
+        "offset_mm": {
+          "description": "Plane `normal . x = offset_mm`; the stone is `normal . x <= offset_mm`.",
+          "type": "number"
+        }
+      },
+      "required": [
+        "kind",
+        "normal",
+        "offset_mm"
+      ],
+      "type": "object"
+    },
+    "file": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "description": "A relative path inside the folder: `/`-separated, no `..`, no leading `/` or `.`.",
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.-]*(/[A-Za-z0-9_][A-Za-z0-9_.-]*)*$",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "gem_cut": {
+      "additionalProperties": false,
+      "properties": {
+        "convex": {
+          "type": "boolean"
+        },
+        "cut_id": {
+          "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$",
+          "type": "string"
+        },
+        "cut_type": {
+          "enum": [
+            "round_brilliant",
+            "marquise",
+            "pear",
+            "princess",
+            "heart",
+            "oval",
+            "emerald",
+            "baguette",
+            "tapered_baguette",
+            "trillion",
+            "cushion",
+            "radiant",
+            "asscher",
+            "rose",
+            "cabochon",
+            "other"
+          ],
+          "type": "string"
+        },
+        "facets": {
+          "items": {
+            "$ref": "#/$defs/facet"
+          },
+          "maxItems": 512,
+          "type": "array"
+        },
+        "girdle_finish": {
+          "enum": [
+            "polished",
+            "faceted",
+            "frosted"
+          ],
+          "type": "string"
+        },
+        "max_bounces_hint": {
+          "description": "Accepted and ignored: the viewer has no bounce loops.",
+          "maximum": 64,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "mesh_ref": {
+          "additionalProperties": false,
+          "properties": {
+            "glb": {
+              "description": "A relative path inside the folder: `/`-separated, no `..`, no leading `/` or `.`.",
+              "maxLength": 200,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.-]*(/[A-Za-z0-9_][A-Za-z0-9_.-]*)*$",
+              "type": "string"
+            },
+            "node": {
+              "maxLength": 200,
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "glb",
+            "node"
+          ],
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "proportions": {
+          "$ref": "#/$defs/proportions"
+        },
+        "size_mm": {
+          "description": "`[length]` for round cuts, else `[length, width]` (`[.., depth]` optional).",
+          "items": {
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "maxItems": 3,
+          "minItems": 1,
+          "type": "array"
+        },
+        "symmetry": {
+          "additionalProperties": false,
+          "properties": {
+            "mirror": {
+              "type": "boolean"
+            },
+            "n_fold": {
+              "maximum": 64,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "mirror",
+            "n_fold"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "convex",
+        "cut_id",
+        "cut_type",
+        "facets",
+        "girdle_finish",
+        "mesh_ref",
+        "proportions",
+        "size_mm",
+        "symmetry"
+      ],
+      "type": "object"
+    },
+    "lod": {
+      "additionalProperties": false,
+      "properties": {
+        "level": {
+          "maximum": 7,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "node": {
+          "maxLength": 200,
+          "minLength": 1,
+          "type": "string"
+        },
+        "screen_size": {
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "type": "number"
+        },
+        "tri_count": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "level",
+        "node",
+        "screen_size",
+        "tri_count"
+      ],
+      "type": "object"
+    },
+    "material_slot": {
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "enum": [
+            "metal",
+            "gem",
+            "enamel",
+            "opal",
+            "other"
+          ],
+          "type": "string"
+        },
+        "slot_id": {
+          "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "role",
+        "slot_id"
+      ],
+      "type": "object"
+    },
+    "param": {
+      "additionalProperties": false,
+      "description": "A parametric size (`interfaces.md` § 5).",
+      "properties": {
+        "default": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "min": {
+          "type": "number"
+        },
+        "name": {
+          "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$",
+          "type": "string"
+        },
+        "realized_by": {
+          "enum": [
+            "variant_mesh",
+            "morph",
+            "bone_scale"
+          ],
+          "type": "string"
+        },
+        "step": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "target": {
+          "description": "The morph target or bone name (`morph`, `bone_scale`).",
+          "maxLength": 200,
+          "minLength": 1,
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "unit": {
+          "const": "mm"
+        },
+        "variants": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "node": {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              "value": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "node",
+              "value"
+            ],
+            "type": "object"
+          },
+          "maxItems": 256,
+          "type": "array"
+        }
+      },
+      "required": [
+        "default",
+        "max",
+        "min",
+        "name",
+        "realized_by",
+        "step",
+        "unit"
+      ],
+      "type": "object"
+    },
+    "part": {
+      "additionalProperties": false,
+      "properties": {
+        "accuracy": {
+          "enum": [
+            "front_exact",
+            "plausible"
+          ],
+          "type": "string"
+        },
+        "bbox_mm": {
+          "$ref": "#/$defs/bbox"
+        },
+        "edge_radius_min_mm": {
+          "description": "Required on parts with a metal slot.",
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "front_axis": {
+          "items": {
+            "maximum": 1,
+            "minimum": -1,
+            "type": "number"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "type": "array"
+        },
+        "glb": {
+          "description": "A relative path inside the folder: `/`-separated, no `..`, no leading `/` or `.`.",
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.-]*(/[A-Za-z0-9_][A-Za-z0-9_.-]*)*$",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "post",
+            "threadless_pin",
+            "end_base",
+            "setting",
+            "prong_head",
+            "bezel",
+            "chain",
+            "link",
+            "hoop",
+            "clicker",
+            "bead",
+            "clasp",
+            "jump_ring",
+            "bail",
+            "relief",
+            "tube",
+            "mesh_part"
+          ],
+          "type": "string"
+        },
+        "lods": {
+          "items": {
+            "$ref": "#/$defs/lod"
+          },
+          "maxItems": 8,
+          "type": "array"
+        },
+        "material_slots": {
+          "items": {
+            "$ref": "#/$defs/material_slot"
+          },
+          "maxItems": 64,
+          "type": "array"
+        },
+        "node": {
+          "maxLength": 200,
+          "minLength": 1,
+          "type": "string"
+        },
+        "params": {
+          "items": {
+            "$ref": "#/$defs/param"
+          },
+          "maxItems": 32,
+          "type": "array"
+        },
+        "part_id": {
+          "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$",
+          "type": "string"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "sockets": {
+          "items": {
+            "$ref": "#/$defs/socket"
+          },
+          "maxItems": 256,
+          "type": "array"
+        },
+        "source": {
+          "enum": [
+            "parametric",
+            "photo",
+            "caliper",
+            "hand_sculpt"
+          ],
+          "type": "string"
+        },
+        "tri_count": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "accuracy",
+        "bbox_mm",
+        "front_axis",
+        "glb",
+        "kind",
+        "lods",
+        "material_slots",
+        "node",
+        "params",
+        "part_id",
+        "provenance",
+        "sockets",
+        "source",
+        "tri_count"
+      ],
+      "type": "object"
+    },
+    "proportions": {
+      "additionalProperties": false,
+      "properties": {
+        "crown_angle_deg": {
+          "maximum": 90,
+          "minimum": 0,
+          "type": "number"
+        },
+        "crown_height_pct": {
+          "maximum": 100,
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "girdle_pct": {
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number"
+        },
+        "length_to_width": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "pavilion_angle_deg": {
+          "maximum": 90,
+          "minimum": 0,
+          "type": "number"
+        },
+        "pavilion_depth_pct": {
+          "maximum": 100,
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "table_pct": {
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "crown_angle_deg",
+        "girdle_pct",
+        "length_to_width",
+        "pavilion_angle_deg",
+        "table_pct"
+      ],
+      "type": "object"
+    },
+    "provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "by": {
+          "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$",
+          "type": "string"
+        },
+        "method": {
+          "description": "Free text (marked): how the geometry was made.",
+          "maxLength": 200,
+          "minLength": 1,
+          "type": "string"
+        },
+        "numbers": {
+          "additionalProperties": {
+            "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$",
+            "type": "string"
+          },
+          "description": "Where each number came from (`option`, `text`, `photo`, ...).",
+          "type": "object"
+        }
+      },
+      "required": [
+        "by"
+      ],
+      "type": "object"
+    },
+    "socket": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "gem_seat",
+            "thread_male",
+            "thread_female",
+            "pin",
+            "jump_ring",
+            "chain_end",
+            "bail"
+          ],
+          "type": "string"
+        },
+        "size_mm": {
+          "items": {
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "maxItems": 3,
+          "minItems": 1,
+          "type": "array"
+        },
+        "socket_id": {
+          "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$",
+          "type": "string"
+        },
+        "transform": {
+          "$ref": "#/$defs/transform"
+        }
+      },
+      "required": [
+        "kind",
+        "size_mm",
+        "socket_id",
+        "transform"
+      ],
+      "type": "object"
+    },
+    "transform": {
+      "additionalProperties": false,
+      "description": "A rigid transform in the part's frame, millimeters.",
+      "properties": {
+        "rotation_quat": {
+          "description": "Unit quaternion, `[x, y, z, w]`.",
+          "items": {
+            "maximum": 1,
+            "minimum": -1,
+            "type": "number"
+          },
+          "maxItems": 4,
+          "minItems": 4,
+          "type": "array"
+        },
+        "translation_mm": {
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "type": "array"
+        }
+      },
+      "required": [
+        "rotation_quat",
+        "translation_mm"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://regia.invalid/formats/jewelry-part-kit.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Regia's open-kit folder extended for a product viewer: parts with parametric sizes, sockets and material slots, and gem cuts as ordered facet planes in millimeters. Owner: Regia. Produced by the kit builder, read by Regia. Page: docs/formats/jewelry-part-kit.md.",
+  "properties": {
+    "files": {
+      "items": {
+        "$ref": "#/$defs/file"
+      },
+      "maxItems": 4096,
+      "type": "array"
+    },
+    "gem_cuts": {
+      "items": {
+        "$ref": "#/$defs/gem_cut"
+      },
+      "maxItems": 1024,
+      "type": "array"
+    },
+    "house": {
+      "description": "Supplier slug (`interfaces.md` § 0.2), or `shared` for generic parts.",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,39}$",
+      "type": "string"
+    },
+    "kit_id": {
+      "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$",
+      "type": "string"
+    },
+    "kit_version": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "parts": {
+      "items": {
+        "$ref": "#/$defs/part"
+      },
+      "maxItems": 1024,
+      "type": "array"
+    },
+    "regia_min_version": {
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "type": "string"
+    },
+    "schema": {
+      "const": "jewelry.part_kit/1"
+    },
+    "units": {
+      "const": "mm"
+    }
+  },
+  "required": [
+    "files",
+    "gem_cuts",
+    "house",
+    "kit_id",
+    "kit_version",
+    "parts",
+    "regia_min_version",
+    "schema",
+    "units"
+  ],
+  "title": "Part kit (kit.json)",
+  "type": "object"
+}

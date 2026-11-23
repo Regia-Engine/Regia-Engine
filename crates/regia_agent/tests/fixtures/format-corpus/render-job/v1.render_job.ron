@@ -1,0 +1,30 @@
+// A render job (`.render_job.ron` v1, ADR-1616): three takes of a trailer's shot list, one folder per
+// take under renders/trailer/<date>/, the shot boundaries plus one explicit cut, and a pre-roll cap.
+(
+    version: 1,
+    name: "trailer",
+    shots: Some("cinematics/trailer.shots.ron"),
+    sequence: Some("cinematics/trailer.seq.ron"),
+    out: "renders/trailer",
+    path: "{date}/{take}/{job}_{take}",
+    output: (
+        width: Some(1920),
+        height: Some(1080),
+        fps: Some(24),
+        supersample: Some(2),
+        format: Some("png"),
+        hud: Some(false),
+        warmup_frames: Some(16),
+        settle_frames: Some(16),
+        subframes: Some(4),
+        shutter_angle: Some(180.0),
+        audio: Some((stems: ["music"])),
+    ),
+    takes: [
+        (name: "opening", range: Shots(first: "wide", last: "close")),
+        (name: "blast", range: Markers(from: "boom", to: "dust_settled")),
+        (name: "tail", range: Seconds(start: 42.0, end: 48.5), path: Some("{take}/tail_{frame}")),
+    ],
+    cuts: [Marker("flash"), Seconds(30.0)],
+    max_preroll_frames: Some(2400),
+)

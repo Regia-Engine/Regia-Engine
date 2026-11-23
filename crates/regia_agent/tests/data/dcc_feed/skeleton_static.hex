@@ -1,0 +1,18 @@
+# skeleton_static: two joints
+# Laid out by hand from docs/formats/dcc-feed-protocol-v1.md (spec 60 section 8 test 1).
+71 00 00 00                                          # len = 113
+24 00                                                # msg_type 0x0024
+00 00                                                # flags
+01 00 00 00                                          # seq 1
+06 00 00 00                                          # handle 6
+02 00                                                # joint_count 2
+04 00 72 6f 6f 74                                    # name "root"
+ff ff ff ff                                          # parent -1
+00 00 00 00 00 00 00 00 00 00 00 00                  # t
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 80 3f      # r
+00 00 80 3f 00 00 80 3f 00 00 80 3f                  # s
+03 00 61 72 6d                                       # name "arm"
+00 00 00 00                                          # parent 0
+00 00 00 00 00 00 80 3f 00 00 00 00                  # t
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 80 3f      # r
+00 00 80 3f 00 00 80 3f 00 00 80 3f                  # s

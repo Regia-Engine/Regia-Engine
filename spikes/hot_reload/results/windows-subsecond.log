@@ -1,0 +1,40 @@
+# Windows VM: `dx serve --hot-patch -p patch_host` with dioxus-cli 0.7.10 (installed with
+# `cargo install --locked dioxus-cli --version 0.7.10`: 11 min 9 s in the VM). No attempt produced a
+# running app; the dylib-reload path needed no such setup. Excerpts of the five attempts:
+
+## 1. repo default linker (`rust-lld` from .cargo/config.toml), plain SYSTEM session
+• linker: Some("rust-lld")
+137.34s ERROR linking with `C:\spike\dxbin\bin\dx.exe` failed: exit code: 1
+137.36s ERROR Build failed: cargo build finished with errors for target: patch_host [x86_64-pc-windows-msvc]
+
+## 2. CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_LINKER = MSVC link.exe, no developer environment
+• linker: Some("C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\link.exe")
+248.07s ERROR Failed to generate fat binary: LINK : fatal error LNK1104: cannot open file 'opengl32.lib'
+248.07s ERROR Build failed: Failed to generate fat binary: LINK : fatal error LNK1104: cannot open file 'opengl32.lib'
+
+## 3. MSVC link.exe inside the vcvars64 developer environment
+• linker: Some("C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\link.exe")
+219.56s ERROR Failed to generate fat binary: C:\spike\repo\spikes\hot_reload\subsecond\target\x86_64-pc-windows-msvc\desktop-dev\libdeps-a8482f2a.a : warning LNK4003: invalid library format; library ignored
+219.57s ERROR Build failed: Failed to generate fat binary: C:\spike\repo\spikes\hot_reload\subsecond\target\x86_64-pc-windows-msvc\desktop-dev\libdeps-a8482f2a.a : warning LNK4003: invalid library format; library ignored
+(+ 1022 "unresolved external symbol" errors, e.g. _RNvCsdtSMxSA38aw_7___rustc10rust_panic)
+
+## 4. rust-lld inside the vcvars64 developer environment
+• linker: Some("rust-lld")
+197.01s ERROR linking with `C:\spike\dxbin\bin\dx.exe` failed: exit code: 1
+197.03s  WARN error: could not compile `patch_host` (bin "patch_host") due to 1 previous error dx_src=cargo
+197.03s ERROR Build failed: cargo build finished with errors for target: patch_host [x86_64-pc-windows-msvc]
+
+## 5. toolchain gcc-ld\lld-link.exe inside the vcvars64 developer environment
+• linker: Some("C:\\rust\\rustup\\toolchains\\1.99.0-x86_64-pc-windows-msvc\\lib\\rustlib\\x86_64-pc-windows-msvc\\bin\\gcc-ld\\lld-link.exe")
+179.06s ERROR linking with `C:\rust\rustup\toolchains\1.99.0-x86_64-pc-windows-msvc\lib\rustlib\x86_64-pc-windows-msvc\bin\gcc-ld\lld-link.exe` failed: exit code: 1
+179.07s  WARN error: could not compile `quote` (build script) due to 1 previous error dx_src=cargo
+179.11s ERROR linking with `C:\rust\rustup\toolchains\1.99.0-x86_64-pc-windows-msvc\lib\rustlib\x86_64-pc-windows-msvc\bin\gcc-ld\lld-link.exe` failed: exit code: 1
+179.12s  WARN error: could not compile `serde` (build script) due to 1 previous error dx_src=cargo
+179.13s ERROR linking with `C:\rust\rustup\toolchains\1.99.0-x86_64-pc-windows-msvc\lib\rustlib\x86_64-pc-windows-msvc\bin\gcc-ld\lld-link.exe` failed: exit code: 1
+179.14s  WARN error: could not compile `proc-macro2` (build script) due to 1 previous error dx_src=cargo
+179.17s ERROR linking with `C:\rust\rustup\toolchains\1.99.0-x86_64-pc-windows-msvc\lib\rustlib\x86_64-pc-windows-msvc\bin\gcc-ld\lld-link.exe` failed: exit code: 1
+179.18s  WARN error: could not compile `serde_core` (build script) due to 1 previous error dx_src=cargo
+179.27s ERROR linking with `C:\rust\rustup\toolchains\1.99.0-x86_64-pc-windows-msvc\lib\rustlib\x86_64-pc-windows-msvc\bin\gcc-ld\lld-link.exe` failed: exit code: 1
+179.27s  WARN error: could not compile `libm` (build script) due to 1 previous error dx_src=cargo
+179.55s ERROR Build failed: cargo build finished with errors for target: patch_host [x86_64-pc-windows-msvc]
+

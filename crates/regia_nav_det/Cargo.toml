@@ -1,0 +1,30 @@
+[package]
+name = "regia_nav_det"
+description = "Deterministic navigation for lockstep simulations: grid, two-level search, flow fields, navmesh, layered tunnels, agents and crowds; no ECS dependency."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+# ADR-8877: the deterministic navigation that lived in `regia_nav::det` (ADR-8049, ADR-8174), moved so a headless
+# lockstep sim links it without bevy_ecs. `regia_nav` re-exports it as `regia_nav::det`. Lockstep closure crate
+# (`docs/ci/lockstep-closure.toml`): every workspace dependency here must be on the closure too.
+[dependencies]
+# Transcendentals, `det_*` extrema, canonical float bits and the golden harness (ADR-8012 A-4, ADR-8049).
+regia_detsim = { workspace = true }
+# The tunnel layer and the tunnel navmesh bake read the tunnel description of the world-geometry compat layer
+# (ADR-8195); regia_world_geom is itself a lockstep closure crate.
+regia_world_geom = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+# The grid and agent tests round-trip settings through RON.
+ron = { workspace = true }
+# The tunnel-nav proofs and the tunnel bake's doc example arm the compat layer's fixture layouts (test data only).
+regia_world_geom = { workspace = true, features = ["fixtures"] }

@@ -1,0 +1,21 @@
+ProcGraph(
+    format_version: 1,
+    description: "fuzz base",
+    params: [(name: "spacing", ty: Float, default: 4.0, min: Some(0.5), max: Some(64.0), doc: "")],
+    inputs: [],
+    outputs: [(name: "out", kinds: ["Points"])],
+    nodes: {
+        1: (ty: "in.self", settings: {}, at: (0.0, 0.0)),
+        2: (ty: "sample.region", settings: {"spacing_m": Bind("spacing")}, at: (1.0, 0.0)),
+        3: (ty: "points.jitter", settings: {"offset": [(-1.0, 0.0, -1.0), (1.0, 0.0, 1.0)]}, at: (2.0, 0.0)),
+        4: (ty: "density.noise", settings: {"scale_m": 8.0}, at: (3.0, 0.0)),
+        5: (ty: "points.prune", settings: {}, at: (4.0, 0.0)),
+        6: (ty: "spawn.mesh", settings: {"entries": [(mesh: "a.glb", weight: 2.0)]}, at: (5.0, 0.0)),
+        7: (ty: "attr.math", settings: {"op": sqrt, "a": "density", "target": "w"}, at: (6.0, 0.0)),
+        8: (ty: "graph.output", settings: {"pin": "out"}, at: (7.0, 0.0)),
+    },
+    edges: [(from: (1, "out"), to: (2, "region")), (from: (2, "out"), to: (3, "in")), (from: (3, "out"), to: (4, "in")),
+        (from: (4, "out"), to: (5, "in")), (from: (5, "out"), to: (6, "in")), (from: (6, "out"), to: (7, "in")),
+        (from: (7, "out"), to: (8, "in"))],
+    flags: (starter: false, tool: None, domain: World),
+)

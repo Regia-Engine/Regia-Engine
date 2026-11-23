@@ -1,0 +1,322 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://regiaengine.com/schemas/glasscrack-ron-v1.json",
+  "title": "Regia Engine .glasscrack.ron v1",
+  "description": "Glass crack set (docs/formats/glass-crack.md). RON tuples map to JSON arrays, Some(x) to x, None to null, enum variants to strings.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version",
+    "name",
+    "glass_type",
+    "shading",
+    "escalation",
+    "d1",
+    "d2",
+    "d3"
+  ],
+  "properties": {
+    "format_version": {
+      "const": 1
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "glass_type": {
+      "enum": [
+        "laminate",
+        "pressure_pane"
+      ]
+    },
+    "page_size": {
+      "enum": [
+        256,
+        512,
+        1024
+      ]
+    },
+    "damage_space": {
+      "enum": [
+        "planar",
+        "uv0",
+        "uv1"
+      ]
+    },
+    "shading": {
+      "$ref": "#/$defs/shading"
+    },
+    "escalation": {
+      "$ref": "#/$defs/escalation"
+    },
+    "d1": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/stamp"
+      },
+      "minItems": 1
+    },
+    "d2": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/stamp"
+      },
+      "minItems": 1
+    },
+    "d3": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/stamp"
+      },
+      "minItems": 1
+    },
+    "laminate": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/laminate"
+        }
+      ]
+    },
+    "pressure_pane": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/pressurePane"
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "glass_type": {
+            "const": "laminate"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "laminate"
+        ],
+        "properties": {
+          "laminate": {
+            "$ref": "#/$defs/laminate"
+          },
+          "pressure_pane": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "glass_type": {
+            "const": "pressure_pane"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "pressure_pane"
+        ],
+        "properties": {
+          "pressure_pane": {
+            "$ref": "#/$defs/pressurePane"
+          },
+          "laminate": {
+            "type": "null"
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "stamp": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "mask",
+        "size_m"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mask": {
+          "type": "string",
+          "minLength": 1
+        },
+        "normal": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "size_m": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "pivot": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "weight": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "random_rotation": {
+          "type": "boolean"
+        }
+      }
+    },
+    "shading": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "crack_scatter": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$"
+        },
+        "crack_transmission": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "crack_roughness": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "crazing_haze": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "crazing_roughness": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "normal_bend": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "hole_cutoff": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "edge_jitter": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "escalation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "d1": {
+          "type": "number",
+          "minimum": 0
+        },
+        "d2": {
+          "type": "number",
+          "minimum": 0
+        },
+        "d3": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "laminate": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "max_hole_radius_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "min_hole_energy": {
+          "type": "number",
+          "minimum": 0
+        },
+        "halo_radius_m": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "pressurePane": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "chunks"
+      ],
+      "properties": {
+        "pane_gap_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "inner_tint": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$"
+        },
+        "breach": {
+          "type": "boolean"
+        },
+        "chunks": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "preset": {
+              "type": "string",
+              "minLength": 1
+            },
+            "count": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "size_m": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0.03
+              },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          }
+        }
+      }
+    }
+  }
+}

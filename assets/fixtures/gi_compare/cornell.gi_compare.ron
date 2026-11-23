@@ -1,0 +1,37 @@
+// A Cornell-like box, 2 m inside, open at the front, lit only by a small overhead emitter
+// (0.4 m square). The ADR-206 L1 case: all of the raster frame's light here comes from the
+// bake's emissive component, so L1's truncation shows directly (low under the source,
+// ringing on the far side). Read by `cargo xtask gi-compare` (book/agents/gi-compare.md).
+(
+    format_version: 1,
+    name: "cornell",
+    purpose: "L1 under a small overhead source (ADR-206)",
+    sun: None,
+    sky_lux: 0.0,
+    materials: [
+        (name: "white", albedo: (0.725, 0.71, 0.68)),
+        (name: "red", albedo: (0.63, 0.065, 0.05)),
+        (name: "green", albedo: (0.14, 0.45, 0.091)),
+        (name: "light", albedo: (0.78, 0.78, 0.78), emissive: (17000.0, 12000.0, 4000.0)),
+    ],
+    shapes: [
+        (name: "floor", kind: Box(half: (1.1, 0.05, 1.1)), material: "white", at: (0.0, -0.05, 0.0)),
+        (name: "ceiling", kind: Box(half: (1.1, 0.05, 1.1)), material: "white", at: (0.0, 2.05, 0.0)),
+        (name: "back", kind: Box(half: (1.1, 1.1, 0.05)), material: "white", at: (0.0, 1.0, -1.05)),
+        (name: "left", kind: Box(half: (0.05, 1.1, 1.1)), material: "red", at: (-1.05, 1.0, 0.0)),
+        (name: "right", kind: Box(half: (0.05, 1.1, 1.1)), material: "green", at: (1.05, 1.0, 0.0)),
+        (name: "light", kind: Box(half: (0.2, 0.01, 0.2)), material: "light", at: (0.0, 1.99, 0.0)),
+        (name: "tall_block", kind: Box(half: (0.3, 0.6, 0.3)), material: "white", at: (-0.35, 0.6, -0.3), yaw_deg: 17.0),
+        (name: "short_block", kind: Box(half: (0.3, 0.3, 0.3)), material: "white", at: (0.4, 0.3, 0.35), yaw_deg: -18.0),
+    ],
+    layout: (
+        // One interior brick over the room's air: no fade over its last cell, so the walls read
+        // the room's probes and nothing else. The lattice lies on the room's box (the walls'
+        // inner faces), as `regia bake-gi --from-scene` places an interior brick (ADR-1364).
+        bricks: [(min: (-1.0, 0.0, -1.0), max: (1.0, 2.0, 1.0), spacing: 0.19)],
+        interiors: [(min: (-1.0, 0.0, -1.0), max: (1.0, 2.0, 1.0))],
+        moment_resolution: 8,
+        max_distance: 4.0,
+    ),
+    bake: (rays_per_probe: 256, samples: 32, max_bounces: 6, seed: 7),
+)

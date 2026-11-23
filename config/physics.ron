@@ -1,0 +1,53 @@
+// Physics collision layers (specs/15 § 3) — the canonical example.
+//
+// Copy into your game project as `config/physics.ron` and load it at startup:
+//
+//     let file = regia_physics::LayerFile::load("config/physics.ron".as_ref())?;
+//     app.insert_resource(regia_physics::PhysicsLayers::from_file(&file)?);
+//
+// - Up to 32 named layers; a collider picks one with `Collider::layer`
+//   (`CollisionLayer::new(index)` — the index is the position in `layers`).
+// - `collides` is the collision matrix: pairs that generate contacts and events.
+//   It is symmetric — writing one direction enables both.
+// - `queries` is the query matrix: `(query layer, seen layer)` pairs. Queries
+//   "belonging to" a layer only see the layers its row allows
+//   (`PhysicsQuery::from_layer`); raycasts/overlaps without a from-layer see
+//   everything.
+(
+    // Bitmask order = list order: world=0, player=1, enemy=2, debris=3, trigger=4.
+    layers: [
+        "world",   // static level geometry: ground, walls, stairs
+        "player",  // the character and things that push it
+        "enemy",   // enemy bodies
+        "debris",  // cosmetic chunks: collide with the world, not with each other
+        "trigger", // sensor volumes: overlap only, no contacts
+    ],
+
+    // Collision matrix (symmetric; one direction suffices).
+    collides: [
+        ("world", "world"),
+        ("world", "player"),
+        ("world", "enemy"),
+        ("world", "debris"),
+        ("player", "enemy"),
+        ("enemy", "enemy"),
+        // No rows mention "trigger": sensors generate overlap events against the
+        // pairs below only through the matrix — add pairs here to make a trigger
+        // collide with them, e.g. ("trigger", "player").
+        ("trigger", "player"),
+        // Debris does not collide with player/enemy (cosmetic, specs/15 M14) or
+        // other debris (cheap): no rows.
+    ],
+
+    // Query matrix: which layers queries "belonging to" a layer may see.
+    queries: [
+        // Player-side queries (aiming, ground checks) see the world and triggers.
+        ("player", "world"),
+        ("player", "trigger"),
+        // Enemy queries see the world and the player.
+        ("enemy", "world"),
+        ("enemy", "player"),
+        // Unaffiliated queries (editor tooling, agents) see everything: they run
+        // without a from-layer.
+    ],
+)

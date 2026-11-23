@@ -1,0 +1,10 @@
+(
+    format_version: 2,
+    parent: "materials/scatter_rock.matgraph.ron",
+    params: {
+        "roughness": Float(0.95),
+        "tint": Color((0.035, 0.032, 0.03)),
+    },
+    textures: {},
+    switches: {},
+)

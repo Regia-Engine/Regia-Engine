@@ -1,0 +1,2 @@
+# Oracle for lamp-row: the calls a careful agent makes after the setup.
+{"method":"scene.apply_edits","params":{"edits":[{"op":"spawn","name":"Lamp 2","components":{"Transform":{"translation":[4,3,0]}}},{"op":"spawn","name":"Lamp 3","components":{"Transform":{"translation":[8,3,0]}}},{"op":"spawn","name":"Lamp 4","components":{"Transform":{"translation":[12,3,0]}}},{"op":"spawn","name":"Lamp 5","components":{"Transform":{"translation":[16,3,0]}}}]}}

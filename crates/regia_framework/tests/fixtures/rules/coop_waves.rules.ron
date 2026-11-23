@@ -1,0 +1,31 @@
+// Co-op waves (ADR-8748): two players hold out against two waves; the party shares five lives.
+(
+    format_version: 1,
+    id: "coop_waves",
+    name_key: "mode.coop_waves",
+    skeleton: "custom",
+    session: (
+        flow: (start_delay_ticks: 0),
+        respawn: (default: (kind: "delay", ticks: 60)),
+        waves: (
+            waves: [
+                (groups: [(archetype: "grunt", count: 4, spawn_tag: "east")], alive_cap: 3),
+                (
+                    at: (kind: "after_cleared", delay_ticks: 5),
+                    groups: [
+                        (archetype: "grunt", count: 2, spawn_tag: "east"),
+                        (archetype: "brute", count: 1, spawn_tag: "gate"),
+                    ],
+                ),
+            ],
+            difficulty: [
+                (players: 1, count_percent: 100, cap_percent: 100),
+                (players: 3, count_percent: 150, cap_percent: 125),
+            ],
+            players_team: 1,
+            shared_lives: 5,
+            fail_on_team_wipe: true,
+            success: either,
+        ),
+    ),
+)

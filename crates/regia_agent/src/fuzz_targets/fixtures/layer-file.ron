@@ -1,0 +1,18 @@
+LayerFile(
+    format_version: 1,
+    scene_format_version: 13,
+    layer: "night_props",
+    entities: [
+        (
+            at: 2,
+            entity: (
+                guid: "8f1c3a00-0000-0000-0000-000000000002",
+                name: "Lamp",
+                components: {
+                    "regia_scene::layers::LayerMembership": (layers: ["night_props"]),
+                    "regia_scene::transform::Transform": (translation: (1.0, 0.0, 0.0), rotation: (0.0, 0.0, 0.0, 1.0), scale: (1.0, 1.0, 1.0)),
+                },
+            ),
+        ),
+    ],
+)

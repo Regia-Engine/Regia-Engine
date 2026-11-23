@@ -1,0 +1,9 @@
+(
+    format_version: 1,
+    name: "wet rubber",
+    friction: 1.1,
+    restitution: 0.35,
+    density: 1.4,
+    friction_combine: Max,
+    restitution_combine: Average,
+)

@@ -1,0 +1,409 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
+// Portions ported from nannou (https://github.com/nannou-org/nannou, commit bffa988),
+// nannou_core/src/geom/tri.rs. Copyright (c) 2017 MindBuffer, Copyright (c) 2019 nannou-org; dual-licensed
+// MIT OR Apache-2.0, used here under the MIT licence (see docs/ported-sources.toml).
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+// and associated documentation files (the "Software"), to deal in the Software without restriction,
+// including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+// and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so,
+// subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all copies or substantial
+// portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+// LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+// WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+// SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+use core::ops::Deref;
+
+use crate::math::geom::{Cuboid, Range, Rect, Scalar, Vertex, Vertex2d, Vertex3d, vertex};
+use num_traits::Zero;
+
+/// The number of vertices in a triangle.
+pub const NUM_VERTICES: u8 = 3;
+
+/// A triangle as three vertices.
+#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
+pub struct Tri<V = vertex::Default>(pub [V; NUM_VERTICES as usize]);
+
+/// An iterator yielding each of the vertices of the triangle.
+#[derive(Clone, Debug)]
+pub struct Vertices<V = vertex::Default> {
+    tri: Tri<V>,
+    index: u8,
+}
+
+/// An iterator yielding triangles whose vertices are produced by the given iterator yielding
+/// vertices.
+#[derive(Clone, Debug)]
+pub struct IterFromVertices<I> {
+    vertices: I,
+}
+
+/// An iterator that flattens an iterator yielding triangles into its vertices.
+#[derive(Clone, Debug)]
+pub struct VerticesFromIter<I, V = vertex::Default> {
+    tris: I,
+    tri: Option<Vertices<V>>,
+}
+
+/// Converts an iterator yielding `[usize; 3]` into an iterator yielding `usize`s.
+#[derive(Clone, Debug)]
+pub struct FlattenIndices<I> {
+    indices: I,
+    b: Option<usize>,
+    c: Option<usize>,
+}
+
+impl<V> Tri<V> {
+    /// Create a **Tri** by indexing into the given buffer.
+    ///
+    /// **Panics** if any of the given indices are out of range of the given `vertices` slice.
+    pub fn from_index_tri(vertices: &[V], indices: &[usize; 3]) -> Self
+    where
+        V: Clone,
+    {
+        from_index_tri(vertices, indices)
+    }
+
+    /// Create a **Tri** from the next three vertices yielded by the given `vertices` iterator.
+    ///
+    /// Returns **None** if there were not at least 3 vertices in the given iterator.
+    pub fn from_vertices<I>(vertices: I) -> Option<Self>
+    where
+        I: IntoIterator<Item = V>,
+    {
+        from_vertices(vertices)
+    }
+
+    /// Produce an iterator yielding each of the vertices of the triangle.
+    pub fn vertices(self) -> Vertices<V> {
+        let tri = self;
+        let index = 0;
+        Vertices { tri, index }
+    }
+
+    /// Produce the centroid of the triangle aka the "mean"/"average" of all the points.
+    pub fn centroid(self) -> V
+    where
+        V: vertex::Average,
+    {
+        crate::math::geom::centroid(self[..].iter().cloned()).expect("a triangle has three vertices")
+    }
+
+    /// Maps the underlying vertices to a new type and returns the resulting `Tri`.
+    pub fn map_vertices<F, V2>(self, mut map: F) -> Tri<V2>
+    where
+        F: FnMut(V) -> V2,
+    {
+        let Tri([a, b, c]) = self;
+        Tri([map(a), map(b), map(c)])
+    }
+
+    /// Returns `true` if the given 2D vertex is contained within the 2D `Tri`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use regia_core::math::geom::*;
+    /// # use regia_core::math::geom::Tri;
+    /// # fn main() {
+    /// let a = [-0.5, 0.0];
+    /// let b = [0.0, 1.0];
+    /// let c = [0.5, -0.75];
+    /// let tri = Tri([a, b, c]);
+    /// assert!(tri.contains(&[0.0, 0.0]));
+    /// assert!(!tri.contains(&[3.0, 3.0]));
+    /// # }
+    /// ```
+    pub fn contains(&self, v: &V) -> bool
+    where
+        V: Vertex2d,
+    {
+        let (a, b, c) = (*self).into();
+        let (a, b, c) = (a.point2(), b.point2(), c.point2());
+        let v = (*v).point2();
+
+        fn sign<S>([ax, ay]: [S; 2], [bx, by]: [S; 2], [cx, cy]: [S; 2]) -> S
+        where
+            S: Scalar,
+        {
+            (ax - cx) * (by - cy) - (bx - cx) * (ay - cy)
+        }
+
+        let zero = V::Scalar::zero();
+        // A zero-area triangle contains nothing.
+        if sign(a, b, c) == zero {
+            return false;
+        }
+        let (d1, d2, d3) = (sign(v, a, b), sign(v, b, c), sign(v, c, a));
+        let has_neg = d1 < zero || d2 < zero || d3 < zero;
+        let has_pos = d1 > zero || d2 > zero || d3 > zero;
+        // Edges count as inside for either winding.
+        !(has_neg && has_pos)
+    }
+
+    /// The bounding `Rect` of the triangle.
+    pub fn bounding_rect(self) -> Rect<V::Scalar>
+    where
+        V: Vertex2d,
+    {
+        let (a, b, c) = self.into();
+        let ([ax, ay], b, c) = (a.point2(), b.point2(), c.point2());
+        let rect = Rect {
+            x: Range::new(ax, ax),
+            y: Range::new(ay, ay),
+        };
+        rect.stretch_to_point(b).stretch_to_point(c)
+    }
+
+    /// The bounding `Rect` of the triangle.
+    pub fn bounding_cuboid(self) -> Cuboid<V::Scalar>
+    where
+        V: Vertex3d,
+    {
+        let (a, b, c) = self.into();
+        let ([ax, ay, az], b, c) = (a.point3(), b.point3(), c.point3());
+        let cuboid = Cuboid {
+            x: Range::new(ax, ax),
+            y: Range::new(ay, ay),
+            z: Range::new(az, az),
+        };
+        cuboid.stretch_to_point(b).stretch_to_point(c)
+    }
+}
+
+/// Returns the first `Tri` that contains the given vertex.
+///
+/// Returns `None` if no `Tri`'s contain the given vertex.
+pub fn iter_contains<I, V>(tris: I, v: &V) -> Option<I::Item>
+where
+    I: IntoIterator,
+    I::Item: AsRef<Tri<V>>,
+    V: Vertex2d,
+{
+    tris.into_iter().find(|tri| tri.as_ref().contains(v))
+}
+
+/// Create a **Tri** from the next three vertices yielded by the given `vertices` iterator.
+///
+/// Returns **None** if there were not at least 3 vertices in the given iterator.
+pub fn from_vertices<I>(vertices: I) -> Option<Tri<I::Item>>
+where
+    I: IntoIterator,
+{
+    let mut vertices = vertices.into_iter();
+    match (vertices.next(), vertices.next(), vertices.next()) {
+        (Some(a), Some(b), Some(c)) => Some(Tri([a, b, c])),
+        _ => None,
+    }
+}
+
+/// Produce an iterator yielding a triangle for every three vertices yielded by the given
+/// `vertices` iterator.
+pub fn iter_from_vertices<I>(vertices: I) -> IterFromVertices<I::IntoIter>
+where
+    I: IntoIterator,
+{
+    let vertices = vertices.into_iter();
+    IterFromVertices { vertices }
+}
+
+/// Create a **Tri** by indexing into the given buffer.
+///
+/// **Panics** if any of the given indices are out of range of the given `vertices` slice.
+pub fn from_index_tri<V>(vertices: &[V], indices: &[usize; 3]) -> Tri<V>
+where
+    V: Clone,
+{
+    let a = vertices[indices[0]].clone();
+    let b = vertices[indices[1]].clone();
+    let c = vertices[indices[2]].clone();
+    Tri([a, b, c])
+}
+
+/// Like [`from_index_tri`], but returns `None` instead of panicking when an index is out of range.
+pub fn try_from_index_tri<V>(vertices: &[V], indices: &[usize; 3]) -> Option<Tri<V>>
+where
+    V: Clone,
+{
+    let a = vertices.get(indices[0])?.clone();
+    let b = vertices.get(indices[1])?.clone();
+    let c = vertices.get(indices[2])?.clone();
+    Some(Tri([a, b, c]))
+}
+
+/// Produce an iterator that flattens the given iterator yielding triangles into its vertices.
+pub fn vertices_from_iter<I, V>(tris: I) -> VerticesFromIter<I::IntoIter, V>
+where
+    I: IntoIterator<Item = Tri<V>>,
+{
+    let tris = tris.into_iter();
+    let tri = None;
+    VerticesFromIter { tris, tri }
+}
+
+/// Given an iterator yielding trios of indices, produce an iterator that yields each index one at
+/// a time.
+pub fn flatten_index_tris<I>(index_tris: I) -> FlattenIndices<I::IntoIter>
+where
+    I: IntoIterator<Item = [usize; 3]>,
+{
+    FlattenIndices {
+        indices: index_tris.into_iter(),
+        b: None,
+        c: None,
+    }
+}
+
+impl<V> Deref for Tri<V> {
+    type Target = [V; 3];
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl<V> From<[V; 3]> for Tri<V> {
+    fn from(points: [V; 3]) -> Self {
+        Tri(points)
+    }
+}
+
+impl<V> From<(V, V, V)> for Tri<V> {
+    fn from((a, b, c): (V, V, V)) -> Self {
+        Tri([a, b, c])
+    }
+}
+
+impl<V> From<Tri<V>> for [V; 3] {
+    fn from(val: Tri<V>) -> Self {
+        val.0
+    }
+}
+
+impl<V> From<Tri<V>> for (V, V, V) {
+    fn from(val: Tri<V>) -> Self {
+        let Tri([a, b, c]) = val;
+        (a, b, c)
+    }
+}
+
+impl<V> AsRef<Tri<V>> for Tri<V> {
+    fn as_ref(&self) -> &Tri<V> {
+        self
+    }
+}
+
+impl<V> AsRef<[V; 3]> for Tri<V> {
+    fn as_ref(&self) -> &[V; 3] {
+        &self.0
+    }
+}
+
+impl<V> Iterator for Vertices<V>
+where
+    V: Clone,
+{
+    type Item = V;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < NUM_VERTICES {
+            let v = self.tri.0[self.index as usize].clone();
+            self.index += 1;
+            Some(v)
+        } else {
+            None
+        }
+    }
+}
+
+impl<V> ExactSizeIterator for Vertices<V>
+where
+    V: Clone,
+{
+    fn len(&self) -> usize {
+        NUM_VERTICES as usize - self.index as usize
+    }
+}
+
+impl<I> Iterator for IterFromVertices<I>
+where
+    I: Iterator,
+{
+    type Item = Tri<I::Item>;
+    fn next(&mut self) -> Option<Self::Item> {
+        from_vertices(&mut self.vertices)
+    }
+}
+
+impl<I, V> Iterator for VerticesFromIter<I, V>
+where
+    I: Iterator<Item = Tri<V>>,
+    V: Vertex,
+{
+    type Item = V;
+    fn next(&mut self) -> Option<Self::Item> {
+        loop {
+            if let Some(v) = self.tri.as_mut().and_then(|vs| vs.next()) {
+                return Some(v);
+            }
+            self.tri = Some(self.tris.next()?.vertices());
+        }
+    }
+}
+
+impl<I, V> ExactSizeIterator for VerticesFromIter<I, V>
+where
+    I: Iterator<Item = Tri<V>> + ExactSizeIterator,
+    V: Vertex,
+{
+    fn len(&self) -> usize {
+        let current_tri_vs = self.tri.as_ref().map(|vs| vs.len()).unwrap_or(0);
+        let remaining_tri_vs = self.tris.len() * NUM_VERTICES as usize;
+        current_tri_vs + remaining_tri_vs
+    }
+}
+
+impl<I> Iterator for FlattenIndices<I>
+where
+    I: Iterator<Item = [usize; 3]>,
+{
+    type Item = usize;
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Some(next) = self.b.take() {
+            return Some(next);
+        }
+        if let Some(next) = self.c.take() {
+            return Some(next);
+        }
+        if let Some([next, b, c]) = self.indices.next() {
+            self.b = Some(b);
+            self.c = Some(c);
+            return Some(next);
+        }
+        None
+    }
+}
+
+impl<I> ExactSizeIterator for FlattenIndices<I>
+where
+    I: Iterator<Item = [usize; 3]> + ExactSizeIterator,
+{
+    fn len(&self) -> usize {
+        self.indices.len() * 3 + self.b.map(|_| 1).unwrap_or(0) + self.c.map(|_| 1).unwrap_or(0)
+    }
+}
+
+#[cfg(test)]
+mod index_tri_tests {
+    use super::*;
+
+    #[test]
+    fn try_from_index_tri_rejects_out_of_range() {
+        assert!(try_from_index_tri(&[10], &[0, 1, 2]).is_none());
+        let t = try_from_index_tri(&[1, 2, 3], &[2, 1, 0]).map(|t| t.0);
+        assert_eq!(t, Some([3, 2, 1]));
+    }
+}

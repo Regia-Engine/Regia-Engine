@@ -1,0 +1,494 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://regiaengine.com/formats/animgraph.schema.json",
+  "title": "Regia Engine anim graph",
+  "description": "Logical document for `.animgraph.ron`, frozen at format_version 1 (M12); format_version 2 (ADR-203) adds the optional transition `blend` and layer `weight_inertialize`, whose defaults reproduce version 1. The file on disk is RON matching serde, not JSON: enum variants are external (`Clip((...))`, `Float(0.0)`, `Trigger`, `Some(\"Name\")`, `None`). Vec3 parameters are `Vec3((x, y, z))`. Clip names are resolved at runtime against the animator's clip library. Unknown versions are rejected unless regia_animation::graph::registered_migrations can reach the current version (1 → 2 and 2 → 3 are registered). format_version 3 (ADR-1870, spec 34 M9) adds the montage `Slot` node; the 2 → 3 step only bumps the version. The canonical example is locomotion.animgraph.ron. format_version 4 (ADR-8475) adds the iterative-IK nodes `ChainIK` (FABRIK or CCD over a joint chain of any length) and `BodyAim` (a turn spread over a joint stack); the 3 → 4 step only bumps the version. The example chain_ik.animgraph.ron uses both. format_version 4 also carries the locomotion warp nodes `StrideWarp` and `OrientationWarp` (ADR-8540, same format batch); the example locomotion_warp.animgraph.ron uses both.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format_version", "parameters", "root"],
+  "properties": {
+    "format_version": { "enum": [1, 2, 3, 4] },
+    "parameters": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/parameter" }
+    },
+    "root": { "$ref": "#/$defs/node" }
+  },
+  "$defs": {
+    "parameter": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "prefixItems": [
+        { "type": "string", "description": "Parameter name." },
+        { "$ref": "#/$defs/paramValue" }
+      ]
+    },
+    "paramValue": {
+      "description": "The variant fixes the parameter type. RON: Float(0.0), Int(0), Bool(false), Vec2((x, y)), Vec3((x, y, z)), Trigger.",
+      "oneOf": [
+        { "type": "object", "required": ["Float"], "properties": { "Float": { "type": "number" } } },
+        { "type": "object", "required": ["Int"], "properties": { "Int": { "type": "integer" } } },
+        { "type": "object", "required": ["Bool"], "properties": { "Bool": { "type": "boolean" } } },
+        { "type": "object", "required": ["Vec2"], "properties": { "Vec2": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "number" } } } },
+        { "type": "object", "required": ["Vec3"], "properties": { "Vec3": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "number" } } } },
+        { "const": "Trigger" }
+      ]
+    },
+    "node": {
+      "description": "AnimNode. RON wraps the struct in an extra tuple: Clip((clip: \"Idle\", looping: true, speed: 1.0, sync_group: None)).",
+      "oneOf": [
+        { "$ref": "#/$defs/clip" },
+        { "$ref": "#/$defs/blendSpace1D" },
+        { "$ref": "#/$defs/blendSpace2D" },
+        { "$ref": "#/$defs/stateMachine" },
+        { "$ref": "#/$defs/blend" },
+        { "$ref": "#/$defs/additive" },
+        { "$ref": "#/$defs/layer" },
+        { "$ref": "#/$defs/twoBoneIk" },
+        { "$ref": "#/$defs/lookAt" },
+        { "$ref": "#/$defs/rootMotion" },
+        { "$ref": "#/$defs/slot" },
+        { "$ref": "#/$defs/chainIk" },
+        { "$ref": "#/$defs/bodyAim" },
+        { "$ref": "#/$defs/strideWarp" },
+        { "$ref": "#/$defs/orientationWarp" }
+      ]
+    },
+    "clip": {
+      "type": "object",
+      "required": ["Clip"],
+      "properties": {
+        "Clip": {
+          "type": "object",
+          "required": ["clip", "looping", "speed"],
+          "properties": {
+            "clip": { "type": "string" },
+            "looping": { "type": "boolean" },
+            "speed": { "type": "number" },
+            "sync_group": { "type": ["string", "null"] }
+          }
+        }
+      }
+    },
+    "blendSpace1D": {
+      "type": "object",
+      "required": ["BlendSpace1D"],
+      "properties": {
+        "BlendSpace1D": {
+          "type": "object",
+          "required": ["space"],
+          "properties": {
+            "space": {
+              "type": "object",
+              "required": ["param", "samples"],
+              "properties": {
+                "param": { "type": "string" },
+                "samples": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "object",
+                    "required": ["value", "clip"],
+                    "properties": {
+                      "value": { "type": "number" },
+                      "clip": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            },
+            "sync_group": { "type": ["string", "null"] }
+          }
+        }
+      }
+    },
+    "blendSpace2D": {
+      "type": "object",
+      "required": ["BlendSpace2D"],
+      "properties": {
+        "BlendSpace2D": {
+          "type": "object",
+          "required": ["space"],
+          "properties": {
+            "space": {
+              "type": "object",
+              "required": ["param_x", "param_y", "samples"],
+              "properties": {
+                "param_x": { "type": "string" },
+                "param_y": { "type": "string" },
+                "samples": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "object",
+                    "required": ["point", "clip"],
+                    "properties": {
+                      "point": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "number" } },
+                      "clip": { "type": "string" }
+                    }
+                  }
+                },
+                "triangles": {
+                  "type": "array",
+                  "description": "Optional. Empty on load; the runtime Delaunay-triangulates."
+                }
+              }
+            },
+            "sync_group": { "type": ["string", "null"] }
+          }
+        }
+      }
+    },
+    "stateMachine": {
+      "type": "object",
+      "required": ["StateMachine"],
+      "properties": {
+        "StateMachine": {
+          "type": "object",
+          "required": ["initial", "states", "transitions"],
+          "properties": {
+            "initial": { "type": "string" },
+            "states": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 2,
+                "description": "(state name, sub-graph node)"
+              }
+            },
+            "transitions": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/transition" }
+            }
+          }
+        }
+      }
+    },
+    "transition": {
+      "type": "object",
+      "required": ["from", "to", "conditions", "duration", "curve", "interruptible"],
+      "properties": {
+        "from": { "type": ["string", "null"], "description": "null means from any state." },
+        "to": { "type": "string" },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "description": "Float/Int {param, op, value}, Bool {param, value}, Trigger {param}, ClipFinished, Notify(name). op is Lt|Le|Gt|Ge|Eq|Ne. curve is Linear|Smooth."
+          }
+        },
+        "duration": { "type": "number" },
+        "curve": { "enum": ["Linear", "Smooth"] },
+        "interruptible": { "type": "boolean" },
+        "blend": {
+          "enum": ["Crossfade", "Inertialize", "InertializeSpring"],
+          "default": "Crossfade",
+          "description": "v2. Crossfade evaluates both states for `duration`; Inertialize evaluates only the target and decays the switch's pose offset to zero over `duration` (Bollo quintic, overshoot-safe); InertializeSpring uses a critically damped spring decay. Omitted = Crossfade."
+        }
+      }
+    },
+    "blend": {
+      "type": "object",
+      "required": ["Blend"],
+      "properties": {
+        "Blend": {
+          "type": "object",
+          "required": ["a", "b", "alpha_param"],
+          "properties": {
+            "a": { "$ref": "#/$defs/node" },
+            "b": { "$ref": "#/$defs/node" },
+            "alpha_param": { "type": "string" }
+          }
+        }
+      }
+    },
+    "additive": {
+      "type": "object",
+      "required": ["Additive"],
+      "properties": {
+        "Additive": {
+          "type": "object",
+          "required": ["base", "additive", "weight_param"],
+          "properties": {
+            "base": { "$ref": "#/$defs/node" },
+            "additive": { "$ref": "#/$defs/node" },
+            "weight_param": { "type": "string" }
+          }
+        }
+      }
+    },
+    "layer": {
+      "type": "object",
+      "required": ["Layer"],
+      "properties": {
+        "Layer": {
+          "type": "object",
+          "required": ["base", "layers"],
+          "properties": {
+            "base": { "$ref": "#/$defs/node" },
+            "layers": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["graph", "mask", "mode", "weight_param"],
+                "properties": {
+                  "graph": { "$ref": "#/$defs/node" },
+                  "mask": {
+                    "type": "object",
+                    "required": ["joints", "include_children"],
+                    "properties": {
+                      "joints": { "type": "array", "items": { "type": "string" } },
+                      "include_children": { "type": "boolean" }
+                    }
+                  },
+                  "mode": { "enum": ["Override", "Additive"] },
+                  "weight_param": { "type": "string" },
+                  "weight_inertialize": {
+                    "type": "number",
+                    "minimum": 0,
+                    "default": 0,
+                    "description": "v2. Seconds over which changes of the weight parameter are inertialized (eased with the quintic decay, carrying the current rate). 0 / omitted = follow the parameter."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "twoBoneIk": {
+      "type": "object",
+      "required": ["TwoBoneIK"],
+      "properties": {
+        "TwoBoneIK": {
+          "type": "object",
+          "required": ["inner", "chain", "target"],
+          "properties": {
+            "inner": { "$ref": "#/$defs/node" },
+            "chain": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "string" }, "description": "[root, mid, tip], direct parent chain. In RON a fixed array of 3 is a tuple: (\"Arm_R\", \"ForeArm_R\", \"Hand_R\")." },
+            "target": { "$ref": "#/$defs/ikTarget" },
+            "pole": { "type": ["string", "null"], "description": "Vec3 parameter name." },
+            "weight_param": { "type": ["string", "null"] }
+          }
+        }
+      }
+    },
+    "lookAt": {
+      "type": "object",
+      "required": ["LookAt"],
+      "properties": {
+        "LookAt": {
+          "type": "object",
+          "required": ["inner", "joint", "target", "max_yaw", "max_pitch"],
+          "properties": {
+            "inner": { "$ref": "#/$defs/node" },
+            "joint": { "type": "string" },
+            "target": { "$ref": "#/$defs/ikTarget" },
+            "max_yaw": { "type": "number", "description": "Radians from the bind rotation." },
+            "max_pitch": { "type": "number" },
+            "weight_param": { "type": ["string", "null"] }
+          }
+        }
+      }
+    },
+    "rootMotion": {
+      "type": "object",
+      "required": ["RootMotion"],
+      "properties": {
+        "RootMotion": {
+          "type": "object",
+          "required": ["inner", "mode"],
+          "properties": {
+            "inner": { "$ref": "#/$defs/node" },
+            "mode": { "enum": ["None", "XZ", "XYZ", "Yaw"] }
+          }
+        }
+      }
+    },
+    "slot": {
+      "type": "object",
+      "required": ["Slot"],
+      "properties": {
+        "Slot": {
+          "type": "object",
+          "required": ["name", "source"],
+          "properties": {
+            "name": { "type": "string", "description": "Montage slot played inside the graph (format_version 3)." },
+            "source": { "$ref": "#/$defs/node" },
+            "eval_idle_source": { "type": "boolean", "description": "Evaluate source under a full-body montage at weight 1 (default true)." }
+          }
+        }
+      }
+    },
+    "chainIk": {
+      "type": "object",
+      "required": ["ChainIK"],
+      "properties": {
+        "ChainIK": {
+          "type": "object",
+          "description": "Iterative IK over the chain from root to tip (format_version 4). The tip moves to the target; the root's parent stays put.",
+          "required": ["inner", "root", "tip", "target"],
+          "additionalProperties": false,
+          "properties": {
+            "inner": { "$ref": "#/$defs/node" },
+            "root": { "type": "string", "description": "First joint of the chain (it turns)." },
+            "tip": { "type": "string", "description": "Last joint, a descendant of root (its own rotation is left alone)." },
+            "solver": { "enum": ["Fabrik", "Ccd"], "description": "Default Fabrik." },
+            "target": { "$ref": "#/$defs/ikTarget" },
+            "pole": { "type": ["string", "null"], "description": "Vec3 parameter the chain's bend turns towards (the chain turns about its root-to-tip line; the tip stays)." },
+            "limits": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/chainLimits" }] },
+            "iterations": { "type": "integer", "minimum": 0, "maximum": 256, "description": "Default 24." },
+            "tolerance": { "type": "number", "minimum": 0, "description": "Meters; default 0.001." },
+            "weight_param": { "type": ["string", "null"] }
+          }
+        }
+      }
+    },
+    "bodyAim": {
+      "type": "object",
+      "required": ["BodyAim"],
+      "properties": {
+        "BodyAim": {
+          "type": "object",
+          "description": "Turns joints bottom first, each by its share, so aim_joint's axis points at the target (format_version 4).",
+          "required": ["inner", "joints", "aim_joint", "target"],
+          "additionalProperties": false,
+          "properties": {
+            "inner": { "$ref": "#/$defs/node" },
+            "joints": {
+              "type": "array",
+              "minItems": 1,
+              "description": "(joint name, share) pairs, bottom first. In RON each pair is a tuple: (\"spine\", 1.0). Shares are relative and not negative; a name is never empty (ADR-8732).",
+              "items": { "type": "array", "minItems": 2, "maxItems": 2, "prefixItems": [{ "type": "string", "minLength": 1 }, { "type": "number", "minimum": 0 }] }
+            },
+            "aim_joint": { "type": "string", "description": "One of joints or a descendant of the last." },
+            "axis": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "number" }, "description": "Aim direction in aim_joint's frame, not zero; default (0.0, 0.0, -1.0). In RON a tuple." },
+            "target": { "$ref": "#/$defs/ikTarget" },
+            "limits": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/chainLimits" }] },
+            "passes": { "type": "integer", "minimum": 1, "maximum": 32, "description": "Default 8; each pass removes most of the parallax the previous one left." },
+            "weight_param": { "type": ["string", "null"] }
+          }
+        }
+      }
+    },
+    "strideWarp": {
+      "type": "object",
+      "required": ["StrideWarp"],
+      "properties": {
+        "StrideWarp": {
+          "type": "object",
+          "description": "Stride warping (format_version 4, ADR-8540): the ground speed parameter over the inner graph's root-motion speed, clamped and smoothed, scales the inner clock (Rate) or the stride with leg IK (Pose). An inner graph without root motion passes the pose.",
+          "required": ["inner", "ground_speed_param"],
+          "properties": {
+            "inner": { "$ref": "#/$defs/node" },
+            "ground_speed_param": { "type": "string", "description": "Float parameter: the character's ground speed, m/s." },
+            "settings": {
+              "type": "object",
+              "description": "Omitted: strength 1, min_speed 0.1, ratio_min 0.8, ratio_max 1.25, response 12, mode Pose. When written, every field is required.",
+              "required": ["strength", "min_speed", "ratio_min", "ratio_max", "response", "mode"],
+              "properties": {
+                "strength": { "type": "number", "minimum": 0, "maximum": 1 },
+                "min_speed": { "type": "number", "minimum": 0, "description": "m/s; below it (actual or clip speed) the warp is off." },
+                "ratio_min": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+                "ratio_max": { "type": "number", "minimum": 1 },
+                "response": { "type": "number", "exclusiveMinimum": 0, "description": "Critically damped spring stiffness, 1/s." },
+                "mode": { "enum": ["Rate", "Pose"] }
+              }
+            },
+            "legs": {
+              "type": "array",
+              "description": "Pose mode: (hip, knee, ankle) joint names per leg; required (non-empty) in Pose mode.",
+              "items": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "string", "minLength": 1 } }
+            },
+            "pelvis": { "type": "string", "description": "Pose mode: the hips joint the legs hang from (lowered, never raised)." },
+            "stride_length": { "type": "number", "minimum": 0, "description": "Pose mode: largest scaled foot offset along the movement, meters; default 0.5." }
+          }
+        }
+      }
+    },
+    "orientationWarp": {
+      "type": "object",
+      "required": ["OrientationWarp"],
+      "properties": {
+        "OrientationWarp": {
+          "type": "object",
+          "description": "Orientation warping (format_version 4, ADR-8540): the pelvis turns by the wrapped difference between the heading parameter and the inner root-motion heading (0 = forward -Z, counter-clockwise positive), clipped to max_delta, times strength; the spine turns back by its shares.",
+          "required": ["inner", "heading_param", "pelvis"],
+          "properties": {
+            "inner": { "$ref": "#/$defs/node" },
+            "heading_param": { "type": "string", "description": "Float parameter: desired movement heading, radians." },
+            "pelvis": { "type": "string", "minLength": 1 },
+            "spine": {
+              "type": "array",
+              "description": "(joint name, share) pairs, low to high; shares sum to 1 (an empty list turns the whole body). In RON each pair is a tuple.",
+              "items": { "type": "array", "minItems": 2, "maxItems": 2, "prefixItems": [{ "type": "string" }, { "type": "number", "minimum": 0 }] }
+            },
+            "strength": { "type": "number", "minimum": 0, "maximum": 1, "description": "Default 1." },
+            "max_delta": { "type": "number", "minimum": 0, "maximum": 3.14159265, "description": "Radians; default pi/2." }
+          }
+        }
+      }
+    },
+    "chainLimits": {
+      "description": "Uniform(limit) applies to every turning joint; PerJoint([(joint: \"name\", limit: ...)]) by joint name, others free.",
+      "oneOf": [
+        { "type": "object", "required": ["Uniform"], "properties": { "Uniform": { "$ref": "#/$defs/jointLimit" } } },
+        {
+          "type": "object",
+          "required": ["PerJoint"],
+          "properties": {
+            "PerJoint": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["joint", "limit"],
+                "additionalProperties": false,
+                "properties": { "joint": { "type": "string" }, "limit": { "$ref": "#/$defs/jointLimit" } }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "jointLimit": {
+      "description": "Relative to the joint's bind local rotation, radians. Cone: swing about any axis off the bone up to max_swing, twist about the bone within [min_twist, max_twist]. Hinge: rotation about axis (bind local frame) within [min, max].",
+      "oneOf": [
+        { "const": "Free" },
+        {
+          "type": "object",
+          "required": ["Cone"],
+          "properties": {
+            "Cone": {
+              "type": "object",
+              "required": ["max_swing", "min_twist", "max_twist"],
+              "properties": { "max_swing": { "type": "number" }, "min_twist": { "type": "number" }, "max_twist": { "type": "number" } }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["Hinge"],
+          "properties": {
+            "Hinge": {
+              "type": "object",
+              "required": ["axis", "min", "max"],
+              "properties": {
+                "axis": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "number" } },
+                "min": { "type": "number" },
+                "max": { "type": "number" }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "ikTarget": {
+      "description": "Param(\"Name\") reads a vec3 parameter in object space. Socket(\"name\") reads a resolved socket.",
+      "oneOf": [
+        { "type": "object", "required": ["Param"], "properties": { "Param": { "type": "string" } } },
+        { "type": "object", "required": ["Socket"], "properties": { "Socket": { "type": "string" } } }
+      ]
+    }
+  }
+}

@@ -1,0 +1,914 @@
+{
+  "$defs": {
+    "anodized": {
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": [
+            "fresnel_lut"
+          ]
+        },
+        {
+          "required": [
+            "color_rgb_linear"
+          ]
+        }
+      ],
+      "properties": {
+        "catalogue_name": {
+          "maxLength": 200,
+          "minLength": 1,
+          "type": "string"
+        },
+        "color_rgb_linear": {
+          "$ref": "#/$defs/rgb",
+          "description": "Plain color; the viewer uses it when there is no `fresnel_lut`."
+        },
+        "fresnel_lut": {
+          "$ref": "#/$defs/fresnel_lut"
+        },
+        "oxide": {
+          "$ref": "#/$defs/oxide"
+        },
+        "roughness": {
+          "description": "Default roughness; a picked finish overrides it. Absent: 0.1.",
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "substrate_material_id": {
+          "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$",
+          "type": "string"
+        },
+        "thickness_jitter_nm": {
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number"
+        },
+        "thickness_nm": {
+          "exclusiveMinimum": 0,
+          "maximum": 2000,
+          "type": "number"
+        },
+        "voltage_hint_v": {
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "substrate_material_id"
+      ],
+      "type": "object"
+    },
+    "calibration": {
+      "additionalProperties": false,
+      "properties": {
+        "achieved_de00": {
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "date": {
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "method": {
+          "enum": [
+            "photo_fit",
+            "none"
+          ],
+          "type": "string"
+        },
+        "target_lab": {
+          "items": {
+            "maximum": 200,
+            "minimum": -200,
+            "type": "number"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "type": [
+            "array",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "method"
+      ],
+      "type": "object"
+    },
+    "conductor": {
+      "additionalProperties": false,
+      "properties": {
+        "f0_rgb_linear": {
+          "$ref": "#/$defs/rgb",
+          "description": "The viewer's base color."
+        },
+        "f82_tint_rgb": {
+          "$ref": "#/$defs/rgb"
+        },
+        "nk": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/nk"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "nk_dataset": {
+          "maxLength": 200,
+          "minLength": 1,
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "plating": {
+          "enum": [
+            "none",
+            "rhodium",
+            "black_rhodium"
+          ],
+          "type": "string"
+        },
+        "roughness": {
+          "description": "Default roughness; a picked finish overrides it. Absent: 0.1.",
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "f0_rgb_linear"
+      ],
+      "type": "object"
+    },
+    "entry": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "conductor"
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "anodized"
+                  ]
+                },
+                {
+                  "required": [
+                    "gem_dielectric"
+                  ]
+                },
+                {
+                  "required": [
+                    "gem_special"
+                  ]
+                },
+                {
+                  "required": [
+                    "finish"
+                  ]
+                }
+              ]
+            },
+            "required": [
+              "conductor"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "anodized"
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "conductor"
+                  ]
+                },
+                {
+                  "required": [
+                    "gem_dielectric"
+                  ]
+                },
+                {
+                  "required": [
+                    "gem_special"
+                  ]
+                },
+                {
+                  "required": [
+                    "finish"
+                  ]
+                }
+              ]
+            },
+            "required": [
+              "anodized"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "gem_dielectric"
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "conductor"
+                  ]
+                },
+                {
+                  "required": [
+                    "anodized"
+                  ]
+                },
+                {
+                  "required": [
+                    "gem_special"
+                  ]
+                },
+                {
+                  "required": [
+                    "finish"
+                  ]
+                }
+              ]
+            },
+            "required": [
+              "gem_dielectric"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "gem_special"
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "conductor"
+                  ]
+                },
+                {
+                  "required": [
+                    "anodized"
+                  ]
+                },
+                {
+                  "required": [
+                    "gem_dielectric"
+                  ]
+                },
+                {
+                  "required": [
+                    "finish"
+                  ]
+                }
+              ]
+            },
+            "required": [
+              "gem_special"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "finish"
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "conductor"
+                  ]
+                },
+                {
+                  "required": [
+                    "anodized"
+                  ]
+                },
+                {
+                  "required": [
+                    "gem_dielectric"
+                  ]
+                },
+                {
+                  "required": [
+                    "gem_special"
+                  ]
+                }
+              ]
+            },
+            "required": [
+              "finish"
+            ]
+          }
+        }
+      ],
+      "properties": {
+        "anodized": {
+          "$ref": "#/$defs/anodized"
+        },
+        "calibration": {
+          "$ref": "#/$defs/calibration"
+        },
+        "catalogue_facets": {
+          "description": "Option labels this entry maps from, as `<group>=<label>`.",
+          "items": {
+            "pattern": "^[^=]{1,120}=.{1,200}$",
+            "type": "string"
+          },
+          "maxItems": 64,
+          "type": "array"
+        },
+        "conductor": {
+          "$ref": "#/$defs/conductor"
+        },
+        "display_name": {
+          "description": "Free text (marked): the name a person reads.",
+          "maxLength": 200,
+          "minLength": 1,
+          "type": "string"
+        },
+        "finish": {
+          "$ref": "#/$defs/finish"
+        },
+        "gem_dielectric": {
+          "$ref": "#/$defs/gem_dielectric"
+        },
+        "gem_special": {
+          "$ref": "#/$defs/gem_special"
+        },
+        "kind": {
+          "enum": [
+            "conductor",
+            "anodized",
+            "gem_dielectric",
+            "gem_special",
+            "finish"
+          ],
+          "type": "string"
+        },
+        "material_id": {
+          "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$",
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "status": {
+          "enum": [
+            "measured",
+            "estimate"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "calibration",
+        "catalogue_facets",
+        "display_name",
+        "kind",
+        "material_id",
+        "source",
+        "status"
+      ],
+      "type": "object"
+    },
+    "finish": {
+      "additionalProperties": false,
+      "properties": {
+        "anisotropy": {
+          "additionalProperties": false,
+          "properties": {
+            "direction_source": {
+              "enum": [
+                "tangent",
+                "uv",
+                "radial"
+              ],
+              "type": "string"
+            },
+            "strength": {
+              "maximum": 1,
+              "minimum": -1,
+              "type": "number"
+            }
+          },
+          "required": [
+            "direction_source",
+            "strength"
+          ],
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "detail_normal_ref": {
+          "description": "A relative path inside the folder: `/`-separated, no `..`, no leading `/` or `.`.",
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.-]*(/[A-Za-z0-9_][A-Za-z0-9_.-]*)*$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "feature_scale_mm": {
+          "exclusiveMinimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "finish_kind": {
+          "enum": [
+            "polish",
+            "brushed",
+            "sandblast",
+            "hammered",
+            "textured"
+          ],
+          "type": "string"
+        },
+        "roughness": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "finish_kind",
+        "roughness"
+      ],
+      "type": "object"
+    },
+    "fresnel_lut": {
+      "additionalProperties": false,
+      "properties": {
+        "cos_theta": {
+          "const": "uniform_0_1",
+          "description": "Entry i sits at cos theta = i / (n - 1)."
+        },
+        "entries": {
+          "items": {
+            "items": {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            "maxItems": 3,
+            "minItems": 3,
+            "type": "array"
+          },
+          "maxItems": 64,
+          "minItems": 8,
+          "type": "array"
+        },
+        "inputs_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "cos_theta",
+        "entries"
+      ],
+      "type": "object"
+    },
+    "gem_dielectric": {
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": [
+            "tint_rgb_linear"
+          ]
+        },
+        {
+          "required": [
+            "attenuation_rgb_per_mm"
+          ]
+        },
+        {
+          "required": [
+            "absorption_spectrum"
+          ]
+        }
+      ],
+      "properties": {
+        "abbe_vd": {
+          "exclusiveMinimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "absorption_spectrum": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/spectrum"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "attenuation_rgb_per_mm": {
+          "items": {
+            "minimum": 0,
+            "type": "number"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "birefringence": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "inclusions": {
+          "enum": [
+            "none",
+            "light",
+            "natural"
+          ],
+          "type": "string"
+        },
+        "ior_family": {
+          "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$",
+          "type": "string"
+        },
+        "n_d": {
+          "exclusiveMinimum": 1,
+          "maximum": 4,
+          "type": "number"
+        },
+        "scatter": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "sellmeier": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/sellmeier"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sparkle": {
+          "description": "Strength of the cheap sparkle. Absent: derived from `abbe_vd`.",
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "surface": {
+          "description": "`frosted` selects the frosted-stone shader.",
+          "enum": [
+            "polished",
+            "frosted"
+          ],
+          "type": "string"
+        },
+        "surface_roughness": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "tint_rgb_linear": {
+          "description": "The stone's tint, used as given.",
+          "items": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "type": "array"
+        }
+      },
+      "required": [
+        "n_d"
+      ],
+      "type": "object"
+    },
+    "gem_special": {
+      "additionalProperties": false,
+      "properties": {
+        "adularescence": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "body_rgb_linear": {
+          "$ref": "#/$defs/rgb"
+        },
+        "chatoyancy": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "model": {
+          "enum": [
+            "opal",
+            "pearl",
+            "phenomenal"
+          ],
+          "type": "string"
+        },
+        "orient_strength": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "patch_scale_mm": {
+          "exclusiveMinimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "sphere_spacing_nm": {
+          "items": {
+            "minimum": 0,
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": [
+            "array",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "body_rgb_linear",
+        "model"
+      ],
+      "type": "object"
+    },
+    "nk": {
+      "additionalProperties": false,
+      "properties": {
+        "k": {
+          "items": {
+            "minimum": 0,
+            "type": "number"
+          },
+          "maxItems": 512,
+          "minItems": 3,
+          "type": "array"
+        },
+        "n": {
+          "items": {
+            "minimum": 0,
+            "type": "number"
+          },
+          "maxItems": 512,
+          "minItems": 3,
+          "type": "array"
+        },
+        "wavelength_nm": {
+          "items": {
+            "maximum": 2000,
+            "minimum": 200,
+            "type": "number"
+          },
+          "maxItems": 512,
+          "minItems": 3,
+          "type": "array"
+        }
+      },
+      "required": [
+        "k",
+        "n",
+        "wavelength_nm"
+      ],
+      "type": "object"
+    },
+    "oxide": {
+      "additionalProperties": false,
+      "properties": {
+        "coefficients": {
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 16,
+          "type": "array"
+        },
+        "dataset": {
+          "maxLength": 200,
+          "minLength": 1,
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "k": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "model": {
+          "enum": [
+            "dataset",
+            "sellmeier",
+            "cauchy"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "model"
+      ],
+      "type": "object"
+    },
+    "rgb": {
+      "items": {
+        "maximum": 4,
+        "minimum": 0,
+        "type": "number"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "type": "array"
+    },
+    "sellmeier": {
+      "additionalProperties": false,
+      "properties": {
+        "b": {
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "type": "array"
+        },
+        "c_um2": {
+          "items": {
+            "minimum": 0,
+            "type": "number"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "type": "array"
+        }
+      },
+      "required": [
+        "b",
+        "c_um2"
+      ],
+      "type": "object"
+    },
+    "source": {
+      "additionalProperties": false,
+      "properties": {
+        "citation": {
+          "description": "Free text (marked): the published source.",
+          "maxLength": 400,
+          "minLength": 1,
+          "type": "string"
+        },
+        "dataset": {
+          "maxLength": 200,
+          "minLength": 1,
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "retrieved": {
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "citation"
+      ],
+      "type": "object"
+    },
+    "spectrum": {
+      "additionalProperties": false,
+      "properties": {
+        "per_mm": {
+          "items": {
+            "minimum": 0,
+            "type": "number"
+          },
+          "maxItems": 512,
+          "minItems": 3,
+          "type": "array"
+        },
+        "wavelength_nm": {
+          "items": {
+            "maximum": 2000,
+            "minimum": 200,
+            "type": "number"
+          },
+          "maxItems": 512,
+          "minItems": 3,
+          "type": "array"
+        }
+      },
+      "required": [
+        "per_mm",
+        "wavelength_nm"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://regia.invalid/formats/jewelry-material-library.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Every material a viewer can show, as simple look data: metals (base color and roughness), anodized metals (a plain color or a small cos-theta table), gems (index and tint), special stones and finishes. Physical fields are accepted and ignored. Owner: Regia. Page: docs/formats/jewelry-material-library.md.",
+  "properties": {
+    "library_version": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "materials": {
+      "items": {
+        "$ref": "#/$defs/entry"
+      },
+      "maxItems": 4096,
+      "type": "array"
+    },
+    "schema": {
+      "const": "jewelry.material_library/1"
+    },
+    "working_space": {
+      "enum": [
+        "linear_rec709",
+        "acescg"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "library_version",
+    "materials",
+    "schema",
+    "working_space"
+  ],
+  "title": "Material library (library.json)",
+  "type": "object"
+}

@@ -1,0 +1,31 @@
+ProcGraph(
+    format_version: 1,
+    description: "Starter: a conifer (strong apical control, whorled branches; spec 68). Bark and needle-card placeholders from the default content.",
+    params: [
+        (name: "growth_steps", ty: Int, default: 14, min: Some(1.0), max: Some(64.0), doc: "Growth steps"),
+    ],
+    inputs: [],
+    outputs: [ (name: "skeleton", kinds: ["PlantSkeleton"]), (name: "mesh", kinds: ["PlantMesh"]) ],
+    nodes: {
+        1: (ty: "plant.seed", settings: { "tilt_deg": [0.0, 2.0] }, at: (0.0, 0.0)),
+        2: (ty: "plant.grow", settings: { "growth_steps": Bind("growth_steps"), "apical": 0.85, "buds_per_node": 5, "divergence_deg": 36.0, "branch_angle_deg": 75.0, "branch_angle_decay": 1.0, "up_pull": 0.12, "internode_m": 0.3, "max_order": 3, "wander_deg": 4.0 }, at: (220.0, 0.0)),
+        3: (ty: "plant.radius", settings: { "exponent": 2.3 }, at: (440.0, 0.0)),
+        4: (ty: "plant.bend", settings: { "max_deg": 20.0 }, at: (550.0, 0.0)),
+        5: (ty: "plant.mesh", settings: { "materials": by_order(["materials/default_bark.material.ron"]) }, at: (660.0, 0.0)),
+        6: (ty: "plant.leaves", settings: { "choices": [(card: true, material: "materials/default_leaf.material.ron", weight: 1.0, size_m: [0.1, 0.16], rules: [])], "orders": [1.0, 16.0], "orient": "along", "spacing_m": 0.12 }, at: (880.0, 0.0)),
+        7: (ty: "plant.export", settings: { "name": "plant_conifer" }, at: (1100.0, 0.0)),
+        8: (ty: "graph.output", settings: { "pin": "skeleton" }, at: (660.0, 200.0)),
+        9: (ty: "graph.output", settings: { "pin": "mesh" }, at: (1320.0, 0.0)),
+    },
+    edges: [
+        (from: (1, "out"), to: (2, "in")),
+        (from: (2, "out"), to: (3, "in")),
+        (from: (3, "out"), to: (4, "in")),
+        (from: (4, "out"), to: (5, "in")),
+        (from: (5, "out"), to: (6, "in")),
+        (from: (6, "out"), to: (7, "in")),
+        (from: (4, "out"), to: (8, "in")),
+        (from: (7, "out"), to: (9, "in")),
+    ],
+    flags: (starter: true, tool: None, domain: Plant),
+)

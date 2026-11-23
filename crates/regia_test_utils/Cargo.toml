@@ -1,0 +1,54 @@
+[package]
+name = "regia_test_utils"
+description = "Headless rendering harness, golden-image comparison, test worlds."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia = { workspace = true }
+regia_render = { workspace = true }
+# The headless smoke scene of `shuffle` drives the engine's CPU-side plugins directly.
+regia_animation = { workspace = true }
+regia_app = { workspace = true }
+regia_core = { workspace = true }
+# `det_golden` re-exports the lockstep kit's golden harness (ADR-8046).
+regia_detsim = { workspace = true }
+regia_ecs = { workspace = true }
+regia_framework = { workspace = true, features = ["functional-tests"] }
+# The record/replay harnesses (`repro`, `replay_soak`) drive their scenes through the action layer
+# and the input recorder.
+regia_input = { workspace = true }
+regia_nav = { workspace = true }
+regia_physics = { workspace = true }
+regia_scene = { workspace = true }
+wgpu = { workspace = true }
+image = { workspace = true }
+image-compare = { workspace = true }
+anyhow = { workspace = true }
+# `functional::TestError`.
+thiserror = { workspace = true }
+gltf = { workspace = true }
+glam = { workspace = true }
+# `alloc_counter::quiet_tracing` (ADR-5718): the state `tracing` has in a host with a subscriber.
+tracing = { workspace = true }
+# `device_pools` (ADR-5718): the logger that meets wgpu-core's trace line inside a pass's replay.
+# Already in the graph through wgpu and regia_render.
+log = { workspace = true }
+
+[dev-dependencies]
+# `tests/net_soak.rs` (ADR-7899): the network soak's plan runner, measured with this crate's counting allocator.
+regia_net_soak = { workspace = true }
+# `tests/hwrt_gate.rs` overwrites the process-wide ray-tracing report through
+# `regia_render::hwrt::record_device_report_for_test` (ADR-7570).
+regia_render = { workspace = true, features = ["test-hooks"] }
+# `tests/loader_fuzz.rs` (ADR-538) decodes `.fgiv` volumes and `.material.ron` files before handing
+# them to the renderer's CPU consumers. Already in the graph through regia_render.
+regia_asset = { workspace = true }
+# Only the tests build meshlets (`tests/visbuffer_differential.rs`).
+regia_asset_pipeline = { workspace = true }

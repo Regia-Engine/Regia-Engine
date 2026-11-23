@@ -1,0 +1,18 @@
+// A `.rules.ron` v1 rule set whose options bind session fields (ADR-8881): a playlist row's
+// `caps`, `time_limit` or `home_flag` changes the match without game code.
+(
+    format_version: 1,
+    id: "ctf_tuned",
+    name_key: "mode.ctf_tuned",
+    extends: "ctf",
+    session: (
+        objectives: (capture_limit: 3),
+    ),
+    options: [
+        (key: "caps", kind: int, default: "5", min: "1", max: "10", bind: "objectives.capture_limit"),
+        (key: "time_limit", kind: int, default: "0", min: "0", max: "216000", bind: "phases.time_limit_ticks"),
+        (key: "home_flag", kind: bool, default: "true", bind: "objectives.capture_needs_home_flag"),
+        (key: "touch", kind: float, default: "2.5", min: "0.5", max: "8", bind: "objectives.flag_touch_radius"),
+        (key: "sky", kind: enum, default: "day", choices: ["day", "night"]),
+    ],
+)

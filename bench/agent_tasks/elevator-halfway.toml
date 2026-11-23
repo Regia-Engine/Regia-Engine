@@ -1,0 +1,29 @@
+format_version = 1
+id = "elevator-halfway"
+title = "Park the elevator halfway with a sequence"
+prompt = "The entity 'Elevator' is at the origin. Author a three-second sequence that raises it 6 m straight up, bound to Elevator, and leave the sequence paused at exactly the 1.5 second mark, so the elevator stands at (0, 3, 0)."
+features = ["sequencer", "scene"]
+crates = ["regia_agent", "regia_framework"]
+call_budget = 8
+
+[setup]
+target = "sequencer"
+
+[[setup.call]]
+method = "scene.spawn"
+params = { name = "Elevator", components = { Transform = { translation = [0, 0, 0] } } }
+save = { e = "/entity" }
+
+[[check]]
+name = "elevator at 3 m"
+method = "scene.query_entities"
+params = { name = "Elevator" }
+pointer = "/entities/0/translation"
+expect = { kind = "within_distance", point = [0, 3, 0], max = 0.05 }
+
+[[check]]
+name = "clock at 1.5 s"
+method = "sequence.player"
+params = { action = "query" }
+pointer = "/players/0/time"
+expect = { kind = "number_range", min = 1.45, max = 1.55 }

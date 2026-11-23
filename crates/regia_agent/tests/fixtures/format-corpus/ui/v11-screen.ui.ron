@@ -1,0 +1,16 @@
+// `.ui.ron` v11 fold (ADR-8252): screen back, a disabled subtree and a node pivot.
+(
+    version: 11,
+    back: pop,
+    root: (
+        children: [
+            (
+                name: "menu",
+                disabled_subtree: true,
+                children: [
+                    (name: "item", pivot: (0.0, 1.0), widget: button),
+                ],
+            ),
+        ],
+    ),
+)

@@ -1,0 +1,42 @@
+(
+    version: 1,
+    atmosphere: (
+        preset: Earth,
+        time_of_day: Some((
+            hour: 8.0,
+            day_of_year: 80,
+            latitude_deg: 46.0,
+        )),
+        sun_illuminance_lux: None,
+        cloud_coverage: 0.0,
+        cloud_type: 0.0,
+        sky_body: None,
+        moons: [],
+        haze: (
+            density: 0.0,
+            scale_height_m: 200.0,
+            base_height_m: 0.0,
+        ),
+        aerosol_turbidity: 0.1,
+    ),
+    look: (
+        exposure_bias_ev: 0.0,
+        min_ev100: None,
+        max_ev100: None,
+        meter: None,
+        contrast: None,
+        saturation: None,
+        grade: None,
+        lut: None,
+        local_exposure: None,
+        baked_gi: None,
+    ),
+    weather: Preset("fair"),
+    changes: [
+        (
+            frame: 120,
+            to: Preset("cloudy"),
+            seconds: 6.0,
+        ),
+    ],
+)

@@ -1,0 +1,55 @@
+// A `.logic.ron` v2 graph (ADR-8832, P-177): typed entity variables (`hp`, `tag`) and typed
+// world variables on the declared `gatehouse` board, seeded when the graph starts; the rules
+// write them with values of their declared types.
+LogicGraphDef(
+    format_version: 2,
+    description: "Gatehouse guard with typed variables",
+    seed: 11,
+    locals: [(name: "alarms", default: Int(0))],
+    world: ["gatehouse"],
+    entity_vars: [
+        (name: "hp", default: Int(100)),
+        (name: "tag", default: String("guard")),
+        (name: "alert", default: Bool(false)),
+    ],
+    world_vars: [
+        (board: "gatehouse", name: "raised", default: Int(0)),
+        (board: "gatehouse", name: "threat", default: Float(0.25)),
+    ],
+    rules: [
+        (
+            name: "hit",
+            event: EntityEvent("hit"),
+            actions: [
+                (task: "logic::SetBlackboard", set: {
+                    "key": Literal(String("hp")),
+                    "op": Literal(String("increment")),
+                    "value": Literal(Int(-10)),
+                }),
+                (task: "logic::SetBlackboard", set: {
+                    "key": Literal(String("entity/alert")),
+                    "value": Literal(Bool(true)),
+                }),
+            ],
+        ),
+        (
+            name: "raise",
+            event: BlackboardChanged(key: "alert"),
+            condition: Key("alert"),
+            actions: [
+                (task: "logic::SetBlackboard", set: {
+                    "key": Literal(String("world/gatehouse/raised")),
+                    "op": Literal(String("increment")),
+                }),
+                (task: "logic::SetBlackboard", set: {
+                    "key": Literal(String("world/gatehouse/threat")),
+                    "value": Literal(Float(0.75)),
+                }),
+                (task: "logic::SetBlackboard", set: {
+                    "key": Literal(String("local/alarms")),
+                    "op": Literal(String("increment")),
+                }),
+            ],
+        ),
+    ],
+)

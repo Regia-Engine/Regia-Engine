@@ -1,0 +1,24 @@
+// Behavior tree of the melee grunt (samples/third_person, ADR-2596). `.bt.ron` v1 (no version
+// field; docs/formats/bt-ron.md). The `sense` service runs the perception predicates every tick
+// and writes `disabled`, `alert` and `in_range` into the blackboard; the selector below it is
+// re-evaluated every tick (each leaf but the attack finishes in one tick), so the brain reacts
+// as soon as the blackboard changes: hold while staggered or dead, fight while alert (attack in
+// range, else chase), patrol otherwise. Giving up is the `sense` service clearing `alert`.
+(
+    root: 0,
+    nodes: [
+        (name: "sense", kind: service, children: [1], key: "", seconds: 0.0, times: None, task: "third_person::enemy::Sense", policy: require_all),
+        (name: "brain", kind: selector, children: [2, 5, 11], key: "", seconds: 0.0, times: None, task: "", policy: require_all),
+        (name: "hold_if_disabled", kind: sequence, children: [3, 4], key: "", seconds: 0.0, times: None, task: "", policy: require_all),
+        (name: "disabled", kind: condition, children: [], key: "disabled", seconds: 0.0, times: None, task: "", policy: require_all),
+        (name: "hold", kind: leaf, children: [], key: "", seconds: 0.0, times: None, task: "third_person::enemy::Hold", policy: require_all),
+        (name: "engage_if_alert", kind: sequence, children: [6, 7], key: "", seconds: 0.0, times: None, task: "", policy: require_all),
+        (name: "alert", kind: condition, children: [], key: "alert", seconds: 0.0, times: None, task: "", policy: require_all),
+        (name: "fight", kind: selector, children: [8, 10], key: "", seconds: 0.0, times: None, task: "", policy: require_all),
+        (name: "attack_if_in_range", kind: sequence, children: [9, 12], key: "", seconds: 0.0, times: None, task: "", policy: require_all),
+        (name: "in_range", kind: condition, children: [], key: "in_range", seconds: 0.0, times: None, task: "", policy: require_all),
+        (name: "chase", kind: leaf, children: [], key: "", seconds: 0.0, times: None, task: "third_person::enemy::Chase", policy: require_all),
+        (name: "patrol", kind: leaf, children: [], key: "", seconds: 0.0, times: None, task: "third_person::enemy::Patrol", policy: require_all),
+        (name: "attack", kind: leaf, children: [], key: "", seconds: 0.0, times: None, task: "third_person::enemy::MeleeAttack", policy: require_all),
+    ],
+)

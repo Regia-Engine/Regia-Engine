@@ -1,0 +1,53 @@
+// A project bus tree, `config/audio.ron` (`docs/formats/audio-buses-ron.md`, ADR-8105 (g), ADR-8354):
+// the default tree plus a bypassed EQ, a delay send bus and two snapshots.
+(
+    version: 1,
+    buses: [
+        (name: "Master", parent: None, volume_db: 0.0, mute: false),
+        (name: "Music", parent: Some("Master"), volume_db: -3.0, bypass_medium: true),
+        (
+            name: "Sfx",
+            parent: Some("Master"),
+            effects: [
+                Bypassed(Eq(
+                    low_hz: 200.0,
+                    low_db: 2.0,
+                    mid_hz: 1000.0,
+                    mid_db: -3.0,
+                    high_hz: 5000.0,
+                    high_db: 1.0,
+                    quality: 0.7,
+                )),
+                Compressor(threshold_db: -12.0, ratio: 2.0, attack_secs: 0.01, release_secs: 0.2, makeup_db: 1.0),
+            ],
+            sends: [(bus: "Echo", volume_db: -9.0)],
+        ),
+        (
+            name: "World",
+            parent: Some("Sfx"),
+            effects: [LowPass(cutoff_hz: 20000.0, resonance: 0.0)],
+            sends: [(bus: "Reverb", volume_db: -60.0)],
+        ),
+        (name: "Ui", parent: Some("Sfx"), bypass_medium: true),
+        (name: "Voice", parent: Some("Master"), bypass_medium: true),
+        (name: "Ambience", parent: Some("Master"), volume_db: -6.0, sends: [(bus: "Reverb", volume_db: -60.0)]),
+    ],
+    send_buses: [
+        (name: "Reverb", effects: [Reverb(feedback: 0.85, damping: 0.4, stereo_width: 0.7, mix: 1.0)]),
+        (name: "Echo", effects: [Delay(delay_secs: 0.3, feedback_db: -9.0, mix: 1.0)]),
+    ],
+    snapshots: [
+        (
+            name: "Paused",
+            bus_volumes: {"Music": -12.0, "Sfx": -20.0},
+            filter_cutoffs: {"World": 800.0},
+            blend_secs: 0.5,
+        ),
+        (
+            name: "Hall",
+            bus_mutes: {"Music": true},
+            send_volumes: [(bus: "World", send: "Reverb", volume_db: -6.0), (bus: "Sfx", send: "Echo", volume_db: 0.0)],
+            blend_secs: 0.25,
+        ),
+    ],
+)

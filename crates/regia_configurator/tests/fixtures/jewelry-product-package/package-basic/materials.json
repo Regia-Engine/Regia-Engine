@@ -1,0 +1,56 @@
+{
+  "library_version": 1,
+  "materials": [
+    {
+      "calibration": {
+        "method": "none"
+      },
+      "catalogue_facets": [
+        "Material=Metal A"
+      ],
+      "conductor": {
+        "f0_rgb_linear": [
+          0.6,
+          0.58,
+          0.55
+        ],
+        "roughness": 0.12
+      },
+      "display_name": "Grey metal A",
+      "kind": "conductor",
+      "material_id": "grey-metal-a",
+      "source": {
+        "citation": "synthetic fixture values",
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "calibration": {
+        "method": "none"
+      },
+      "catalogue_facets": [
+        "Gem=Clear A"
+      ],
+      "display_name": "Clear stone (high index)",
+      "gem_dielectric": {
+        "abbe_vd": 55.3,
+        "attenuation_rgb_per_mm": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "n_d": 2.417
+      },
+      "kind": "gem_dielectric",
+      "material_id": "clear-high-dispersion",
+      "source": {
+        "citation": "published refractive index and Abbe number",
+        "retrieved": "2026-11-04"
+      },
+      "status": "measured"
+    }
+  ],
+  "schema": "jewelry.material_library/1",
+  "working_space": "linear_rec709"
+}

@@ -1,0 +1,68 @@
+[package]
+name = "regia_web"
+description = "The product viewer's web player: the browser loop, input, package fetch and the JS API over the lean viewer (wasm32; a tested platform-free core elsewhere)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[lib]
+# `cdylib` is the wasm module; `rlib` lets the tests and the native core link it.
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+glam = { workspace = true }
+# A path, not the workspace entry: a member cannot turn off defaults the workspace entry leaves on. The player
+# builds without the JSON Schema validator and its `regex` (ADR-2535, measured in ADR-2541).
+regia_configurator = { path = "../regia_configurator", default-features = false }
+regia_looks = { workspace = true, features = ["viewer"] }
+regia_viewer = { workspace = true }
+regia_viewer_pack = { workspace = true }
+regia_viewer_view = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+wgpu = { workspace = true }
+
+[dev-dependencies]
+# The evidence test writes what a player draws as PNG.
+regia_viewer = { workspace = true, features = ["tools"] }
+# The tests run with the validator, so every build they write still meets the published schema.
+regia_configurator = { workspace = true }
+# The tests read the stand-in kit through the real cook.
+regia_viewer_pack = { workspace = true, features = ["cook"] }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+js-sys = { workspace = true }
+wasm-bindgen = { workspace = true }
+wasm-bindgen-futures = { workspace = true }
+web-sys = { workspace = true, features = [
+    "AddEventListenerOptions",
+    "CanvasRenderingContext2d",
+    "console",
+    "CssStyleDeclaration",
+    "CustomEvent",
+    "CustomEventInit",
+    "Document",
+    "DomRect",
+    "DomRectReadOnly",
+    "Element",
+    "Event",
+    "EventTarget",
+    "HtmlCanvasElement",
+    "HtmlElement",
+    "ImageData",
+    "Performance",
+    "PointerEvent",
+    "Request",
+    "RequestInit",
+    "ResizeObserver",
+    "ResizeObserverEntry",
+    "Response",
+    "WheelEvent",
+    "Window",
+] }

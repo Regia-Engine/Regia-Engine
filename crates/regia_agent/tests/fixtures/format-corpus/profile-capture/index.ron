@@ -1,0 +1,17 @@
+(
+    format: "profile-capture",
+    entries: [
+        (
+            version: 1,
+            file: "v1.json",
+            origin: "frozen copy of the fuzz-target registry fixture",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+        (
+            version: 2,
+            file: "v2.json",
+            origin: "frozen copy of the fuzz-target registry fixture",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+    ],
+)

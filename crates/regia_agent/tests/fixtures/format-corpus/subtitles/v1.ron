@@ -1,0 +1,20 @@
+(
+    format_version: 1,
+    priority: 2,
+    keep_breaks: true,
+    one_at_a_time: false,
+    cues: [
+        (
+            at: 0.0,
+            until: Some(1.5),
+            text_key: Some("subs-door-1"),
+            text: None,
+        ),
+        (
+            at: 1.5,
+            until: None,
+            text_key: None,
+            text: Some("*creak*"),
+        ),
+    ],
+)

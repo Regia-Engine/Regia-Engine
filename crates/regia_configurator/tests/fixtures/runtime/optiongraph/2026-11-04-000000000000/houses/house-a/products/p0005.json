@@ -1,0 +1,35 @@
+{
+  "addons": [],
+  "axes": [
+    {
+      "group": "Metal",
+      "kind": "metal",
+      "values": [
+        {
+          "available": true,
+          "code": "1",
+          "label": "Metal A",
+          "value_key": "Metal=Metal A"
+        }
+      ]
+    }
+  ],
+  "canonical_of": "house-a/p0001",
+  "cart": {
+    "mode": "shopify_lines"
+  },
+  "product_key": "house-a/p0005",
+  "schema": "jewelry.option_graph/1",
+  "snapshot_id": "2026-11-04-000000000000",
+  "status": "duplicate",
+  "title": "End piece (listing 2)",
+  "variants": [
+    {
+      "picks": {
+        "Metal": "Metal A"
+      },
+      "sku": "HA-3",
+      "variant_key": "3001"
+    }
+  ]
+}

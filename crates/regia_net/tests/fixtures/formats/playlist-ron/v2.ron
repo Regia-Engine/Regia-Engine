@@ -1,0 +1,11 @@
+(
+    format_version: 2,
+    looping: true,
+    order: weighted(seed: 7),
+    no_repeat_last: 1,
+    entries: [
+        (map_id: "levels/a.level.ron", mode: "", options: {}),
+        (map_id: "levels/b.level.ron", mode: "ctf", options: { "limit": "10" }, weight: 3),
+        (map_id: "levels/c.level.ron", mode: "koth", options: {}, min_players: 4, max_players: 16),
+    ],
+)

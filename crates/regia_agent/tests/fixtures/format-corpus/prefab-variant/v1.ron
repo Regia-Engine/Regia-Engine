@@ -1,0 +1,10 @@
+(
+    format_version: 1,
+    base: (
+        prefab: "asset:3f7a1c2e-8b64-4a35-9d20-6f1e2b3c4d5a",
+        overrides: [(target: "9b2e6f0a-1e42-4c11-8d5a-3c2f7e10d0aa", component: "game::Lamp", path: ".intensity", value: 250.0)],
+        added_components: [(target: "9b2e6f0a-1e42-4c11-8d5a-3c2f7e10d0aa", component: "game::Flicker", value: (rate: 2.5))],
+        removed_components: [(target: "1c0ffee0-0000-4000-8000-000000000001", component: "game::Tags")],
+        removed_children: ["1c0ffee0-0000-4000-8000-000000000001"],
+    ),
+)

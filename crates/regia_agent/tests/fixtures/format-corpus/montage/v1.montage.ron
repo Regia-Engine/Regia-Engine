@@ -1,0 +1,17 @@
+// anim_lab: a two-section wave on the "upper" slot (spec 17 § 4b, `.montage.ron` v1).
+(
+    format_version: 1,
+    name: "wave",
+    tracks: [
+        (slot: "upper", segments: [(clip: "Wave")]),
+    ],
+    sections: [
+        (name: "raise", start: 0.0),
+        (name: "lower", start: 0.5, next: Stop),
+    ],
+    notifies: [
+        (name: "peak", time: 0.5),
+    ],
+    blend_in: (time: 0.0),
+    blend_out: (time: 0.0),
+)

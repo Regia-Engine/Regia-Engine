@@ -1,0 +1,5 @@
+(format_version: 1, name: "resupply", description: "Restock to the full magazine",
+ lifetime: Instant,
+ base_edits: [(attribute: "ammo", op: AddPre, amount: Const(99.0))],
+ kind_tags: ["Effect.Ammo.Refill"],
+ cues: [(tag: "Cue.Resupply", at: Applied)])

@@ -1,0 +1,8 @@
+(
+    version: 1,
+    tileset: "grass",
+    patterns: [
+        (name: "bush", width: 2, height: 1, cells: [5, 6]),
+        (name: "pond corner", width: 2, height: 2, cells: [9, 10, 0, 2147483661]),
+    ],
+)

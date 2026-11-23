@@ -1,0 +1,80 @@
+(
+    version: 1,
+    name: "example",
+    heightfield: "heightfield.png",
+    world_width: 1024.0,
+    height_scale: 140.0,
+    height_offset: 0.0,
+    heightfield_size: None,
+    layers: "terrain.layers.ron",
+    material: Some((
+        layers: [
+            Style(
+                style: "Grass",
+                size: 256,
+                seed: 31,
+            ),
+            Style(
+                style: "Rock",
+                size: 256,
+                seed: 32,
+            ),
+            Style(
+                style: "Snow",
+                size: 256,
+                seed: 33,
+            ),
+        ],
+        macro_world_size: 0.0,
+        anti_tiling_cell: 4.0,
+        relief: (
+            near_detail: 0.0,
+            mid_relief: 0.0,
+            strata: 0.0,
+            rock_detail: 0.0,
+            talus: 0.6,
+            self_shadow_reach_m: 40.0,
+            cavity: 0.6,
+            glints: 1.0,
+            bounce: 1.0,
+            cliff_relief: 1.0,
+            layer_occlusion: 1.0,
+        ),
+    )),
+    splat: None,
+    scatter: Some("scatter/example.scatter.ron"),
+    stand_ins: [
+        (
+            mesh: "rock_a",
+            stand_in: Rock(
+                color: (0.2, 0.19, 0.18),
+            ),
+        ),
+        (
+            mesh: "rock_b",
+            stand_in: Boulder(
+                color: (0.16, 0.15, 0.14),
+            ),
+        ),
+        (
+            mesh: "pine",
+            stand_in: Cone(
+                color: (0.03, 0.08, 0.035),
+            ),
+        ),
+    ],
+    max_scatter_instances: 20000,
+    sky: "sky.ron",
+    track: Some("track.ron"),
+    spawns: Some("spawns.ron"),
+    vfx_dir: None,
+    camera: (
+        position: (60.0, 46.0, -170.0),
+        target: (0.0, 36.0, -100.0),
+        fov_deg: 45.0,
+        near: 0.3,
+        far: 20000.0,
+        exposure_ev: None,
+    ),
+    lead_in_frames: 0,
+)

@@ -1,0 +1,4 @@
+(format_version: 1, name: "rifle", description: "Hitscan shot",
+ kind_tags: ["Weapon.Rifle"], run_tags: ["State.Firing"],
+ cost: Some("effects/rifle_cost.effect.ron"), cooldown: Some("effects/rifle_cooldown.effect.ron"),
+ charge: OnStart, max_run_ticks: Some(1))

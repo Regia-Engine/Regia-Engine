@@ -1,0 +1,56 @@
+[package]
+name = "regia_detsim"
+description = "Lockstep simulation kit: libm-pinned transcendentals, tick constants, the FTZ/DAZ guard and the per-system desync hash (ADR-8012 A-4, ADR-8013, ADR-8047)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+# Pure-Rust transcendentals with the exact bits Direct Order 27's sim runs today. The workspace pins
+# it exactly (`=0.2.16`): a patch release could move a transcendental by one ulp and desync a lockstep
+# match between builds, so a bump is a sim-version change (ADR-8012 A-4).
+libm = { workspace = true }
+# The desync hash walks a game's state through a hashing `serde::Serializer` (ADR-8047), and the AI
+# core's state and agent rows serialize (DO27's types derive serde as-is, ADR-8152). Already a
+# workspace dependency of every runtime crate; docs/03 lists it for this crate. `avoid::OrcaSettings`,
+# `OrcaSolver` and `OrcaSegment` are host settings data too (ADR-8555).
+serde = { workspace = true }
+# `ai`: a trace span on the per-tick decision step.
+tracing = { workspace = true }
+# `ai::UtilityCatalogue::from_ron_str` (gap AI-7): a game's utility catalogue as `.detutility.ron`, parsed with no
+# asset system so a headless sim loads it. Already a workspace dependency of every RON format crate.
+ron = { workspace = true }
+
+[dev-dependencies]
+# The desync hash tests and `tests/ai_core.rs` (the agent rows serialize as JSON); the settings round
+# trip in tests/orca_lp.rs (ADR-8555).
+serde_json = { workspace = true }
+# Test only: the planted cross-architecture divergence of the det-golden runners (ADR-8081) steps
+# glam's SIMD types on purpose. Lockstep code itself never uses them (ADR-8012 A-4, det-scan).
+glam = { workspace = true }
+# The match-rules golden (ADR-8503). A dev-dependency cycle: regia_rules depends on this crate.
+regia_rules = { workspace = true }
+
+[target.'cfg(any(target_os = "linux", target_os = "android", target_os = "macos"))'.dependencies]
+# Thread CPU clock for the tick profiler (ADR-8498). Already a workspace dependency.
+libc = { workspace = true }
+
+[target.'cfg(target_os = "windows")'.dependencies]
+# GetThreadTimes for the tick profiler (ADR-8498). Win32_System_Threading and
+# Win32_Foundation are already enabled on the workspace crate.
+windows-sys = { workspace = true }
+
+[features]
+# serde derives on the hover parameters and state (ADR-8079), for a game that keeps them in its wire snapshots or
+# settings files. Off by default. `serde` itself is a required dependency (the desync hash, ADR-8047), so the feature
+# only switches the derives on (review sprint-v06-absorb-rev-b X1).
+serde = []
+# `fpu::set_flush_to_zero_for_tests`: plants FTZ on the calling thread so a test can prove a guard
+# resets it (the sim host's thread-start guard, ADR-8526). Dev-dependencies only; never a runtime
+# feature.
+fp-test-hooks = []

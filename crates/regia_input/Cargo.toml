@@ -1,0 +1,37 @@
+[package]
+name = "regia_input"
+description = "Raw input (keyboard, mouse, touch, gamepad) and the action-mapping system."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+# `devices`: the desktop device backends (gilrs gamepads, SpaceMouse). Off in the `server` build, which keeps
+# the action layer only (spec 76 § 2, ADR-1886); the Android backend needs no feature.
+[features]
+default = ["devices"]
+devices = ["dep:gilrs"]
+
+[dependencies]
+regia_core = { workspace = true }
+regia_app = { workspace = true }
+# No `window`: the server build keeps the action layer without any device backend (ADR-1886).
+regia_platform = { path = "../regia_platform", default-features = false }
+thiserror = { workspace = true }
+serde = { workspace = true }
+ron = { workspace = true }
+tracing = { workspace = true }
+# `#[derive(InputAction)]` (ADR-7070).
+regia_macros = { workspace = true }
+
+[target.'cfg(not(target_os = "android"))'.dependencies]
+gilrs = { workspace = true, optional = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }
+# Captures the warn line of a damaged `input_overrides.ron` (tests/player_data.rs, ADR-3102).
+tracing-subscriber = { workspace = true }

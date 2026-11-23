@@ -1,0 +1,6 @@
+(
+    format_version: 1,
+    entries: ["video/a.video.ron", "video/b.video.ron"],
+    loop_list: true,
+    shuffle: Some(7),
+)

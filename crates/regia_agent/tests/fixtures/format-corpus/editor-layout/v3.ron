@@ -1,0 +1,29 @@
+(
+    format_version: 3,
+    root: Split(
+        axis: Horizontal,
+        fraction: 0.2,
+        first: Split(
+            axis: Vertical,
+            fraction: 0.5,
+            first: Tabs(tabs: ["outliner"], active: 0),
+            second: Tabs(tabs: ["outliner#1"], active: 0),
+        ),
+        second: Split(
+            axis: Horizontal,
+            fraction: 0.75,
+            first: Tabs(tabs: ["viewport", "content"], active: 0),
+            second: Tabs(tabs: ["inspector", "inspector#1"], active: 1),
+        ),
+    ),
+    known_panels: ["viewport", "outliner", "inspector", "content", "problems"],
+    floating: [
+        (tabs: ["problems", "content#1"], active: 1, rect: Some((40.0, 60.0, 480.0, 320.0))),
+    ],
+    instances: {
+        "content#1": (folder: "assets/textures", filter: "rock"),
+        "inspector#1": (locked: Some("guid:000000000000000000000000000000a1")),
+        "outliner": (filter: "kind:light"),
+        "outliner#1": (filter: "tag:enemy", columns: ["visible_locked", "type", "tags"]),
+    },
+)

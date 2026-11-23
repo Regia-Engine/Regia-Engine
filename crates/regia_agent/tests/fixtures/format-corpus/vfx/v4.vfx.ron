@@ -1,0 +1,40 @@
+// Sample: embers lifted by a slow vortex and curl noise over a fire bed. Two runs with the
+// same seed and timestep put every ember in the same pool slot at the same position (the GPU
+// update is per particle, the spawn slots follow the host's ring cursor; ADR-545).
+(
+    version: 4,
+    name: "sample_ember_drift",
+    system: (budget: 800, lod: Some((distances: [30.0, 90.0], rate_scale: [1.0, 0.5, 0.0]))),
+    emitters: [
+        (
+            name: "embers",
+            delay: 0.0,
+            spawn: (mode: Rate(120.0), lifetime: (min: 2.0, max: 5.0)),
+            init: (
+                shape: Box(half_extents: (1.5, 0.1, 1.5)),
+                velocity: (mode: Directional(
+                    dir: (0.0, 1.0, 0.0),
+                    spread: 20.0,
+                    speed: (min: 0.6, max: 1.8),
+                )),
+                size: (min: 0.02, max: 0.05),
+                color: [(t: 0.0, color: "#ffb050")],
+            ),
+            update: (
+                gravity: (0.0, 0.4, 0.0),
+                drag: 0.5,
+                curl: Some((1.2, 0.6, 0.4)),
+                vortex: Some((axis: (0.0, 1.0, 0.0), strength: 0.8)),
+                color_over_life: [(t: 0.0, color: "#ffd070"), (t: 1.0, color: "#a02000")],
+                alpha_over_life: [(t: 0.0, v: 0.0), (t: 0.1, v: 1.0), (t: 1.0, v: 0.0)],
+            ),
+            render: (
+                mode: Billboard,
+                sprite: SoftDisc,
+                blend: Additive,
+                emissive: 3.0,
+                screen_floor_px: 1.5,
+            ),
+        ),
+    ],
+)

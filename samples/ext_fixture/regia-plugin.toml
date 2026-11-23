@@ -1,0 +1,12 @@
+format_version = 1
+id = "ext_fixture"
+name = "Extension host fixture"
+version = "1.0.0"
+publisher = "Regia Engine"
+licence = "LicenseRef-Proprietary"
+description = "Exercises dynamic loading, the ABI stamp and reload."
+capabilities = ["agent_method", "systems"]
+
+[[code]]
+crate = "ext_fixture"
+audience = ["editor"]

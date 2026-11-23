@@ -1,0 +1,59 @@
+   Compiling winapi v0.3.9
+   Compiling alloca v0.4.0
+   Compiling plotters-backend v0.3.7
+   Compiling ciborium-io v0.2.2
+   Compiling clap_builder v4.6.7
+   Compiling plotters-svg v0.3.7
+   Compiling ciborium-ll v0.2.2
+   Compiling itertools v0.13.0
+   Compiling same-file v1.0.6
+   Compiling cast v0.3.0
+   Compiling walkdir v2.5.0
+   Compiling page_size v0.6.0
+   Compiling clap v4.6.7
+   Compiling ciborium v0.2.2
+   Compiling criterion-plot v0.8.2
+   Compiling plotters v0.3.7
+   Compiling tinytemplate v1.2.1
+   Compiling oorandom v11.1.5
+   Compiling anes v0.1.6
+   Compiling criterion v0.8.2
+   Compiling regia_framework v0.2.23 (<build-dir>)
+    Finished `test` profile [optimized + debuginfo] target(s) in 6m 53s
+  Executable unittests src\lib.rs (C:/work/regia/v05-windows-final-a/t\debug\deps\regia_framework-7f8e77f0b6fc6344.exe)
+    Finished `test` profile [optimized + debuginfo] target(s) in 1.93s
+     Running unittests src\lib.rs (C:/work/regia/v05-windows-final-a/t\debug\deps\regia_framework-7f8e77f0b6fc6344.exe)
+
+running 29 tests
+test feedback::bundle::tests::category_names_round_trip ... ok
+test feedback::bundle::tests::exception_codes_never_read_as_signals ... ok
+test feedback::bundle::tests::missing_parts_say_why ... ok
+test feedback::bundle::tests::ring_overwrites_and_windows_by_time ... ok
+test feedback::bundle::tests::windows_native_crash_bundle_has_the_linux_layout ... ok
+test feedback::native::imp::tests::frame_samples_round_trip ... ok
+test feedback::crash::tests::crash_gate_admits_one_per_interval ... ok
+test feedback::bundle::tests::prune_keeps_unannounced_crash_bundles ... ok
+test feedback::native::imp::tests::log_records_round_trip ... ok
+test feedback::native::imp::tests::publish_requests_never_wait_for_a_stuck_publisher ... ok
+test feedback::native::record_tests::the_log_tail_comes_from_the_crashed_runs_file ... ok
+test feedback::native::record_tests::the_next_launch_bundle_has_the_desktop_keys_and_android_fields ... ok
+test feedback::bundle::tests::concurrent_writes_get_distinct_paths ... ok
+test feedback::native::record_tests::the_report_is_written_unless_the_record_follows_a_panic ... ok
+test feedback::tests::direct_capture_without_renderer_or_ui ... ok
+test feedback::tests::nothing_is_bound_by_default ... ok
+test feedback::native::record_tests::collection_keeps_the_newest_five_records ... ok
+test feedback::tests::the_sampler_reads_a_stall_at_its_real_length ... ok
+test feedback::zip::tests::an_entry_that_would_push_the_archive_past_four_gib_does_not_fit ... ok
+test feedback::zip::tests::crc32_matches_the_check_value ... ok
+test feedback::zip::tests::dos_time_encodes_civil_fields ... ok
+test feedback::zip::tests::entries_that_share_one_data_range_are_refused ... ok
+test feedback::zip::tests::entry_names_that_could_leave_a_folder_are_refused ... ok
+test feedback::zip::tests::rejects_garbage_and_corruption ... ok
+test feedback::zip::tests::round_trips_entries ... ok
+test vehicle_feedback::tests::the_map_keeps_both_channels_in_range ... ok
+test feedback::tests::exit_joins_running_writers ... ok
+test feedback::tests::escape_cancels_and_nothing_is_written ... ok
+test feedback::tests::prompt_writes_a_bundle_with_every_part ... ok
+
+test result: ok. 29 passed; 0 failed; 0 ignored; 0 measured; 1468 filtered out; finished in 2.09s
+

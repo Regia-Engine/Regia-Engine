@@ -1,0 +1,51 @@
+(
+    format_version: 2,
+    // The DO27 bundle, read-only. Everything below except `terrain` is relative to it.
+    root: Some("<build-dir>"),
+    manifest: Some("MANIFEST.sha256"),
+
+    // The terrain grid mesh becomes the traced heightfield, sampled at its own 1.25 m spacing.
+    // Uncovered samples (the open borehole mouth) are holes.
+    terrain_mesh: Some((source: "terrain/terrain.gltf", spacing: 1.25, albedo: (0.32, 0.30, 0.28))),
+
+    // DO27's mesh list. The entry whose source is the terrain mesh is not placed twice.
+    static_meshes: Some("static_meshes.json"),
+    interiors_file: Some("interiors.json"),
+
+    // Meshes added by hand: a cooked mesh or a glTF, with a column-major 4x4 transform.
+    meshes: [
+        (
+            id: Some("beacon"),
+            source: "assets_ferrite/props/beacon/beacon.gltf",
+            transform: (1.0, 0.0, 0.0, 0.0,  0.0, 1.0, 0.0, 0.0,  0.0, 0.0, 1.0, 0.0,  12.0, 3.0, -40.0, 1.0),
+            layer: Some("setpiece"),
+            material: Some((albedo: Some((0.4, 0.4, 0.42)), emissive: Some((0.0, 0.0, 0.0)))),
+        ),
+    ],
+    // Textured parts without an albedo override bake with this albedo (times the base color factor).
+    default_albedo: (0.5, 0.5, 0.5),
+
+    sun: Some((toward: (0.3, 0.5, 0.2), illuminance: 50000.0, angular_radius: 0.00465)),
+    sky: None, // airless
+    sky_bodies: [(direction: (-0.4, 0.6, 0.7), angular_radius: 0.12, radiance: (900.0, 820.0, 700.0))],
+    // A 1500 lm lamp panel facing down over the beacon (v2).
+    emitters: [
+        (id: Some("beacon_lamp"),
+         shape: Quad(corner: (11.5, 5.0, -40.5), edge_u: (0.0, 0.0, 1.0), edge_v: (1.0, 0.0, 0.0)),
+         power: Some(1500.0), color: (1.0, 0.85, 0.7)),
+    ],
+
+    layout: (
+        terrain_spacing: Some((8.0, 8.0)),
+        levels: [1.0, 2.0, 4.0, 8.0, 16.0],
+        bricks: [],
+        // One brick over each interior, then one per cluster of set-piece placements.
+        auto_bricks: Some((spacing: 1.0, margin: 2.0, max_probes: 262144, layers: ["setpiece"])),
+        moment_resolution: 4,
+        max_distance: None,
+    ),
+    bake: (rays_per_probe: 256, samples: 16, max_bounces: 8, seed: 1, probes_per_batch: 4096,
+           relocation_iterations: 2, filter: true,
+           // v2: quality controls (book/agents/baked-gi-quality.md).
+           rr_start: 3, clamp_direct: 0.0, clamp_indirect: 0.0, sample_groups: 8, firefly_threshold: 6.0),
+)

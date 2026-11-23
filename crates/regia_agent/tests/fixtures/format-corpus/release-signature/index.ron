@@ -1,0 +1,11 @@
+(
+    format: "release-signature",
+    entries: [
+        (
+            version: 1,
+            file: "v1.json",
+            origin: "frozen from the registry fixture: docs/formats/release-signature.example.json (equal to the fuzz-target fixture release.signature; the writer output for seed [7; 32], checked by regia_release_chunks the_signature_example_is_what_the_writer_writes), lane v07-release-sign-hosting, ADR-8846",
+            exercises: "the current version: what regia release sign writes today must stay readable",
+        ),
+    ],
+)

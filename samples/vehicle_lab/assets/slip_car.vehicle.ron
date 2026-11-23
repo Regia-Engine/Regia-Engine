@@ -1,0 +1,45 @@
+// The lab's car on slip-angle tires (`docs/formats/vehicle.md`, v3, ADR-2719): the same body,
+// drivetrain, bars, aero and aids as `rwd_car.vehicle.ron`, with brush tires in front and Magic
+// Formula tires behind, mild load sensitivity and the side force at the contact. Read a tire with
+// `physics.vehicle_tire_curve { ron, wheel }`; check a change with `physics.vehicle_config_check`.
+(
+    format_version: 3,
+    name: "vehicle lab rwd slip tires",
+    config: (
+        chassis_mass: 1200.0,
+        max_brake_force: 4500.0,
+        wheels: [
+            (position: (-0.8, -0.2, -1.3), steer: true, brake: true,
+             tire_model: Slip((cornering_stiffness: 48000.0, load_exponent: 0.15))),
+            (position: (0.8, -0.2, -1.3), steer: true, brake: true,
+             tire_model: Slip((cornering_stiffness: 48000.0, load_exponent: 0.15))),
+            (position: (-0.8, -0.2, 1.3), brake: true,
+             tire_model: Slip((
+                 curve: MagicFormula(shape: 1.3, curvature: -0.4),
+                 cornering_stiffness: 60000.0,
+                 load_exponent: 0.15,
+             ))),
+            (position: (0.8, -0.2, 1.3), brake: true,
+             tire_model: Slip((
+                 curve: MagicFormula(shape: 1.3, curvature: -0.4),
+                 cornering_stiffness: 60000.0,
+                 load_exponent: 0.15,
+             ))),
+        ],
+        drivetrain: Geared((
+            layout: Rwd,
+            rear_differential: LimitedSlip(torque_bias: 2.5),
+        )),
+        anti_roll: [
+            (left: 0, right: 1, stiffness: 14000.0),
+            (left: 2, right: 3, stiffness: 9000.0),
+        ],
+        aero: Some((
+            drag_coefficient: 0.32,
+            frontal_area: 2.1,
+            front_downforce: 0.1,
+            rear_downforce: 0.2,
+        )),
+        aids: (abs: Some(()), traction_control: Some(())),
+    ),
+)

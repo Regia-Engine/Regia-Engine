@@ -1,0 +1,378 @@
+[workspace]
+resolver = "3"
+members = ["crates/*", "xtask", "samples/*", "samples/*/android"]
+# Project templates (`regia new`) carry `{{placeholders}}` in `Cargo.toml.tmpl`: never workspace members.
+exclude = ["crates/regia_templates/templates", "vendor/lewton", "vendor/kira", "extensions/hello_panel"]
+
+[workspace.package]
+version = "0.7.0"
+edition = "2024"
+rust-version = "1.98"
+license = "MPL-2.0"
+publish = false
+
+[workspace.lints.rust]
+unsafe_code = "deny"            # crates that genuinely need unsafe override this locally, see docs/04-conventions.md
+missing_docs = "warn"
+rust_2024_compatibility = { level = "warn", priority = -1 }
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+unwrap_used = "warn"
+dbg_macro = "warn"
+todo = "warn"
+undocumented_unsafe_blocks = "warn" # docs/04-conventions.md § 5; xtask/tests/unsafe_policy.rs covers other targets
+
+[workspace.dependencies]
+# --- engine crates ---------------------------------------------------------
+regia_core = { path = "crates/regia_core" }
+regia_macros = { path = "crates/regia_macros" }
+regia_ecs = { path = "crates/regia_ecs" }
+regia_app = { path = "crates/regia_app" }
+regia_platform = { path = "crates/regia_platform" }
+regia_input = { path = "crates/regia_input" }
+regia_asset = { path = "crates/regia_asset" }
+regia_asset_pipeline = { path = "crates/regia_asset_pipeline" }
+regia_scene = { path = "crates/regia_scene" }
+regia_world = { path = "crates/regia_world" }
+sim_bridge = { path = "samples/sim_bridge" }
+regia_render = { path = "crates/regia_render" }
+regia_physics = { path = "crates/regia_physics" }
+regia_audio = { path = "crates/regia_audio" }
+regia_animation = { path = "crates/regia_animation" }
+regia_ui = { path = "crates/regia_ui" }
+regia_terrain = { path = "crates/regia_terrain" }
+regia_pick = { path = "crates/regia_pick" }
+regia_looks = { path = "crates/regia_looks" }
+regia_matgraph = { path = "crates/regia_matgraph" }
+regia_framework = { path = "crates/regia_framework" }
+regia_vfx = { path = "crates/regia_vfx" }
+regia_quick = { path = "crates/regia_quick" }
+# The product viewer's lean renderer (native, WebGPU, WebGL2; ADR-2539).
+regia_viewer = { path = "crates/regia_viewer" }
+regia_2d = { path = "crates/regia_2d" }
+regia_pt = { path = "crates/regia_pt" }
+regia_nav = { path = "crates/regia_nav" }
+regia_nav_det = { path = "crates/regia_nav_det" }
+regia_ai = { path = "crates/regia_ai" }
+regia_procgen = { path = "crates/regia_procgen" }
+# Procedural mesh helpers: extrude, bevel, lathe, boolean-lite, UV projection (spec 23 § 6, ADR-7240).
+regia_gen = { path = "crates/regia_gen" }
+# Lockstep simulation kit: libm-pinned math, tick constants, FTZ/DAZ guard (ADR-8012 A-4/A-5, ADR-8013).
+regia_detsim = { path = "crates/regia_detsim" }
+# GPU-free, ECS-free world geometry for lockstep sims: Stage A compat, the meshlayers formats (spec 121, ADR-8050,
+# ADR-8112); the deterministic tunnel layer reads it (ADR-8195).
+regia_world_geom = { path = "crates/regia_world_geom" }
+regia_rules = { path = "crates/regia_rules" }
+# Particle liquid (PIC/FLIP, whitewater, `.fluidcache`, ADR-2441); optional (`regia` feature `fluid`).
+regia_fluid = { path = "crates/regia_fluid" }
+regia_xr = { path = "crates/regia_xr" }
+regia = { path = "crates/regia" }
+regia_dylib = { path = "crates/regia_dylib" }
+regia_editor = { path = "crates/regia_editor" }
+regia_cli = { path = "crates/regia_cli" }
+regia_release_chunks = { path = "crates/regia_release_chunks" }
+regia_templates = { path = "crates/regia_templates" }
+regia_test_utils = { path = "crates/regia_test_utils" }
+regia_net_soak = { path = "crates/regia_net_soak" }
+regia_agent = { path = "crates/regia_agent" }
+regia_steam = { path = "crates/regia_steam" }
+regia_crash = { path = "crates/regia_crash" }
+regia_telemetry = { path = "crates/regia_telemetry" }
+regia_net = { path = "crates/regia_net" }
+regia_media = { path = "crates/regia_media" }
+regia_script_lua = { path = "crates/regia_script_lua" }
+# Product configurator contracts (JSON boundary formats, schema validator; ADR-2480).
+regia_configurator = { path = "crates/regia_configurator" }
+regia_dlss = { path = "crates/regia_dlss" }
+regia_xess = { path = "crates/regia_xess" }
+# Product viewer drag view: damped camera controller clamped to a recipe's view_range (ADR-2540).
+regia_viewer_view = { path = "crates/regia_viewer_view" }
+# Product viewer package: quantized mesh, manifest with hashes, `regia viewer pack` cook (ADR-2540).
+regia_viewer_pack = { path = "crates/regia_viewer_pack" }
+regia_web = { path = "crates/regia_web" }
+
+# --- ECS / reflection (pinned; see docs/03-workspace-and-dependencies.md "Upgrade policy") ---
+# Bevy 0.20 is the first line on glam 0.33, which rapier/kira require. Stable 0.20.0 (ADR-258).
+bevy_ecs = { version = "=0.20.0", default-features = false, features = ["std", "bevy_reflect", "multi_threaded", "serialize", "async_executor", "trace"] }
+bevy_reflect = { version = "=0.20.0", default-features = false, features = ["std", "glam", "uuid", "smallvec", "indexmap", "debug", "reflect_documentation"] }
+bevy_tasks = { version = "=0.20.0", features = ["multi_threaded"] }
+bevy_state = { version = "=0.20.0", default-features = false, features = ["std", "bevy_reflect"] }
+
+# --- math / core utilities ---
+glam = { version = "0.33.12", features = ["serde", "bytemuck"] }
+bytemuck = { version = "1.25", features = ["derive"] }
+num-traits = "0.2.19"
+lyon = "1.0.19"
+uuid = { version = "1.27", features = ["v4", "serde"] }
+blake3 = "1.8"
+snow = { version = "0.10", default-features = false, features = ["use-chacha20poly1305", "use-blake2", "use-curve25519", "use-getrandom"] }
+semver = "1.0"   # extension manifests: version ranges (specs/57, ADR-1669)
+smallvec = { version = "1.16", features = ["serde", "union", "const_generics"] }
+parking_lot = "0.12"
+# Integer-grid polygon booleans for procedural polygons (spec 64 § 3, ADR-1664). Pure Rust, MIT OR Apache-2.0.
+i_overlay = { version = "9.1", default-features = false }
+# Pure-Rust f32 transcendentals (musl port) for outputs that must be bit-identical on
+# every OS (the CPU sun/atmosphere tables and the glass crack pages; audit G render5).
+# Exact pin (ADR-8012 A-4, ADR-8013): `regia_detsim::math` gives a lockstep sim these bits, and
+# cargo unifies every semver-compatible libm into one version, so a bump is a sim-version change.
+libm = "=0.2.16"
+crossbeam-channel = "0.5"
+thiserror = "2"
+anyhow = "1"
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", features = ["env-filter", "fmt"] }
+profiling = "1.0.18"                                # dev tooling only: lookdev `wgpu-spans` (wgpu-core scopes as tracing spans)
+tracing-tracy = "0.12"
+log = "0.4"
+
+# --- serialization ---
+serde = { version = "1.0.229", features = ["derive"] }
+ron = { version = "0.12", features = ["integer128"] }
+postcard = { version = "1.1", features = ["use-std"] }
+serde_json = { version = "1", features = ["float_roundtrip"] }
+# JSON Schema `pattern` for the configurator contracts (ADR-2480); already locked through naga_oil.
+regex = "1.13"
+toml = "1"
+lz4_flex = "0.14"
+memmap2 = "0.9"
+
+# --- platform ---
+# Unix signals for the dedicated-server host (`regia_net::server_host`, spec 76 § 5, ADR-1663). The safe
+# `flag` API only; default features (channel/iterator threads) off.
+signal-hook = { version = "0.3", default-features = false }
+winit = { version = "0.30.13", features = ["android-game-activity"] }
+gilrs = "0.11"
+# Screen-reader OS bridge (ADR-1998; optional `accesskit` feature of regia_platform / regia_ui / regia): the
+# core version egui 0.36 already locks, and the adapters of the same release (AT-SPI on Linux, UI Automation
+# on Windows, NSAccessibility on macOS). MIT OR Apache-2.0.
+accesskit = "0.24.1"
+accesskit_consumer = "0.36"
+accesskit_unix = { version = "0.21.1", default-features = false, features = ["async-io"] }
+accesskit_windows = "0.32.1"
+accesskit_macos = "0.26.3"
+# TalkBack (ADR-3454). 0.7.5 is the last release on accesskit 0.24.1; 0.8+ needs 0.25.
+# `embedded-dex` loads `dev.accesskit.android.Delegate` from the crate, so the activity shim
+# stays unchanged. MIT OR Apache-2.0. Pulls jni 0.21 beside the workspace jni 0.22.
+accesskit_android = { version = "0.7.5", default-features = false, features = ["embedded-dex"] }
+dirs = "7"
+windows-sys = { version = "0.61", features = [
+    "Win32_Devices_DeviceAndDriverInstallation",  # SetupAPI HID enumeration (regia_platform::hid, SpaceMouse, specs/29)
+    "Win32_Devices_HumanInterfaceDevice",         # hid.dll attributes/usage (regia_platform::hid)
+    "Win32_Foundation",
+    "Win32_Globalization",
+    "Win32_System_Console",     # SetConsoleCtrlHandler (regia_platform::console_ctrl, spec 76 § 5, ADR-1886)
+    "Win32_System_Com",         # CoTaskMemFree for SHGetKnownFolderPath (Saved Games, regia_platform::paths)
+    "Win32_System_Diagnostics_ToolHelp", # thread snapshot: resume a child created suspended once it is in its job (regia_platform::child_bind, ADR-7548)
+    "Win32_Security",           # CreateEventW's attributes (native crash watchdog, ADR-158); CreateFileW (hid)
+    "Win32_Security_Authorization", # GetNamedSecurityInfoW / SetNamedSecurityInfoW: owner-only DACL for private files (regia_net server key / known hosts, ADR-4828)
+    "Win32_Storage_FileSystem", # CreateFileW / ReadFile for raw HID reads (regia_platform::hid)
+    "Win32_System_IO",          # ReadFile's OVERLAPPED parameter type (regia_platform::hid)
+    "Win32_System_JobObjects",  # play-in-editor child processes end with the editor (regia_platform::child_bind, ADR-2682)
+    "Win32_System_ProcessStatus", # K32GetProcessMemoryInfo: resident memory on Windows (regia_platform::process_memory, ADR-3288)
+    "Win32_System_Registry",
+    "Win32_System_SystemInformation",
+    "Win32_System_SystemServices", # ACCESS_ALLOWED_ACE_TYPE: private-file DACL scan (regia_net, ADR-4828)
+    "Win32_System_Threading",   # background mode for the pak integrity thread (ADR-172)
+    "Win32_System_Pipes",       # CreateNamedPipeW/ConnectNamedPipeW: the agent local transport named pipe (spec 23 sec 2, ADR-5708)
+    "Win32_UI_Shell",
+    "Win32_UI_WindowsAndMessaging",
+] }
+arboard = { version = "3.6", default-features = false }   # text only: the default "image-data" feature pulls `image` into runtime crates
+android-activity = { version = "=0.6.1", features = ["game-activity"] }
+ndk = "0.9"
+jni = "0.22"
+android_logger = "0.15"
+libc = "0.2"   # Android: _exit after the game ends (ADR-013); Linux/Android: sky worker priority (render)
+# Native crash capture (Linux and Windows; `regia_framework::feedback::native`, ADR-158): signal handler, out-of-process
+# monitor, minidump writer. Embark Studios, MIT OR Apache-2.0 (minidump-writer: MIT).
+crash-handler = "0.8"
+minidumper = "0.11"
+# `cargo xtask binary-size` only (dev tool, never a runtime dependency): read ELF/PE section and symbol sizes. MIT; already in the lock through minidump-writer.
+goblin = { version = "0.9.3", default-features = false, features = ["std", "elf32", "elf64", "pe32", "pe64", "endian_fd"] }
+# `cargo xtask minidump` only (dev tool, never a runtime dependency): parse and stack-walk a .dmp.
+minidump = "0.27"
+minidump-processor = { version = "0.27", default-features = false }
+minidump-unwind = "0.27"
+
+# --- rendering ---
+wgpu = "30"
+# The web player only (`regia_web`, ADR-2541). `wasm-bindgen` is coupled to the `wasm-bindgen-cli` tool:
+# exact same version, `cargo xtask web-player` checks it.
+wasm-bindgen = "=0.2.129"
+wasm-bindgen-futures = "0.4.79"
+js-sys = "0.3.106"
+web-sys = "0.3.106"
+naga_oil = "0.23"
+naga = "30"
+ktx2 = "0.5"
+
+# --- simulation / audio / ui ---
+rapier3d = { version = "0.36", features = ["serde-serialize"] }
+rapier2d = { version = "0.36", features = ["serde-serialize"] }   # regia_physics `physics2d` feature (T2.10); same glamx as rapier3d
+# Patched copy (ADR-8830): the cpal stream restart no longer panics, see vendor/kira/REGIA-PATCHES.md.
+kira = { path = "vendor/kira", version = "0.12.5" }
+# Ogg Vorbis encoder (libvorbis aoTuV/Lancer, BSD-3-Clause), pipeline-only (ADR-3230, ADR-1593); no random stream serial: output is deterministic.
+vorbis_rs = { version = "0.5.6", default-features = false }
+# The version kira 0.12.5 decodes with (its codec features come from kira); regia_audio decodes
+# whole sounds with it under a size cap (ADR-4922).
+symphonia = { version = "0.6.1", default-features = false }
+# Opus: libopus 1.3.1 translated to unsafe Rust, no C toolchain and no cmake (`regia_media`, ADR-1593, ADR-1911).
+unsafe-libopus = { version = "=0.2.0", default-features = false }
+rustfft = "6.4"
+cpal = "0.18"   # input streams for voice capture (M8); output side arrives through kira
+taffy = "0.14"
+cosmic-text = "0.19"
+# The version cosmic-text 0.19 uses: reads fonts for the cook's font subsetting (ADR-2697).
+skrifa = "0.40"
+# Same version cosmic-text 0.19 uses (`regia_ui` matches `Script`s in cosmic-text's
+# `Fallback` trait); no extra crate enters the build graph.
+unicode-script = "0.5"
+# Same version cosmic-text 0.19 uses: grapheme and word boundaries for TextInput editing (ADR-336).
+unicode-segmentation = "1.13"
+# UAX #14 class SA word segmentation (Thai, Lao, Khmer, Myanmar) for line breaking (ADR-3323):
+# ICU's compiled dictionaries + LSTM, Unicode License v3 (allowed by deny.toml; size measured in
+# the ADR). `regia_ui` is the only runtime user.
+icu_segmenter = "2"
+fluent-bundle = "0.16"
+# The parser fluent-bundle 0.16 itself uses (same version, no new crate in the build): the
+# localization validator, gather and pseudo tools walk the message AST (ADR-1466).
+fluent-syntax = "0.12"
+# The memoizer fluent-bundle 0.16 itself uses (same version, no new crate in the build): `loc_format`'s
+# FluentType impl names its types (ADR-2698).
+intl-memoizer = "0.5"
+unic-langid = "0.9"
+
+# --- media codecs (`regia_media` feature `video`; ADR-1593, ADR-1869) ---
+# AV1: the Rust port of dav1d (unsafe Rust plus arm64 assembly assembled by `cc`; x86 assembly off, no NASM).
+# Pinned to upstream main (1.1.1, not yet on crates.io): it has the safe Rust API and four robustness fixes
+# 1.1.0 lacks, one of them a panic our fuzz corpus hit (ADR-1869 § 1). Move to `=1.1.1` once it is published.
+rav1d = { git = "https://github.com/memorysafety/rav1d", rev = "2e7216c20ac2a75de204d6c8d7268b75a45959b4", default-features = false, features = ["bitdepth_8", "bitdepth_16"] }
+# AV1 encoder for render-out and tools (regia_media `media-encode`, ADR-3369): BSD-2-Clause, Rust; its x86
+# assembly needs NASM, so `asm` stays off (ADR-1593 § 5). `threading` uses the rayon already in the tree.
+rav1e = { version = "=0.8.1", default-features = false, features = ["threading"] }
+# Vorbis: pure safe Rust; raw packets from the WebM demuxer, no Ogg layer.
+# Patched copy (ADR-2164): four header/packet panics fixed, see vendor/lewton/REGIA-PATCHES.md.
+lewton = { path = "vendor/lewton", version = "0.10.2", default-features = false }
+
+# --- asset import (desktop tools only) ---
+gltf = { version = "1.4", features = ["KHR_lights_punctual", "KHR_materials_emissive_strength", "KHR_materials_ior", "KHR_materials_transmission", "KHR_materials_volume", "extras"] }
+image = { version = "0.25.10", default-features = false, features = ["png", "jpeg", "hdr", "exr", "tga", "bmp", "webp"] }
+intel_tex_2 = "0.5"
+ctt-astcenc = "0.6"
+meshopt = "0.6"
+bevy_mikktspace = "1"
+notify = "8.2"
+walkdir = "2.5"
+tiled = { version = "0.16", default-features = false }   # TMX/TSX/JSON tilemap import (T2.10); desktop pipeline only
+texture_packer = { version = "0.30", default-features = false }   # sprite-atlas packing at cook time (T2.10); desktop pipeline only
+# SVG import (ADR-3350): resvg/usvg render the parsed tree with tiny-skia; no text, system fonts or raster images.
+resvg = { version = "0.45.1", default-features = false }   # SVG rasterizer at cook time; desktop pipeline only (Apache-2.0 OR MIT)
+usvg = { version = "0.45.1", default-features = false }   # SVG parser/tree; desktop pipeline only (Apache-2.0 OR MIT)
+winresource = { version = "0.1.34", default-features = false }   # the editor exe's Windows icon/version resource (ADR-20000, MIT)
+tiny-skia = { version = "0.11.4", default-features = false, features = ["std", "simd"] }   # pixmap and transform types resvg draws into; already in the tree (egui/sctk-adwaita)
+roxmltree = "0.20"   # the XML parse with node limit and no DTD that runs before usvg; already in the tree via usvg and fontconfig-parser
+base64 = "0.22"   # Tiled JSON base64 tile data (T2.10); already in the tree via tiled; desktop pipeline only
+flate2 = "1"      # Tiled JSON zlib/gzip tile data (T2.10); already in the tree via tiled; desktop pipeline only
+ufbx = { version = "=0.11.5", default-features = false }   # FBX import (ADR-1602): MIT OR Unlicense bindings that build the bundled ufbx C file with `cc`; desktop pipeline only, never a runtime crate
+openusd = { version = "=0.8.0", default-features = false }   # USD import (ADR-3235): MIT, pure Rust .usda/.usdc/.usdz reader with composition; desktop pipeline only, never a runtime crate
+# Embedded Lua 5.1 for mods (ADR-1751): MIT bindings over the PUC-Rio Lua 5.1.5 C sources (MIT), compiled by
+# lua-src with `cc` (`vendored`); `send` makes a state a Send + Sync resource. Only `regia_script_lua` uses it.
+mlua = { version = "=0.12.2", default-features = false, features = ["lua51", "vendored", "send"] }
+
+# --- agent protocol (M2, specs/23; ADR-014) ---
+tungstenite = { version = "0.30", default-features = false, features = ["handshake"] }   # runtime server, own thread, no async runtime
+png = "0.18"                                        # screenshot encoding in dev builds (image stays pipeline/test-only)
+# OpenEXR writer of render-out (ADR-1521); the version `image` already pulls in. No rayon.
+exr = { version = "1.74", default-features = false }
+rmcp = { version = "3.9", features = ["server", "transport-io", "macros"] }   # `regia mcp` (CLI only; ADR-4855)
+tokio = { version = "1.53", features = ["rt-multi-thread", "macros", "io-std", "sync", "time"] }   # CLI only (rmcp)
+
+# --- reference path tracer previews (oss-survey3 item 10; docs/03 § 7) ---
+oidn = "2.5.1"                                      # MIT bindings to Intel OIDN (Apache-2.0, native lib); `regia_pt/denoise` only, tools never runtime
+
+# --- crash upload (DO27 alpha blocker, specs/21 § 5; docs/03 § 7) ---
+# rustls-backed sync HTTP client for the opt-in `regia_crash` uploader's `tls` feature. `tls` pulls
+# rustls with the `ring` provider (no native-tls/openssl, no cmake/C build, cross-compiles to Android).
+ureq = { version = "2.12", default-features = false, features = ["tls"] }
+# Ed25519 for signed content manifests (ADR-2710): the `ring` rustls already builds (same 0.17
+# line, no new crate in the lock). `alloc` for key generation, `std` for error types.
+ring = { version = "0.17.14", default-features = false, features = ["alloc", "std"] }
+
+# --- Steam (M19, specs/24; SDK licence notes in docs/03 § 1 and crates/regia_steam/README.md) ---
+# Optional dep of regia_steam behind its `steamworks` feature: builds only on desktop and only
+# when a game opts in. steamworks-sys needs Valve's Steamworks SDK at build time
+# (STEAM_SDK_LOCATION, see crates/regia_steam/README.md); the SDK and its redistributable are
+# never committed to this repository (Valve Steamworks SDK Access Agreement).
+steamworks = "0.13"
+
+# --- editor / tools ---
+egui = "0.36.2"
+egui-wgpu = "0.36.2"
+egui-winit = "0.36.2"
+egui_dock = "0.21"
+egui-snarl = "0.12"
+transform-gizmo-egui = "0.11"
+rfd = "0.17"
+libloading = "0.9"
+# DLSS through NGX (regia_dlss, ADR-2002): raw Vulkan handles (the ash wgpu-hal 30 uses) and,
+# only with its `sdk` feature, bindings to the NGX headers plus a C file for their inline helpers.
+ash = "0.38"
+bindgen = "0.73"
+cc = "1"
+clap = { version = "4.6", features = ["derive"] }
+
+# --- proc macros ---
+syn = { version = "2", features = ["full"] }
+quote = "1"
+proc-macro2 = "1"
+
+# --- testing ---
+image-compare = "0.5"
+criterion = "0.8"
+
+[profile.dev]
+opt-level = 1
+debug = "line-tables-only"
+# docs/03 § 6: the DWARF beyond the line tables stays in `.dwo` files beside the objects (shorter links,
+# smaller test binaries). Cargo leaves the setting out on targets without it (Windows, wasm). Moved here
+# from `.cargo/config.toml`'s rustflags by ADR-10394, so a package override can take effect.
+split-debuginfo = "unpacked"
+
+# The allocation tracer's own tests read inline frames from in-process captures. Under the ADR-10354 path
+# remaps the `.dwo` paths a binary names exist on no host, so `regia_test_utils` keeps its DWARF in the
+# objects, where `std::backtrace` reads it (ADR-10394). macOS keeps its own split (`.cargo/config.toml`
+# pins it), since "off" there deletes the objects the debug map names. Another crate's traces get the same
+# on Linux with `--config 'profile.test.package.<crate>.split-debuginfo="off"'`.
+[profile.dev.package.regia_test_utils]
+split-debuginfo = "off"
+
+[profile.dev.package."*"]
+opt-level = 3                    # dependencies (wgpu, rapier, kira...) are unusably slow unoptimised
+
+[profile.release]
+lto = "thin"
+codegen-units = 16
+
+# The web player's size profile (ADR-2541): `cargo build --profile web-release --target wasm32-unknown-unknown
+# -p regia_web`. Nothing else uses it.
+[profile.web-release]
+inherits = "release"
+opt-level = "z"
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = "debuginfo"
+
+[profile.shipping]
+inherits = "release"
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+# Ship a stripped binary with a separate, address-resolvable symbolication artifact: build with the
+# symbol table and line tables intact (no cargo-side stripping, no split), then `regia package`
+# extracts them with `objcopy --only-keep-debug` into `dist/<p>/symbols/` and strips the staged copy
+# (specs/21 § 4.4). `split-debuginfo = "packed"` is deliberately avoided: after `strip = "symbols"`
+# the packed `.dwp`'s `DW_AT_low_pc` is unresolved, so `addr2line` cannot resolve addresses (rustc 1.99).
+debug = "line-tables-only"
+strip = "none"

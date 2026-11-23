@@ -1,0 +1,34 @@
+// Sample (.vfx.ron v7): a ribbon. The particles live on the CPU and are drawn as one
+// camera-facing strip per instance through the trail pipelines: newest at the head, width and
+// colour over length, the spark sprite tiled every 0.4 m, at most 48 points (6 x 47 vertices).
+(
+    version: 7,
+    name: "sample_ribbon_trail",
+    system: (budget: 200),
+    emitters: [
+        (
+            name: "trail",
+            spawn: (mode: Rate(60.0), lifetime: (min: 0.8, max: 0.8)),
+            init: (
+                shape: Point,
+                velocity: (mode: Radial(speed: (min: 0.0, max: 0.0))),
+                size: (min: 0.25, max: 0.25),
+                color: [(t: 0.0, color: "#ffffff")],
+            ),
+            update: (gravity: (0.0, 0.5, 0.0), alpha_over_life: [(t: 0.0, v: 1.0), (t: 1.0, v: 0.0)]),
+            render: (
+                mode: Ribbon,
+                sprite: Spark,
+                blend: Additive,
+                emissive: 2.0,
+                ribbon: (
+                    link: Emitter,
+                    max_points: 48,
+                    width: [(t: 0.0, v: 1.0), (t: 1.0, v: 0.1)],
+                    color: [(t: 0.0, color: "#fff0c0"), (t: 1.0, color: "#ff402000")],
+                    texture: Tile(0.4),
+                ),
+            ),
+        ),
+    ],
+)

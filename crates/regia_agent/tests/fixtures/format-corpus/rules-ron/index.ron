@@ -1,0 +1,23 @@
+(
+    format: "rules-ron",
+    entries: [
+        (
+            version: 1,
+            file: "v1.ron",
+            origin: "hand-written v1 fixture; v1 is the first version of this format",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+        (
+            version: 1,
+            file: "v1-sections.ron",
+            origin: "written by hand for the genre sections (ADR-8748), in the v0.7 window before the v1 freeze",
+            exercises: "every genre section: co-op waves (both `at` kinds, difficulty rows, `shared_lives: Some(None)`), a branching race course, a two-phase shrinking zone, elimination with an alliance, all five victory condition kinds and the surrender vote",
+        ),
+        (
+            version: 1,
+            file: "v1-binds.ron",
+            origin: "written by hand for option binds (ADR-8881), in the v0.7 window before the v1 freeze",
+            exercises: "options with `bind`: int, bool and float options bound to session fields, an optional field turned off by 0, and an unbound enum option beside them",
+        ),
+    ],
+)

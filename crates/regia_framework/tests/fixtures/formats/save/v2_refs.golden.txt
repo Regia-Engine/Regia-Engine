@@ -1,0 +1,11 @@
+version: 2
+game_version: 1.2.3
+engine_version: 0.2.5
+timestamp_secs: 1700000000.5
+thumbnail: Some("89504e47")
+entity 0:
+  Health = 00009342
+  Transform = 010203040506
+entity 1:
+resource game::Score = 2a000000
+entity_ids: [Level { guid: 1512366075204170928972419503379277431, level: 7 }, Runtime(0), Level { guid: 119, level: 0 }, Lost]

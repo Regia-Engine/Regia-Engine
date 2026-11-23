@@ -1,0 +1,10 @@
+[package]
+name = "editor_host"
+description = "Editor-side link test: engine dylib (dynamic) + the editor's egui stack (static) in one binary."
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+spike_regia = { workspace = true, features = ["dynamic"] }
+spike_editor = { path = "../spike_editor" }

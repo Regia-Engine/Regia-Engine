@@ -1,0 +1,10 @@
+format_version = 1
+
+[generator]
+kind = "command"
+seed = 42
+description = "corpus fixture"
+command = ["tool", "--seed", "{seed}", "--out", "{out}"]
+timeout_secs = 30
+inputs = ["data/a.ron", "data/b/"]
+outputs = ["assets/gen/a.ron", "assets/gen/b/"]

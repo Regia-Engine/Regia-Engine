@@ -1,0 +1,12 @@
+(
+    version: 1,
+    description: "Example gameplay tags",
+    tags: [
+        // Damage kinds.
+        (name: "Combat.Damage", description: "Any damage"),
+        (name: "Combat.Damage.Fire", description: "Fire damage"),
+        (name: "Combat.Damage.Ice"),
+        (name: "Status.Burning", description: "On fire; takes Fire damage over time"),
+        (name: "Status.Immune"),
+    ],
+)

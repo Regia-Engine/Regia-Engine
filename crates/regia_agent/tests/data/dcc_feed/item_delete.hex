@@ -1,0 +1,7 @@
+# item_delete: handle 2
+# Laid out by hand from docs/formats/dcc-feed-protocol-v1.md (spec 60 section 8 test 1).
+0c 00 00 00                                          # len = 12
+11 00                                                # msg_type 0x0011
+00 00                                                # flags
+01 00 00 00                                          # seq 1
+02 00 00 00                                          # handle 2

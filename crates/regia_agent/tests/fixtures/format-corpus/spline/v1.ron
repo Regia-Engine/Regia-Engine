@@ -1,0 +1,37 @@
+{
+    "regia_scene::Spline": (
+        points: [
+            (
+                position: (0.0, 0.0, 0.0),
+                tangent_in: (0.0, 0.0, 0.0),
+                tangent_out: (0.0, 0.0, 0.0),
+                mode: Auto,
+                roll_deg: 0.0,
+                scale: (1.0, 1.0),
+                values: [],
+            ),
+            (
+                position: (1.0, 0.0, 0.0),
+                tangent_in: (0.0, 0.0, 0.0),
+                tangent_out: (0.0, 0.0, 0.0),
+                mode: Auto,
+                roll_deg: 0.0,
+                scale: (1.0, 1.0),
+                values: [],
+            ),
+            (
+                position: (2.0, 0.0, 1.0),
+                tangent_in: (0.0, 0.0, 0.0),
+                tangent_out: (0.0, 0.0, 0.0),
+                mode: Auto,
+                roll_deg: 0.0,
+                scale: (1.0, 1.0),
+                values: [],
+            ),
+        ],
+        closed: false,
+        up: RotationMinimizing,
+        attrs: [],
+        format_version: 1,
+    ),
+}

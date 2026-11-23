@@ -1,0 +1,9 @@
+# Cross-OS libm-1000 vector on Regia's default hull (plan row S-07, ADR-8079, ADR-8164).
+# input: HoverParams::DEFAULT_HULL; throttle=1.0; strafe=0.0; steer=0.0; jump=false; floor_y=0.0; dt=1/60; ticks=1000
+# math: regia_detsim::math (libm 0.2.16) via hover::step; pose XZ integrates velocity*dt; pose Y = floor_y+altitude
+# hash fields: px_py_pz_vx_vy_vz as lowercase hex of f32::to_bits()
+# Regia's own vector: the loop and the hash format are those of DO27's vector of the same name, the hull is the engine's
+# (no baseline-game numbers, ADR-8012 A-8). The hull covers 464.45 m in the 1000 ticks, reaches its 30 m/s cap, and rests
+# 0.5 micrometres under its 1 m ride height. Recorded on x86_64-linux; a change that moves this line is a sim-version
+# change (ADR-8019). DO27 pins the same vector on its own hull in its own repository.
+hash=00000000_3f7ffff7_43e839aa_00000000_35e10003_41f00000

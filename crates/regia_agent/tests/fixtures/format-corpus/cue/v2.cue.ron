@@ -1,0 +1,24 @@
+// Handwritten `.cue.ron` v2 (from ferrite_audio cue.rs at 5225c1380 and docs/formats/audio-cue-v1.md at that rev):
+// the v1 impact_flesh body plus the three v2 fields (version, filter_cutoff_hz, filter_offset_octaves).
+(
+    version: 2,
+    name: "impact_flesh",
+    bus: Some("World"),
+    sounds: [
+        (sound: "audio/impacts/flesh_a.ogg", weight: 1.0),
+        (sound: "audio/impacts/flesh_b.ogg", weight: 1.0),
+        (sound: "audio/impacts/flesh_c.ogg", weight: 0.5),
+    ],
+    mode: Random,
+    no_repeat_last: 2,
+    pitch_min: 0.95,
+    pitch_max: 1.05,
+    volume_db_min: -2.0,
+    volume_db_max: 0.0,
+    max_concurrent: Some(4),
+    steal: Oldest,
+    cooldown: (secs: 0, nanos: 50000000),
+    volume_db: 0.0,
+    filter_cutoff_hz: Some(6000.0),
+    filter_offset_octaves: -0.5,
+)

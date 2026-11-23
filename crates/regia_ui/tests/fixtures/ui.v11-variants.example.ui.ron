@@ -1,0 +1,46 @@
+// `.ui.ron` v11 layout variants (ADR-7858, folded into v11 under ADR-7724): override sets chosen by
+// the window's orientation and size. The first variant whose `when` matches applies on top of the base.
+(
+    version: 11,
+    root: (
+        style: (size: (Percent(100.0), Percent(100.0))),
+        children: [
+            (
+                name: "title",
+                style: (position: absolute, inset: (left: 40.0, top: 40.0), size: (600.0, 80.0)),
+                text: (spans: ["Main menu"]),
+            ),
+            (
+                name: "play",
+                interactable: true,
+                style: (position: absolute, inset: (left: 40.0, top: 160.0), size: (240.0, 64.0)),
+                text: (spans: ["Play"]),
+            ),
+            (
+                name: "art",
+                style: (position: absolute, inset: (left: 700.0, top: 40.0), size: (480.0, 480.0)),
+            ),
+        ],
+    ),
+    variants: [
+        (
+            name: "phone portrait",
+            when: (orientation: portrait, max_width: 1200.0),
+            overrides: {
+                "play": { "style.inset": [40.0, 900.0, "Auto", "Auto"], "opacity": 0.9 },
+                "art": { "style.display": "none" },
+            },
+        ),
+        (
+            name: "ultrawide",
+            when: (orientation: landscape, min_aspect: 2.2),
+            overrides: {
+                // Unnamed and named nodes alike: a path from the root also works.
+                "/0": { "style.inset": [200.0, 40.0, "Auto", "Auto"] },
+            },
+        ),
+        (
+            when: (min_width: 3000.0, max_aspect: 2.0),
+        ),
+    ],
+)

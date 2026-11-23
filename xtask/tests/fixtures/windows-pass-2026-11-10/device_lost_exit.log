@@ -1,0 +1,12 @@
+   Compiling regia v0.2.23 (<build-dir>)
+    Finished `test` profile [optimized + debuginfo] target(s) in 47.70s
+  Executable tests\device_lost_exit.rs (C:/work/regia/v05-windows-final-a/t\debug\deps\device_lost_exit-377ebb368f0b1591.exe)
+    Finished `test` profile [optimized + debuginfo] target(s) in 1.91s
+     Running tests\device_lost_exit.rs (C:/work/regia/v05-windows-final-a/t\debug\deps\device_lost_exit-377ebb368f0b1591.exe)
+device_lost_exit: exit requested 6.8732ms after the loss: Error(3)
+device_lost_exit[telemetry]: ok (exit 3, bundle feedback-2026-11-10_14-05-33-crash.zip)
+device_lost_exit: exit requested 11.1589ms after the loss: Error(3)
+device_lost_exit[render]: ok (exit 3, bundle feedback-2026-11-10_14-05-34-crash.zip)
+device_lost_exit: exit requested 10.2673ms after the loss: Error(4)
+device_lost_exit[surface]: ok (exit 4, bundle feedback-2026-11-10_14-05-35-crash.zip)
+test device_lost_exit ... ok

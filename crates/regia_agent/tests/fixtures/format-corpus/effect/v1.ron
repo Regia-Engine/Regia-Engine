@@ -1,0 +1,9 @@
+(format_version: 1, name: "poison",
+ lifetime: Timed(Const(6.0)), pulse: Some((every: 1.0, on_apply: false)),
+ base_edits: [(attribute: "health", op: AddPre, amount: Curve((table: "", name: "poison")))],
+ live_mods: [(attribute: "move_speed", op: Scale, amount: Const(0.8))],
+ status_tags: ["Status.Poisoned"], kind_tags: ["Effect.Damage.Poison"],
+ stack: Some((key: ByTarget, cap: 3, on_add: (time: Reset, pulse: Keep), when_full: RejectRenew,
+              on_lapse: EndAll, cue_each_stack: false)),
+ cues: [(tag: "Cue.Status.Poison", at: Sustained)],
+ curves: [(name: "poison", points: [(1.0, -2.0), (10.0, -9.0)])])

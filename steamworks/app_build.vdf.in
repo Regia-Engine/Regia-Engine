@@ -1,0 +1,14 @@
+"AppBuild"
+{
+  "AppID" "{{APP_ID}}"
+  "Desc" "{{DEMO_NAME}} {{VERSION}} ({{GIT}})"
+  "BuildOutput" "../output/"
+  "ContentRoot" "../content/"
+  "SetLive" ""
+  "Preview" "{{PREVIEW}}"
+  "Depots"
+  {
+    "{{DEPOT_ID_WINDOWS}}" "depot_build_{{DEPOT_ID_WINDOWS}}.vdf"
+    "{{DEPOT_ID_LINUX}}" "depot_build_{{DEPOT_ID_LINUX}}.vdf"
+  }
+}

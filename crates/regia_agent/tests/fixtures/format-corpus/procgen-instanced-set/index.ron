@@ -1,0 +1,11 @@
+(
+    format: "procgen-instanced-set",
+    entries: [
+        (
+            version: 1,
+            file: "v1.ron",
+            origin: "frozen copy of the fuzz-target registry fixture",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+    ],
+)

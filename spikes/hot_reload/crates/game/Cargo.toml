@@ -1,0 +1,17 @@
+[package]
+name = "game"
+description = "Spike game crate (rlib). The host rebuilds it as a dylib for each reload."
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[features]
+# specs/20 § 1: link the engine dynamically (the editor-host build).
+hot-reload = ["spike_regia/dynamic"]
+# Option (b) for the external sim: the sim lives in `sim_dylib`, which is never reloaded.
+sim-persistent = ["hot-reload", "dep:sim_dylib"]
+
+[dependencies]
+spike_regia = { workspace = true }
+sim = { workspace = true }
+sim_dylib = { workspace = true, optional = true }

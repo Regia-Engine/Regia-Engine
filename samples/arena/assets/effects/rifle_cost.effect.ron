@@ -1,0 +1,4 @@
+(format_version: 1, name: "rifle_cost", description: "One round per rifle shot",
+ lifetime: Instant,
+ base_edits: [(attribute: "ammo", op: AddPre, amount: Const(-1.0))],
+ kind_tags: ["Effect.Ammo.Cost"])

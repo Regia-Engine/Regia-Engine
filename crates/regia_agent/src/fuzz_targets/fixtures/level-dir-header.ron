@@ -1,0 +1,7 @@
+LevelDirFile(
+    format_version: 1,
+    scene_format_version: 10,
+    resources: {
+        "regia_scene::level::LevelSettings": (gravity: (0.0, -9.81, 0.0)),
+    },
+)

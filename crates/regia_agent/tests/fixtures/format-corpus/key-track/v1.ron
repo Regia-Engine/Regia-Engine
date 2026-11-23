@@ -1,0 +1,17 @@
+(
+    format_version: 1,
+    steps: [
+        Section(name: "boot"),
+        Note(text: "scripted keys"),
+        Tap(target: "input.confirm", millis: 200),
+        Expect(pattern: "player ready", within_millis: 1000, optional: false),
+        Press(target: "key:Escape"),
+        Wait(millis: 50),
+        Release(target: "key:Escape"),
+        Hold(targets: ["key:Shift"], millis: 100),
+        TapN(target: "input.confirm", count: 2, gap_millis: 300),
+        Mouse(dx: 1, dy: -2, millis: 300),
+        Wheel(notches: -1),
+        ReleaseAll,
+    ],
+)

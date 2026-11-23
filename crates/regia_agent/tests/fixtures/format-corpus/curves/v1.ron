@@ -1,0 +1,8 @@
+(
+    format_version: 1,
+    interp: Linear,                         // table default: Step | Linear | Cubic
+    curves: {
+        "falloff": (pre: Hold, post: Hold, keys: [(0.0, 1.0), (10.0, 0.6), (30.0, 0.0)]),
+        "xp": (interp: Cubic, post: Linear, keys: [(1, 0), (2, 100), (x: 3, y: 250, out_tangent: 160.0)]),
+    },
+)

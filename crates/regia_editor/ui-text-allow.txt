@@ -1,0 +1,6 @@
+# UI text scan allowlist (crates/regia_editor/tests/ui_text_scan.rs, ADR-8586).
+# One row per legitimate exception: file (relative to src) | flagged text | reason.
+project_settings.rs | (base_url) | names the Regia.toml key the Chunk host field writes, which people edit by hand too
+bake_runner.rs | ({}) | `Bake failed (<code>)`: tests/editor_features.rs:155 pins the code in this line; rewording it changes that test (lead's call, ADR-8586 follow-up)
+lightmap_panel.rs | ({}) | `Bake failed (<code>)`: tests/editor_features.rs:225 pins the code in this line; rewording it changes that test (lead's call, ADR-8586 follow-up)
+chunks_panel.rs | ({}) | the why box's `reason` is the one-word rule kind (`rule`, `follows`, `entry`) people read with the chunk, not an error code

@@ -1,0 +1,93 @@
+   Compiling blake3 v1.8.7
+   Compiling windows-sys v0.60.2
+   Compiling naga v30.0.1
+   Compiling winit v0.30.13
+   Compiling regia_scene v0.2.23 (<build-dir>)
+   Compiling arboard v3.6.1
+   Compiling regia_platform v0.2.23 (<build-dir>)
+   Compiling notify v8.2.0
+   Compiling wgpu-naga-bridge v30.0.1
+   Compiling wgpu-hal v30.0.1
+   Compiling regia_asset v0.2.23 (<build-dir>)
+   Compiling wgpu-core-deps-windows-linux-android v30.0.1
+   Compiling wgpu-core v30.0.1
+   Compiling wgpu v30.0.1
+   Compiling regia_render v0.2.23 (<build-dir>)
+   Compiling naga_oil v0.23.0
+   Compiling zerotrie v0.2.5
+   Compiling icu_provider v2.3.1
+   Compiling regia_input v0.2.23 (<build-dir>)
+   Compiling icu_locale_fallback v2.3.0
+   Compiling skrifa v0.40.0
+   Compiling cosmic-text v0.19.0
+   Compiling icu_segmenter v2.3.0
+   Compiling regia_physics v0.2.23 (<build-dir>)
+   Compiling regia_audio v0.2.23 (<build-dir>)
+   Compiling snow v0.10.0
+   Compiling ring v0.17.14
+   Compiling regia_net v0.2.23 (<build-dir>)
+   Compiling regia_terrain v0.2.23 (<build-dir>)
+   Compiling regia_ui v0.2.23 (<build-dir>)
+   Compiling regia_vfx v0.2.23 (<build-dir>)
+   Compiling regia_2d v0.2.23 (<build-dir>)
+   Compiling regia_animation v0.2.23 (<build-dir>)
+   Compiling regia_nav v0.2.23 (<build-dir>)
+   Compiling regia_framework v0.2.23 (<build-dir>)
+   Compiling regia_viewer v0.2.23 (<build-dir>)
+   Compiling regia_looks v0.2.23 (<build-dir>)
+   Compiling icu_normalizer v2.3.0
+   Compiling icu_properties v2.3.0
+   Compiling tiny-skia-path v0.11.4
+   Compiling regia_viewer_pack v0.2.23 (<build-dir>)
+   Compiling idna_adapter v1.2.2
+   Compiling regia_ai v0.2.23 (<build-dir>)
+   Compiling regia_procgen v0.2.23 (<build-dir>)
+   Compiling regia_matgraph v0.2.23 (<build-dir>)
+   Compiling regia_media v0.2.23 (<build-dir>)
+   Compiling regia_fluid v0.2.23 (<build-dir>)
+   Compiling regia_world v0.2.23 (<build-dir>)
+   Compiling regia_configurator v0.2.23 (<build-dir>)
+   Compiling kurbo v0.11.3
+   Compiling time v0.3.55
+   Compiling svgtypes v0.15.3
+   Compiling rustls v0.23.46
+   Compiling idna v1.1.0
+   Compiling regia_web v0.2.23 (<build-dir>)
+   Compiling regia_quick v0.2.23 (<build-dir>)
+   Compiling regia_telemetry v0.2.23 (<build-dir>)
+   Compiling rustls-webpki v0.103.16
+   Compiling regia_pick v0.2.23 (<build-dir>)
+   Compiling regia_xr v0.2.23 (<build-dir>)
+   Compiling base64 v0.23.1
+   Compiling usvg v0.45.1
+   Compiling regia_agent v0.2.23 (<build-dir>)
+   Compiling pem v4.0.0
+   Compiling url v2.5.8
+   Compiling yasna v0.6.0
+   Compiling tiny-skia v0.11.4
+   Compiling rgb v0.8.53
+   Compiling resvg v0.45.1
+   Compiling meshopt v0.6.2
+   Compiling vorbis_rs v0.5.6
+   Compiling rcgen v0.14.10
+   Compiling ureq v2.12.1
+   Compiling regia v0.2.23 (<build-dir>)
+   Compiling texture_packer v0.30.0
+   Compiling regia_asset_pipeline v0.2.23 (<build-dir>)
+   Compiling regia_test_utils v0.2.23 (<build-dir>)
+    Finished `test` profile [optimized + debuginfo] target(s) in 43m 27s
+  Executable unittests src\lib.rs (C:/work/regia/v05-windows-final-a/t\debug\deps\regia_render-0827ab717d281a09.exe)
+    Finished `test` profile [optimized + debuginfo] target(s) in 2.09s
+     Running unittests src\lib.rs (C:/work/regia/v05-windows-final-a/t\debug\deps\regia_render-0827ab717d281a09.exe)
+
+running 7 tests
+test gpu_select::tests::an_unpresentable_selection_falls_back_or_is_refused ... ok
+test gpu_select::tests::nothing_set_keeps_the_default_pick ... ok
+test gpu_select::tests::pci_and_uuid_select_by_bus_in_either_spelling_and_win ... ok
+test gpu_select::tests::the_index_selects_and_wins_over_the_name ... ok
+test gpu_select::tests::the_name_matches_a_case_insensitive_substring_first_hit ... ok
+test gpu_select::tests::unusable_values_explain_themselves ... ok
+test gpu_select::tests::vulkan_hardware_wins_and_dx12_is_the_fallback ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 2655 filtered out; finished in 0.00s
+

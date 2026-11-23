@@ -1,0 +1,24 @@
+// Sample (.vfx.ron v7): a fountain over a pool. Droplets that fall into the sphere below (the
+// "water") die there; the same rule runs in the GPU update kernel and the CPU reference.
+(
+    version: 7,
+    name: "sample_kill_room",
+    system: (budget: 900),
+    emitters: [
+        (
+            name: "fountain",
+            spawn: (mode: Rate(300.0), lifetime: (min: 2.0, max: 3.0)),
+            init: (
+                shape: Sphere(radius: (min: 0.0, max: 0.1)),
+                velocity: (mode: Directional(dir: (0.0, 1.0, 0.0), spread: 15.0, speed: (min: 4.0, max: 5.0))),
+                size: (min: 0.03, max: 0.05),
+                color: [(t: 0.0, color: "#a0d0ff")],
+            ),
+            update: (
+                gravity: (0.0, -9.8, 0.0),
+                kill_volume: Some((shape: Sphere(radius: 1.2), center: (0.0, -1.5, 0.0))),
+            ),
+            render: (mode: Billboard, sprite: HardDisc, blend: Additive),
+        ),
+    ],
+)

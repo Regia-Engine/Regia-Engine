@@ -1,0 +1,26 @@
+// `.loopgen.ron` example (format version 1): a low machinery hum with a slow throb.
+// Used verbatim by `crates/regia_audio/tests/loopgen.rs`.
+(
+    version: 1,
+    name: "machinery_hum",
+    sample_rate: 48000,
+    length_secs: 2.0,
+    channels: 1,
+    seed: 27,
+    crossfade_secs: 0.15,
+    output_gain_db: -3.0,
+    nodes: [
+        (id: "rumble", node: Rumble(cutoff_hz: 90.0, q: 0.9, gain: 0.6)),
+        (id: "hum", node: Osc(shape: Saw, hz: 55.0, detune_cents: 7.0, gain: 0.25)),
+        (id: "hum_lp", node: Filter(input: "hum", mode: LowPass, cutoff_hz: 300.0, q: 0.707)),
+        (id: "hiss", node: Noise(color: Pink, gain: 0.08)),
+        (id: "hiss_hp", node: OnePole(input: "hiss", mode: HighPass, cutoff_hz: 2000.0)),
+        (id: "bed", node: Mix(inputs: [
+            (input: "rumble"),
+            (input: "hum_lp", gain: 0.8),
+            (input: "hiss_hp", gain: 0.5),
+        ])),
+        (id: "throb", node: Am(input: "bed", rate_hz: 0.5, depth: 0.3)),
+    ],
+    output: "throb",
+)

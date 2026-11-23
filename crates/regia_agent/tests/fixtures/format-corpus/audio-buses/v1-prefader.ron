@@ -1,0 +1,37 @@
+// A project bus tree, `config/audio.ron` (`docs/formats/audio-buses-ron.md`, ADR-8590): the v1 fold that
+// adds the per-send `tap`. `Sfx` feeds the reverb before its fader and mute and the echo after them (an
+// explicit `PostFader`); `World` has no `tap` field (post-fader, the default); a snapshot sets the
+// pre-fader route's level.
+(
+    version: 1,
+    buses: [
+        (name: "Master", parent: None, volume_db: 0.0, mute: false),
+        (
+            name: "Sfx",
+            parent: Some("Master"),
+            volume_db: -80.0,
+            mute: true,
+            effects: [LowPass(cutoff_hz: 8000.0, resonance: 0.0)],
+            sends: [
+                (bus: "Reverb", volume_db: -6.0, tap: PreFader),
+                (bus: "Echo", volume_db: -12.0, tap: PostFader),
+            ],
+        ),
+        (
+            name: "World",
+            parent: Some("Sfx"),
+            sends: [(bus: "Reverb", volume_db: -60.0)],
+        ),
+    ],
+    send_buses: [
+        (name: "Reverb", effects: [Reverb(feedback: 0.85, damping: 0.4, stereo_width: 0.7, mix: 1.0)]),
+        (name: "Echo", effects: [Delay(delay_secs: 0.3, feedback_db: -9.0, mix: 1.0)]),
+    ],
+    snapshots: [
+        (
+            name: "Wet",
+            send_volumes: [(bus: "Sfx", send: "Reverb", volume_db: 0.0)],
+            blend_secs: 0.5,
+        ),
+    ],
+)

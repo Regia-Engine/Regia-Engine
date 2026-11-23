@@ -1,0 +1,17 @@
+(
+    format: "fracture",
+    entries: [
+        (
+            version: 1,
+            file: "v1.fracture.ron",
+            origin: "handwritten from git e4defa90dbd64cbb53f59f6555c6f9dfb181f298:docs/formats/fracture.md and crates/regia_asset_pipeline/tests/fracture.rs (parent of the v2 bump bc4782e1d)",
+            exercises: "The first shape: chunks as welded position/index meshes plus joints; no chunk render meshes (normals, UVs, tangents).",
+        ),
+        (
+            version: 2,
+            file: "v2.ron",
+            origin: "the v1 text of crates/regia_asset_pipeline/tests/fuzz.rs loaded and written by FractureSet at the current version",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+    ],
+)

@@ -1,0 +1,22 @@
+[package]
+name = "regia_pick"
+description = "Render-side ray picking over terrain and mesh layers: triangle rays, a mesh BVH, the hole-aware terrain march and WorldPick."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia_core = { workspace = true }
+regia_ecs = { workspace = true }
+regia_scene = { workspace = true }
+regia_render = { workspace = true }
+regia_terrain = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+regia_asset = { workspace = true }

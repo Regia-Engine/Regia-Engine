@@ -1,0 +1,13 @@
+[project]
+name = "third_person"
+id = "dev.regia.third_person"
+version = "0.1.0"
+build_number = 1
+engine = "0.1"
+startup_level = ""
+organization = "Regia Engine"
+
+# The engine pause key (ADR-10104): Pause/Break freezes the game and shows the built-in Paused screen;
+# Esc keeps opening this sample's own menu (Save, Load, Settings).
+[game]
+pause = true

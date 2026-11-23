@@ -1,0 +1,5 @@
+# ThreadSanitizer suppressions for the `tsan-subset` job (docs/06-testing-and-ci.md § 14, ADR-2726).
+#
+# Every entry has a comment above it: what the report was, and why it is not a race in Regia. An
+# entry with no reason fails `xtask/tests/unsafe_policy.rs`. Do not suppress a report in a Regia
+# crate's own code: fix it, or report it to the lane that owns the code.

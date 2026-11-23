@@ -1,0 +1,13 @@
+{
+    "regia_framework::traversal::Ladder": (
+        half_width: 0.35,
+        height: 3.0,
+        climb_speed: 1.5,
+        standoff: 0.4,
+        exit_forward: 0.6,
+        user_id: 0,
+        nav_link: true,
+        enabled: true,
+        format_version: 1,
+    ),
+}

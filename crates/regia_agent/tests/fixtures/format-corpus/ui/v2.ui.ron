@@ -1,0 +1,24 @@
+(
+    version: 2,
+    root: (
+        name: "editor",
+        style: (direction: column),
+        children: [
+            (
+                name: "main_menu",
+                widget: menu_bar([
+                    (id: "file", label: "File", submenu: [
+                        (id: "save", label: "Save", shortcut: "Ctrl+S"),
+                        (separator: true),
+                        (id: "quit", label: "Quit", enabled: false),
+                    ]),
+                    (id: "view", label: "View", submenu: [
+                        (id: "grid", label: "Grid", checkable: true, checked: true),
+                    ]),
+                ]),
+            ),
+            (name: "more", widget: popup_menu([(id: "a", label: "A")])),
+            (name: "canvas", widget: context_menu([(label: "Copy")])),
+        ],
+    ),
+)

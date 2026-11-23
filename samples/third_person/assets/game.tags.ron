@@ -1,0 +1,27 @@
+// Gameplay tags of samples/third_person (ADR-1463).
+(
+    version: 1,
+    description: "samples/third_person tags",
+    tags: [
+        (name: "Role.Player", description: "A player-controlled character"),
+        (name: "Pickup.Coin", description: "A collectible coin"),
+        (name: "Vehicle.Car", description: "A drivable car"),
+        (name: "State.Driving", description: "The character is driving a car"),
+        (name: "Team.Player", description: "Fights on the player's side (combat, ADR-2596)"),
+        (name: "Team.Enemy", description: "An enemy combatant"),
+        (name: "Enemy.Grunt", description: "The melee grunt"),
+        (name: "Enemy.Ranged", description: "The ranged caster"),
+        (name: "Ability.Melee.Slash", description: "The player's melee combo swing"),
+        (name: "Ability.Enemy.Swipe", description: "The grunt's melee swipe"),
+        (name: "Ability.Enemy.Bolt", description: "The ranged enemy's bolt"),
+        (name: "Cooldown.Slash", description: "The player's swing is recovering"),
+        (name: "Cooldown.Swipe", description: "The grunt's swipe is recovering"),
+        (name: "Cooldown.Bolt", description: "The ranged enemy's bolt is recovering"),
+        (name: "State.Attacking", description: "An attack ability is running"),
+        (name: "Status.Staggered", description: "Hit reaction: cannot move or attack"),
+        (name: "Effect.Damage", description: "An effect that removes health"),
+        (name: "Effect.Stagger", description: "The hit-reaction effect"),
+        (name: "Effect.Heal", description: "An effect that restores health"),
+        (name: "Damage.Amount", description: "Param key: the health change of a hit (negative)"),
+    ],
+)

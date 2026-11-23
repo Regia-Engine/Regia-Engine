@@ -1,0 +1,72 @@
+(
+    format_version: 2,
+    name: "third_person",
+    params: {},
+    variables: [],
+    inputs: [
+        (
+            name: "look",
+            kind: Axis2,
+            speed: (120.0, 90.0),
+            pitch_clamp: (-80.0, 80.0),
+            invert_pitch: false,
+            normalize: false,
+            pull_toward_var: None,
+            pull_weight: 0.1,
+        ),
+    ],
+    rigs: [
+        (
+            name: "main",
+            tags: [],
+            root: [
+                Pivot(
+                    target: DriveTarget,
+                    offset: (0.0, 0.0, 0.0),
+                    space: Target,
+                    aim_offset: (0.0, 0.0, 0.0),
+                    inherit_rotation: false,
+                ),
+                LookInput(
+                    slot: "look",
+                    additive: false,
+                ),
+                Boom(
+                    length: Literal(5.0),
+                    side_offset: Literal(0.0),
+                    up_offset: Literal(0.0),
+                    length_speed: Literal(0.0),
+                ),
+                Collision(
+                    radius: 0.2,
+                    layers: [],
+                    close_speed: 100000000.0,
+                    open_speed: 0.0,
+                    open_rate: 5.0,
+                    anchor: Pivot,
+                    reuse_last_frame: false,
+                ),
+                SmoothPosition(
+                    depth: 10.0,
+                    side: 10.0,
+                    height: 10.0,
+                    space: World,
+                ),
+                SmoothRotation(
+                    pitch: 10.0,
+                    yaw: 10.0,
+                    roll: 10.0,
+                ),
+                Lean(
+                    gain: 0.12,
+                    max: 0.18,
+                    speed: 6.0,
+                ),
+            ],
+            transitions: [],
+            blend_out: None,
+        ),
+    ],
+    transitions: [],
+    director: Fixed("main"),
+)

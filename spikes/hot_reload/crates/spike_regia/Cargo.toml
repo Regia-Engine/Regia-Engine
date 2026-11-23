@@ -1,0 +1,18 @@
+[package]
+name = "spike_regia"
+description = "Prototype of the `regia` facade: re-exports the engine and, with `dynamic`, force-links the engine dylib."
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[features]
+# specs/20 § 1 `hot-reload`: link the engine through `spike_engine_dylib`.
+# `spike_editor` is never linked into a game library; depending on it makes `cargo rustc -p game`
+# resolve the same features as the editor build, so both use the identical engine dylib (README,
+# "feature unification").
+dynamic = ["dep:spike_engine_dylib", "dep:spike_editor"]
+
+[dependencies]
+spike_engine = { workspace = true }
+spike_engine_dylib = { workspace = true, optional = true }
+spike_editor = { path = "../spike_editor", optional = true }

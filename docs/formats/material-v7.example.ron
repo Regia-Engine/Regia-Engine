@@ -1,0 +1,23 @@
+(
+    format_version: 7,
+    name: "M_FrostedPane",
+    shader: Standard,
+    base: (
+        base_color: (0.95, 0.97, 1.0, 1.0),
+        metallic: 0.0,
+        roughness: 0.2,
+        emissive: (0.0, 0.0, 0.0),
+        emissive_strength: 1.0,
+        orm_packed: true,
+        ior: 1.5,
+    ),
+    hard_surface: (
+        multi_scatter: true,
+        specular_occlusion: true,
+    ),
+    transmission: (
+        factor: 0.9,
+    ),
+    transmission_roughness: 0.35,
+    render_state: (alpha_mode: opaque, queue_offset: 0, alpha_cutoff: 0.5),
+)

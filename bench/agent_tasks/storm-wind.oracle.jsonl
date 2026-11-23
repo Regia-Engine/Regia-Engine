@@ -1,0 +1,2 @@
+# Oracle for storm-wind: the calls a careful agent makes after the setup.
+{"method":"terrain.set_wind","params":{"strength":3.5,"direction":[0.0,1.0]}}

@@ -1,0 +1,27 @@
+[package]
+name = "regia_xr"
+description = "OpenXR head-mounted displays: the XR plugin, action manifest, tracking spaces, comfort, hands and the simulator backend (spec 58)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia_core = { workspace = true }
+regia_app = { workspace = true }
+regia_platform = { workspace = true }
+regia_input = { workspace = true }
+regia_scene = { workspace = true }
+regia_render = { workspace = true }
+wgpu = { workspace = true }
+bytemuck = { workspace = true }
+serde = { workspace = true }
+ron = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+regia_test_utils = { workspace = true }

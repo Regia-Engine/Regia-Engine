@@ -1,0 +1,7 @@
+(
+    root: 0,
+    nodes: [
+        (name: "root", kind: selector, children: [1], key: "", seconds: 0.0, times: None, task: "", policy: require_all),
+        (name: "leaf_1", kind: leaf, children: [], key: "", seconds: 0.0, times: None, task: "game::Patrol", policy: require_all),
+    ],
+)

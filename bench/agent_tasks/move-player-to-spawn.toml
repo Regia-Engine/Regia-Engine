@@ -1,0 +1,37 @@
+format_version = 1
+id = "move-player-to-spawn"
+title = "Put the player at Spawn Point B, facing east"
+prompt = "Move the entity 'Player' to the position of 'Spawn Point B' and turn it 90 degrees to the left around the vertical (Y) axis."
+features = ["scene"]
+crates = ["regia_agent"]
+call_budget = 8
+
+[setup]
+target = "scene"
+
+[[setup.call]]
+method = "scene.spawn"
+params = { name = "Player", components = { Transform = { translation = [0, 0, 0] } } }
+save = { p = "/entity" }
+
+[[setup.call]]
+method = "scene.spawn"
+params = { name = "Spawn Point A", components = { Transform = { translation = [-5, 0, 3] } } }
+
+[[setup.call]]
+method = "scene.spawn"
+params = { name = "Spawn Point B", components = { Transform = { translation = [12, 0, -7] } } }
+
+[[check]]
+name = "at spawn B"
+method = "scene.query_entities"
+params = { name = "Player" }
+pointer = "/entities/0/translation"
+expect = { kind = "within_distance", point = [12, 0, -7], max = 0.05 }
+
+[[check]]
+name = "turned 90 degrees"
+method = "play.expect"
+params = { assertions = [{ name = "y", condition = { entity = { name = "Player" }, component = "Transform", path = "rotation.y", op = "gte", value = 0.7 } }, { name = "w", condition = { entity = { name = "Player" }, component = "Transform", path = "rotation.w", op = "gte", value = 0.7 } }] }
+pointer = "/pass"
+expect = { kind = "equals", value = true }

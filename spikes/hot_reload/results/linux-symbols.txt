@@ -1,0 +1,32 @@
+target/debug/deps/libspike_engine_dylib.so                 152762480 bytes    37762 exported
+target/debug/deps/libsim_dylib.so                             180712 bytes       91 exported
+target/debug/libgame_dylib.so                                1950032 bytes      753 exported
+.hot/libgame_dylib-9.so                                      1949784 bytes      753 exported
+target/debug/host                                             598680 bytes        0 exported
+target/debug/editor_host                                    16145008 bytes        0 exported
+--- engine dylib: exported symbols by crate (top 25) ---
+   4792 read_fonts
+   2961 x11rb_protocol
+   2635 core
+   2365 alloc
+   1828 wayland_protocols
+   1178 rustix
+    929 rapier3d
+    893 bevy_ecs
+    799 ash
+    796 wayland_protocols_plasma
+    776 taffy
+    701 glam
+    695 parry3d
+    649 wgpu_core
+    585 hashbrown
+    581 alsa
+    578 bevy_reflect
+    556 naga
+    510 winit
+    476 erased_serde
+    475 ron
+    419 wgpu_hal
+    416 glow
+    397 wayland_client
+    376 regex_automata

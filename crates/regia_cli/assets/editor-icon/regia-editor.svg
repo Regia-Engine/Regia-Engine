@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 108 108" role="img" aria-label="Regia Editor app icon: the PiercingXX logomark, two stacked white X's, underlined, on a black rounded tile">
+  <!-- The ONE source of every Regia Editor app icon (ADR-20000). `cargo xtask editor-icons` draws the
+       PNGs, the Windows .ico and the macOS .icns beside this file from it; swap the mark by replacing
+       this file and running that command.
+       Copied verbatim (geometry and colours) from the brand master
+       piercingxx-branding/branding/assets/logomark.svg (BRAND-GUIDE.md § 5 "The logomark",
+       checklist item 6): the underlined-XX logomark on a rounded-square Ink tile, corner radius about
+       20 % of the tile, Signal white on Ink, no glow, shadow or recolor. The brand repo is the master;
+       never edit it from here. -->
+  <rect x="0" y="0" width="108" height="108" rx="22" fill="#000000"/>
+  <!-- Top X: white X centred at (54,40), half-extent 14, stroke 6. -->
+  <path d="M40,26 L68,54 M40,54 L68,26" fill="none" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round"/>
+  <!-- Bottom X: white X centred at (54,66), half-extent 14. -->
+  <path d="M40,52 L68,80 M40,80 L68,52" fill="none" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round"/>
+  <!-- Underline: white bar beneath the two X's. -->
+  <path d="M38,88 L70,88" fill="none" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/>
+</svg>

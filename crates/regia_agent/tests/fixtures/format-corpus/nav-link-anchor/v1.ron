@@ -1,0 +1,15 @@
+{
+    "regia_nav::link_file::NavLinkAnchor": (
+        to: (0.0, 2.0, -3.0),
+        bidirectional: true,
+        area: 0,
+        user_id: 0,
+        kind: Jump,
+        radius: 2.0,
+        cost_scale: 1.0,
+        flags: 1,
+        enabled: true,
+        duration: 0.0,
+        format_version: 1,
+    ),
+}

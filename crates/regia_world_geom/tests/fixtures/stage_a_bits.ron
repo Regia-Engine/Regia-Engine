@@ -1,0 +1,39 @@
+// Stage A bit table (spec 121 § 13.2, plan row W-05, ADR-8432).
+// Frozen. A Stage B change that moves a word fails
+// `stage_a_bits_are_the_same_with_and_without_stage_b` and must bump QUERY_BITS_VERSION
+// in the same commit. The composite of these words is pinned in that test, not only here.
+//
+// mesh: (map, terrain, mesh+nav, mouth holes, query table) from tests/mesh_bits.rs PINNED.
+// stage_a: tests/mesh_bits.rs STAGE_A_PINNED.
+// onfoot: tests/mesh_bits.rs ONFOOT_PINNED.
+// nav: crates/regia_nav/tests/det_tunnel_nav.rs SWITCHBACKS_NAVMESH_{BAKE_ID,LEN,FNV}
+// (literals; this crate does not depend on regia_nav).
+(
+    query_bits_version: 8,
+    mesh: [
+        ("switchbacks", "none", (0xc717_2398_946e_2bb2, 0x4d25_767f_9dce_13f5, 0xa11f_0ece_effa_aa44)),
+        ("switchbacks", "canyon", (0xb249_b8d9_3843_cfc3, 0xf1e7_88f8_0bc6_1f5a, 0x4718_1dbd_6540_c23f)),
+        ("switchbacks", "rolling", (0xc717_2398_946e_2bb2, 0x4d25_767f_9dce_13f5, 0x1d86_3566_2efe_e279)),
+        ("atacama_rail", "none", (0xfab6_00c6_ea31_8aa4, 0xeb6d_fcb8_048f_9665, 0xf89e_b90c_1a7a_01b9)),
+        ("atacama_rail", "canyon", (0xa9b9_4188_39e0_acb7, 0xeb6d_fcb8_048f_9665, 0x7865_9834_3e3d_0055)),
+        ("atacama_rail", "rolling", (0xcdc2_4d97_2efd_b312, 0xeb6d_fcb8_048f_9665, 0x38c7_7c7d_9519_df07)),
+        ("cinder_steps", "none", (0x2d4c_f45a_180e_74f1, 0x8fa4_d05f_a195_185e, 0x3f0d_cd2c_b207_7379)),
+        ("cinder_steps", "canyon", (0x17be_4deb_2b8e_fd55, 0x8fa4_d05f_a195_185e, 0x3fd4_e962_cd5b_0811)),
+        ("cinder_steps", "rolling", (0x624d_cd20_0ddc_5e9b, 0xfac0_e5d1_f878_9e8d, 0xeef8_9300_7e85_e3aa)),
+    ],
+    stage_a: [
+        ("switchbacks", "none", 0xd8e3_cef9_8082_1b23),
+        ("switchbacks", "canyon", 0x8a02_39cb_c199_18ce),
+        ("cinder_steps", "none", 0xbe2c_20d4_34f7_ee84),
+        ("cinder_steps", "canyon", 0x5235_4c62_6c2e_a45b),
+        ("four_decks", "none", 0xe72e_4ea0_bcf5_c015),
+    ],
+    onfoot: [
+        ("gallery", 0x0935_9425_42f4_c2a2),
+        ("switchbacks_tube", 0x042a_f2f6_62ac_4b9f),
+        ("switchbacks_ramp_cone", 0xc9de_38d3_6487_2aa4),
+    ],
+    nav_bake_id: 0xbae1_74da_539e_bf71,
+    nav_len: 65181,
+    nav_fnv: 0xb9ab_f6c8_fdd9_5dc5,
+)

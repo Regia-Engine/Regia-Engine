@@ -1,0 +1,9 @@
+[project]
+name = "Dedicated Server"
+id = "com.regiaengine.samples.dedicated_server"
+version = "0.1.0"
+build_number = 1
+engine = "0.2"
+
+[kinds]
+strictness = "warn"

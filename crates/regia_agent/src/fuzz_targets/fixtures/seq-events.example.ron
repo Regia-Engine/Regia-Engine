@@ -1,0 +1,48 @@
+// A sequence (`.seq.ron` v6, ADR-8105 row (c)): event tracks fire named events with payloads when
+// playback crosses their keys (`SequenceEventFired`), a locked track the editor refuses to edit,
+// and a muted (disabled) event track that fires nothing.
+(
+    version: 6,
+    name: "door-scene",
+    fps: 30.0,
+    tracks: [
+        // A sequence-wide event track: two keys at one time fire in file order.
+        (
+            name: "cues",
+            keys: Event([
+                (time: 0.5, event: "music_start", payload: "theme_a"),
+                (time: 2.0, event: "door_open", payload: "fast"),
+                (time: 2.0, event: "door_sound"),
+                (time: 4.0, event: "scene_end"),
+            ]),
+        ),
+        // An event track about one binding.
+        (
+            name: "door-events",
+            target: "door",
+            keys: Event([
+                (time: 1.0, event: "unlock"),
+            ]),
+        ),
+        // A locked keyed track: the timeline and the editor.seq_* edits refuse to change it.
+        (
+            name: "door-angle",
+            target: "door",
+            property: "hinge.angle",
+            keys: Float([
+                (time: 2.0, value: 0.0),
+                (time: 3.0, value: 90.0, ease: Smooth),
+            ]),
+            locked: true,
+        ),
+        // A muted event track: nothing fires.
+        (
+            name: "debug-events",
+            keys: Event([
+                (time: 1.5, event: "debug_marker", payload: "off"),
+            ]),
+            enabled: false,
+        ),
+    ],
+    markers: [(name: "end", time: 4.0)],
+)

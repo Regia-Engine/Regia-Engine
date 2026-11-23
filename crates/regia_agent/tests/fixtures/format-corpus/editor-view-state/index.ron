@@ -1,0 +1,11 @@
+(
+    format: "editor-view-state",
+    entries: [
+        (
+            version: 1,
+            file: "v1.ron",
+            origin: "handwritten from 7a87c9394 (docs/formats/editor-view-state-ron.md's example)",
+            exercises: "the current version: what the editor writes today must stay readable",
+        ),
+    ],
+)

@@ -1,0 +1,23 @@
+(
+    format: "bake",
+    entries: [
+        (
+            version: 1,
+            file: "v1.bake.ron",
+            origin: "git a855c2a5ec44da314412474ac696ef72b2acda2f:docs/formats/bake-ron.md (the Example block, parent of the v2 bump a1bac87b0; doc example with pre-rename path strings such as assets_ferrite/)",
+            exercises: "Adds format_version, root, terrain_mesh, meshes, static_meshes, interiors, manifest, default_albedo and layout.auto_bricks over v0; no sky_hdri or emitters (v2).",
+        ),
+        (
+            version: 2,
+            file: "v2.bake.ron",
+            origin: "handwritten from 0dae2317a74e748db6c787ceb2bdd39d3ebbea99 (docs/formats/bake-ron.md's v2 Example: the v1 fixture body + the v2 fields the doc adds)",
+            exercises: "sky_hdri / sky_atmosphere / emitters and the bake quality controls (rr_start, clamp_direct, clamp_indirect, sample_groups, firefly_threshold); its one `sun` migrates to a one-element `suns` (v3)",
+        ),
+        (
+            version: 3,
+            file: "v3.bake.ron",
+            origin: "handwritten from c2890783b (docs/formats/bake-ron.md's v3 Example: the v2 fixture body with `sun` replaced by a two-element `suns`, ADR-7818)",
+            exercises: "the current version: `suns: [..]` with two suns (the scene's sun and an extra sun with a color and an angular radius)",
+        ),
+    ],
+)

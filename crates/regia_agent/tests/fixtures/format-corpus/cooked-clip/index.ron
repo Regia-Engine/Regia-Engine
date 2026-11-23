@@ -1,0 +1,29 @@
+(
+    format: "cooked-clip",
+    entries: [
+        (
+            version: 1,
+            file: "v1.fckd",
+            origin: "handwritten from git cfb0495b804d98ce8bd03a54dc23914c6be5c0de:crates/ferrite_animation/src/clip.rs and cooked.rs (parent of the v2 bump 5b7423d85); FCKD wrapper + postcard payload; type tag is the pre-rename ferrite_animation::AnimationClip",
+            exercises: "A payload with no FCLP magic and morph tracks that carry no node (v2 adds the magic and MorphTrack::node).",
+        ),
+        (
+            version: 2,
+            file: "v2.fckd",
+            origin: "the real v1 fixture (v1.fckd) migrated by the loader and written at v2",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+        (
+            version: 3,
+            file: "v3.fckd",
+            origin: "the real v2 fixture (v2.fckd) migrated by the loader and written at v3",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+        (
+            version: 3,
+            file: "v3-nodes.fckd",
+            origin: "v3.fckd decoded by the runtime loader, with node-tracks/v1.bin attached and written through to_cooked_payload / encode_cooked_file (ADR-8157)",
+            exercises: "the additive RawNodes variant in the unreleased v0.6 format batch; source identity and plain-node TRS survive migration",
+        ),
+    ],
+)

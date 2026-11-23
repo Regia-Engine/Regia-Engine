@@ -1,0 +1,11 @@
+(
+    format: "import-presets",
+    entries: [
+        (
+            version: 1,
+            file: "v1.ron",
+            origin: "frozen copy of the fuzz-target registry fixture plus the documented example",
+            exercises: "the current version: what the editor writes today must stay readable",
+        ),
+    ],
+)

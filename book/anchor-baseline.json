@@ -1,0 +1,25 @@
+{
+  "format_version": 1,
+  "rows": [
+    {
+      "page": "COVERAGE.md",
+      "target": "agents/cloth.md#physicscloth_edit_map",
+      "reason": "Anchor does not resolve to exactly one heading."
+    },
+    {
+      "page": "COVERAGE.md",
+      "target": "agents/editor-preferences.md#the-file",
+      "reason": "Anchor does not resolve to exactly one heading."
+    },
+    {
+      "page": "COVERAGE.md",
+      "target": "agents/editor-preferences.md#the-file-1",
+      "reason": "Anchor does not resolve to exactly one heading."
+    },
+    {
+      "page": "COVERAGE.md",
+      "target": "agents/editor-preferences.md#the-file-2",
+      "reason": "Anchor does not resolve to exactly one heading."
+    }
+  ]
+}

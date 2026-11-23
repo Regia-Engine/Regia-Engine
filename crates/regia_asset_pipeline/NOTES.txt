@@ -1,0 +1,130 @@
+ASTC texture block encoder (pure Rust) - build notes
+=====================================================
+Task: ASTC LDR encoder for regia_asset_pipeline (Android lane had uploads only).
+This continuation re-read the previous draft, ran it, found its physical layout
+was self-consistent but NOT spec-conformant (the astcenc cross-check failed), and
+rewrote the codec core from the Khronos Data Format Specification 1.3, ch. 23
+(fetched from registry.khronos.org), which reproduces the ASTC specification.
+The cross-checks below now run in the normal test suite and pass.
+
+WHAT WAS BUILT
+--------------
+- crates/regia_asset_pipeline/src/astc_encode.rs (NEW, ~3250 lines, safe Rust, no
+  new dependencies; only thiserror + tracing, both already crate dependencies).
+  One-line wiring in crates/regia_asset_pipeline/src/lib.rs: `pub mod astc_encode;`
+- Public API:
+    encode_block(&[[u8;4]], BlockSize, Quality) -> [u8;16]   (infallible: pads/truncates)
+    try_encode_block(...) -> Result<[u8;16], AstcEncodeError> (strict texel count)
+    encode_image(w, h, rgba, BlockSize, Quality) -> Result<Vec<u8>, AstcEncodeError>
+    decode_block(&[u8;16], BlockSize) -> Vec<[u8;4]>        (reference decoder, subset)
+    decode_image(w, h, blocks, BlockSize) -> Result<Vec<u8>, AstcEncodeError>
+    inspect_block(&[u8;16], BlockSize) -> BlockInfo          (kind / CEM / derived ranges)
+    bise_encode / bise_decode / bise_bits, QUANT_RANGES (21), WEIGHT_RANGES (12)
+    Types: BlockSize (4x4/5x5/6x6/8x8 2D), Quality (Fast/Balanced/Thorough),
+           ColorEndpointMode (Luminance, LuminanceAlpha, Rgb, Rgba = CEM 0/4/8/12, all direct),
+           AstcEncodeError (thiserror), BlockInfo/BlockKind.
+- Algorithm: single partition, weight grid = block footprint, single plane. Endpoint fit:
+  principal axis (power iteration on covariance, 32 fixed iterations) + alternating
+  least-squares refits, then endpoints refitted against the quantized weights (stored
+  levels' centroids), gamut-clamped throughout. Candidates (CEM x legal weight range,
+  breadth by Quality; Balanced adds 1 endpoint-tweak pass, Thorough 2 over every range)
+  scored by pack+decode squared error, first candidate wins ties. Constant blocks ->
+  void-extent. Deterministic: fixed iteration counts/order, no HashMap, no threads,
+  no clock in the codec.
+- Spec fidelity (all from Data Format Spec 1.3 ch. 23):
+  * Block mode: the 11-bit layout table, incl. scattered rho bits, precision bit,
+    dual-plane bit, and the square-grid row that forces P=0 (so 6x6/8x8 footprint
+    grids offer only weight ranges 2,3,4,5,6,8).
+  * BISE: interleaved chunk order (m0 T0 T1 m1 T2 T3 m2 T4 m3 T5 T6 m4 T7 / quints
+    likewise), spec bit-manipulation trit/quint unpacking, stream length
+    ceil(N*8/5)/ceil(N*7/3) + N*n with the final group's packed bits past the stream
+    end encoding as zero (encoder inverts by exhaustive search over 256/128 inputs).
+  * Unquantization: bit replication for power-of-two ranges, the A/B/C/D scramble
+    tables for trit/quint ranges (endpoints 0..255, weights 0..63 then +1 over 32).
+  * Endpoint modes 0/4/8/12 with the RGB-sum order test and blue contraction; the
+    encoder stores endpoints in non-decreasing sum order so they decode direct.
+  * Weight infill with the D=(1024+B/2)/(B-1) scaling and sixteenth-weight bilinear
+    blend; weight application in 16-bit with top-8-bits output.
+  * Legality: weight sequences must spend 24..=96 bits, at most 64 weights, and
+    endpoint budget at least ceil(13C/5) (the encoder only searches legal configs;
+    inspect_block reports illegal blocks Invalid like a real decoder).
+- docs/provenance.md: 3 entries at the end (Khronos Data Format Spec 1.3 ch. 23 for
+  the format and BISE/unquantization; Nystad et al. HPG 2012; Pearson 1901 / Gauss /
+  Lloyd 1982 for the fit). No proprietary or GPL source was read; the vendored
+  astcenc was used only as a black-box decode oracle via crate::astc tests.
+- book/reference/astc-encoder.md (new page) + one SUMMARY.md line under Reference.
+
+TESTS (in-module, 32 #[test], all passing, none ignored)
+---------------------------------------------------------
+BISE: all values round-trip for every range at count 1; exhaustive pairs/triples for
+  ranges 2..6; zeros/max/ramps/seeded-noise at counts 2..64 for every range; packed
+  length == bise_bits; size-formula spot values (13/16, 16/22); invalid range/value/
+  truncation errors; empty sequence.
+Unquantization: sorted value set spans 0..255 with distinct near-uniform values for
+  all 21 ranges; scrambled spot values (range 6 -> [0,255,51,204,102,153]);
+  quantize8 inverts unquantize8 by value at every level; degenerate ranges defined.
+Block mode / budgets: decode->encode->decode identity over all 2048 mode patterns;
+  footprint grids offer the exact legal weight-range sets; reserved patterns reject;
+  endpoint_range_for spot values under the spec size formula (8 vals/47 bits -> 48);
+  weight infill identity at footprint, 1x1 constant, 2x2 center = average;
+  blue contraction fires only on decreasing RGB sums (both branches + equal sums).
+Round trips (module decoder): solid colors EXACT at all sizes/qualities incl. alpha 0
+  and stored as void-extent with the exact pattern bits; non-constant blocks inspect
+  as Normal, one partition, within the legal budget; 1-D gradient PSNR floors
+  38/36/34/28 dB (4x4..8x8), 2-D floors 32/30/29/25 dB, vertical ramp 32 dB;
+  greyscale picks Luminance, stays exactly grey, floors 40/32/26/16 dB (8x8 is the
+  two-level centroid bound ~16.8 dB, reached via the quantized-weight refit);
+  alpha ramp picks RGBA, floors 38/28/24/15 dB with per-size RGB drift bounds;
+  2-color checkerboard >= 36 dB; white noise in [9,25] dB; noisy gradient >= 24 dB;
+  blue-dominant ramp >= 30 dB with blue error <= 12; Thorough >= Fast - 0.25 dB;
+  hand-built symbolic black->white ramp decodes monotone with exact ends.
+Images/edges: partial blocks for (1,1),(3,5),(10,7),(17,13),(31,1),(1,29) at all
+  sizes with exact output lengths and per-block legality; solid 1x1 exact at 8x8;
+  byte determinism (block and image, all sizes/qualities); bad-buffer/zero-dim/
+  bad-block-count errors; encode_block empty->void black, short->edge repeat,
+  long->truncate (equals exact encode).
+Adversarial: reserved mode, oversized grid, multi-partition, unsupported CEM decode
+  to opaque magenta with correct texel counts for 0x00/0x55/0xAA/0xFF fills; outlier,
+  alternating extremes and seeded-chaos texels at every size/quality never panic and
+  stay legal, outlier texel stays >180; NaN/Inf fit guards exercised directly.
+Speed guard: Fast 128x128 and Balanced 64x64 each < 60 s (tripwire).
+Cross-checks vs vendored astcenc decoder (crate::astc), now always-on:
+  reference_decoder_reads_our_gradient (64x64, all sizes: module vs reference decode
+    >= 40 dB and source-vs-reference >= 24 dB),
+  reference_decoder_reads_our_void_extent (exact constant via astcenc),
+  reference_decoder_agrees_on_every_symbolic_configuration (99 hand-built blocks:
+    every size x CEM x legal weight range, seeded random endpoint/weight levels;
+    worst texel disagreement <= 1 level).
+
+VERIFIED WITH (this continuation actually ran cargo, rustc 1.99)
+----------------------------------------------------------------
+rustfmt --edition 2024 --check src/astc_encode.rs             -> clean
+cargo clippy -p regia_asset_pipeline --all-targets -- -D warnings -> clean
+cargo test -p regia_asset_pipeline --lib astc_encode          -> 32 passed
+cargo test -p regia_asset_pipeline --lib                      -> 414 passed, 3 ignored (pre-existing)
+cargo xtask preflight --changed -> could not run: this scratch tree has no `main`
+  ref ("error: no merge base between HEAD and `main`"), so the changed-set
+  computation fails before the gates. The per-crate gates above substitute for it.
+NOTE: `cargo fmt` (workspace- and crate-wide) under rustc 1.99 reformats the
+  repo's committed files wholesale (they are not clean under this toolchain's
+  rustfmt defaults). Every such collateral edit in this session was reverted;
+  the final tracked diff is exactly book/SUMMARY.md (+1), docs/provenance.md (+3),
+  crates/regia_asset_pipeline/src/lib.rs (+1), plus the three new files.
+
+RESIDUAL NOTES / KNOWN LIMITS
+-----------------------------
+- Endpoint ranges 3 and 5: the Data Format Spec's endpoint table starts at range 6.
+  unquantize8 uses the uniform values [0,128,255] / [0,64,128,191,255]. These ranges
+  cannot occur in legal blocks (the minimum-endpoint-budget rule makes every derived
+  endpoint range >= 6), so neither the encoder nor the decoder's legal path reaches
+  them; they are exercised only by the standalone unquantization tests.
+- The module decoder covers the encoder's subset only (one partition, direct CEMs
+  0/4/8/12, single plane). Foreign blocks outside it decode as magenta by design;
+  decoding arbitrary astcenc output (partitions, base+offset modes, HDR) is out of
+  scope and stays with crate::astc.
+- Quality: single partition + footprint grid is the spec'd starting point. The
+  largest known wins left are partitions, smaller weight grids at 6x6/8x8 (which
+  would allow more weight levels than the legal footprint grid permits there),
+  dual plane for alpha/normal maps, and blue-contracted endpoint candidates.
+
+STATUS: DONE

@@ -1,0 +1,31 @@
+[package]
+name = "regia_quick"
+description = "Quick immediate drawing: nannou-style Draw API for 2D shapes, paths, meshes and text over the frame, plus lit 3D primitives."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia_core = { workspace = true }
+regia_ecs = { workspace = true }
+regia_app = { workspace = true }
+regia_platform = { workspace = true }
+regia_input = { workspace = true }
+regia_scene = { workspace = true }
+regia_render = { workspace = true }
+regia_ui = { workspace = true }
+lyon = { workspace = true }
+bytemuck = { workspace = true }
+cosmic-text = { workspace = true }
+png = { workspace = true }
+wgpu = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+regia_test_utils = { workspace = true }
+image = { workspace = true }

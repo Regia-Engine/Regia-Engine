@@ -1,0 +1,11 @@
+// The arena's quick capture the flag: the shipped `ctf` rule set with one capture to win and
+// dropped flags going home after ten seconds (book/tutorials/capture-the-flag.md).
+(
+    format_version: 1,
+    id: "ctf_quick",
+    name_key: "mode.ctf_quick",
+    extends: "ctf",
+    session: (
+        objectives: (capture_limit: 1, flag_return_ticks: 600),
+    ),
+)

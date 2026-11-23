@@ -1,0 +1,21 @@
+(
+    format_version: 1,
+    roots: [
+        "assets/props/crate.prefab.ron",
+    ],
+    assets: [
+        (
+            path: "assets/props/crate.glb",
+            id: Some("5f1d3c9a-0b7e-4c1a-9d0e-2a6b8c4f1e30"),
+            bytes: 1024,
+            hash: "9148ea9ec3e2dc60",
+        ),
+        (
+            path: "assets/props/crate.prefab.ron",
+            id: None,
+            bytes: 96,
+            hash: "ba6d27b5723c60a3",
+        ),
+    ],
+    created_utc: Some("2026-11-15T00:00:00Z"),
+)

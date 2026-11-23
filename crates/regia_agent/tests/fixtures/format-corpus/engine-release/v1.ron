@@ -1,0 +1,10 @@
+(
+    format_version: 1,
+    version: "0.2.13",
+    commit: Some("f612a1ada"),
+    rust_version: "1.99",
+    crates: ["regia", "regia_core"],
+    files: [
+        (path: "Cargo.toml", size: 512, blake3: "0000000000000000000000000000000000000000000000000000000000000000"),
+    ],
+)

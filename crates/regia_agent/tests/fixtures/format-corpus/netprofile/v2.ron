@@ -1,0 +1,25 @@
+NetProfile(
+    format_version: 2,
+    priority: 1.0,
+    relevance: Spatial(radius: 150.0, hysteresis: 0.15),   // or World
+    sent_to_all: false,
+    owner_only: false,
+    group_required: false,
+    follow_parent: false,
+    custom_filter: None,                // Some("line_of_sight")
+    min_interval_ticks: 1,
+    max_interval_ticks: None,
+    linger_ticks: 30,
+    owner_boost: 4.0,
+    view_falloff: true,
+    position_step_m: Some(0.001),
+    // spec 74:
+    interpolation: Linear,              // Hermite, None
+    snap_distance_m: 5.0,
+    max_extrapolate_ms: 100.0,
+    appear_immediately: false,
+    // spec 120 § 8.3 (v2):
+    rate_tiers: Some((near_m: 150.0, mid_m: 600.0, mid_every: 3, far_hz: 2.0)),
+    // spec 120 § 8.2 (v2, ADR-8522): the extrapolation gate, off by default
+    extrapolation_gate_m: None,         // Some(0.02)
+)

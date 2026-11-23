@@ -1,0 +1,14 @@
+(
+    format_version: 1,
+    id: "intro",
+    notes: "Gate scene. Guard is tired, not hostile.",
+    lines: [
+        (id: "greet", speaker: "guard", text: "conv-intro-greet", emotion: Some("weary"),
+         note: "Said while waving the player in.",
+         voice: Auto, duration: Clip, tags: ["gate"]),
+        (id: "warn", speaker: "guard", text: "conv-intro-warn", voice: Explicit({"en": "audio/vo/en/gate_warn.ogg"}),
+         duration: Fixed(2600), cues: [(0, "conv-intro-warn-a"), (1300, "conv-intro-warn-b")]),
+    ],
+    steps: [ Line("greet"), If(cond: "met_captain", then: "short", else: "long"),
+             Label("long"), Line("warn"), End, Label("short"), End ],
+)

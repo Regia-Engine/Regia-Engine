@@ -1,0 +1,29 @@
+format_version = 1
+id = "reopen-the-route"
+title = "Reopen a blocked route"
+prompt = "A navigation obstacle blocks the walkable floor (x and z from -4 to 4), so units cannot walk from (-3, 0, 0) to (3, 0, 0). Remove the obstacle that blocks the route. Do not rebuild the mesh."
+features = ["nav"]
+crates = ["regia_agent", "regia_nav"]
+call_budget = 6
+
+[setup]
+target = "nav"
+
+[[setup.call]]
+method = "nav.add_obstacle"
+params = { min = [-0.5, -1, -4], max = [0.5, 2, 4] }
+save = { o = "/id" }
+
+[[check]]
+name = "a path exists"
+method = "nav.find_path"
+params = { from = [-3, 0, 0], to = [3, 0, 0] }
+pointer = "/path/length"
+expect = { kind = "number_range", min = 5.9, max = 6.1 }
+
+[[check]]
+name = "the path has waypoints"
+method = "nav.find_path"
+params = { from = [-3, 0, 0], to = [3, 0, 0] }
+pointer = "/path/waypoints"
+expect = { kind = "count_range", min = 2, max = 20 }

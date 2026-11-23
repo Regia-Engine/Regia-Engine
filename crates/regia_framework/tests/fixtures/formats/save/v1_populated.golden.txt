@@ -1,0 +1,10 @@
+version: 1
+game_version: 1.2.3
+engine_version: 0.2.5
+timestamp_secs: 1700000000.5
+thumbnail: Some("89504e47")
+entity 0:
+  Health = 00009342
+  Transform = 010203040506
+entity 1:
+resource game::Score = 2a000000

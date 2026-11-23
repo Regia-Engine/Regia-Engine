@@ -1,0 +1,17 @@
+// Ecology profile of `oak_birch_woodland.biome.ron` (ADR-2456, book agents/biomes.md "Ecology").
+EcologyProfile(
+    format_version: 1,
+    site: (moisture: (4.0, 6.0), reaction: (2.0, 4.0), altitude_m: (0.0, 900.0), slope_deg: (0.0, 35.0), soil: "sandy podzolic brown earth"),
+    species: [
+        (entry: "canopy/sessile_oak", species: "quercus_petraea", role: Dominant, share: Some(0.6)),
+        (entry: "canopy/silver_birch", species: "betula_pendula", role: Dominant, share: Some(0.3)),
+        (entry: "canopy/aspen", species: "populus_tremula", role: Associated, share: Some(0.1)),
+        (entry: "shrubs/rowan", species: "sorbus_aucuparia", role: Associated, share: Some(0.6)),
+        (entry: "shrubs/alder_buckthorn", species: "frangula_alnus", role: Understory, share: Some(0.4)),
+        (entry: "field/bracken", species: "pteridium_aquilinum", role: Understory, share: Some(0.4)),
+        (entry: "field/hair_grass", species: "deschampsia_flexuosa", role: Understory, share: Some(0.35)),
+        (entry: "field/bilberry", species: "vaccinium_myrtillus", role: Understory, share: Some(0.25)),
+        (entry: "ground/feather_moss", species: "hylocomium_splendens", role: Understory, share: Some(1.0)),
+    ],
+    competition: (shade_rules: true, self_thinning: Some((cell_m: 25.0, max_stems_per_ha: 180.0, exponent: 1.605))),
+)

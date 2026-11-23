@@ -1,0 +1,58 @@
+(
+    version: 1,
+    effects: [
+        (
+            frame: 170,
+            effect: "dust_trail",
+            at: UnderEntity(
+                offset: (0.0, 0.5, 0.0),
+            ),
+            forward: (0.0, 1.0, 0.0),
+            seed: Some(11),
+        ),
+        (
+            frame: 180,
+            effect: "explosion",
+            at: UnderEntity(
+                offset: (0.0, 1.0, 0.0),
+            ),
+            forward: (0.0, 1.0, 0.0),
+            seed: Some(7),
+        ),
+        (
+            frame: 182,
+            effect: "smoke",
+            at: UnderEntity(
+                offset: (0.0, 1.0, 0.0),
+            ),
+            forward: (0.0, 1.0, 0.0),
+            seed: Some(9),
+        ),
+    ],
+    decals: [
+        (
+            frame: 180,
+            at: UnderEntity(
+                offset: (0.0, 0.0, 0.0),
+            ),
+            normal: None,
+            half_size: (6.0, 6.0, 2.0),
+            color: (0.05, 0.04, 0.04, 0.9),
+            lifetime: None,
+            prefab: Some("scorch"),
+            yaw_deg: 20.0,
+        ),
+        (
+            frame: 181,
+            at: UnderEntity(
+                offset: (0.0, 0.0, 0.0),
+            ),
+            normal: None,
+            half_size: (1.2, 1.2, 2.0),
+            color: (0.02, 0.018, 0.016, 0.8),
+            lifetime: None,
+            prefab: None,
+            yaw_deg: 0.0,
+        ),
+    ],
+)

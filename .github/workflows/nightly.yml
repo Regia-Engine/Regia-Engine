@@ -1,0 +1,163 @@
+# Nightly and weekly jobs outside the merge gate (docs/ci/nightly-jobs.toml, ADR-1035, ADR-1379).
+# Every `cargo xtask` command here is a registered job whose `wrapper` is this file; xtask's ci_workflows test
+# checks both ways. Cron is UTC. Scheduled runs use the default branch.
+name: nightly
+
+on:
+  schedule:
+    - cron: "30 7 * * *"   # daily: sweep plan, Android lint, GPU player sweep (when its runner is on)
+    - cron: "0 9 * * 0"    # weekly (Sunday): shuffle-check
+  workflow_dispatch:
+
+concurrency:
+  group: nightly
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: 0
+
+jobs:
+  sweep-plan:
+    # The nightly player sweep's plan, CSV and JSON writers without a GPU or DO27 content: catches a broken
+    # sub-command before the farm run at night does (book/user-guide/nightly-sweep.md).
+    name: nightly-sweep plan (dry run)
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '30 7 * * *'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install system libraries
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends pkg-config libasound2-dev libudev-dev libdbus-1-dev libxkbcommon-dev libwayland-dev
+      - name: Toolchain
+        run: rustup show active-toolchain || rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo xtask nightly-sweep --dry-run --out target/nightly-sweep-plan
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nightly-sweep-plan
+          path: target/nightly-sweep-plan/
+
+  android-lint:
+    # AGENTS.md rule 10 on main every day, whether or not anything was pushed.
+    name: android lint (arm64-v8a)
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '30 7 * * *'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain
+        run: |
+          rustup show active-toolchain || rustup toolchain install
+          rustup target add aarch64-linux-android
+      - uses: Swatinem/rust-cache@v2
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-ndk
+      - name: Clippy
+        run: |
+          export ANDROID_NDK_HOME="$ANDROID_NDK_LATEST_HOME"
+          cargo ndk -t arm64-v8a clippy -p regia -p hello_window -p hello_window_android --locked -- -D warnings
+
+  templates:
+    # `regia new` for every template, then `cargo check` of the project (docs/06 `templates`, spec 94 § 8).
+    name: templates compile
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '30 7 * * *'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install system libraries
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends pkg-config libasound2-dev libudev-dev libdbus-1-dev libxkbcommon-dev libwayland-dev
+      - name: Toolchain
+        run: rustup show active-toolchain || rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test -p regia_cli --test distribution_upgrade -- --ignored
+
+  shuffle-check:
+    name: shuffle-check (32 seeds)
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 9 * * 0'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install system libraries
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends pkg-config libasound2-dev libudev-dev libdbus-1-dev libxkbcommon-dev libwayland-dev
+      - name: Toolchain
+        run: rustup show active-toolchain || rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo xtask shuffle-check --seeds 32
+
+  two-tag-upgrade:
+    # Spec 94 § 9 (ADR-2610): the `regia` of the older tag makes every template, the newer tag's `regia`
+    # upgrades it, and the result must `cargo check`. The tags are the two newest `v*` tags (both carry spec 94).
+    name: two-tag upgrade (newest two tags)
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 9 * * 0'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      - name: Install system libraries
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends pkg-config libasound2-dev libudev-dev libdbus-1-dev libxkbcommon-dev libwayland-dev
+      - name: Toolchain
+        run: rustup show active-toolchain || rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+      - name: Pick the two newest tags
+        run: |
+          set -euo pipefail
+          tags="$(git tag --list 'v0.*' --sort=-v:refname | head -n 2)"
+          to="$(echo "$tags" | sed -n 1p)"
+          from="$(echo "$tags" | sed -n 2p)"
+          test -n "$from" && test -n "$to" || { echo "fewer than two v0.* tags"; exit 1; }
+          echo "TWO_TAG_FROM=$from" >> "$GITHUB_ENV"
+          echo "TWO_TAG_TO=$to" >> "$GITHUB_ENV"
+      - run: cargo xtask two-tag-upgrade --from "$TWO_TAG_FROM" --to "$TWO_TAG_TO" --templates all
+
+  fuzz:
+    # Coverage-guided fuzzing of the fuzz registry (docs/ci/nightly-jobs.toml `fuzz`, ADR-2723, book/agents/fuzzing.md). Not a
+    # merge gate: a failure means a new finding, which the artifact holds. The corpus is kept between nights in the cache,
+    # saved even after a finding: that is when it has just grown.
+    name: fuzz (libFuzzer + ASan)
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '30 7 * * *'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install system libraries
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends pkg-config libasound2-dev libudev-dev libdbus-1-dev libxkbcommon-dev libwayland-dev
+      - name: Toolchains
+        run: |
+          rustup show active-toolchain || rustup toolchain install
+          rustup toolchain install nightly --profile minimal -c rust-src -c llvm-tools-preview
+      - name: Install cargo-fuzz
+        run: cargo install cargo-fuzz --locked
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/cache/restore@v4
+        with:
+          path: |
+            fuzz/corpus
+            crates/regia_media/fuzz/corpus
+          key: fuzz-corpus-${{ github.run_id }}
+          restore-keys: fuzz-corpus-
+      - run: cargo xtask fuzz run-all --seconds-per-target 60 --parallel 4
+      - name: WebM demuxer and decoders under ASan
+        if: always()
+        run: |
+          cp Cargo.lock crates/regia_media/fuzz/Cargo.lock
+          cd crates/regia_media/fuzz
+          mkdir -p corpus/decode
+          cargo +nightly fuzz run decode corpus/decode ../tests/fixtures -- -max_total_time=600
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: |
+            fuzz/corpus
+            crates/regia_media/fuzz/corpus
+          key: fuzz-corpus-${{ github.run_id }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fuzz-findings
+          path: |
+            fuzz/findings
+            fuzz/logs
+            crates/regia_media/fuzz/artifacts

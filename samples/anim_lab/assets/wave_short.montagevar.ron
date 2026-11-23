@@ -1,0 +1,10 @@
+// anim_lab: a child montage of "wave" (spec 34 M4, `.montagevar.ron` v1). It swaps the clip
+// and keeps the parent's timing: sections, notifies and blends come from "wave".
+(
+    format_version: 1,
+    name: "wave_short",
+    parent: "wave",
+    overrides: [
+        (track: 0, segment: 0, clip: "WaveShort", rescale: true),
+    ],
+)

@@ -1,0 +1,14 @@
+gallery-title = UI Gallery
+gallery-theme = Theme
+gallery-language = Language
+gallery-widgets = Widgets
+gallery-text = Text (RTL / CJK / emoji)
+gallery-list = Virtualised list
+menu-start = Start
+btn-toggle-theme = Toggle theme
+btn-cycle-locale = Cycle language
+label-slider = Volume
+label-progress = Loading
+label-input = Name
+label-toggle = Music
+item-row = Item { $n }

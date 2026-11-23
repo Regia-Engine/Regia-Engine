@@ -1,0 +1,13 @@
+SceneFile(
+    format_version: 13,
+    entities: [
+        (guid: "a9010000-0000-4000-8000-000000000001", name: "FixtureCharacter", components: {
+            "regia_scene::transform::Transform": (translation: (9.0, 8.0, 7.0), rotation: (0.0, 0.0, 0.0, 1.0), scale: (1.0, 1.0, 1.0)),
+            "regia_framework::sim_bridge::Team": (9),
+            "regia_framework::character::CharacterInput": (move_dir: (0.0, 0.0, 0.0), jump: false, crouch: true, sprint: false),
+        }),
+        (guid: "a9010000-0000-4000-8000-000000000002", name: "FixtureAccessory", parent: "a9010000-0000-4000-8000-000000000001", components: {
+            "regia_scene::transform::Transform": (translation: (0.0, 2.0, 0.0), rotation: (0.0, 0.0, 0.0, 1.0), scale: (1.0, 1.0, 1.0)),
+        }),
+    ],
+)

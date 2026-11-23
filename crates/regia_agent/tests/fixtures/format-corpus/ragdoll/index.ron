@@ -1,0 +1,29 @@
+(
+    format: "ragdoll",
+    entries: [
+        (
+            version: 1,
+            file: "v1.ragdoll.ron",
+            origin: "git 0e31801938f11293567963321d78b9ad29c56bed:crates/regia_agent/src/fuzz_targets/fixtures/ragdoll.ron (parent of the v2 bump f84f83e57)",
+            exercises: "v1 capsule-only bones with joint limits (v2 adds box and sphere bodies)",
+        ),
+        (
+            version: 2,
+            file: "v2.ragdoll.ron",
+            origin: "frozen copy of the fuzz-target registry fixture (v2 was current at the corpus branch base)",
+            exercises: "v2: box and sphere bodies",
+        ),
+        (
+            version: 3,
+            file: "v3.ragdoll.ron",
+            origin: "git ff1ee0dac:crates/regia_agent/src/fuzz_targets/fixtures/ragdoll.ron (the v3 fuzz fixture: active ragdoll, ADR-2498)",
+            exercises: "v3: active ragdoll mode (motors, balance, get-up)",
+        ),
+        (
+            version: 4,
+            file: "v4.ron",
+            origin: "registry fixture (version 3) loaded and re-encoded by the loader at version 4",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+    ],
+)

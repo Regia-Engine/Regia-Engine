@@ -1,0 +1,11 @@
+(
+    format: "hub-toml",
+    entries: [
+        (
+            version: 1,
+            file: "v1.toml",
+            origin: "hand-written from the v1 contract, ADR-8648",
+            exercises: "the current version: the default hub.toml the package stages",
+        ),
+    ],
+)

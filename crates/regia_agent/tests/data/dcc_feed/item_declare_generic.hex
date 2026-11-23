@@ -1,0 +1,15 @@
+# item_declare: generic item with two channels
+# Laid out by hand from docs/formats/dcc-feed-protocol-v1.md (spec 60 section 8 test 1).
+24 00 00 00                                          # len = 36
+10 00                                                # msg_type 0x0010
+00 00                                                # flags
+01 00 00 00                                          # seq 1
+03 00 00 00                                          # handle 3
+06 00 72 69 67 5f 63 68                              # key "rig_ch"
+06                                                   # kind 6 generic
+00 00 00 00                                          # parent_handle 0
+00 00                                                # display_name ""
+00                                                   # variant 0
+02 00                                                # n channels
+01 00 61                                             # channel "a"
+01 00 62                                             # channel "b"

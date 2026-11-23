@@ -1,0 +1,30 @@
+// Soak budgets — Tier-1 desktop reference (`docs/06-testing-and-ci.md` § 4). `cargo xtask soak`
+// loads this file unless `--budgets` points elsewhere; `cargo xtask budgets check` re-checks a
+// written report against it.
+//
+// Frame budgets are for `samples/third_person` at 1080p High; until it exists (M20) they are
+// measured on `samples/sim_bridge` (and the DO27 benchmark replay from M17).
+(
+    // Frame time p99: <= 6.9 ms.
+    frame_p99_ms: 6.9,
+    // Hitch rule: no frame > 50 ms after the first 10 s of play.
+    frame_max_ms: 50.0,
+    // Seconds excluded from the hitch rule and from frame-time percentiles ("after the first
+    // 10 s of play").
+    warmup_secs: 10.0,
+    // Memory (sample): <= 1.5 GB peak RSS.
+    rss_mb: 1536.0,
+    // Cold start to the first interactive frame (here: to the first agent-protocol answer):
+    // <= 3 s.
+    start_secs: 3.0,
+    // M18: error-level log lines are user-visible failures — zero per session.
+    errors: 0,
+    // No warn budget in docs/06; this started at 0 and was calibrated on the first evidence
+    // runs (docs/evidence/m18): the reference desktop's gilrs logs one startup warning for the
+    // owner's unmapped gamepad (third-party, environment-specific — absent on CI, which has no
+    // gamepads). Allowance 2 = that line plus a small margin; tighten once regia_input's gilrs
+    // backend handles unmapped pads quietly.
+    warns: 2,
+    // M18: zero crashes per session.
+    crashes: 0,
+)

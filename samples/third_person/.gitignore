@@ -1,0 +1,7 @@
+# The Fox is fetched from the Khronos glTF sample models at first run (CC0).
+assets/Fox.glb
+# Cooked cache.
+.regia/
+# rename-keep-begin: the state directory's name before the rename (ADR-1388), for one release.
+.ferrite/
+# rename-keep-end

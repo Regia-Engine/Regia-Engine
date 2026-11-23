@@ -1,0 +1,22 @@
+// Example `.decal.ron` (format version 1, `docs/formats/decal-ron.md`).
+// A scorch prefab: dark albedo, world receivers only (no characters), soft atlas.
+(
+    version: 1,
+    name: "scorch",
+    half_size: (1.4, 1.4, 0.35),
+    albedo: "#2a140c",
+    opacity: 0.92,
+    roughness: 0.95,
+    normal_strength: 1.0,
+    normal_xy: (0.0, 0.0),
+    emissive: "#000000",
+    angle_fade: (0.2, 0.55),
+    distance_fade: (40.0, 80.0),
+    priority: 0,
+    receiver_mask: 3,
+    atlas: "scorch",
+    lifetime: None,
+    edge_softness: 0.85,
+    channels: "albedo+normal+roughness",
+    blend: "modulate",
+)

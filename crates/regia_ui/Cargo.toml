@@ -1,0 +1,90 @@
+[package]
+name = "regia_ui"
+description = "Runtime game UI: retained widgets, taffy layout, cosmic-text, focus navigation, localization."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia_core = { workspace = true }
+regia_ecs = { workspace = true }
+regia_app = { workspace = true }
+regia_platform = { workspace = true }
+# The rebinding panel drives the input rebinder (ADR-1801).
+regia_input = { workspace = true }
+regia_render = { workspace = true }
+# World-space UI panels read their root's `GlobalTransform` (ADR-2406).
+regia_scene = { workspace = true }
+regia_asset = { workspace = true }
+taffy = { workspace = true }
+cosmic-text = { workspace = true }
+unicode-script = { workspace = true }
+unicode-segmentation = { workspace = true }
+icu_segmenter = { workspace = true }
+fluent-bundle = { workspace = true }
+# Message AST for the localization validator, gather and pseudo tools (ADR-1466).
+fluent-syntax = { workspace = true }
+# NUMBER()/DATETIME() results implement FluentType, whose methods name the memoizer (ADR-2698).
+intl-memoizer = { workspace = true }
+unic-langid = { workspace = true }
+bytemuck = { workspace = true }
+serde = { workspace = true }
+# The agent bridge speaks the protocol's JSON values (no new crate: the agent protocol already uses it).
+serde_json = { workspace = true }
+ron = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+wgpu = { workspace = true }
+# The screen-reader OS bridge: the a11y tree as AccessKit tree updates (`accesskit_bridge`, ADR-1998).
+accesskit = { workspace = true, optional = true }
+
+[features]
+# The screen-reader OS bridge (ADR-1998): the accessibility tree goes to the platform's assistive
+# technology through AccessKit (AT-SPI, UI Automation, NSAccessibility); off by default.
+accesskit = ["dep:accesskit", "regia_platform/accesskit"]
+
+[dev-dependencies]
+# The hot-reload test drives the dev source watcher.
+regia_asset = { workspace = true, features = ["dev-assets"] }
+regia_test_utils = { workspace = true }
+image = { workspace = true }
+image-compare = { workspace = true }
+# Scroll benches (ADR-520): one scrolled frame over 10,000 rows.
+criterion = { workspace = true }
+# The bridge tests feed every tree update to the tree the platform adapters keep (ADR-1998).
+accesskit_consumer = { workspace = true }
+
+[[bench]]
+name = "scroll_10k"
+harness = false
+
+[[bench]]
+name = "backdrop_blur"
+harness = false
+
+[[bench]]
+name = "caption_budgets"
+harness = false
+
+# View-model binding budget (ADR-1811, spec 81 § 9): one refresh of 200 bindings.
+[[bench]]
+name = "bindings_200"
+harness = false
+
+[[bench]]
+name = "repeat_1000"
+harness = false
+
+[[bench]]
+name = "group_layers"
+harness = false
+
+# The screen-reader OS bridge against a recording adapter and the adapters' own tree (ADR-1998).
+[[test]]
+name = "accesskit_bridge"
+required-features = ["accesskit"]

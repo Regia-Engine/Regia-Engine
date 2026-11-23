@@ -1,0 +1,4 @@
+(
+    format_version: 1,
+    voice_path: "audio/vo/{locale}/{conversation}_{line}.ogg",
+)

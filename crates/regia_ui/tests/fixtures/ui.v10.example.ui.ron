@@ -1,0 +1,37 @@
+// `.ui.ron` v10: the game widgets (ADR-2958, its lane's v6).
+(
+    version: 10,
+    root: (
+        style: (size: (Percent(100.0), Percent(100.0))),
+        children: [
+            (
+                name: "lobbies",
+                style: (size: (Points(600.0), Points(400.0))),
+                widget: lobby_list((title: "Matches", launch: "loc:lobby-start")),
+            ),
+            (
+                name: "scores",
+                widget: scoreboard((
+                    title: "Scores",
+                    columns: [(key: "tags", title: "Tags", width: 64.0), (key: "tagged")],
+                    group_by_team: false,
+                    hold_action: "Scores",
+                )),
+            ),
+            (
+                name: "radar",
+                style: (size: (Points(200.0), Points(200.0))),
+                widget: radar((range: 75.0, rotate: true, max_blips: 16)),
+            ),
+            (
+                name: "minimap",
+                style: (size: (Points(200.0), Points(200.0))),
+                widget: radar((world_rect: (-50.0, -50.0, 50.0, 50.0), map_image: 77)),
+            ),
+            (
+                name: "markers",
+                widget: marker_layer((edge_margin: 40.0)),
+            ),
+        ],
+    ),
+)

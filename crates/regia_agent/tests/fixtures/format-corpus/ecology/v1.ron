@@ -1,0 +1,15 @@
+// Ecology profile of `beech_forest.biome.ron` (ADR-2456, book agents/biomes.md "Ecology").
+EcologyProfile(
+    format_version: 1,
+    site: (moisture: (4.5, 6.5), reaction: (5.0, 8.0), altitude_m: (100.0, 1400.0), slope_deg: (0.0, 40.0), soil: "brown earth over limestone (mull humus)"),
+    species: [
+        (entry: "canopy/beech", species: "fagus_sylvatica", role: Dominant, share: Some(0.8)),
+        (entry: "canopy/sycamore_maple", species: "acer_pseudoplatanus", role: Associated, share: Some(0.12)),
+        (entry: "canopy/ash", species: "fraxinus_excelsior", role: Associated, share: Some(0.08)),
+        (entry: "field/woodruff", species: "galium_odoratum", role: Understory, share: Some(0.35)),
+        (entry: "field/dogs_mercury", species: "mercurialis_perennis", role: Understory, share: Some(0.3)),
+        (entry: "field/wood_anemone", species: "anemone_nemorosa", role: Understory, share: Some(0.25)),
+        (entry: "field/male_fern", species: "dryopteris_filix_mas", role: Understory, share: Some(0.1)),
+    ],
+    competition: (shade_rules: true, self_thinning: Some((cell_m: 25.0, max_stems_per_ha: 220.0, exponent: 1.605))),
+)

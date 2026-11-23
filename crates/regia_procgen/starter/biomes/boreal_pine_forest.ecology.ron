@@ -1,0 +1,15 @@
+// Ecology profile of `boreal_pine_forest.biome.ron` (ADR-2456, book agents/biomes.md "Ecology").
+EcologyProfile(
+    format_version: 1,
+    site: (moisture: (2.0, 4.0), reaction: (1.0, 2.5), altitude_m: (0.0, 800.0), slope_deg: (0.0, 30.0), soil: "sandy podzol on glacial outwash"),
+    species: [
+        (entry: "canopy/scots_pine", species: "pinus_sylvestris", role: Dominant, share: Some(0.85)),
+        (entry: "canopy/silver_birch", species: "betula_pendula", role: Associated, share: Some(0.15)),
+        (entry: "shrubs/juniper", species: "juniperus_communis", role: Understory, share: Some(1.0)),
+        (entry: "field/heather", species: "calluna_vulgaris", role: Understory, share: Some(0.5)),
+        (entry: "field/lingonberry", species: "vaccinium_vitis_idaea", role: Understory, share: Some(0.5)),
+        (entry: "ground/reindeer_lichen", species: "cladonia_rangiferina", role: Understory, share: Some(0.7)),
+        (entry: "ground/feather_moss", species: "hylocomium_splendens", role: Understory, share: Some(0.3)),
+    ],
+    competition: (shade_rules: true, self_thinning: Some((cell_m: 25.0, max_stems_per_ha: 220.0, exponent: 1.605))),
+)

@@ -1,0 +1,56 @@
+{
+  "build_hash": "sha256:fe4c47f8def2a00f849f6187b2cc073f9a465a2862a12c1ef4b4c6319593689f",
+  "camera": {
+    "pan_mm": [
+      0,
+      0
+    ],
+    "spin_deg": 0,
+    "tilt_azimuth_deg": 90,
+    "tilt_deg": 12,
+    "zoom": 1.25
+  },
+  "design_key": "house-a/d0001",
+  "engine_version": "0.2.14",
+  "geometry_key": "sha256:9a67b8869549e2a14dc980ca1b2ea1f924835680e7717d09076aa0c7aa2b5f10",
+  "house": "house-a",
+  "house_variant_id": "1000:1",
+  "picks": {
+    "Extras": [],
+    "Gem": "Clear A",
+    "Material": "Metal A"
+  },
+  "product_key": "house-a/p0001",
+  "recipe": {
+    "design_key": "house-a/d0001",
+    "hash": "sha256:8f9f2937f1b854614a43b2b373de2ef72c67020c49d166de10040e1326f55cc0",
+    "version": 1
+  },
+  "resolution": {
+    "cart_lines": [
+      {
+        "id": "1000:1",
+        "quantity": 1
+      }
+    ],
+    "cart_mode": "shopify_lines",
+    "made_to_order_line": null,
+    "orderable": true,
+    "reasons": [],
+    "sku": "HA-0001-A",
+    "statement": "End piece, metal A, clear stone A",
+    "variant_key": "1000:1"
+  },
+  "schema": "jewelry.build/1",
+  "sku": "HA-0001-A",
+  "snapshot_id": "2026-11-04-000000000000",
+  "wear": {
+    "mirror": false,
+    "preset_id": "default",
+    "rotation_deg": [
+      0,
+      0,
+      0
+    ]
+  }
+}

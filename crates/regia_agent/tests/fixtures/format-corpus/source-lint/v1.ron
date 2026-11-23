@@ -1,0 +1,4 @@
+(
+    format_version: 1,
+    defaults: (materials: Some((default_roughness: Some(0.5)))),
+)

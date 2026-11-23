@@ -1,0 +1,21 @@
+// A strategy mode (ADR-8748): lose every capital and you are out; hold the wonder or reach 500 to win;
+// a team may surrender with two thirds of its players.
+(
+    format_version: 1,
+    id: "strategy",
+    name_key: "mode.strategy",
+    skeleton: "custom",
+    session: (
+        flow: (max_teams: 2, start_delay_ticks: 0),
+        objectives: (max_teams: 2),
+        victory: (
+            conditions: [
+                (kind: "destroy_all_tagged", tag: "capital"),
+                (kind: "hold_for", objective: 7, ticks: 6000),
+                (kind: "score_threshold", score: 500),
+                (kind: "surrender"),
+            ],
+            surrender: (threshold_percent: 66, window_ticks: 900),
+        ),
+    ),
+)

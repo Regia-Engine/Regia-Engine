@@ -1,0 +1,28 @@
+// `.ui.ron` v7 (ADR-2866): isolated group opacity, rounded clips and image masks.
+(
+    version: 7,
+    root: (
+        name: "hud",
+        children: [
+            (
+                name: "inventory",
+                group_opacity: 0.5,
+                clip_shape: rounded,
+                border: (color: "#00000000", width: 0.0, radius: 12.0),
+                children: [
+                    (name: "slot-a", background: "#d04040ff"),
+                    (name: "slot-b", background: "#d04040ff"),
+                ],
+            ),
+            (
+                name: "portrait",
+                mask: (image: 7, fit: contain),
+                background: "#ffffffff",
+            ),
+            (
+                name: "plain",
+                clip_shape: rect,
+            ),
+        ],
+    ),
+)

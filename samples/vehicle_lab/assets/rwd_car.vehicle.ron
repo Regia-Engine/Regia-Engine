@@ -1,0 +1,26 @@
+// The lab's car (`docs/formats/vehicle.md`): the default body and wheels, rear-wheel drive through a
+// limited-slip differential, anti-roll bars on both axles, road aero and both driver aids. Edit a
+// field to retune it; `physics.vehicle_config_check` checks a change without running the lab.
+(
+    format_version: 2,
+    name: "vehicle lab rwd",
+    config: (
+        chassis_mass: 1200.0,
+        max_brake_force: 4500.0,
+        drivetrain: Geared((
+            layout: Rwd,
+            rear_differential: LimitedSlip(torque_bias: 2.5),
+        )),
+        anti_roll: [
+            (left: 0, right: 1, stiffness: 14000.0),
+            (left: 2, right: 3, stiffness: 9000.0),
+        ],
+        aero: Some((
+            drag_coefficient: 0.32,
+            frontal_area: 2.1,
+            front_downforce: 0.1,
+            rear_downforce: 0.2,
+        )),
+        aids: (abs: Some(()), traction_control: Some(())),
+    ),
+)

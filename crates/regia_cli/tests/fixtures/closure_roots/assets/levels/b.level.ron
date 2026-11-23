@@ -1,0 +1,7 @@
+// A level the game travels to from a: it ships, but nothing in it is needed at boot.
+(entities: [
+    (components: {
+        "game::Mesh": (path: "assets://meshes/b.glb"),
+        "game::Door": (to: "levels/a.level.ron"),
+    }),
+])

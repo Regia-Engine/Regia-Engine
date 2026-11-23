@@ -1,0 +1,11 @@
+(
+    format: "saved-searches",
+    entries: [
+        (
+            version: 1,
+            file: "v1.ron",
+            origin: "handwritten from 301b5e6d2 (the module docs' example of crates/regia_editor/src/saved_searches.rs, plus a provider list)",
+            exercises: "the current version: what the editor writes today must stay readable",
+        ),
+    ],
+)

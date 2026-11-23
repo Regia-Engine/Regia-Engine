@@ -1,0 +1,45 @@
+format_version = 1
+id = "clearcoat-car-paint"
+title = "Author a red clear-coated car paint material"
+prompt = "Create a material graph named 'car_paint': a red base color (red channel at least 0.6, green and blue at most 0.2) from a color parameter, a roughness of 0.25 from a float parameter, and a full clear coat (clearcoat 1.0). It has to compile without errors."
+features = ["materials"]
+crates = ["regia_agent", "regia_matgraph"]
+call_budget = 8
+
+[setup]
+target = "materials"
+
+[[check]]
+name = "compiles"
+method = "material.compile"
+params = { name = "car_paint" }
+pointer = "/ok"
+expect = { kind = "equals", value = true }
+
+[[check]]
+name = "full clearcoat"
+method = "material.graph_get"
+params = { name = "car_paint" }
+pointer = "/graph/shading/clearcoat"
+expect = { kind = "equals", value = 1.0 }
+
+[[check]]
+name = "red"
+method = "material.graph_get"
+params = { name = "car_paint" }
+pointer = "/graph/params/0/value/Color/0"
+expect = { kind = "number_range", min = 0.6, max = 1.0 }
+
+[[check]]
+name = "not green"
+method = "material.graph_get"
+params = { name = "car_paint" }
+pointer = "/graph/params/0/value/Color/1"
+expect = { kind = "number_range", min = 0.0, max = 0.2 }
+
+[[check]]
+name = "has a roughness output"
+method = "material.graph_get"
+params = { name = "car_paint" }
+pointer = "/graph/output/roughness"
+expect = { kind = "exists" }

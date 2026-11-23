@@ -1,0 +1,17 @@
+(
+    format: "navlanes",
+    entries: [
+        (
+            version: 1,
+            file: "v1.navlanes.ron",
+            origin: "git 58e0b02dc614b34f0d5aecd06d40be882508f46e:crates/regia_agent/src/fuzz_targets/fixtures/navlanes.ron (parent of the v2 bump 597ed0cb8)",
+            exercises: "v1 lane graph: points, width, next, speed, user_id, flags (v2 adds lane weights, preferred bits, opposite pairs)",
+        ),
+        (
+            version: 2,
+            file: "v2.ron",
+            origin: "frozen copy of the fuzz-target registry fixture",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+    ],
+)

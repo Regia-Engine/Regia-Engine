@@ -1,0 +1,13 @@
+// The bark material: its color map by path, its normal map by asset id (a fresh clone cooks both).
+(
+    format_version: 5,
+    name: "M_Bark",
+    shader: Standard,
+    base: (
+        base_color: (1.0, 1.0, 1.0, 1.0),
+        metallic: 0.0,
+        roughness: 0.7,
+        base_color_map: Some("textures/bark.png"),
+        normal_map: Some("8e4c2b17-0a9d-4f63-b5e8-2c7d91f04a3e"),
+    ),
+)

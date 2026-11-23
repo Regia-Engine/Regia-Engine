@@ -1,0 +1,328 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://regia.engine/schemas/weather.ron.schema.json",
+  "title": "config/weather.ron",
+  "description": "Project weather effects (spec 99 § 7.1, format_version 1). Every field has a default, so a file names only what it changes; a missing file is every default. Unknown fields are an error (weather_config_invalid). RON spells enums bare (Weather, Rain) and options as Some(x) / None; this schema writes them as strings and null. Kept in step with the serde fields by regia_vfx's test `the_json_schema_names_every_field`.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "format_version": {
+      "const": 1,
+      "default": 1,
+      "description": "Format version; a newer one is refused (weather_config_version) and the defaults are kept."
+    },
+    "presets": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/preset"
+      },
+      "description": "Named weathers beside the built-in ones; a name that clashes with a built-in preset, or twice, is an error."
+    },
+    "effects": {
+      "$ref": "#/$defs/effects"
+    },
+    "start": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "default": null,
+      "description": "A preset to start in when a level opens without a Weather resource; null leaves the sky alone."
+    },
+    "precipitation": {
+      "$ref": "#/$defs/precipitation"
+    },
+    "wind": {
+      "$ref": "#/$defs/wind"
+    },
+    "surface": {
+      "$ref": "#/$defs/surface"
+    },
+    "visibility": {
+      "$ref": "#/$defs/visibility"
+    }
+  },
+  "$defs": {
+    "effects": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Which effects run; each is off when absent. `regia new` writes all three on.",
+      "properties": {
+        "precipitation": {
+          "type": "boolean",
+          "default": false,
+          "description": "Rain, snow and splashes are drawn."
+        },
+        "surface": {
+          "type": "boolean",
+          "default": false,
+          "description": "Surfaces get wet, pool and take snow."
+        },
+        "scene_wind": {
+          "type": "boolean",
+          "default": false,
+          "description": "The weather writes SceneWind (and through it the terrain wind)."
+        }
+      }
+    },
+    "preset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "base"
+      ],
+      "description": "Starts from `base` (a built-in or an earlier preset) and replaces the given fields.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The preset's name."
+        },
+        "base": {
+          "type": "string",
+          "description": "The preset it starts from."
+        },
+        "coverage": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Cloud coverage; clamped to 0..1."
+        },
+        "cloud_type": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Cloud type; clamped to 0..1."
+        },
+        "density": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Cloud density; clamped to at least 0."
+        },
+        "wind_m_per_s": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "number"
+          },
+          "minItems": 2,
+          "maxItems": 2,
+          "description": "The wind at cloud height, world X and Z (m/s)."
+        },
+        "precipitation": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Precipitation; clamped to 0..1."
+        },
+        "temperature_c": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Air temperature near the ground (°C); clamped to -60..60."
+        },
+        "precipitation_kind": {
+          "enum": [
+            "Auto",
+            "Rain",
+            "Snow",
+            "Sleet",
+            null
+          ],
+          "description": "What falls; Auto goes by the temperature."
+        },
+        "gustiness": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Gust strength; clamped to 0..1."
+        }
+      }
+    },
+    "precipitation": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "What falls and how it is drawn.",
+      "properties": {
+        "max_rain_mm_per_h": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "default": 50.0,
+          "description": "Rain rate at precipitation 1 (mm/h)."
+        },
+        "max_snow_we_mm_per_h": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "default": 5.0,
+          "description": "Snow water equivalent at precipitation 1 (mm/h)."
+        },
+        "snow_all_below_c": {
+          "type": "number",
+          "default": 0.0,
+          "description": "All snow at or below this temperature (°C); must be below rain_all_above_c."
+        },
+        "rain_all_above_c": {
+          "type": "number",
+          "default": 2.5,
+          "description": "All rain at or above this temperature (°C)."
+        },
+        "snow_ratio": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "default": 10.0,
+          "description": "Snow depth per water depth."
+        },
+        "visible_drop_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "default": 1.0,
+          "description": "Smallest drop drawn (mm)."
+        },
+        "density_scale": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 4,
+          "default": 1.0,
+          "description": "Scales the drawn count, 0..4."
+        },
+        "streak_exposure_s": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "default": 0.0167,
+          "description": "Streak length as an exposure time (s)."
+        },
+        "splashes": {
+          "type": "boolean",
+          "default": true,
+          "description": "Rain splashes on the surfaces it hits."
+        }
+      }
+    },
+    "wind": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "The scene wind the weather writes.",
+      "properties": {
+        "mode": {
+          "enum": [
+            "Weather",
+            "Manual",
+            "Off"
+          ],
+          "default": "Weather",
+          "description": "The SceneWind mode the plugin inserts."
+        },
+        "surface_factor": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0,
+          "description": "Ground wind over cloud wind; null is (10 m / cloud base)^(1/7)."
+        },
+        "veer_deg": {
+          "type": "number",
+          "default": 0.0,
+          "description": "Turns the surface wind from the wind aloft (degrees)."
+        },
+        "gust_scale": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 4,
+          "default": 1.0,
+          "description": "Scales the gusts, 0..4."
+        }
+      }
+    },
+    "surface": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "How surfaces wet, pool, dry and take snow.",
+      "properties": {
+        "wet_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "default": 0.2,
+          "description": "Water depth that is fully wet (mm)."
+        },
+        "dry_time_s": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "default": 1800.0,
+          "description": "Drying time at a drying factor of 1 (s)."
+        },
+        "drain_mm_per_h": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "default": 2.5,
+          "description": "Rain rate the ground drains before it pools (mm/h)."
+        },
+        "puddle_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "default": 5.0,
+          "description": "Ponded depth that is full puddles (mm)."
+        },
+        "puddle_dry_time_s": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "default": 3600.0,
+          "description": "Puddle drying time (s)."
+        },
+        "full_cover_m": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "default": 0.03,
+          "description": "Snow depth that hides the ground (m)."
+        },
+        "melt_mm_per_c_day": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "default": 4.0,
+          "description": "Degree-day melt (mm per °C per day)."
+        },
+        "melt_scale": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "default": 1.0,
+          "description": "Scales the melt."
+        }
+      }
+    },
+    "visibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "How what falls thickens the air.",
+      "properties": {
+        "couple_fog": {
+          "type": "boolean",
+          "default": true,
+          "description": "Add the precipitation's extinction to the frame."
+        },
+        "rain_visibility_m": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "default": 3000.0,
+          "description": "Visibility in the heaviest rain (m)."
+        },
+        "snow_visibility_m": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "default": 400.0,
+          "description": "Visibility in the heaviest snow (m)."
+        }
+      }
+    }
+  }
+}

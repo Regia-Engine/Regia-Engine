@@ -1,0 +1,140 @@
+# What `cargo xtask rename-brand` must NOT change (ADR-1388, docs/rename-regia.md).
+#
+# The list is compiled into the tool (`include_str!`), so every branch converted by the same xtask
+# binary gets the same result. One rule per line:
+#
+#   keep-file <glob>      neither the path nor the content changes
+#   keep-content <glob>   the content is kept; the path still moves with its crate directory
+#   keep-text <literal>   the literal is protected wherever it appears
+#
+# Globs are matched against the old and the new path (relative, `/`-separated); `**` crosses
+# directories, `*` and `?` do not. In-file markers protect too: a line containing `rename-keep`,
+# and every line from `rename-keep-begin` to `rename-keep-end`.
+
+# --- History: ADR bodies, provenance, progress log, past release notes, evidence names ---------
+keep-content docs/decisions.md
+keep-content docs/decisions-index.md
+keep-content docs/provenance.md
+keep-content docs/progress.md
+keep-content docs/perf-log.md
+keep-file docs/releases/v0.*.md
+keep-file docs/releases/v0.*/**
+keep-file docs/evidence/**
+# Released fragments, run ledgers, branch triage and old-fragment names (ADR-8670).
+keep-file docs/releases/fragments/v0.*/**
+keep-content docs/release/ledger-updates/**
+keep-content branch-triage.tsv
+keep-content xtask/release-notes-baseline.txt
+keep-content docs/ci/docs-links.toml
+keep-text lane/sprint-fix-auto-ferrite_
+keep-text ferrite-do27-sheet.png
+# Generated from the book (`cargo xtask manual`); the book itself is checked.
+keep-content docs/manual/manual.html
+
+# --- Legal text: the owner decides the licence wording for the new name ------------------------
+keep-content LICENSE
+keep-content docs/demo/EULA-DRAFT.md
+
+# --- The rename itself: its tool, keep list, tests, plan and verify script carry the old names as data
+keep-content xtask/src/rename_brand.rs
+keep-content xtask/rename-keep.txt
+keep-content xtask/tests/rename_brand.rs
+keep-content docs/rename-regia.md
+keep-content scripts/rename-regia-verify.sh
+keep-content docs/releases/v0.1.28-rename-regia-tool.md
+# The brand module defines both spellings; the tool only flips its `BRAND_RENAMED` flag.
+keep-content crates/ferrite_core/src/brand.rs
+# Fixtures written with the old names, loaded by the compatibility tests.
+keep-content **/legacy-brand/**
+# Frozen format-corpus fixtures: files as earlier builds wrote them (old type paths, comments).
+keep-content crates/regia_agent/tests/fixtures/format-corpus/**
+# Code and tests whose job is the legacy spelling (ADR-8670): the brand edge tests, the engine-crate
+# classifier that also accepts old type paths, and tests that clear or set the old environment
+# variable names so the fallback cannot leak into them.
+keep-content crates/regia_core/tests/brand_edges.rs
+keep-content crates/regia_scene/src/kind/roles.rs
+keep-content crates/regia_render/tests/first_frame_cache_checkpoint.rs
+keep-content crates/regia_render/tests/gpu_select.rs
+keep-content crates/regia_render/tests/pipeline_cache_instances.rs
+keep-content crates/regia_render/tests/pipeline_count_pin.rs
+keep-content crates/regia_render/tests/prepare_maps.rs
+keep-content crates/regia_render/tests/prepare_step.rs
+keep-content crates/regia_render/tests/require_adapter.rs
+keep-content crates/regia_render/tests/shipped_pipeline_cache.rs
+keep-content crates/regia_cli/tests/cooked_pack_e2e.rs
+keep-content crates/regia_cli/tests/texture_tiers.rs
+keep-content crates/regia_cli/tests/thin_film_pak_e2e.rs
+keep-content crates/regia_editor/tests/book_tutorials.rs
+keep-content crates/regia_editor/tests/headless_editor.rs
+keep-content crates/regia_framework/tests/ragdoll_stepping.rs
+keep-content xtask/src/walkthrough.rs
+# Project names still read for one release (`brand::LEGACY_MANIFEST_FILE`, `LEGACY_PROJECT_STATE_DIR`):
+# the old manifest, the old state / cache directory and its scratch-file prefix.
+keep-text Ferrite.toml
+keep-text .ferrite/
+keep-text ".ferrite"
+keep-text `.ferrite`
+keep-text .ferrite-tmp-
+
+# --- On-disk identifiers (ADR-8670 retired these keeps) ---------------------------------------
+# EXR header keys, render-out manifest schemas and bake export / stamp formats are written with the
+# new name and read in both spellings (`regia_core::brand::find_key`); the legacy literals that are
+# still needed (to read old data) carry an in-file `rename-keep` marker. The `--check` mode
+# (`cargo xtask rename-brand --check`, run by the xtask test `the_workspace_passes_the_rename_check`)
+# fails on any old-name hit this list does not cover.
+
+# --- Host paths and lock files that exist on machines and do not move with the rename ----------
+keep-text <build-dir>
+# Host tooling and bench recipes: they drive checkouts and builds from before the rename too (both
+# environment spellings, both crate spellings, the farm's host paths, the old card lock second).
+keep-content tools/gaterig/**
+keep-content tools/gpusup/**
+keep-content scripts/bench/**
+# The Android device lock the farm's tools take (one lane per device).
+keep-text /tmp/ferrite-adb-
+keep-text <build-dir>
+keep-text <build-dir>
+keep-text <build-dir>
+keep-text /srv/fast2/ferrite
+keep-text <build-dir>
+# The pre-rename GPU card locks: repository tools take `/tmp/regia-gpu-<n>.lock` first, then this
+# one, so they exclude the host tools that take only the old lock (ADR-8670). Keep it until every
+# host tool has moved.
+keep-text /tmp/ferrite-gpu
+keep-text ~/ferrite
+keep-text ~/ferrite-out
+keep-text HOME/ferrite-out
+keep-text HOME/ferrite-prof
+keep-text <scratch>
+keep-text ferrite-farm
+keep-text ferrite-do27-content
+keep-text ferrite-nvme-src
+# Direct Order 27's own names: its `shell-ferrite/` directory and its `assets_ferrite/` content tree.
+keep-text shell-ferrite
+keep-text assets_ferrite
+# The repository directory on the owner's machines (renamed separately, ADR-1388 § repo).
+keep-text Ferrite-Engine
+# GitHub repository variables the CI workflows read (renamed in the repository settings, later).
+keep-text vars.FERRITE_
+# The user-facing page about the rename names both spellings on purpose.
+keep-content book/user-guide/rename-regia.md
+# The crash upload header's old name: every upload sends it next to `X-Regia-Report-Name` for one
+# release after v0.6.0 (ADR-8670); drop this line with that header.
+keep-text X-Ferrite-Report-Name
+# Self-hosted CI runner labels, configured on the runner machines (relabel them first, then drop these).
+keep-text ferrite-vm
+keep-text ferrite-gpu
+# Links into kept files: their anchors are generated from the kept headings (a trailing `#` also
+# protects the link fragment after it).
+keep-text decisions.md#
+keep-text decisions-index.md#
+keep-text provenance.md#
+keep-text progress.md#
+keep-text perf-log.md#
+
+# The AI readme (ADR-10230): llms.txt and llms-full.txt are generated from the book (`cargo xtask llms-txt`); a page's
+# first sentence is copied without its line's rename-keep marker (rename-regia.md says the old name on purpose).
+keep-content dist/public-root/llms.txt
+keep-content dist/public-root/llms-full.txt
+# The private list of terms the public onboarding files must not contain names the old brand to forbid it.
+keep-content xtask/onboarding/forbidden-terms.txt

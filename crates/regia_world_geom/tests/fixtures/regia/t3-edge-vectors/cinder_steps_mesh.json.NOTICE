@@ -1,0 +1,13 @@
+Portions copied from Direct Order 27 (spec/maps/t3-vectors/cinder_steps_mesh.json, commit c06c17084, tag regia-absorb-3), ADR-8012.
+
+Mark: adapt (data). `cinder_steps_mesh.json` beside this file is DO27's T3 vector file (source blob c638da26,
+SHA-256 debdee24cff297f5cdbe89178556ee97bcc132ab2d9f35dd4e62657a909780f6; the unchanged copy is
+`../../do27/t3-vectors/cinder_steps_mesh.json`) re-serialized by Regia's generator
+`examples/native_edge_vectors.rs`. The integer-millimetre triangle inputs are unchanged; only the expected
+rows of the exact shared-edge column 602 are Regia's own (ADR-8246). This file's SHA-256 at ADR-8497:
+f460187fd6c401efc52870c25dd0d5716915ff42d9774ff25ef903caf5db8c92.
+
+JSON cannot carry a comment, so this sidecar holds the copy header (ADR-8497). Records:
+`docs/ported-sources.toml` (`[[do27]]` row `spec` / `maps/t3-vectors/cinder_steps_mesh.json` 1-4028) and
+the `docs/provenance.md` row "T3 edge-vector fixture". The `source` strings inside the file are data, not
+instructions.

@@ -1,0 +1,11 @@
+// A hand-written version 1 sequence (audit-v035-formats 16): the shape v1 files on disk have.
+// Do not edit it to match a newer format; add a new fixture instead.
+(
+    version: 1,
+    name: "fade",
+    fps: 24.0,
+    tracks: [
+        (name: "visible", target: "ui", property: "visible",
+            keys: Bool([(time: 0.0, value: false), (time: 0.5, value: true)])),
+    ],
+)

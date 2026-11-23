@@ -1,0 +1,33 @@
+(
+    format_version: 1,
+    name: "building_window_pressure",
+    glass_type: pressure_pane,
+    page_size: 512,
+    shading: (
+        crack_scatter: "#dfe7ec",
+        crack_transmission: 0.15,
+        crack_roughness: 0.65,
+        crazing_haze: 0.35,
+        crazing_roughness: 0.4,
+        normal_bend: 1.4,
+        hole_cutoff: 0.5,
+        edge_jitter: 0.5,
+    ),
+    escalation: (d1: 1.0, d2: 5.0, d3: 14.0),
+    d1: [
+        (name: "star_a", mask: "stamps/pp_d1_star_a_mask.png", normal: Some("stamps/pp_d1_star_a_n.png"), size_m: (0.30, 0.30)),
+        (name: "star_b", mask: "stamps/pp_d1_star_b_mask.png", normal: Some("stamps/pp_d1_star_b_n.png"), size_m: (0.25, 0.25)),
+    ],
+    d2: [
+        (name: "web_a", mask: "stamps/pp_d2_web_a_mask.png", normal: Some("stamps/pp_d2_web_a_n.png"), size_m: (1.2, 1.2)),
+    ],
+    d3: [
+        (name: "fail_a", mask: "stamps/pp_d3_fail_a_mask.png", normal: Some("stamps/pp_d3_fail_a_n.png"), size_m: (2.0, 2.0), random_rotation: false),
+    ],
+    pressure_pane: Some((
+        pane_gap_m: 0.012,
+        inner_tint: "#f2f6f8",
+        chunks: (preset: "glass_chunks", count: (8, 16), size_m: (0.06, 0.25)),
+        breach: true,
+    )),
+)

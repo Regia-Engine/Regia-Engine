@@ -1,0 +1,157 @@
+{
+  "version": 1,
+  "views": [
+    {
+      "name": "overview",
+      "description": "High pass over the map, camera looking at the scene's centre",
+      "path": {
+        "interp": "CatmullRom",
+        "keys": [
+          {
+            "time": 0,
+            "position": [
+              60,
+              90,
+              -250
+            ]
+          },
+          {
+            "time": 7,
+            "position": [
+              -40,
+              80,
+              -150
+            ]
+          }
+        ]
+      },
+      "look_at": {
+        "Point": [
+          0,
+          36,
+          -100
+        ]
+      },
+      "fov": [
+        {
+          "time": 0,
+          "value": 45
+        }
+      ]
+    },
+    {
+      "name": "approach",
+      "description": "The scene's own start camera moving in",
+      "path": {
+        "interp": "CatmullRom",
+        "keys": [
+          {
+            "time": 0,
+            "position": [
+              60,
+              46,
+              -170
+            ]
+          },
+          {
+            "time": 7,
+            "position": [
+              20,
+              40,
+              -130
+            ]
+          }
+        ]
+      },
+      "look_at": {
+        "Point": [
+          0,
+          36,
+          -100
+        ]
+      },
+      "fov": [
+        {
+          "time": 0,
+          "value": 45
+        }
+      ]
+    },
+    {
+      "name": "mid",
+      "description": "Mid-height sweep across the slope",
+      "path": {
+        "interp": "CatmullRom",
+        "keys": [
+          {
+            "time": 0,
+            "position": [
+              -60,
+              30,
+              -140
+            ]
+          },
+          {
+            "time": 7,
+            "position": [
+              40,
+              30,
+              -110
+            ]
+          }
+        ]
+      },
+      "look_at": {
+        "Point": [
+          0,
+          30,
+          -100
+        ]
+      },
+      "fov": [
+        {
+          "time": 0,
+          "value": 45
+        }
+      ]
+    },
+    {
+      "name": "low",
+      "description": "Low pass near the ground, the worst case for overdraw",
+      "path": {
+        "interp": "CatmullRom",
+        "keys": [
+          {
+            "time": 0,
+            "position": [
+              0,
+              29.7,
+              -150
+            ]
+          },
+          {
+            "time": 7,
+            "position": [
+              10,
+              29.7,
+              -110
+            ]
+          }
+        ]
+      },
+      "look_at": {
+        "Point": [
+          0,
+          31,
+          -80
+        ]
+      },
+      "fov": [
+        {
+          "time": 0,
+          "value": 45
+        }
+      ]
+    }
+  ]
+}

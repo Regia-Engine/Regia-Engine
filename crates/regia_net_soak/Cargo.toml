@@ -1,0 +1,43 @@
+[package]
+name = "regia_net_soak"
+description = "Dev-only network soak: regia_net's server and clients on an impaired in-process network (latency, jitter, burst loss, reorder, bandwidth cap, MTU, outages, NAT rebinding), named profiles, a sample game and bars (ADR-7899)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+# The ECS half: the time harness (`timed`, ADR-8185) and the regia_net features it runs on. On by
+# default; `--no-default-features` builds the soak kit on the ECS-free regia_net core, which is how
+# `tests/lockstep_server_host.rs` proves the lockstep server needs no ECS (ADR-8558).
+default = ["ecs"]
+ecs = ["dep:regia_ecs", "regia_net/ecs"]
+# The lockstep fault hook: `LockSim::perturb`, the scenario's planted drift and the bot's
+# `--inject-desync-at` (ADR-8146). Off by default and enabled by nothing else: the hook is in a
+# build exactly when this feature is named (ADR-8209; the earlier guard keyed on debug assertions,
+# which an optimized profile may have and a dev profile may lack).
+desync-inject = []
+
+# Every dependency is already in the workspace graph (regia_net uses all of them).
+[dependencies]
+# A path dependency so `default-features = false` holds (a workspace dependency keeps its defaults).
+regia_net = { path = "../regia_net", default-features = false }
+# The lockstep sample simulation steps through the lockstep kit's math (ADR-8146).
+regia_detsim = { workspace = true }
+# The time harness (`timed`, ADR-8185) runs ECS worlds; regia_net already depends on it.
+regia_ecs = { workspace = true, optional = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+
+# The time harness's test game (tests/time_harness.rs): the transform and math types regia_net's
+# own prediction tests use.
+[dev-dependencies]
+regia_scene = { workspace = true }
+glam = { workspace = true }
+# The lag-compensation window test (tests/lagcomp_window.rs) casts `regia_core::math::Ray`s.
+regia_core = { workspace = true }

@@ -1,0 +1,42 @@
+// A forest glade (`.ambience.ron` v1, docs/formats/ambience-ron.md): an air tone and wind beds,
+// birds that fall silent in the rain, and a distant woodpecker.
+(
+    version: 1,
+    name: "glade",
+    seed: 20261105,
+    bus: "Ambience",
+    volume_db: 0.0,
+    calm_m_per_s: 0.3,
+    attack_secs: 0.4,
+    release_secs: 1.5,
+    beds: [
+        (name: "air", sound: Some("amb/air_loop"), drive: Constant, curve: [(1.0, -42.0)]),
+        (
+            name: "wind",
+            sound: Some("amb/wind_loop"),
+            drive: Wind,
+            curve: [(0.3, -54.0), (2.0, -36.0), (8.0, -20.0), (17.0, -10.0)],
+        ),
+        (name: "rain", sound: Some("amb/rain_loop"), drive: Rain, curve: [(0.1, -46.0), (10.0, -16.0)]),
+    ],
+    one_shots: [
+        (
+            name: "birds",
+            sounds: ["amb/bird_a", "amb/bird_b", "amb/bird_c"],
+            interval_secs: (2.0, 7.0),
+            distance_m: (8.0, 35.0),
+            height_m: (2.0, 12.0),
+            volume_db: (-14.0, -6.0),
+            drive: Rain,
+            curve: [(0.0, 0.0), (0.5, -12.0), (2.0, -100.0)],
+        ),
+        (
+            name: "woodpecker",
+            sounds: ["amb/woodpecker"],
+            interval_secs: (9.0, 20.0),
+            distance_m: (40.0, 90.0),
+            height_m: (3.0, 10.0),
+            volume_db: (-18.0, -12.0),
+        ),
+    ],
+)

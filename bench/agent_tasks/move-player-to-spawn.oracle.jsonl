@@ -1,0 +1,2 @@
+# Oracle for move-player-to-spawn: the calls a careful agent makes after the setup.
+{"method":"scene.apply_edits","params":{"edits":[{"op":"set_property","entity":"$p","component":"Transform","path":"translation","value":[12,0,-7]},{"op":"set_property","entity":"$p","component":"Transform","path":"rotation","value":[0,0.7071068,0,0.7071068]}]}}

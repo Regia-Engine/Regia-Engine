@@ -1,0 +1,21 @@
+// `.scatter.ron` fixture (format version 1) — from `docs/formats/terrain.md`.
+ScatterRule(
+    version: 1,
+    seed: 2747,
+    mesh: "models/rock_small.gltf",
+    cell_size: 8.0,
+    instances_per_cell: 0.7,
+    min_scale: 0.6,
+    max_scale: 1.8,
+    yaw_jitter_radians: 6.283,
+    align_to_normal: false,
+    tilt_max_radians: 0.12,
+    height_min: -1000.0,
+    height_max: 1000.0,
+    slope_max: 0.7,
+    layer_index: None,
+    layer_min_weight: 0.5,
+    avoid_holes: true,
+    fade_start_distance: 220.0,
+    fade_end_distance: 320.0,
+)

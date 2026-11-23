@@ -1,0 +1,25 @@
+// Handwritten from regia_input/src/rebind.rs at 6cd063cf44ad88084ecc12b2b219e9337c463c5e (overrides v1:
+// no format_version field, no slots; the shape InputOverrides::to_ron wrote then).
+(
+    contexts: {
+        "Gameplay": {
+            "Jump": (
+                action: "Jump",
+                input: Key("KeyJ"),
+                modifiers: [],
+                triggers: [],
+            ),
+            "Move": (
+                action: "Move",
+                input: Keys2D(
+                    up: "ArrowUp",
+                    down: "ArrowDown",
+                    left: "ArrowLeft",
+                    right: "ArrowRight",
+                ),
+                modifiers: [],
+                triggers: [],
+            ),
+        },
+    },
+)

@@ -1,0 +1,17 @@
+(
+    format: "demo",
+    entries: [
+        (
+            version: 1,
+            file: "v1.regiademo",
+            origin: "git 0dcc7e2d64a8fb8849a84867f093121306709c77:crates/regia_framework/tests/fixtures/formats/demo/v1.regiademo (branch lane/sprint-replay-compat-fixtures; authored there in the v1 layout, not a pre-existing artifact)",
+            exercises: "Header format_version 1, no timestamps field (v2 adds the per-step timestamps).",
+        ),
+        (
+            version: 2,
+            file: "v2.ron",
+            origin: "frozen copy of the fuzz-target registry fixture",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+    ],
+)

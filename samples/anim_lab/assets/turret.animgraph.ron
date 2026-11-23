@@ -1,0 +1,21 @@
+// anim_lab: the turret aim case (spec 17 § 6, DO27 turret driven by parameters, ADR-7216). The
+// barrel joint's look-at follows AimTarget; the lab moves AimTarget every frame.
+(
+    format_version: 3,
+    parameters: [
+        ("AimTarget", Vec3((0.0, 0.2, -3.0))),
+    ],
+    root: LookAt((
+        inner: Clip((
+            clip: "Idle",
+            looping: true,
+            speed: 1.0,
+            sync_group: None,
+        )),
+        joint: "barrel",
+        target: Param("AimTarget"),
+        max_yaw: 1.4,
+        max_pitch: 0.8,
+        weight_param: None,
+    )),
+)

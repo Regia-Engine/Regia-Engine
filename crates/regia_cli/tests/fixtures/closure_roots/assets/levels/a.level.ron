@@ -1,0 +1,12 @@
+// The start level: a mesh, a door to level b (a travel target), two escaped texture names, a sign
+// whose text is not a reference, a menu layout, and a spawn table in an unknown format.
+(entities: [
+    (components: {
+        "game::Mesh": (path: "meshes/a.glb"),
+        "game::Door": (to: "levels/b.level.ron"),
+        "game::Crate": (texture: "textures/\u{63}rate.png"),
+        "game::Sign": (texture: "textures/caf\u{e9}.png", text: "Hello \"world\""),
+        "game::Menu": (layout: "ui/menus/pause.ui.ron"),
+        "game::Spawner": (table: "config/spawn.table"),
+    }),
+])

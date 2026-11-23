@@ -1,0 +1,8 @@
+(
+    format_version: 1,
+    looping: true,
+    entries: [
+        (map_id: "levels/a.level.ron", mode: "", options: {}),
+        (map_id: "levels/b.level.ron", mode: "ctf", options: { "limit": "10" }),
+    ],
+)

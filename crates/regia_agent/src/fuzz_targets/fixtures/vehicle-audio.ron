@@ -1,0 +1,30 @@
+// A vehicle sound (`docs/formats/vehicle-audio.md`, ADR-3271): generated placeholder sounds only.
+(
+    format_version: 1,
+    name: "fuzz car",
+    engine: (
+        on_load: [
+            (rpm: 1000.0, sound: "placeholder:engine_on_1000"),
+            (rpm: 3000.0, sound: "placeholder:engine_on_3000", gain_db: -1.0),
+            (rpm: 6000.0, sound: "placeholder:engine_on_6000"),
+        ],
+        off_load: [(rpm: 1500.0, sound: "placeholder:engine_off_1500")],
+        redline_rpm: 6800.0,
+        limiter: (margin_rpm: 100.0, cut_db: -12.0, rate_hz: 15.0, min_throttle: 0.5),
+        shift: Some((sound: "placeholder:shift", gain_db: -6.0, dip_db: -8.0, dip_secs: 0.1, on_downshift: true)),
+        on_load_slot: Exhaust,
+        off_load_slot: Engine,
+    ),
+    whine: Some((sound: "placeholder:whine_5000", recorded_rpm: 5000.0, gain_curve: [(1000.0, -40.0), (7000.0, -16.0)])),
+    tires: (
+        squeal: Some((sound: "placeholder:squeal", threshold: 0.5, full: 1.5)),
+        rolling: [
+            (surface: "default", sound: "placeholder:roll_asphalt", gain_curve: [(0.0, -100.0), (30.0, -18.0)]),
+            (surface: "gravel", sound: "placeholder:roll_gravel", gain_curve: [(0.0, -100.0), (30.0, -12.0)]),
+        ],
+        bump: Some((sound: "placeholder:bump", rate_threshold_mps: 0.5, full_rate_mps: 2.5)),
+    ),
+    wind: Some((sound: "placeholder:wind", gain_curve: [(0.0, -100.0), (40.0, -14.0)])),
+    smoothing: (rpm_secs: 0.03, load_secs: 0.08, gain_secs: 0.05, tire_secs: 0.06),
+    emitters: (engine: (0.0, 0.3, -1.4), exhaust: (0.4, -0.25, 2.1)),
+)

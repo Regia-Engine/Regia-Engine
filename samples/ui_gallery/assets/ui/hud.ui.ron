@@ -1,0 +1,17 @@
+(
+    version: 2,
+    root: (
+        name: "gallery-hud",
+        safe_area: true,
+        style: (direction: column, padding: 8, gap: (4, 4)),
+        children: [
+            (
+                name: "score",
+                classes: ["surface"],
+                style: (padding: 8, size: (220, Auto)),
+                text: (spans: ["Score: 0"], style: (font_px: 20)),
+                bind: (source: "GalleryScore.value", format: "Score: {:03}"),
+            ),
+        ],
+    ),
+)

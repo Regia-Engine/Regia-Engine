@@ -1,0 +1,8 @@
+{ "format_version": 2, "build": "0.2.4", "seed": 0,
+  "tests": [ { "name": "door_opens", "level": "levels/arena.level.ron", "tags": ["smoke"],
+               "verdict": "Failed", "message": "[player is through] x: expected 1, got 0",
+               "skipped": false,
+               "passes": [ { "label": null, "verdict": "Failed", "message": "...", "frames": 120 } ],
+               "steps": [ { "name": "player is through", "frames": 0, "verdict": "Failed" } ],
+               "frames": 120, "blessed": false,
+               "notes": ["door angle at begin: 0.12 rad"] } ] }

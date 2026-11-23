@@ -1,0 +1,13 @@
+(
+    format_version: 2,
+    root: Split(
+        axis: Horizontal,
+        fraction: 0.2,
+        first: Tabs(tabs: ["outliner"], active: 0),
+        second: Tabs(tabs: ["viewport", "content"], active: 0),
+    ),
+    known_panels: ["viewport", "outliner", "content", "problems"],
+    floating: [
+        (tabs: ["problems"], active: 0, rect: Some((40.0, 60.0, 480.0, 320.0))),
+    ],
+)

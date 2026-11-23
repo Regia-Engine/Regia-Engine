@@ -1,0 +1,5 @@
+(format_version: 1, name: "bolt", description: "The caster's slow magic bolt",
+ kind_tags: ["Ability.Enemy.Bolt"], run_tags: ["State.Attacking"],
+ owner_forbids: Some(Has("Status.Staggered")),
+ cooldown: Some("combat/bolt_cooldown.effect.ron"),
+ charge: OnStart, max_run_ticks: Some(1))

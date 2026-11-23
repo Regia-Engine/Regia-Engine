@@ -1,0 +1,6 @@
+(format_version: 1, fov_deg: 100.0, ipd_m: 0.063, refresh_hz: 90.0,
+ ticks: [
+  (tick: 0, head: (position: (0.0, 1.7, 0.0)), state: Some(Focused)),
+  (tick: 10, head: (position: (0.0, 1.7, -0.2)), right: Some((position: (0.3, 1.2, -0.3))),
+   inputs: [("grab", "right", Float(1.0))]),
+ ])

@@ -1,0 +1,20 @@
+[package]
+name = "arena_android"
+description = "Android entry point of the arena sample (GameActivity, lib name `main`)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[lib]
+name = "main"
+doc = false
+crate-type = ["cdylib"]
+
+[lints]
+workspace = true
+
+[dependencies]
+regia = { workspace = true }
+arena = { path = ".." }

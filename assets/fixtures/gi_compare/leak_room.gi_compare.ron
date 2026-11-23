@@ -1,0 +1,35 @@
+// A closed 6 x 3 x 6 m room with one doorway (1.2 x 2.2 m, in the +Z wall) on flat, sunlit
+// ground. The leak case: the sun and sky reach the room only through the doorway, so a bake
+// that lets the outdoor probes bleed through the walls shows as interior light the reference
+// does not have. The views' interior box (the room's air) is the leak metric's mask.
+(
+    format_version: 1,
+    name: "leak_room",
+    purpose: "light leaking through walls into a closed room with one doorway",
+    sun: Some((toward: (0.35, 0.75, 0.45), color: (1.0, 0.96, 0.9), lux: 100000.0)),
+    sky_lux: 15000.0,
+    materials: [
+        (name: "ground", albedo: (0.3, 0.28, 0.25)),
+        (name: "wall", albedo: (0.6, 0.6, 0.6)),
+    ],
+    terrain: Some((size: (96.0, 96.0), spacing: 2.0, height: 0.0, material: "ground")),
+    shapes: [
+        (name: "roof", kind: Box(half: (3.3, 0.15, 3.3)), material: "wall", at: (0.0, 3.15, 0.0)),
+        (name: "west", kind: Box(half: (0.15, 1.5, 3.3)), material: "wall", at: (-3.15, 1.5, 0.0)),
+        (name: "east", kind: Box(half: (0.15, 1.5, 3.3)), material: "wall", at: (3.15, 1.5, 0.0)),
+        (name: "north", kind: Box(half: (3.0, 1.5, 0.15)), material: "wall", at: (0.0, 1.5, -3.15)),
+        (name: "south_left", kind: Box(half: (1.2, 1.5, 0.15)), material: "wall", at: (-1.8, 1.5, 3.15)),
+        (name: "south_right", kind: Box(half: (1.2, 1.5, 0.15)), material: "wall", at: (1.8, 1.5, 3.15)),
+        (name: "lintel", kind: Box(half: (0.6, 0.4, 0.15)), material: "wall", at: (0.0, 2.6, 3.15)),
+    ],
+    layout: (
+        terrain: Some((spacing: (4.0, 4.0), levels: [0.5, 1.5, 3.0, 6.0])),
+        // The probe lattice lies on the interior's box (the walls' inner faces), as
+        // `regia bake-gi --from-scene` places an interior brick (ADR-1364).
+        bricks: [(min: (-3.0, 0.0, -3.0), max: (3.0, 3.0, 3.0), spacing: 0.5)],
+        interiors: [(min: (-3.0, 0.0, -3.0), max: (3.0, 3.0, 3.0))],
+        moment_resolution: 8,
+        max_distance: 16.0,
+    ),
+    bake: (rays_per_probe: 256, samples: 16, max_bounces: 4, seed: 7),
+)

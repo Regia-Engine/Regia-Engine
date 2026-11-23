@@ -1,0 +1,34 @@
+{
+  "addons": [],
+  "axes": [
+    {
+      "group": "Metal",
+      "kind": "metal",
+      "values": [
+        {
+          "available": true,
+          "code": "1",
+          "label": "Metal A",
+          "value_key": "Metal=Metal A"
+        }
+      ]
+    }
+  ],
+  "cart": {
+    "mode": "shopify_lines"
+  },
+  "product_key": "house-a/p0004",
+  "schema": "jewelry.option_graph/1",
+  "snapshot_id": "2026-11-04-000000000000",
+  "status": "basic",
+  "title": "Plain post",
+  "variants": [
+    {
+      "picks": {
+        "Metal": "Metal A"
+      },
+      "sku": "HA-3",
+      "variant_key": "3001"
+    }
+  ]
+}

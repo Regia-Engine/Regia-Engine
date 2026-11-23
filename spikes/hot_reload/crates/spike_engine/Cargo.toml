@@ -1,0 +1,49 @@
+[package]
+name = "spike_engine"
+description = "Stand-in for the engine umbrella (`regia` + the full skeleton dependency set) plus the hot-reload runtime prototype."
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+regia = { workspace = true }
+regia_app = { workspace = true }
+regia_ecs = { workspace = true }
+regia_agent = { workspace = true }
+bevy_ecs = { workspace = true }
+bevy_reflect = { workspace = true }
+glam = { workspace = true }
+serde = { workspace = true }
+ron = { workspace = true }
+postcard = { workspace = true }
+blake3 = { workspace = true }
+uuid = { workspace = true }
+parking_lot = { workspace = true }
+crossbeam-channel = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+lz4_flex = { workspace = true }
+memmap2 = { workspace = true }
+winit = { workspace = true }
+wgpu = { workspace = true }
+naga_oil = { workspace = true }
+ktx2 = { workspace = true }
+rapier3d = { workspace = true }
+kira = { workspace = true }
+taffy = { workspace = true }
+cosmic-text = { workspace = true }
+fluent-bundle = { workspace = true }
+unic-langid = { workspace = true }
+notify = { workspace = true }
+tungstenite = { workspace = true }
+png = { workspace = true }
+# Host-side needs live in the engine so `cargo build -p host` and `cargo rustc -p game` resolve the
+# same features for every shared crate (otherwise the engine dylib is rebuilt; see README).
+libloading = { workspace = true }
+serde_json = { workspace = true }
+
+[target.'cfg(not(target_os = "android"))'.dependencies]
+gilrs = { workspace = true }
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { workspace = true }

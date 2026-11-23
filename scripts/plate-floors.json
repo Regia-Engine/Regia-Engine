@@ -1,0 +1,26 @@
+{
+  "_comment": "Per-vendor PSNR floors (dB) of a plate against the reference-GPU plate (RTX 5090, same camera, exposure and time of day). Set 3 dB under the 2026-10-21 sweep's measured pair (<scratch> sprint-v020-sweep.md). A vendor with no entry is not gated yet: measure it, then add a row. Goldens stay on lavapipe.",
+  "reference": "nvidia_blackwell",
+  "vendors": {
+    "nvidia_ampere": {
+      "switchbacks_wide": 59.0,
+      "switchbacks_mid": 59.0,
+      "switchbacks_close": 58.0
+    },
+    "nvidia_pascal": {
+      "switchbacks_wide": 48.0,
+      "switchbacks_mid": 46.0,
+      "switchbacks_close": 52.0
+    },
+    "intel_arc": {
+      "switchbacks_wide": 33.5,
+      "switchbacks_mid": 34.5,
+      "switchbacks_close": 26.0
+    },
+    "amd_rdna3": {
+      "switchbacks_wide": 33.5,
+      "switchbacks_mid": 34.0,
+      "switchbacks_close": 25.5
+    }
+  }
+}

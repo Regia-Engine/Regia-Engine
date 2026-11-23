@@ -1,0 +1,131 @@
+<!doctype html>
+<!-- Regia product viewer demo (ADR-2540). Static files only. `regia viewer standin -o site --pack`
+     writes site/packages/<name>/ and this page as site/demo/index.html; put the regia_web wasm build
+     (its .js and .wasm) in site/demo/pkg/, serve `site` from any static host (for a local look:
+     `python3 -m http.server` inside it) and open demo/index.html?product=../packages/standin-round-prong-end
+     The page uses the player's own API: RegiaViewer.create, open, options, setPick, build, setView,
+     resetView, on("ready" | "changed" | "error"). Without the wasm build it still reads the package's
+     manifest and options and lists them. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Product viewer demo</title>
+<style>
+  :root { color-scheme: light; font-family: system-ui, sans-serif; }
+  body { margin: 0; display: grid; grid-template-columns: 1fr 320px; height: 100vh; background: #f4f2ee; color: #222; }
+  @media (max-width: 800px) { body { grid-template-columns: 1fr; grid-template-rows: 60vh auto; } }
+  #stage { position: relative; }
+  canvas { width: 100%; height: 100%; display: block; background: radial-gradient(#fff, #e6e2db); }
+  #status { position: absolute; left: 12px; bottom: 12px; font-size: 12px; color: #555; }
+  aside { padding: 16px; overflow: auto; border-left: 1px solid #ddd; background: #fff; }
+  h1 { font-size: 16px; margin: 0 0 12px; }
+  h2 { font-size: 13px; margin: 16px 0 6px; color: #555; font-weight: 600; }
+  .values { display: flex; flex-wrap: wrap; gap: 6px; }
+  button { font: inherit; font-size: 13px; padding: 6px 10px; border: 1px solid #bbb; border-radius: 6px; background: #fafafa; cursor: pointer; }
+  button[aria-pressed="true"] { border-color: #333; background: #333; color: #fff; }
+  button.refused { border-color: #b33; color: #b33; }
+  pre { font-size: 11px; background: #f7f7f7; padding: 8px; overflow: auto; max-height: 240px; }
+  .muted { color: #888; font-size: 12px; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="view" aria-label="Product view: drag to turn, pinch or scroll to zoom, double tap to reset"></canvas>
+  <div id="status">Loading...</div>
+</div>
+<aside>
+  <h1 id="title">Product</h1>
+  <div id="groups"></div>
+  <h2>View</h2>
+  <div class="values"><button id="reset">Front view</button></div>
+  <h2>Build</h2>
+  <pre id="build"></pre>
+  <p class="muted" id="size"></p>
+</aside>
+<script type="module">
+  const params = new URLSearchParams(location.search);
+  const product = params.get("product") || "../packages/standin-round-prong-end";
+  const base = product.endsWith("/") ? product : product + "/";
+  const status = document.getElementById("status");
+  const canvas = document.getElementById("view");
+  let viewer = null;
+  const picks = {};
+
+  const labelOf = (v) => (typeof v === "string" ? v : v.label);
+  const groupOf = (g) => g.group || g.name;
+
+  function showBuild() {
+    const b = viewer ? viewer.build() : { picks };
+    document.getElementById("build").textContent = JSON.stringify(b, null, 2);
+  }
+
+  function renderOptions(groups) {
+    const box = document.getElementById("groups");
+    box.replaceChildren();
+    for (const g of groups.filter((g) => g.visual !== false)) {
+      const name = groupOf(g);
+      const h = document.createElement("h2");
+      h.textContent = name;
+      const row = document.createElement("div");
+      row.className = "values";
+      for (const v of g.values || []) {
+        const label = labelOf(v);
+        const b = document.createElement("button");
+        b.textContent = label;
+        b.setAttribute("aria-pressed", String(picks[name] === label));
+        b.onclick = () => {
+          try {
+            if (viewer) viewer.setPick(name, label, { adjust: false });
+            picks[name] = label;
+            renderOptions(groups);
+          } catch (err) {
+            b.classList.add("refused");
+            status.textContent = `${name} = ${label}: ${err && err.message ? err.message : err}`;
+          }
+        };
+        row.append(b);
+      }
+      box.append(h, row);
+    }
+    showBuild();
+  }
+
+  async function readJson(path) {
+    const r = await fetch(base + path);
+    if (!r.ok) throw new Error(`${path}: HTTP ${r.status}`);
+    return r.json();
+  }
+
+  const manifest = await readJson("manifest.json").catch((e) => { status.textContent = String(e); return null; });
+  if (manifest) {
+    document.getElementById("title").textContent = manifest.package_id;
+    const total = manifest.files.reduce((n, f) => n + f.bytes, 0);
+    document.getElementById("size").textContent =
+      `${(total / 1024).toFixed(1)} KiB in ${manifest.files.length} files, ${manifest.meshes.length} meshes; ${manifest.package_hash.slice(0, 19)}...`;
+  }
+
+  try {
+    const mod = await import("./pkg/regia_web.js");
+    if (mod.default) await mod.default();
+    viewer = await mod.RegiaViewer.create(canvas, {});
+    viewer.on("ready", () => {
+      status.textContent = "Drag to turn, pinch or scroll to zoom, double tap to reset.";
+      renderOptions(viewer.options().groups || viewer.options());
+    });
+    viewer.on("changed", showBuild);
+    viewer.on("error", (e) => { status.textContent = e && e.message ? e.message : String(e); });
+    await viewer.open(base);
+  } catch (err) {
+    viewer = null;
+    if (manifest) {
+      const options = await readJson("options.json");
+      status.textContent = "Package loaded. The wasm player is not in ./pkg, so nothing is drawn.";
+      renderOptions(options.groups);
+    }
+  }
+
+  document.getElementById("reset").onclick = () => { if (viewer) viewer.resetView(); };
+</script>
+</body>
+</html>

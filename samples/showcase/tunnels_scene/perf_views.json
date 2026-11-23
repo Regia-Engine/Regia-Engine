@@ -1,0 +1,376 @@
+{
+  "version": 1,
+  "views": [
+    {
+      "description": "Inside the sealed tube at 3 m over the floor, along the bore",
+      "fov": [
+        {
+          "time": 0.0,
+          "value": 60.0
+        }
+      ],
+      "name": "tube_west",
+      "path": {
+        "interp": "Linear",
+        "keys": [
+          {
+            "position": [
+              -230.94,
+              -283.0,
+              165.59
+            ],
+            "time": 0.0
+          },
+          {
+            "position": [
+              -226.1,
+              -283.0,
+              166.81
+            ],
+            "time": 0.86
+          },
+          {
+            "position": [
+              -221.36,
+              -283.0,
+              168.4
+            ],
+            "time": 1.71
+          },
+          {
+            "position": [
+              -216.63,
+              -283.0,
+              170.0
+            ],
+            "time": 2.57
+          },
+          {
+            "position": [
+              -211.77,
+              -283.0,
+              171.09
+            ],
+            "time": 3.43
+          },
+          {
+            "position": [
+              -206.79,
+              -283.0,
+              171.04
+            ],
+            "time": 4.29
+          },
+          {
+            "position": [
+              -202.03,
+              -283.0,
+              169.58
+            ],
+            "time": 5.14
+          },
+          {
+            "position": [
+              -197.73,
+              -283.0,
+              167.04
+            ],
+            "time": 6.0
+          }
+        ]
+      }
+    },
+    {
+      "description": "The plain right above tube_west, the same path and heading",
+      "fov": [
+        {
+          "time": 0.0,
+          "value": 60.0
+        }
+      ],
+      "name": "outdoor_west",
+      "path": {
+        "interp": "Linear",
+        "keys": [
+          {
+            "position": [
+              -230.94,
+              -253.0,
+              165.59
+            ],
+            "time": 0.0
+          },
+          {
+            "position": [
+              -226.1,
+              -253.0,
+              166.81
+            ],
+            "time": 0.86
+          },
+          {
+            "position": [
+              -221.36,
+              -253.0,
+              168.4
+            ],
+            "time": 1.71
+          },
+          {
+            "position": [
+              -216.63,
+              -253.0,
+              170.0
+            ],
+            "time": 2.57
+          },
+          {
+            "position": [
+              -211.77,
+              -253.0,
+              171.09
+            ],
+            "time": 3.43
+          },
+          {
+            "position": [
+              -206.79,
+              -253.0,
+              171.04
+            ],
+            "time": 4.29
+          },
+          {
+            "position": [
+              -202.03,
+              -253.0,
+              169.58
+            ],
+            "time": 5.14
+          },
+          {
+            "position": [
+              -197.73,
+              -253.0,
+              167.04
+            ],
+            "time": 6.0
+          }
+        ]
+      }
+    },
+    {
+      "description": "Inside the sealed tube at 3 m over the floor, along the bore",
+      "fov": [
+        {
+          "time": 0.0,
+          "value": 60.0
+        }
+      ],
+      "name": "tube_east",
+      "path": {
+        "interp": "Linear",
+        "keys": [
+          {
+            "position": [
+              190.33,
+              -283.0,
+              160.36
+            ],
+            "time": 0.0
+          },
+          {
+            "position": [
+              193.87,
+              -283.0,
+              163.88
+            ],
+            "time": 0.86
+          },
+          {
+            "position": [
+              197.73,
+              -283.0,
+              167.04
+            ],
+            "time": 1.71
+          },
+          {
+            "position": [
+              202.03,
+              -283.0,
+              169.58
+            ],
+            "time": 2.57
+          },
+          {
+            "position": [
+              206.79,
+              -283.0,
+              171.04
+            ],
+            "time": 3.43
+          },
+          {
+            "position": [
+              211.77,
+              -283.0,
+              171.09
+            ],
+            "time": 4.29
+          },
+          {
+            "position": [
+              216.63,
+              -283.0,
+              170.0
+            ],
+            "time": 5.14
+          },
+          {
+            "position": [
+              221.37,
+              -283.0,
+              168.4
+            ],
+            "time": 6.0
+          }
+        ]
+      }
+    },
+    {
+      "description": "The plain right above tube_east, the same path and heading",
+      "fov": [
+        {
+          "time": 0.0,
+          "value": 60.0
+        }
+      ],
+      "name": "outdoor_east",
+      "path": {
+        "interp": "Linear",
+        "keys": [
+          {
+            "position": [
+              190.33,
+              -253.0,
+              160.36
+            ],
+            "time": 0.0
+          },
+          {
+            "position": [
+              193.87,
+              -253.0,
+              163.88
+            ],
+            "time": 0.86
+          },
+          {
+            "position": [
+              197.73,
+              -253.0,
+              167.04
+            ],
+            "time": 1.71
+          },
+          {
+            "position": [
+              202.03,
+              -253.0,
+              169.58
+            ],
+            "time": 2.57
+          },
+          {
+            "position": [
+              206.79,
+              -253.0,
+              171.04
+            ],
+            "time": 3.43
+          },
+          {
+            "position": [
+              211.77,
+              -253.0,
+              171.09
+            ],
+            "time": 4.29
+          },
+          {
+            "position": [
+              216.63,
+              -253.0,
+              170.0
+            ],
+            "time": 5.14
+          },
+          {
+            "position": [
+              221.37,
+              -253.0,
+              168.4
+            ],
+            "time": 6.0
+          }
+        ]
+      }
+    },
+    {
+      "description": "From the plain down the mid_east skylight ramp into the tube",
+      "fov": [
+        {
+          "time": 0.0,
+          "value": 60.0
+        }
+      ],
+      "name": "mouth_drive",
+      "path": {
+        "interp": "CatmullRom",
+        "keys": [
+          {
+            "position": [
+              70.19,
+              -253.0,
+              -44.72
+            ],
+            "time": 0.0
+          },
+          {
+            "position": [
+              48.0,
+              -253.0,
+              -78.0
+            ],
+            "time": 2.0
+          },
+          {
+            "position": [
+              24.0,
+              -275.5,
+              -114.0
+            ],
+            "time": 4.0
+          },
+          {
+            "position": [
+              0.0,
+              -283.0,
+              -150.0
+            ],
+            "time": 6.0
+          },
+          {
+            "position": [
+              -16.64,
+              -283.0,
+              -174.96
+            ],
+            "time": 8.0
+          }
+        ]
+      }
+    }
+  ]
+}

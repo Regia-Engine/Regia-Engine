@@ -1,0 +1,31 @@
+[package]
+name = "regia_viewer_pack"
+description = "Product viewer package: quantized meshes, recipe and option data, manifest with hashes; the `regia viewer pack` cook and the stand-in parts."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+default = []
+# The desktop cook: read a part kit's GLB, write packages, measure gzip sizes, write stand-in kits
+# (`regia viewer pack`, `regia viewer standin`). The reader side (decode, verify) needs none of it.
+cook = ["dep:gltf", "dep:flate2", "dep:image"]
+
+[dependencies]
+glam = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+blake3 = { workspace = true }
+tracing = { workspace = true }
+# The cook refuses a recipe whose view_range the drag view would not accept.
+regia_viewer_view = { workspace = true }
+# The stand-in kit's gem cuts.
+regia_looks = { workspace = true }
+gltf = { workspace = true, optional = true }
+flate2 = { workspace = true, optional = true }
+image = { workspace = true, optional = true }

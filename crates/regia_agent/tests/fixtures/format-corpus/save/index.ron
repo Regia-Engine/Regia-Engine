@@ -1,0 +1,7 @@
+(
+    format: "save",
+    entries: [
+        (version: 1, file: "v1.save", origin: "frozen copy of crates/regia_framework/tests/fixtures/empty.save (written by the version-1 writer, checked in since the save format was frozen)", exercises: "the container: magic, header version, postcard payload (no entities, no resources) and the CRC footer"),
+        (version: 2, file: "v2.save", origin: "frozen copy of crates/regia_framework/tests/fixtures/formats/save/v2_refs.save (written by the version-2 writer, lane save-entity-refs, ADR-3239)", exercises: "format 2: the entity id table and remapped entity references"),
+    ],
+)

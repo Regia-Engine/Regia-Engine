@@ -1,0 +1,47 @@
+[package]
+name = "regia_fluid"
+description = "Particle liquid: a deterministic PIC/FLIP reference solver on a MAC grid, whitewater, a particle level-set surface, the `.fluidcache` bake and an optional wgpu compute path (ADR-2441)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+# The coupling plugin (ADR-2577) reads `regia_core::math`; the sbom-deps-hygiene removal of this
+# edge was valid on its base (integ/v036-fixed) but not on integ/v038b, where fluid-followups
+# added the use — restored at the merge.
+regia_core = { workspace = true }
+regia_ecs = { workspace = true }
+regia_app = { workspace = true }
+glam = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+# `draw`: the surface mesh and the whitewater points go out as `MeshRenderer` entities (the forward path the quick
+# 3D layer draws through); the solver and the cache need no renderer.
+regia_render = { workspace = true, optional = true }
+regia_scene = { workspace = true, optional = true }
+# `gpu`: the wgpu compute path (ADR-2441 § 4). The CPU reference is the contract.
+wgpu = { workspace = true, optional = true }
+bytemuck = { workspace = true, optional = true }
+# `physics`: kinematic and dynamic rigid bodies as moving solids, pressure impulses back (ADR-2577).
+regia_physics = { workspace = true, optional = true }
+
+[features]
+default = []
+# Publish the liquid surface and the whitewater points through `MeshRenderer` (needs the renderer).
+draw = ["dep:regia_render", "dep:regia_scene"]
+# The wgpu compute path (grid transfers, red-black Gauss-Seidel pressure, advection).
+gpu = ["dep:wgpu", "dep:bytemuck"]
+# Couple `regia_physics` bodies with the liquid both ways (`coupling::FluidPhysicsPlugin`).
+physics = ["dep:regia_physics", "dep:regia_scene"]
+
+[dev-dependencies]
+# The GPU tolerance test opens a headless device (lavapipe in CI).
+regia_render = { workspace = true }
+# The coupling tests run the physics step and the fluid step in one app.
+regia_physics = { workspace = true }
+regia_scene = { workspace = true }

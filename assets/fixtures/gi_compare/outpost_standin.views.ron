@@ -1,0 +1,37 @@
+// Views of outpost_standin.gi_compare.ron: the whole outpost from the hill, the street between
+// the buildings, and the inside of the hab and of the hangar (each with its air as the leak
+// mask). The fly-through comes down from the hill and walks into the hab through its door.
+(
+    format_version: 1,
+    size: (480, 270),
+    ev100: 15.0,
+    indirect_ev100: Some(12.5),
+    views: [
+        (name: "overview", eye: (45.0, 22.0, 55.0), target: (0.0, 3.0, -5.0), fov_y_deg: 50.0),
+        (name: "street", eye: (6.0, 3.0, 10.0), target: (-14.0, 3.0, -4.0), fov_y_deg: 60.0),
+        (
+            name: "hab_inside",
+            eye: (-9.0, 3.65, -3.0),
+            target: (-19.0, 2.5, -8.5),
+            fov_y_deg: 75.0,
+            interior: Some((min: (-20.0, 1.95, -10.0), max: (-8.0, 5.45, -2.0))),
+            ev100: Some(11.0),
+            indirect_ev100: Some(10.0),
+        ),
+        (
+            name: "hangar_inside",
+            eye: (14.0, 4.46, -16.5),
+            target: (11.0, 4.5, -2.0),
+            fov_y_deg: 75.0,
+            interior: Some((min: (2.0, 2.66, -18.0), max: (22.0, 10.66, -2.0))),
+            ev100: Some(12.0),
+            indirect_ev100: Some(10.5),
+        ),
+    ],
+    flythrough: [
+        (eye: (45.0, 22.0, 55.0), target: (0.0, 3.0, -5.0), fov_y_deg: 50.0, ev100: Some(15.0)),
+        (eye: (10.0, 4.0, 14.0), target: (-12.0, 3.0, -2.0), fov_y_deg: 60.0, ev100: Some(14.5)),
+        (eye: (-14.0, 3.2, 4.0), target: (-14.0, 3.0, -6.0), fov_y_deg: 65.0, ev100: Some(13.5)),
+        (eye: (-14.0, 3.65, -3.0), target: (-18.0, 2.6, -9.0), fov_y_deg: 75.0, ev100: Some(11.0)),
+    ],
+)

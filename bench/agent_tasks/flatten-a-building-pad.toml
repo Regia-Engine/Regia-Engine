@@ -1,0 +1,31 @@
+format_version = 1
+id = "flatten-a-building-pad"
+title = "Raise a building pad on the terrain"
+prompt = "The terrain is flat at 0 m and spans 64 m, with one height sample per meter (65 by 65 samples; sample 32 is the middle). Raise an 8 by 8 sample square centered on the middle of the terrain to 6 m, and leave the rest at 0 m. The terrain applies height patches over the next frames."
+features = ["terrain"]
+crates = ["regia_agent", "regia_terrain"]
+call_budget = 8
+
+[setup]
+target = "terrain"
+
+[[check]]
+name = "pad at 6 m"
+method = "terrain.get"
+params = { at = [[0, 0], [1.5, -1.5]] }
+pointer = "/probes/0/height"
+expect = { kind = "number_range", min = 5.9, max = 6.1 }
+
+[[check]]
+name = "pad at 6 m (second point)"
+method = "terrain.get"
+params = { at = [[0, 0], [1.5, -1.5]] }
+pointer = "/probes/1/height"
+expect = { kind = "number_range", min = 5.9, max = 6.1 }
+
+[[check]]
+name = "far ground unchanged"
+method = "terrain.get"
+params = { at = [[20, 20], [-25, 10]] }
+pointer = "/probes/0/height"
+expect = { kind = "number_range", min = -0.01, max = 0.01 }

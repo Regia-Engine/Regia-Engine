@@ -1,0 +1,31 @@
+[package]
+name = "regia_app"
+description = "App, Plugin, schedules, fixed timestep, time, frame driver (platform-agnostic)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia_core = { workspace = true }
+regia_ecs = { workspace = true }
+tracing = { workspace = true }
+
+[features]
+default = ["debug_names"]
+# `App::shuffle_schedules` needs bevy's `shuffle_seed` build setting, which lives behind the ECS
+# crate's `debug_names` feature (on by default; a shipping build may turn both off).
+debug_names = ["regia_ecs/debug_names"]
+
+[dev-dependencies]
+criterion = { workspace = true }
+# The shared counting allocator of the allocation tests (ADR-3291).
+regia_test_utils = { workspace = true }
+
+[[bench]]
+name = "schedule"
+harness = false

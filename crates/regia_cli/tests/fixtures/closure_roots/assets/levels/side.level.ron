@@ -1,0 +1,3 @@
+// A level the game opens by name from a level-select screen: no file references it, so it ships
+// only when a profile `include` or a chunk `entry` declares it (a dynamic root).
+(entities: [(components: {"game::Mesh": (path: "meshes/side.glb")})])

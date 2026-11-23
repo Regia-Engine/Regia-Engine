@@ -1,0 +1,90 @@
+// A sequence (`.seq.ron` v5, ADR-1507, ADR-1880, ADR-2405, ADR-2862, ADR-3197): keyed tracks (one
+// with Bezier tangents), an animation-clip track with a crossfade, an audio track with a spatial
+// (3D) section that keeps its pitch, passes with a Doppler shift and is occluded by walls, a
+// looping sub-sequence and video sections.
+(
+    version: 5,
+    name: "intro",
+    fps: 30.0,
+    tracks: [
+        // Fade the title card in, then out.
+        (
+            name: "title-opacity",
+            target: "ui/title",
+            property: "opacity",
+            keys: Float([
+                (time: 0.0, value: 0.0),
+                (time: 1.0, value: 1.0, ease: Smooth),
+                (time: 3.0, value: 1.0),
+                (time: 4.0, value: 0.0, ease: Smooth),
+            ]),
+        ),
+        // Slide the hero in from the side with an overshoot-free Bezier, then settle.
+        (
+            name: "hero-position",
+            target: "hero",
+            property: "transform.position",
+            keys: Vec3([
+                (time: 1.0, value: (-6.0, 0.0, 0.0), ease: Bezier, tangent: Aligned((6.0, 0.0, 0.0))),
+                (time: 3.0, value: (0.0, 0.0, 0.0), ease: Bezier, weights: Some((0.5, 0.25))),
+                (time: 5.0, value: (0.0, 0.5, 0.0), tangent: Flat),
+            ]),
+        ),
+        // The hero walks, then crossfades into a wave over half a second.
+        (
+            name: "hero-body",
+            target: "hero",
+            keys: Clip([
+                (clip: "walk", start: 1.0, end: 3.5, looping: true, blend_out: 0.5),
+                (clip: "wave", start: 3.0, end: 6.0, blend_in: 0.5),
+            ]),
+        ),
+        // Music under the whole sequence, faded out at the end, and the hero's footsteps in 3D: they
+        // follow the hero, a little fast (varispeed, so a little higher too), silent past 25 m.
+        (
+            name: "music",
+            keys: Audio([
+                (sound: "music_intro", start: 0.0, end: 6.0, volume_db: -6.0, fade_out: 1.5, bus: Some("Music")),
+                (sound: "footsteps", start: 1.0, end: 3.5, time_scale: 1.25,
+                    spatial: Some((source: Binding("hero"), max_distance: 25.0, occlusion: true)),
+                    time_scale_mode: PreservePitch),
+            ]),
+        ),
+        // A shared sparkle effect, its `lamp` target played on the hero sign's light, twice over.
+        (
+            name: "sparkle",
+            keys: Sub([(sequence: "cinematics/fx/sparkle.seq.ron", start: 2.5, end: 4.0, bindings: {"lamp": "hero/light"},
+                repeat: Count(2), loop_length: Some(0.75))]),
+        ),
+        // Toggle the letterbox bars on for the whole sequence.
+        (
+            name: "letterbox",
+            target: "ui/letterbox",
+            property: "visible",
+            keys: Bool([
+                (time: 0.0, value: true),
+                (time: 6.0, value: false),
+            ]),
+        ),
+        // A movie fullscreen, and a loop on a screen in the world.
+        (
+            name: "movies",
+            keys: Video([
+                (video: "movies/logo.video.ron", start: 0.0, end: 1.0, target: Fullscreen(layer: 0, fit: Letterbox)),
+                (video: "movies/news.webm", start: 2.0, end: 6.0, offset: 1.5, volume_db: -6.0, looping: true,
+                    target: Screen(binding: "props/tv", slot: Emissive)),
+            ]),
+        ),
+        // A muted track: sampled as if absent.
+        // (
+        //     name: "unused-glow",
+        //     target: "ui/glow", property: "intensity",
+        //     keys: Float([(time: 0.0, value: 0.5)]), enabled: false,
+        // ),
+    ],
+    markers: [
+        (name: "music-in", time: 0.0, payload: "cue:music_intro"),
+        (name: "title", time: 1.0),
+        (name: "clear", time: 6.0, payload: "flow:menu"),
+    ],
+)

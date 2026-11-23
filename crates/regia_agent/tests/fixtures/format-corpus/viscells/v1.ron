@@ -1,0 +1,57 @@
+(
+    version: 1,
+    cells: [
+        (
+            id: 0,
+            name: "outdoor",
+            outdoor: true,
+            bounds: [],
+        ),
+        (
+            id: 1,
+            name: "room_a",
+            outdoor: false,
+            bounds: [
+                (
+                    center: (0.0, 1.5, 0.0),
+                    half_extents: (4.0, 1.5, 4.0),
+                    rotation_radians: 0.25,
+                ),
+            ],
+        ),
+        (
+            id: 2,
+            name: "room_b",
+            outdoor: false,
+            bounds: [
+                (
+                    center: (0.0, 1.5, -8.0),
+                    half_extents: (4.0, 1.5, 4.0),
+                    rotation_radians: 0.0,
+                ),
+            ],
+        ),
+    ],
+    portals: [
+        (
+            a: 1,
+            b: 2,
+            quad: [
+                (-1.0, 0.0, -4.0),
+                (1.0, 0.0, -4.0),
+                (1.0, 2.0, -4.0),
+                (-1.0, 2.0, -4.0),
+            ],
+        ),
+        (
+            a: 1,
+            b: 0,
+            quad: [
+                (-1.0, 0.5, 4.0),
+                (1.0, 0.5, 4.0),
+                (1.0, 2.0, 4.0),
+                (-1.0, 2.0, 4.0),
+            ],
+        ),
+    ],
+)

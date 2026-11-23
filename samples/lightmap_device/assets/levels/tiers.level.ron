@@ -1,0 +1,2 @@
+// The tier profiles' entry level (ADR-5382): empty; the profiles ship the bake through their `include`.
+(entities: [])

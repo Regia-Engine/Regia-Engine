@@ -1,0 +1,12 @@
+[package]
+name = "spike_engine_dylib"
+description = "Prototype of `regia_dylib`: the engine as one Rust dylib (bevy_dylib pattern)."
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[lib]
+crate-type = ["dylib"]
+
+[dependencies]
+spike_engine = { workspace = true }

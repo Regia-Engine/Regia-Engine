@@ -1,0 +1,46 @@
+// An .autotile.ron (v2, docs/formats/autotile-ron.md): three terrains on the map's
+// "terrain" tileset. Local tile ids are positions in that tileset (row-major from the top left).
+(
+    version: 2,
+    tileset: "terrain",
+    seed: 1,
+    border: Same,
+    terrains: [
+        (
+            // A 47-tile blob set laid out in tileset ids 0..=46 (tile i is drawn for the
+            // i-th reduced neighbour mask, docs/specs/86-2d-toolkit.md § 2.1).
+            name: "grass",
+            layout: Blob47([
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+                16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+                32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46,
+            ]),
+            // The fully surrounded tile has two flower variants.
+            variants: {
+                46: [(tile: 46, weight: 6), (tile: 47, weight: 1), (tile: 48, weight: 1)],
+            },
+        ),
+        (
+            // A 16-tile edge set: index = N 1 + E 2 + S 4 + W 8.
+            name: "wall",
+            layout: Edge16([64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79]),
+        ),
+        (
+            // 16 corner tiles: index = TL 1 + TR 2 + BR 4 + BL 8 (a corner is set when the cell and
+            // the three neighbours touching it are this terrain).
+            name: "path",
+            layout: WangCorner([100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115]),
+        ),
+        (
+            // Hand-written rules: first match wins.
+            name: "fence",
+            layout: Rules([
+                (pattern: "?#? / ?#? / ?#?", tile: 96),
+                (pattern: "??? / .## / ???", tile: 97),
+                (pattern: "??? / ##. / ???", tile: 97, flip_x: true),
+                (pattern: "??? / ### / ???", tile: 98),
+            ]),
+            fallback: Some(99),
+        ),
+    ],
+)

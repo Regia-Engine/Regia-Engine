@@ -1,0 +1,32 @@
+(
+    format_version: 2,
+    name: "rally car",
+    config: (
+        chassis_mass: 1100.0,
+        max_engine_force: 4200.0,
+        max_steer_angle: 0.45,
+        ground_layers: Some(3),
+        query_layer: None,
+        wheels: [
+            (position: (-0.8, -0.2, -1.3), steer: true, drive: true, brake: true),
+            (position: (0.8, -0.2, -1.3), steer: true, drive: true, brake: true),
+            (position: (-0.8, -0.2, 1.3), drive: true, brake: true),
+            (position: (0.8, -0.2, 1.3), drive: true, brake: true),
+        ],
+        drivetrain: Geared((
+            engine: (torque_curve: [(1000.0, 180.0), (4500.0, 300.0), (7000.0, 220.0)], redline_rpm: 7000.0),
+            gearbox: (forward_ratios: [3.4, 2.1, 1.45, 1.1], upshift_rpm: 6200.0, downshift_rpm: 2600.0),
+            layout: Awd,
+            front_differential: Open,
+            rear_differential: LimitedSlip(torque_bias: 2.5),
+            centre_differential: Locked,
+            front_torque_share: 0.4,
+        )),
+        anti_roll: [
+            (left: 0, right: 1, stiffness: 15000.0),
+            (left: 2, right: 3, stiffness: 9000.0),
+        ],
+        aero: Some((drag_coefficient: 0.32, frontal_area: 2.1, front_downforce: 0.2, rear_downforce: 0.3)),
+        aids: (abs: Some(()), traction_control: Some(())),
+    ),
+)

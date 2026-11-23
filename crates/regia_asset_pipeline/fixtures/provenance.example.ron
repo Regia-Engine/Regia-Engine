@@ -1,0 +1,29 @@
+// config/provenance.ron: the project's provenance policy (docs/formats/provenance-ron.md, ADR-2428).
+(
+    format_version: 1,
+    // The project's own provenance fields: keys of the `extensions` map in a `.meta` provenance block.
+    fields: [
+        (name: "licence", description: "SPDX id of the asset's licence, or `owner` for work the project owns"),
+        (name: "foreign_game_file", values: ["false"], description: "true when the file comes from another game"),
+        (name: "third_party_mod_file", values: ["true", "false"], description: "true for a file from a third-party mod"),
+    ],
+    // An extensions key not declared above is a warning.
+    warn_undeclared: true,
+    // Required fields per asset kind (the `.meta` importer id); `*` applies to every kind.
+    kinds: {
+        "*": (required: ["origin", "tool"]),
+        "gltf": (required: ["licence"]),
+        "png": (required: ["licence"]),
+    },
+    // Tools accepted; empty accepts every tool.
+    tools: [hand, agent, generator, import],
+    // Origins accepted, as globs over the `origin` string; empty accepts any origin.
+    origins: ["dcc:*", "generator:*", "https://polyhaven.com/**", "assets/**"],
+    licence_field: "licence",
+    // Licences accepted; empty accepts any licence.
+    licences: ["CC0-1.0", "CC-BY-4.0", "owner"],
+    // Agent- and generator-made assets ship only once reviewed by the owner or a named reviewer.
+    review: (required_for: [agent, generator], accepted: [owner, named]),
+    // Sources the policy does not apply to.
+    exclude: ["assets/dev/**"],
+)

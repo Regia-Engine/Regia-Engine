@@ -1,0 +1,1644 @@
+{
+  "library_version": 1,
+  "materials": [
+    {
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Material=24K Gold"
+      ],
+      "conductor": {
+        "f0_rgb_linear": [
+          1.022,
+          0.663,
+          0.196
+        ],
+        "f82_tint_rgb": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "nk": null,
+        "nk_dataset": "f0-only",
+        "plating": "none"
+      },
+      "display_name": "Fine gold",
+      "kind": "conductor",
+      "material_id": "gold-yellow-24k",
+      "source": {
+        "citation": "F0 before the fit (1.022, 0.782, 0.344): N. Hoffman, 'Physics and Math of Shading', SIGGRAPH 2015 Physically Based Shading course notes, table of F0 values (linear sRGB), measured; look fit, not an alloy measurement: F0 x mix(1, F0 / max(F0), 0.65), one partial extra self-reflection, because a single-bounce render in a neutral studio reads paler and greener than the metal does on a real curved piece; no published alloy color data was consulted",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Material=18K Yellow Gold"
+      ],
+      "conductor": {
+        "f0_rgb_linear": [
+          0.98,
+          0.649,
+          0.22
+        ],
+        "f82_tint_rgb": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "nk": null,
+        "nk_dataset": "f0-only",
+        "plating": "none"
+      },
+      "display_name": "18K yellow gold",
+      "kind": "conductor",
+      "material_id": "gold-yellow-18k",
+      "source": {
+        "citation": "F0 before the fit (0.98, 0.76, 0.37): estimate, scaled from the 24K row of N. Hoffman, 'Physics and Math of Shading', SIGGRAPH 2015 Physically Based Shading course notes; look fit, not an alloy measurement: F0 x mix(1, F0 / max(F0), 0.65), one partial extra self-reflection, because a single-bounce render in a neutral studio reads paler and greener than the metal does on a real curved piece; no published alloy color data was consulted",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Material=14K Yellow Gold"
+      ],
+      "conductor": {
+        "f0_rgb_linear": [
+          0.94,
+          0.624,
+          0.269
+        ],
+        "f82_tint_rgb": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "nk": null,
+        "nk_dataset": "f0-only",
+        "plating": "none"
+      },
+      "display_name": "14K yellow gold",
+      "kind": "conductor",
+      "material_id": "gold-yellow-14k",
+      "source": {
+        "citation": "F0 before the fit (0.94, 0.73, 0.42): estimate, scaled from the 24K row of N. Hoffman, 'Physics and Math of Shading', SIGGRAPH 2015 Physically Based Shading course notes; look fit, not an alloy measurement: F0 x mix(1, F0 / max(F0), 0.65), one partial extra self-reflection, because a single-bounce render in a neutral studio reads paler and greener than the metal does on a real curved piece; no published alloy color data was consulted",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Material=14K Rose Gold",
+        "Material=18K Rose Gold"
+      ],
+      "conductor": {
+        "f0_rgb_linear": [
+          0.97,
+          0.65,
+          0.5
+        ],
+        "f82_tint_rgb": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "nk": null,
+        "nk_dataset": "f0-only",
+        "plating": "none"
+      },
+      "display_name": "14K rose gold",
+      "kind": "conductor",
+      "material_id": "gold-rose-14k",
+      "source": {
+        "citation": "estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Material=14K White Gold"
+      ],
+      "conductor": {
+        "f0_rgb_linear": [
+          0.78,
+          0.74,
+          0.65
+        ],
+        "f82_tint_rgb": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "nk": null,
+        "nk_dataset": "f0-only",
+        "plating": "none"
+      },
+      "display_name": "14K white gold (unplated)",
+      "kind": "conductor",
+      "material_id": "gold-white-14k",
+      "source": {
+        "citation": "estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Material=14K White Gold Rhodium",
+        "Material=18K White Gold"
+      ],
+      "conductor": {
+        "f0_rgb_linear": [
+          0.8,
+          0.79,
+          0.77
+        ],
+        "f82_tint_rgb": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "nk": null,
+        "nk_dataset": "f0-only",
+        "plating": "rhodium"
+      },
+      "display_name": "Rhodium plate (white gold, plated)",
+      "kind": "conductor",
+      "material_id": "rhodium",
+      "source": {
+        "citation": "estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Material=Platinum"
+      ],
+      "conductor": {
+        "f0_rgb_linear": [
+          0.673,
+          0.637,
+          0.585
+        ],
+        "f82_tint_rgb": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "nk": null,
+        "nk_dataset": "f0-only",
+        "plating": "none"
+      },
+      "display_name": "Platinum",
+      "kind": "conductor",
+      "material_id": "platinum",
+      "source": {
+        "citation": "N. Hoffman, 'Physics and Math of Shading', SIGGRAPH 2015 Physically Based Shading course notes, table of F0 values (linear sRGB)",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "measured"
+    },
+    {
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Material=Sterling Silver"
+      ],
+      "conductor": {
+        "f0_rgb_linear": [
+          0.972,
+          0.96,
+          0.915
+        ],
+        "f82_tint_rgb": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "nk": null,
+        "nk_dataset": "f0-only",
+        "plating": "none"
+      },
+      "display_name": "Sterling silver",
+      "kind": "conductor",
+      "material_id": "silver",
+      "source": {
+        "citation": "N. Hoffman, 'Physics and Math of Shading', SIGGRAPH 2015 Physically Based Shading course notes, table of F0 values (linear sRGB)",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "measured"
+    },
+    {
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Material=Titanium"
+      ],
+      "conductor": {
+        "f0_rgb_linear": [
+          0.542,
+          0.497,
+          0.449
+        ],
+        "f82_tint_rgb": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "nk": {
+          "k": [
+            2.45,
+            2.85,
+            3.25
+          ],
+          "n": [
+            1.95,
+            2.15,
+            2.35
+          ],
+          "wavelength_nm": [
+            450.0,
+            550.0,
+            650.0
+          ]
+        },
+        "nk_dataset": null,
+        "plating": "none"
+      },
+      "display_name": "Titanium",
+      "kind": "conductor",
+      "material_id": "titanium",
+      "source": {
+        "citation": "N. Hoffman, 'Physics and Math of Shading', SIGGRAPH 2015 Physically Based Shading course notes, table of F0 values (linear sRGB); n,k: estimate fitted to that F0",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "measured"
+    },
+    {
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Material=Niobium"
+      ],
+      "conductor": {
+        "f0_rgb_linear": [
+          0.58,
+          0.55,
+          0.52
+        ],
+        "f82_tint_rgb": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "nk": {
+          "k": [
+            2.6,
+            3.0,
+            3.3
+          ],
+          "n": [
+            2.0,
+            2.3,
+            2.6
+          ],
+          "wavelength_nm": [
+            450.0,
+            550.0,
+            650.0
+          ]
+        },
+        "nk_dataset": null,
+        "plating": "none"
+      },
+      "display_name": "Niobium",
+      "kind": "conductor",
+      "material_id": "niobium",
+      "source": {
+        "citation": "estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos; n,k: estimate",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Material=Steel",
+        "Material=Stainless Steel"
+      ],
+      "conductor": {
+        "f0_rgb_linear": [
+          0.56,
+          0.57,
+          0.58
+        ],
+        "f82_tint_rgb": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "nk": null,
+        "nk_dataset": "f0-only",
+        "plating": "none"
+      },
+      "display_name": "Implant-grade steel",
+      "kind": "conductor",
+      "material_id": "steel",
+      "source": {
+        "citation": "between iron and chromium in N. Hoffman, 'Physics and Math of Shading', SIGGRAPH 2015 Physically Based Shading course notes, table of F0 values (linear sRGB)",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "anodized": {
+        "catalogue_name": "Bronze",
+        "fresnel_lut": null,
+        "oxide": {
+          "coefficients": [
+            2.15,
+            0.035
+          ],
+          "dataset": null,
+          "k": 0.0,
+          "model": "cauchy"
+        },
+        "substrate_material_id": "titanium",
+        "thickness_jitter_nm": 3.0,
+        "thickness_nm": 26.0,
+        "voltage_hint_v": null
+      },
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Anodization=Bronze"
+      ],
+      "display_name": "Titanium anodized bronze",
+      "kind": "anodized",
+      "material_id": "titanium-anodized-bronze",
+      "source": {
+        "citation": "Single-film interference on the substrate's n,k (Born and Wolf 1.6.4); thickness per color name fitted by eye; estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "anodized": {
+        "catalogue_name": "Purple",
+        "fresnel_lut": null,
+        "oxide": {
+          "coefficients": [
+            2.15,
+            0.035
+          ],
+          "dataset": null,
+          "k": 0.0,
+          "model": "cauchy"
+        },
+        "substrate_material_id": "titanium",
+        "thickness_jitter_nm": 3.0,
+        "thickness_nm": 40.0,
+        "voltage_hint_v": null
+      },
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Anodization=Purple"
+      ],
+      "display_name": "Titanium anodized purple",
+      "kind": "anodized",
+      "material_id": "titanium-anodized-purple",
+      "source": {
+        "citation": "Single-film interference on the substrate's n,k (Born and Wolf 1.6.4); thickness per color name fitted by eye; estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "anodized": {
+        "catalogue_name": "Blue",
+        "fresnel_lut": null,
+        "oxide": {
+          "coefficients": [
+            2.15,
+            0.035
+          ],
+          "dataset": null,
+          "k": 0.0,
+          "model": "cauchy"
+        },
+        "substrate_material_id": "titanium",
+        "thickness_jitter_nm": 3.0,
+        "thickness_nm": 50.0,
+        "voltage_hint_v": null
+      },
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Anodization=Blue"
+      ],
+      "display_name": "Titanium anodized blue",
+      "kind": "anodized",
+      "material_id": "titanium-anodized-blue",
+      "source": {
+        "citation": "Single-film interference on the substrate's n,k (Born and Wolf 1.6.4); thickness per color name fitted by eye; estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "anodized": {
+        "catalogue_name": "Light Blue",
+        "fresnel_lut": null,
+        "oxide": {
+          "coefficients": [
+            2.15,
+            0.035
+          ],
+          "dataset": null,
+          "k": 0.0,
+          "model": "cauchy"
+        },
+        "substrate_material_id": "titanium",
+        "thickness_jitter_nm": 3.0,
+        "thickness_nm": 62.0,
+        "voltage_hint_v": null
+      },
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Anodization=Light Blue"
+      ],
+      "display_name": "Titanium anodized light blue",
+      "kind": "anodized",
+      "material_id": "titanium-anodized-light-blue",
+      "source": {
+        "citation": "Single-film interference on the substrate's n,k (Born and Wolf 1.6.4); thickness per color name fitted by eye; estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "anodized": {
+        "catalogue_name": "Gold",
+        "fresnel_lut": null,
+        "oxide": {
+          "coefficients": [
+            2.15,
+            0.035
+          ],
+          "dataset": null,
+          "k": 0.0,
+          "model": "cauchy"
+        },
+        "substrate_material_id": "titanium",
+        "thickness_jitter_nm": 3.0,
+        "thickness_nm": 122.0,
+        "voltage_hint_v": null
+      },
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Anodization=Gold"
+      ],
+      "display_name": "Titanium anodized gold",
+      "kind": "anodized",
+      "material_id": "titanium-anodized-gold",
+      "source": {
+        "citation": "Single-film interference on the substrate's n,k (Born and Wolf 1.6.4); thickness per color name fitted by eye; estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "anodized": {
+        "catalogue_name": "Rose",
+        "fresnel_lut": null,
+        "oxide": {
+          "coefficients": [
+            2.15,
+            0.035
+          ],
+          "dataset": null,
+          "k": 0.0,
+          "model": "cauchy"
+        },
+        "substrate_material_id": "titanium",
+        "thickness_jitter_nm": 3.0,
+        "thickness_nm": 142.0,
+        "voltage_hint_v": null
+      },
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Anodization=Rose"
+      ],
+      "display_name": "Titanium anodized rose",
+      "kind": "anodized",
+      "material_id": "titanium-anodized-rose",
+      "source": {
+        "citation": "Single-film interference on the substrate's n,k (Born and Wolf 1.6.4); thickness per color name fitted by eye; estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "anodized": {
+        "catalogue_name": "Magenta",
+        "fresnel_lut": null,
+        "oxide": {
+          "coefficients": [
+            2.15,
+            0.035
+          ],
+          "dataset": null,
+          "k": 0.0,
+          "model": "cauchy"
+        },
+        "substrate_material_id": "titanium",
+        "thickness_jitter_nm": 3.0,
+        "thickness_nm": 154.0,
+        "voltage_hint_v": null
+      },
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Anodization=Magenta"
+      ],
+      "display_name": "Titanium anodized magenta",
+      "kind": "anodized",
+      "material_id": "titanium-anodized-magenta",
+      "source": {
+        "citation": "Single-film interference on the substrate's n,k (Born and Wolf 1.6.4); thickness per color name fitted by eye; estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "anodized": {
+        "catalogue_name": "Teal",
+        "fresnel_lut": null,
+        "oxide": {
+          "coefficients": [
+            2.15,
+            0.035
+          ],
+          "dataset": null,
+          "k": 0.0,
+          "model": "cauchy"
+        },
+        "substrate_material_id": "titanium",
+        "thickness_jitter_nm": 3.0,
+        "thickness_nm": 192.0,
+        "voltage_hint_v": null
+      },
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Anodization=Teal"
+      ],
+      "display_name": "Titanium anodized teal",
+      "kind": "anodized",
+      "material_id": "titanium-anodized-teal",
+      "source": {
+        "citation": "Single-film interference on the substrate's n,k (Born and Wolf 1.6.4); thickness per color name fitted by eye; estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "anodized": {
+        "catalogue_name": "Green",
+        "fresnel_lut": null,
+        "oxide": {
+          "coefficients": [
+            2.15,
+            0.035
+          ],
+          "dataset": null,
+          "k": 0.0,
+          "model": "cauchy"
+        },
+        "substrate_material_id": "titanium",
+        "thickness_jitter_nm": 3.0,
+        "thickness_nm": 210.0,
+        "voltage_hint_v": null
+      },
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Anodization=Green"
+      ],
+      "display_name": "Titanium anodized green",
+      "kind": "anodized",
+      "material_id": "titanium-anodized-green",
+      "source": {
+        "citation": "Single-film interference on the substrate's n,k (Born and Wolf 1.6.4); thickness per color name fitted by eye; estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "anodized": {
+        "catalogue_name": "Bronze",
+        "fresnel_lut": null,
+        "oxide": {
+          "coefficients": [
+            2.1,
+            0.03
+          ],
+          "dataset": null,
+          "k": 0.0,
+          "model": "cauchy"
+        },
+        "substrate_material_id": "niobium",
+        "thickness_jitter_nm": 3.0,
+        "thickness_nm": 28.0,
+        "voltage_hint_v": null
+      },
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Niobium Anodization=Bronze"
+      ],
+      "display_name": "Niobium anodized bronze",
+      "kind": "anodized",
+      "material_id": "niobium-anodized-bronze",
+      "source": {
+        "citation": "Single-film interference on the substrate's n,k (Born and Wolf 1.6.4); thickness per color name fitted by eye; estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "anodized": {
+        "catalogue_name": "Purple",
+        "fresnel_lut": null,
+        "oxide": {
+          "coefficients": [
+            2.1,
+            0.03
+          ],
+          "dataset": null,
+          "k": 0.0,
+          "model": "cauchy"
+        },
+        "substrate_material_id": "niobium",
+        "thickness_jitter_nm": 3.0,
+        "thickness_nm": 42.0,
+        "voltage_hint_v": null
+      },
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Niobium Anodization=Purple"
+      ],
+      "display_name": "Niobium anodized purple",
+      "kind": "anodized",
+      "material_id": "niobium-anodized-purple",
+      "source": {
+        "citation": "Single-film interference on the substrate's n,k (Born and Wolf 1.6.4); thickness per color name fitted by eye; estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "anodized": {
+        "catalogue_name": "Blue",
+        "fresnel_lut": null,
+        "oxide": {
+          "coefficients": [
+            2.1,
+            0.03
+          ],
+          "dataset": null,
+          "k": 0.0,
+          "model": "cauchy"
+        },
+        "substrate_material_id": "niobium",
+        "thickness_jitter_nm": 3.0,
+        "thickness_nm": 52.0,
+        "voltage_hint_v": null
+      },
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Niobium Anodization=Blue"
+      ],
+      "display_name": "Niobium anodized blue",
+      "kind": "anodized",
+      "material_id": "niobium-anodized-blue",
+      "source": {
+        "citation": "Single-film interference on the substrate's n,k (Born and Wolf 1.6.4); thickness per color name fitted by eye; estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "anodized": {
+        "catalogue_name": "Light Blue",
+        "fresnel_lut": null,
+        "oxide": {
+          "coefficients": [
+            2.1,
+            0.03
+          ],
+          "dataset": null,
+          "k": 0.0,
+          "model": "cauchy"
+        },
+        "substrate_material_id": "niobium",
+        "thickness_jitter_nm": 3.0,
+        "thickness_nm": 64.0,
+        "voltage_hint_v": null
+      },
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Niobium Anodization=Light Blue"
+      ],
+      "display_name": "Niobium anodized light blue",
+      "kind": "anodized",
+      "material_id": "niobium-anodized-light-blue",
+      "source": {
+        "citation": "Single-film interference on the substrate's n,k (Born and Wolf 1.6.4); thickness per color name fitted by eye; estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "anodized": {
+        "catalogue_name": "Gold",
+        "fresnel_lut": null,
+        "oxide": {
+          "coefficients": [
+            2.1,
+            0.03
+          ],
+          "dataset": null,
+          "k": 0.0,
+          "model": "cauchy"
+        },
+        "substrate_material_id": "niobium",
+        "thickness_jitter_nm": 3.0,
+        "thickness_nm": 126.0,
+        "voltage_hint_v": null
+      },
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Niobium Anodization=Gold"
+      ],
+      "display_name": "Niobium anodized gold",
+      "kind": "anodized",
+      "material_id": "niobium-anodized-gold",
+      "source": {
+        "citation": "Single-film interference on the substrate's n,k (Born and Wolf 1.6.4); thickness per color name fitted by eye; estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "anodized": {
+        "catalogue_name": "Pink",
+        "fresnel_lut": null,
+        "oxide": {
+          "coefficients": [
+            2.1,
+            0.03
+          ],
+          "dataset": null,
+          "k": 0.0,
+          "model": "cauchy"
+        },
+        "substrate_material_id": "niobium",
+        "thickness_jitter_nm": 3.0,
+        "thickness_nm": 146.0,
+        "voltage_hint_v": null
+      },
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Niobium Anodization=Pink"
+      ],
+      "display_name": "Niobium anodized pink",
+      "kind": "anodized",
+      "material_id": "niobium-anodized-pink",
+      "source": {
+        "citation": "Single-film interference on the substrate's n,k (Born and Wolf 1.6.4); thickness per color name fitted by eye; estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "anodized": {
+        "catalogue_name": "Violet",
+        "fresnel_lut": null,
+        "oxide": {
+          "coefficients": [
+            2.1,
+            0.03
+          ],
+          "dataset": null,
+          "k": 0.0,
+          "model": "cauchy"
+        },
+        "substrate_material_id": "niobium",
+        "thickness_jitter_nm": 3.0,
+        "thickness_nm": 160.0,
+        "voltage_hint_v": null
+      },
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Niobium Anodization=Violet"
+      ],
+      "display_name": "Niobium anodized violet",
+      "kind": "anodized",
+      "material_id": "niobium-anodized-violet",
+      "source": {
+        "citation": "Single-film interference on the substrate's n,k (Born and Wolf 1.6.4); thickness per color name fitted by eye; estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "anodized": {
+        "catalogue_name": "Teal",
+        "fresnel_lut": null,
+        "oxide": {
+          "coefficients": [
+            2.1,
+            0.03
+          ],
+          "dataset": null,
+          "k": 0.0,
+          "model": "cauchy"
+        },
+        "substrate_material_id": "niobium",
+        "thickness_jitter_nm": 3.0,
+        "thickness_nm": 196.0,
+        "voltage_hint_v": null
+      },
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Niobium Anodization=Teal"
+      ],
+      "display_name": "Niobium anodized teal",
+      "kind": "anodized",
+      "material_id": "niobium-anodized-teal",
+      "source": {
+        "citation": "Single-film interference on the substrate's n,k (Born and Wolf 1.6.4); thickness per color name fitted by eye; estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "anodized": {
+        "catalogue_name": "Green",
+        "fresnel_lut": null,
+        "oxide": {
+          "coefficients": [
+            2.1,
+            0.03
+          ],
+          "dataset": null,
+          "k": 0.0,
+          "model": "cauchy"
+        },
+        "substrate_material_id": "niobium",
+        "thickness_jitter_nm": 3.0,
+        "thickness_nm": 214.0,
+        "voltage_hint_v": null
+      },
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Niobium Anodization=Green"
+      ],
+      "display_name": "Niobium anodized green",
+      "kind": "anodized",
+      "material_id": "niobium-anodized-green",
+      "source": {
+        "citation": "Single-film interference on the substrate's n,k (Born and Wolf 1.6.4); thickness per color name fitted by eye; estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Gem=Diamond",
+        "Gem=White Diamond"
+      ],
+      "display_name": "Colorless diamond-like",
+      "gem_dielectric": {
+        "abbe_vd": 55.3,
+        "absorption_spectrum": null,
+        "attenuation_rgb_per_mm": [
+          0.002,
+          0.002,
+          0.003
+        ],
+        "birefringence": null,
+        "inclusions": "none",
+        "ior_family": "ior-2-42",
+        "n_d": 2.417,
+        "scatter": 0.0,
+        "sellmeier": null,
+        "surface_roughness": 0.0
+      },
+      "kind": "gem_dielectric",
+      "material_id": "diamond-white",
+      "source": {
+        "citation": "Published gemmological constants: refractive index n_d and dispersion (B-G), converted to an Abbe number; GIA Gem Reference Guide (1988)",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "measured"
+    },
+    {
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Gem=Cubic Zirconia",
+        "Gem=CZ"
+      ],
+      "display_name": "Colorless cubic zirconia",
+      "gem_dielectric": {
+        "abbe_vd": 33.0,
+        "absorption_spectrum": null,
+        "attenuation_rgb_per_mm": [
+          0.002,
+          0.002,
+          0.003
+        ],
+        "birefringence": null,
+        "inclusions": "none",
+        "ior_family": "ior-2-16",
+        "n_d": 2.16,
+        "scatter": 0.0,
+        "sellmeier": null,
+        "surface_roughness": 0.0
+      },
+      "kind": "gem_dielectric",
+      "material_id": "cz-white",
+      "source": {
+        "citation": "Published gemmological constants: refractive index n_d and dispersion (B-G), converted to an Abbe number; GIA Gem Reference Guide (1988); color (attenuation): estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Gem=Blue Sapphire"
+      ],
+      "display_name": "Blue corundum",
+      "gem_dielectric": {
+        "abbe_vd": 72.0,
+        "absorption_spectrum": null,
+        "attenuation_rgb_per_mm": [
+          1.1,
+          0.55,
+          0.08
+        ],
+        "birefringence": null,
+        "inclusions": "none",
+        "ior_family": "ior-1-77",
+        "n_d": 1.77,
+        "scatter": 0.0,
+        "sellmeier": null,
+        "surface_roughness": 0.0
+      },
+      "kind": "gem_dielectric",
+      "material_id": "sapphire-blue",
+      "source": {
+        "citation": "Published gemmological constants: refractive index n_d and dispersion (B-G), converted to an Abbe number; GIA Gem Reference Guide (1988); color (attenuation): estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Gem=Ruby"
+      ],
+      "display_name": "Red corundum",
+      "gem_dielectric": {
+        "abbe_vd": 72.0,
+        "absorption_spectrum": null,
+        "attenuation_rgb_per_mm": [
+          0.06,
+          1.4,
+          0.9
+        ],
+        "birefringence": null,
+        "inclusions": "none",
+        "ior_family": "ior-1-77",
+        "n_d": 1.77,
+        "scatter": 0.0,
+        "sellmeier": null,
+        "surface_roughness": 0.0
+      },
+      "kind": "gem_dielectric",
+      "material_id": "ruby-red",
+      "source": {
+        "citation": "Published gemmological constants: refractive index n_d and dispersion (B-G), converted to an Abbe number; GIA Gem Reference Guide (1988); color (attenuation): estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Gem=Emerald"
+      ],
+      "display_name": "Green beryl",
+      "gem_dielectric": {
+        "abbe_vd": 71.0,
+        "absorption_spectrum": null,
+        "attenuation_rgb_per_mm": [
+          0.85,
+          0.085,
+          0.6
+        ],
+        "birefringence": null,
+        "inclusions": "none",
+        "ior_family": "ior-1-58",
+        "n_d": 1.577,
+        "scatter": 0.0,
+        "sellmeier": null,
+        "surface_roughness": 0.0
+      },
+      "kind": "gem_dielectric",
+      "material_id": "emerald-green",
+      "source": {
+        "citation": "Published gemmological constants: refractive index n_d and dispersion (B-G), converted to an Abbe number; GIA Gem Reference Guide (1988); color (attenuation): estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Gem=Aquamarine"
+      ],
+      "display_name": "Blue beryl",
+      "gem_dielectric": {
+        "abbe_vd": 71.0,
+        "absorption_spectrum": null,
+        "attenuation_rgb_per_mm": [
+          0.35,
+          0.12,
+          0.05
+        ],
+        "birefringence": null,
+        "inclusions": "none",
+        "ior_family": "ior-1-58",
+        "n_d": 1.577,
+        "scatter": 0.0,
+        "sellmeier": null,
+        "surface_roughness": 0.0
+      },
+      "kind": "gem_dielectric",
+      "material_id": "aquamarine",
+      "source": {
+        "citation": "Published gemmological constants: refractive index n_d and dispersion (B-G), converted to an Abbe number; GIA Gem Reference Guide (1988); color (attenuation): estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Gem=Amethyst"
+      ],
+      "display_name": "Purple quartz",
+      "gem_dielectric": {
+        "abbe_vd": 70.0,
+        "absorption_spectrum": null,
+        "attenuation_rgb_per_mm": [
+          0.3,
+          0.9,
+          0.15
+        ],
+        "birefringence": null,
+        "inclusions": "none",
+        "ior_family": "ior-1-54",
+        "n_d": 1.544,
+        "scatter": 0.0,
+        "sellmeier": null,
+        "surface_roughness": 0.0
+      },
+      "kind": "gem_dielectric",
+      "material_id": "amethyst",
+      "source": {
+        "citation": "Published gemmological constants: refractive index n_d and dispersion (B-G), converted to an Abbe number; GIA Gem Reference Guide (1988); color (attenuation): estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Gem=Citrine"
+      ],
+      "display_name": "Yellow quartz",
+      "gem_dielectric": {
+        "abbe_vd": 70.0,
+        "absorption_spectrum": null,
+        "attenuation_rgb_per_mm": [
+          0.012,
+          0.08,
+          0.42
+        ],
+        "birefringence": null,
+        "inclusions": "none",
+        "ior_family": "ior-1-54",
+        "n_d": 1.544,
+        "scatter": 0.0,
+        "sellmeier": null,
+        "surface_roughness": 0.0
+      },
+      "kind": "gem_dielectric",
+      "material_id": "citrine",
+      "source": {
+        "citation": "Published gemmological constants: refractive index n_d and dispersion (B-G), converted to an Abbe number; GIA Gem Reference Guide (1988); color (attenuation): estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Gem=Garnet"
+      ],
+      "display_name": "Red garnet",
+      "gem_dielectric": {
+        "abbe_vd": 50.0,
+        "absorption_spectrum": null,
+        "attenuation_rgb_per_mm": [
+          0.15,
+          1.8,
+          1.4
+        ],
+        "birefringence": null,
+        "inclusions": "none",
+        "ior_family": "ior-1-79",
+        "n_d": 1.79,
+        "scatter": 0.0,
+        "sellmeier": null,
+        "surface_roughness": 0.0
+      },
+      "kind": "gem_dielectric",
+      "material_id": "garnet-red",
+      "source": {
+        "citation": "Published gemmological constants: refractive index n_d and dispersion (B-G), converted to an Abbe number; GIA Gem Reference Guide (1988); color (attenuation): estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Gem=Peridot"
+      ],
+      "display_name": "Green olivine",
+      "gem_dielectric": {
+        "abbe_vd": 62.0,
+        "absorption_spectrum": null,
+        "attenuation_rgb_per_mm": [
+          0.45,
+          0.08,
+          0.9
+        ],
+        "birefringence": null,
+        "inclusions": "none",
+        "ior_family": "ior-1-67",
+        "n_d": 1.67,
+        "scatter": 0.0,
+        "sellmeier": null,
+        "surface_roughness": 0.0
+      },
+      "kind": "gem_dielectric",
+      "material_id": "peridot",
+      "source": {
+        "citation": "Published gemmological constants: refractive index n_d and dispersion (B-G), converted to an Abbe number; GIA Gem Reference Guide (1988); color (attenuation): estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Gem=Frosted CZ"
+      ],
+      "display_name": "Frosted colorless stone",
+      "gem_dielectric": {
+        "abbe_vd": 33.0,
+        "absorption_spectrum": null,
+        "attenuation_rgb_per_mm": [
+          0.002,
+          0.002,
+          0.003
+        ],
+        "birefringence": null,
+        "inclusions": "none",
+        "ior_family": "ior-2-16",
+        "n_d": 2.16,
+        "scatter": 0.0,
+        "sellmeier": null,
+        "surface_roughness": 0.55
+      },
+      "kind": "gem_dielectric",
+      "material_id": "cz-frosted",
+      "source": {
+        "citation": "Published gemmological constants: refractive index n_d and dispersion (B-G), converted to an Abbe number; GIA Gem Reference Guide (1988); color (attenuation): estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Gem=White Opal"
+      ],
+      "display_name": "White play-of-color opal",
+      "gem_special": {
+        "adularescence": null,
+        "body_rgb_linear": [
+          0.56,
+          0.58,
+          0.62
+        ],
+        "chatoyancy": null,
+        "model": "opal",
+        "orient_strength": 1.0,
+        "patch_scale_mm": 0.16,
+        "sphere_spacing_nm": [
+          150.0,
+          240.0
+        ]
+      },
+      "kind": "gem_special",
+      "material_id": "opal-white",
+      "source": {
+        "citation": "Play of color as Bragg diffraction from ordered silica spheres (Sanders 1964, Nature 204); patch size and body color: estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Gem=Black Opal"
+      ],
+      "display_name": "Dark play-of-color opal",
+      "gem_special": {
+        "adularescence": null,
+        "body_rgb_linear": [
+          0.05,
+          0.06,
+          0.09
+        ],
+        "chatoyancy": null,
+        "model": "opal",
+        "orient_strength": 1.0,
+        "patch_scale_mm": 0.125,
+        "sphere_spacing_nm": [
+          150.0,
+          240.0
+        ]
+      },
+      "kind": "gem_special",
+      "material_id": "opal-dark",
+      "source": {
+        "citation": "Play of color as Bragg diffraction from ordered silica spheres (Sanders 1964, Nature 204); patch size and body color: estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Finish=High Polish"
+      ],
+      "display_name": "High Polish",
+      "finish": {
+        "anisotropy": null,
+        "detail_normal_ref": null,
+        "feature_scale_mm": null,
+        "finish_kind": "polish",
+        "roughness": 0.08
+      },
+      "kind": "finish",
+      "material_id": "finish-polish",
+      "source": {
+        "citation": "roughness: estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Finish=Brushed"
+      ],
+      "display_name": "Brushed",
+      "finish": {
+        "anisotropy": null,
+        "detail_normal_ref": null,
+        "feature_scale_mm": null,
+        "finish_kind": "brushed",
+        "roughness": 0.32
+      },
+      "kind": "finish",
+      "material_id": "finish-brushed",
+      "source": {
+        "citation": "roughness: estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "calibration": {
+        "achieved_de00": null,
+        "date": null,
+        "method": "none",
+        "target_lab": null
+      },
+      "catalogue_facets": [
+        "Finish=Sandblasted"
+      ],
+      "display_name": "Sandblasted",
+      "finish": {
+        "anisotropy": null,
+        "detail_normal_ref": null,
+        "feature_scale_mm": 0.045,
+        "finish_kind": "sandblast",
+        "roughness": 0.55
+      },
+      "kind": "finish",
+      "material_id": "finish-sandblast",
+      "source": {
+        "citation": "roughness and grain size: estimate; fitted by eye to generic reference photographs (no colorimeter); to be refitted against supplier photos",
+        "dataset": null,
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    }
+  ],
+  "schema": "jewelry.material_library/1",
+  "working_space": "linear_rec709"
+}

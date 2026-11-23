@@ -1,0 +1,23 @@
+(
+    format_version: 1,
+    class_name: "prop",
+    scale: (meters_per_unit: 1.0, identity_tolerance: 0.001),
+    axes: (up: pos_y, forward: pos_z),
+    origin: (
+        ground_offset_m: 0.0,
+        ground_tolerance_m: 0.05,
+        coarse_floor_rise_m: 0.25,
+        center_fraction: 0.1,
+    ),
+    lod: (
+        required: ["lod0"],
+        optional: [],
+        budget_lod: "lod0",
+        lod0_min_triangles: 1,
+        lod0_max_triangles: 100000,
+        chain: ["lod0"],
+        ratios: [],
+        hard_caps: [],
+        require_decreasing: true,
+    ),
+)

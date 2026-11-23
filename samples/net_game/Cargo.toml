@@ -1,0 +1,92 @@
+[package]
+name = "net_game"
+description = "The template networked game (ADR-2039): dedicated server and client of one shared simulation over encrypted UDP, with prediction, interpolation, lag compensation and lobbies."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[lints]
+workspace = true
+
+# The shared simulation needs only `net`; the client binary adds the window and renderer.
+[dependencies]
+regia = { path = "../../crates/regia", default-features = false, features = ["net"] }
+regia_scene = { workspace = true }
+regia_render = { workspace = true, optional = true }
+regia_input = { path = "../../crates/regia_input", optional = true }
+# The Steam leg (`steam_leg`, ADR-5375): in-process agent calls and the real SDK passthrough.
+regia_steam = { workspace = true, optional = true }
+crossbeam-channel = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
+
+# `regia` needs `client` or `server`. The server binary without the client stack:
+# `cargo build -p net_game --no-default-features --features server --bin net_game_server`.
+[features]
+default = ["client"]
+client = ["regia/client", "regia/agent", "regia/ui", "dep:regia_render", "dep:regia_input"]
+server = ["regia/server"]
+# The template match over Steam lobbies and sockets (`steam_leg`, N08, ADR-5375). The mock test
+# needs no SDK; `steamworks` links the real client for the owner's two-account run.
+steam = ["client", "regia/steam", "dep:regia_steam", "dep:crossbeam-channel", "dep:serde_json"]
+steamworks = ["steam", "regia_steam/steamworks"]
+
+[[bin]]
+name = "net_game_server"
+path = "src/bin/server.rs"
+
+[[bin]]
+name = "net_game_client"
+path = "src/bin/client.rs"
+required-features = ["client"]
+
+# The agent smoke drives a client over the real agent protocol (needs the client's `agent`).
+[[test]]
+name = "agent_smoke"
+required-features = ["client"]
+
+[dev-dependencies]
+regia_test_utils = { workspace = true }
+serde_json = { workspace = true }
+png = { workspace = true }
+# The overlay test drives the scoreboard's `Scores` action through the game's own input map
+# (`Tab`, as `NetGameView` binds it); the `client` feature already builds this crate.
+regia_input = { path = "../../crates/regia_input" }
+
+# The HUD's widgets over the real agent protocol, in a match on the in-memory network, and a
+# lobby list over UDP.
+[[test]]
+name = "hud"
+required-features = ["client"]
+
+# The real binaries in two processes: needs `net_game_client`, so the `client` feature.
+[[test]]
+name = "process_pair"
+required-features = ["client"]
+
+# A client renders headless on lavapipe and an agent screenshot shows both players.
+[[test]]
+name = "render_smoke"
+required-features = ["client"]
+
+# Intentionally unify the modes only to test the diagnostic; real clients build separately.
+[[test]]
+name = "client_build_mode"
+required-features = ["client", "server"]
+
+# The Steam leg on the mock Steam network: PASS, wrong content and NOT RUN (ADR-5375).
+[[test]]
+name = "steam_leg"
+required-features = ["steam"]
+
+# The windowed client's Steam readout on the mock backend: SteamPlugin, the HUD line and
+# `steam.status` follow an injected overlay event (ADR-7317).
+[[test]]
+name = "steam_overlay"
+required-features = ["steam"]
+
+# The owner's two-account Steam leg (ignored; needs a signed-in Steam client on each machine).
+[[test]]
+name = "steam_leg_real"
+required-features = ["steamworks"]

@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://regia.engine/schemas/terrain-raster-descriptor.schema.json",
+  "title": "Terrain count-raster descriptor",
+  "description": "Engine-owned layout of a count raster (CT-21, ADR-8542, docs/formats/terrain.md § 14): spacing on X and Z, stored row/column order, sample-center or cell-edge registration, nodata value and valid mask. External schema-2 JSON is unchanged and equals {raster_descriptor: 1, spacing_m: [cell_m, cell_m], registration: center}. Unknown fields are an error. Kept in step with the serde fields by regia_terrain's test `the_json_schema_names_every_descriptor_field`.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["raster_descriptor", "spacing_m", "registration"],
+  "properties": {
+    "raster_descriptor": {
+      "const": 1,
+      "description": "Descriptor version. Another version is refused with terrain_raster_version before any other field is read."
+    },
+    "spacing_m": {
+      "type": "array",
+      "items": { "type": "number", "exclusiveMinimum": 0 },
+      "minItems": 2,
+      "maxItems": 2,
+      "description": "Distance between adjacent samples on X and on Z, meters; positive and finite."
+    },
+    "skew_m": {
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 2,
+      "maxItems": 2,
+      "default": [0, 0],
+      "description": "Rotation terms of the affine transform (X change per row, Z change per column), meters. Only [0, 0] is supported; anything else is refused with terrain_raster_transform and never resampled."
+    },
+    "row0": {
+      "enum": ["south", "north"],
+      "default": "south",
+      "description": "Which edge stored row 0 is: south = minimum Z, north = maximum Z (a north-up image's top row). Normalized by exact index permutation."
+    },
+    "col0": {
+      "enum": ["west", "east"],
+      "default": "west",
+      "description": "Which edge stored column 0 is: west = minimum X, east = maximum X."
+    },
+    "registration": {
+      "enum": ["center", "edge"],
+      "description": "What origin_m names: center = the minimum-corner sample itself (GDAL Point); edge = the outer corner of the minimum-corner cell (GDAL Area), samples sit spacing / 2 inside on each axis. Required: a half-cell shift is never implied."
+    },
+    "origin_m": {
+      "type": ["array", "null"],
+      "items": { "type": "number" },
+      "minItems": 2,
+      "maxItems": 2,
+      "default": null,
+      "description": "World X/Z of the minimum-X/minimum-Z registration point, whichever corner the raster stores first. Absent: -dimension * spacing / 2 per axis (the schema-2 default)."
+    },
+    "nodata_counts": {
+      "type": ["integer", "null"],
+      "minimum": 0,
+      "maximum": 65535,
+      "default": null,
+      "description": "A count meaning no data. Such samples are missing: kept verbatim, never turned into a height."
+    },
+    "valid_mask": {
+      "type": ["object", "null"],
+      "default": null,
+      "additionalProperties": false,
+      "required": ["cols", "rows", "valid"],
+      "properties": {
+        "cols": { "type": "integer", "minimum": 2, "description": "Must equal the raster's columns (terrain_raster_mask)." },
+        "rows": { "type": "integer", "minimum": 2, "description": "Must equal the raster's rows (terrain_raster_mask)." },
+        "valid": {
+          "type": "array",
+          "items": { "enum": [0, 1] },
+          "description": "cols * rows entries in the raster's stored order: 1 = data, 0 = missing."
+        }
+      },
+      "description": "Explicit valid-data mask, combined with nodata_counts."
+    }
+  }
+}

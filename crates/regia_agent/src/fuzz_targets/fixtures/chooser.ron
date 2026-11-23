@@ -1,0 +1,19 @@
+(
+    format_version: 1,
+    mode: Best,                             // First (default) | Best | Weighted | All
+    result: Asset("montage"),               // Asset("<kind>" | "any") | Value(Bool|Int|Float|Name|Tags) | OutputOnly
+    inputs: { "hit_angle": Float, "armed": Bool, "stance": Enum(["stand", "crouch"]) },
+    outputs: { "rate": Float },
+    columns: [
+        (id: "armed",  input: "armed",     kind: Bool),
+        (id: "stance", input: "stance",    kind: Enum),
+        (id: "angle",  input: "hit_angle", kind: FloatDistance(influence: 1.0, max_distance: 180.0, wrap: Some((-180.0, 180.0)))),
+        (id: "rate",   output: "rate",     kind: SetFloat),
+    ],
+    rows: [
+        (id: "hit_front", cells: { "armed": True, "angle": 0.0, "rate": 1.0 }, result: Asset("anim/hit_front.montage.ron"), note: "the default reaction"),
+        (id: "hit_back",  cells: { "angle": 180.0, "stance": Is("crouch"), "rate": 1.2 }, result: Asset("anim/hit_back.montage.ron")),
+        (id: "nested",    enabled: false, cells: {}, result: Chooser("anim/hit_generic.chooser.ron")),
+    ],
+    catch_all: Some((result: Asset("anim/hit_generic.montage.ron"), outputs: { "rate": 1.0 })),
+)

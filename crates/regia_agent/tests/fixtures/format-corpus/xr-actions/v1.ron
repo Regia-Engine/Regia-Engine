@@ -1,0 +1,7 @@
+(format_version: 1,
+ sets: [(name: "gameplay", priority: 0, actions: [
+   (name: "move", ty: Vec2, label: "xr-action-move", subs: ["left"]),
+   (name: "grab", ty: Float, label: "xr-action-grab", subs: ["left", "right"]),
+   (name: "grip_pose", ty: Pose, subs: ["left", "right"]),
+   (name: "buzz", ty: Haptic, subs: ["left", "right"])])],
+ bindings: [(profile: "simple_controller", map: [("grab", "left", "select/click")])])

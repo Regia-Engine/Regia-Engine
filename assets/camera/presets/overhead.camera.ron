@@ -1,0 +1,53 @@
+(
+    format_version: 2,
+    name: "overhead",
+    params: {},
+    variables: [],
+    inputs: [
+        (
+            name: "look",
+            kind: Axis2,
+            speed: (120.0, 90.0),
+            pitch_clamp: (-90.0, -90.0),
+            invert_pitch: false,
+            normalize: false,
+            pull_toward_var: None,
+            pull_weight: 0.1,
+        ),
+    ],
+    rigs: [
+        (
+            name: "main",
+            tags: [],
+            root: [
+                Pivot(
+                    target: DriveTarget,
+                    offset: (0.0, 0.0, 0.0),
+                    space: World,
+                    aim_offset: (0.0, 0.0, 0.0),
+                    inherit_rotation: false,
+                ),
+                LookInput(
+                    slot: "look",
+                    additive: false,
+                ),
+                Boom(
+                    length: Literal(20.0),
+                    side_offset: Literal(0.0),
+                    up_offset: Literal(0.0),
+                    length_speed: Literal(0.0),
+                ),
+                SmoothPosition(
+                    depth: 5.0,
+                    side: 5.0,
+                    height: 5.0,
+                    space: World,
+                ),
+            ],
+            transitions: [],
+            blend_out: None,
+        ),
+    ],
+    transitions: [],
+    director: Fixed("main"),
+)

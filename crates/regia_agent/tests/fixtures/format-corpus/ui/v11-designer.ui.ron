@@ -1,0 +1,43 @@
+// `.ui.ron` v11, the UI designer's additions folded into v11 (ADR-7751, ADR-7724): theme-token and
+// animation bindings, row height from the template for a virtualized repeat, and image fit tile.
+(
+    version: 11,
+    root: (
+        name: "inbox",
+        style: (direction: column, gap: (8, 8)),
+        children: [
+            (
+                name: "accent",
+                style: (size: (240, 24)),
+                text: (spans: [""]),
+                bindings: [(theme: "color.accent")],
+            ),
+            (
+                name: "pulse",
+                style: (size: (240, 24)),
+                opacity: 1,
+                bindings: [
+                    (
+                        target: opacity,
+                        animation: (from: 0.25, to: 1, duration: 0.8, delay: 0.1, ease: "quad_in_out", repeat: ping_pong),
+                    ),
+                ],
+            ),
+            (
+                name: "messages",
+                style: (size: (240, 300)),
+                widget: list(0, 32),
+                repeat: (source: "InboxVm.messages", key: "id", row_height: template),
+                children: [
+                    (
+                        name: "message",
+                        style: (size: (Auto, 56)),
+                        text: (spans: [""]),
+                        bindings: [(source: ".subject")],
+                    ),
+                ],
+            ),
+            (name: "pattern", style: (size: (240, 80)), image: (id: 7, fit: tile)),
+        ],
+    ),
+)

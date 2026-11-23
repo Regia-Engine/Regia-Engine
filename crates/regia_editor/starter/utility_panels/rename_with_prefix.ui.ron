@@ -1,0 +1,21 @@
+// The starter utility panel's document (ADR-8189): a prefix field and a button whose command the
+// panel's driver answers.
+(
+    version: 11,
+    root: (
+        name: "panel",
+        style: (direction: column, padding: 12, gap: (8, 8)),
+        children: [
+            (name: "heading", text: (spans: ["Rename the selected entities"])),
+            (name: "prefix", style: (size: (240, 32)), widget: text_input("Prefix", false)),
+            (
+                name: "rename",
+                widget: button,
+                interactable: true,
+                command: "rename",
+                style: (padding: 8),
+                text: (spans: ["Rename selection"]),
+            ),
+        ],
+    ),
+)

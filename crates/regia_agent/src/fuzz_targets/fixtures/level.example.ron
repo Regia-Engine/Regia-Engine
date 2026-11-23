@@ -1,0 +1,148 @@
+// Example `.level.ron` (format version 8, `docs/formats/scene-files.md`).
+//!
+//! A small courtyard: one ground plane, a door assembly built from entities, and a lamp
+//! instantiated from a prefab with an intensity override and an added component. Entities
+//! reference the lamp prefab by asset guid; overrides reference the lamp's *local ids*.
+//!
+//! Run `cargo test -p regia_scene --test formats` to parse this file against the schema rules.
+
+SceneFile(
+    format_version: 8,
+    entities: [
+        (
+            guid: "3f7a1c2e-8b64-4a35-9d20-6f1e2b3c4d5a",
+            name: "Courtyard",
+            components: {
+                "regia_scene::transform::Transform": (
+                    translation: (0.0, 0.0, 0.0),
+                    rotation: (0.0, 0.0, 0.0, 1.0),
+                    scale: (1.0, 1.0, 1.0),
+                ),
+            },
+        ),
+        (
+            guid: "9b2e6f0a-1e42-4c11-8d5a-3c2f7e10d0aa",
+            name: "Ground",
+            parent: Some("3f7a1c2e-8b64-4a35-9d20-6f1e2b3c4d5a"),
+            components: {
+                "regia_scene::transform::Transform": (
+                    translation: (0.0, 0.0, 0.0),
+                    rotation: (0.0, 0.0, 0.0, 1.0),
+                    scale: (20.0, 1.0, 20.0),
+                ),
+                "regia_scene::components::Static": (),
+                "regia_scene::components::Tags": (["ground", "walkable"]),
+            },
+        ),
+        (
+            guid: "c7d4e2f8-93b1-4a67-8e0c-5d6f7a8b9c0d",
+            name: "North Wall",
+            parent: Some("3f7a1c2e-8b64-4a35-9d20-6f1e2b3c4d5a"),
+            components: {
+                "regia_scene::transform::Transform": (
+                    translation: (0.0, 2.0, -5.0),
+                    rotation: (0.0, 0.0, 0.0, 1.0),
+                    scale: (10.0, 4.0, 0.5),
+                ),
+                "regia_scene::components::Static": (),
+            },
+        ),
+        (
+            guid: "2ab08f1c-6f2a-4b77-9a3e-2c51b0d4e7aa",
+            name: "Door Assembly",
+            parent: Some("3f7a1c2e-8b64-4a35-9d20-6f1e2b3c4d5a"),
+            components: {
+                "regia_scene::transform::Transform": (
+                    translation: (0.0, 0.0, -4.7),
+                    rotation: (0.0, 0.0, 0.0, 1.0),
+                    scale: (1.0, 1.0, 1.0),
+                ),
+            },
+        ),
+        (
+            guid: "8f1c9e60-6f2a-4b77-9a3e-2c51b0d4e7aa",
+            name: "Door",
+            parent: Some("2ab08f1c-6f2a-4b77-9a3e-2c51b0d4e7aa"),
+            components: {
+                "regia_scene::transform::Transform": (
+                    translation: (0.0, 1.0, 0.0),
+                    rotation: (0.0, 0.0, 0.0, 1.0),
+                    scale: (1.0, 1.0, 1.0),
+                ),
+                "my_game::Door": (open_angle: 1.57),
+            },
+        ),
+        (
+            guid: "d1e2f3a4-b5c6-4d7e-8f90-1a2b3c4d5e6f",
+            name: "Yard Lamp",
+            parent: Some("3f7a1c2e-8b64-4a35-9d20-6f1e2b3c4d5a"),
+            prefab_instance: (
+                prefab: "asset:44fe6f0a-1e42-4c11-8d5a-9b3c2f7e10d0",
+                overrides: [
+                    (
+                        target: "0f1e8a44-90d3-4f2e-b7c5-6a2d0e4f8b11",
+                        component: "regia_render::PointLight",
+                        path: ".intensity",
+                        value: 800.0,
+                    ),
+                ],
+                added_components: [
+                    (
+                        target: "0f1e8a44-90d3-4f2e-b7c5-6a2d0e4f8b11",
+                        component: "regia_scene::components::Tags",
+                        value: (["courtyard", "evening"]),
+                    ),
+                ],
+                removed_components: [],
+                added_children: [],
+                removed_children: [],
+            ),
+        ),
+    ],
+    resources: {
+        "regia_scene::level::LevelSettings": (
+            gravity: (0.0, -9.81, 0.0),
+            environment: Some("asset:7e3d9c1a-4b25-4f88-a6d1-0c9e8f7b6a55"),
+            game_rules: Some("my_game::rules::CourtyardRules"),
+            ambient_audio: Some("asset:5b6c7d8e-9f0a-4b1c-8d2e-3f4a5b6c7d8e"),
+            streaming_enabled: false,
+            atmosphere: (
+                preset: Earth,
+                time_of_day: Some((hour: 16.5, day_of_year: 172, latitude_deg: 40.0)),
+                sun_illuminance_lux: None,
+                cloud_coverage: 0.3,
+                cloud_type: 0.5,
+                sky_body: None,
+                moons: [],
+                haze: (density: 0.0, scale_height_m: 200.0, base_height_m: 0.0),
+                // A typical clear day (v8). Omitted keeps today's near-clean air (≈ 0.0053).
+                aerosol_turbidity: 0.1,
+            ),
+            look: (
+                exposure_bias_ev: 0.0,
+                min_ev100: None,
+                max_ev100: None,
+                // Bore Twelve's snow compensation (v7): +1 EV where sunlit ice from 250 cd/m²
+                // fills the metered frame, scaled by its coverage.
+                meter: Some((
+                    low_percentile: 0.45,
+                    high_percentile: 0.98,
+                    center_weight: 0.3,
+                    bright_threshold_cd_m2: 250.0,
+                    bright_bias_ev: 1.0,
+                )),
+                contrast: None,
+                saturation: None,
+                grade: None,
+                lut: None,
+            ),
+            audio_medium: (
+                airborne: None,
+                speed_of_sound_mps: None,
+                level_offset_db: None,
+                absorption_db_per_m_khz2: None,
+                ground: None,
+            ),
+        ),
+    },
+)

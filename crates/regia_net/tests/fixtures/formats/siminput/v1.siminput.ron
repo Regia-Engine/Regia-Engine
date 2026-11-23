@@ -1,0 +1,4 @@
+SimRecording(
+    format_version: 1,
+    frames: [[1, 0, 0, 0], [1, 0, 1, 0], [], [255, 254, 253]],
+)

@@ -1,0 +1,59 @@
+(
+    format: "vfx",
+    entries: [
+        (
+            version: 1,
+            file: "v1.vfx.ron",
+            origin: "git de2994381548e09cf43d973a4457ab7a7b0ab9f2:crates/ferrite_vfx/tests/fixtures/muzzle_flash.vfx.ron (pre-rename brand path)",
+            exercises: "the frozen first schema (muzzle flash, burst emitters, LOD)",
+        ),
+        (
+            version: 2,
+            file: "v2.vfx.ron",
+            origin: "handwritten from 3752bc19dd8da78a5e1e6902ac459282498d051f",
+            exercises: "emissive, lit, self_shadow, screen_floor_px, PuffAnim sprite, flipbook random_start/blend_frames",
+        ),
+        (
+            version: 3,
+            file: "v3.vfx.ron",
+            origin: "handwritten from 78549d889ccc81cf5ad05a437ceeca02f2ca2c1b",
+            exercises: "FireAnim sprite (the only v3 change)",
+        ),
+        (
+            version: 4,
+            file: "v4.vfx.ron",
+            origin: "git 49e02aef687b64a671acff72cd8177603d973318:samples/vfx_lab/effects/ember_drift.vfx.ron",
+            exercises: "real v4 file; does not use heat_haze or FireballAnim (no real v4 file with them exists), so it only proves a genuine v4 body loads",
+        ),
+        (
+            version: 5,
+            file: "v5.vfx.ron",
+            origin: "registry fixture (version 1) loaded and re-encoded by the loader at version 5 (v5 was current at the corpus branch base)",
+            exercises: "v5: what v5 froze",
+        ),
+        (
+            version: 6,
+            file: "v6.vfx.ron",
+            origin: "handwritten from b3f43720e (the v6 struct in crates/regia_vfx/src/format.rs: the v5 fixture body + wind_response/wind_drag and an Event-spawned child emitter)",
+            exercises: "v6: scene wind (wind_response, wind_drag) and event spawns (EventTrigger/EventSpawnDef, SpawnMode::Event)",
+        ),
+        (
+            version: 7,
+            file: "v7.ron",
+            origin: "registry fixture (version 1) loaded and re-encoded by the loader at version 7",
+            exercises: "v7: what v7 froze (the loader's v7 output, kept when v8 became current)",
+        ),
+        (
+            version: 8,
+            file: "v8.ron",
+            origin: "the v7 fixture re-versioned to 8 plus a third emitter: a copy of `flash` as a Mesh particle with render.mesh (ADR-7210)",
+            exercises: "the current version: render.mesh (v8); what the loader writes today must stay readable",
+        ),
+        (
+            version: 8,
+            file: "v8-bounds.ron",
+            origin: "copy of crates/regia_agent/src/fuzz_targets/fixtures/vfx-bounds.example.ron (the vfx-bounds fuzz target's seed; lane w13-ui-vfx-bounds)",
+            exercises: "the v8 fold of ADR-8105 row (h): system.bounds (FixedBoundsDef min/max, P-225) with curl and vortex motion inside it",
+        ),
+    ],
+)

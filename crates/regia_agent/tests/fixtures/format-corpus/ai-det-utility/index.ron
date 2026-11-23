@@ -1,0 +1,11 @@
+(
+    format: "ai-det-utility",
+    entries: [
+        (
+            version: 1,
+            file: "v1.ron",
+            origin: "frozen copy of the ai.det_utility fuzz fixture, format version 1",
+            exercises: "the current version: named inputs, two options, every curve field, additive and multiplier considerations, a floor, defaulted fields",
+        ),
+    ],
+)

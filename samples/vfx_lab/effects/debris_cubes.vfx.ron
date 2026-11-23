@@ -1,0 +1,52 @@
+// Sample: a burst of tumbling debris cubes that overlap on screen while they fly and land.
+// Mesh particles blend without depth writes, so they draw back to front: overlapping cubes
+// keep the same order every frame (ADR-545).
+(
+    version: 4,
+    name: "sample_debris_cubes",
+    system: (budget: 256),
+    emitters: [
+        (
+            name: "chunks",
+            delay: 0.0,
+            spawn: (mode: Burst(160), lifetime: (min: 2.5, max: 4.0)),
+            init: (
+                shape: Sphere(radius: (min: 0.0, max: 0.4)),
+                velocity: (mode: Directional(
+                    dir: (0.0, 1.0, 0.0),
+                    spread: 55.0,
+                    speed: (min: 3.0, max: 7.5),
+                )),
+                size: (min: 0.12, max: 0.35),
+                rotation: (min: 0.0, max: 6.28),
+                spin: (min: -6.0, max: 6.0),
+                color: [(t: 0.0, color: "#6e675e")],
+            ),
+            update: (
+                gravity: (0.0, -9.81, 0.0),
+                drag: 0.15,
+                depth_collision: Some((kill: false, offset: 0.05)),
+                alpha_over_life: [(t: 0.0, v: 1.0), (t: 0.85, v: 1.0), (t: 1.0, v: 0.0)],
+            ),
+            render: (mode: Mesh, blend: Alpha),
+        ),
+        (
+            name: "dust",
+            delay: 0.0,
+            spawn: (mode: Burst(24), lifetime: (min: 1.5, max: 2.5)),
+            init: (
+                shape: Sphere(radius: (min: 0.2, max: 0.6)),
+                velocity: (mode: Radial(speed: (min: 0.4, max: 1.2))),
+                size: (min: 0.8, max: 1.4),
+                color: [(t: 0.0, color: "#9a8f80")],
+            ),
+            update: (
+                gravity: (0.0, 0.3, 0.0),
+                drag: 1.5,
+                size_over_life: [(t: 0.0, v: 1.0), (t: 1.0, v: 2.5)],
+                alpha_over_life: [(t: 0.0, v: 0.7), (t: 1.0, v: 0.0)],
+            ),
+            render: (mode: Billboard, sprite: Puff, blend: Alpha, softness: 1.0, lit: true),
+        ),
+    ],
+)

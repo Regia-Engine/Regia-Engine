@@ -1,0 +1,55 @@
+// Sample: a stack of lit smoke puffs that start at one point and rise straight up, so many
+// puffs sit at the same view depth. The alpha sort orders equal depths by pool slot: the
+// stack must not shimmer from frame to frame (ADR-545).
+(
+    version: 4,
+    name: "sample_smoke_stack",
+    system: (budget: 600),
+    emitters: [
+        (
+            name: "column",
+            delay: 0.0,
+            spawn: (mode: Rate(90.0), lifetime: (min: 3.0, max: 3.0)),
+            init: (
+                shape: Point,
+                velocity: (mode: Directional(dir: (0.0, 1.0, 0.0), speed: (min: 1.2, max: 1.2))),
+                size: (min: 0.6, max: 0.6),
+                rotation: (min: 0.0, max: 6.28),
+                spin: (min: -0.3, max: 0.3),
+                color: [(t: 0.0, color: "#8c8680")],
+            ),
+            update: (
+                drag: 0.2,
+                size_over_life: [(t: 0.0, v: 0.6), (t: 1.0, v: 2.2)],
+                alpha_over_life: [(t: 0.0, v: 0.0), (t: 0.1, v: 0.8), (t: 1.0, v: 0.0)],
+            ),
+            render: (
+                mode: Billboard,
+                sprite: PuffAnim,
+                blend: Alpha,
+                softness: 1.0,
+                lit: true,
+                self_shadow: 0.7,
+                screen_floor_px: 2.0,
+                flipbook: Some((cols: 8, rows: 2, frames: 16, mode: OverLife, random_start: true)),
+            ),
+        ),
+        (
+            name: "tint",
+            delay: 0.0,
+            spawn: (mode: Rate(30.0), lifetime: (min: 3.0, max: 3.0)),
+            init: (
+                shape: Point,
+                velocity: (mode: Directional(dir: (0.0, 1.0, 0.0), speed: (min: 1.2, max: 1.2))),
+                size: (min: 0.5, max: 0.5),
+                color: [(t: 0.0, color: "#5a4c40")],
+            ),
+            update: (
+                drag: 0.2,
+                size_over_life: [(t: 0.0, v: 0.6), (t: 1.0, v: 2.0)],
+                alpha_over_life: [(t: 0.0, v: 0.0), (t: 0.1, v: 0.6), (t: 1.0, v: 0.0)],
+            ),
+            render: (mode: Billboard, sprite: Puff, blend: Alpha, softness: 1.0, lit: true),
+        ),
+    ],
+)

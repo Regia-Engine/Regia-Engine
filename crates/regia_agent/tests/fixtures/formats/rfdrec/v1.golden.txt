@@ -1,0 +1,12 @@
+protocol_version: 1
+client_name: Atelier-é
+dcc: Blender 4.2
+records: 4
+tick=0 type=0x0001 handle=0 size=16
+tick=5 type=0x7001 handle=0 size=12
+tick=5 type=0x0002 handle=0 size=21
+tick=1000000 type=0x0003 handle=0 size=15
+frame 0: 0c000000010000000100000001020304
+frame 1: 080000000170020002000000
+frame 2: 110000000200000003000000ffffffffffffffffff
+frame 3: 0b0000000300010004000000616263

@@ -1,0 +1,23 @@
+[package]
+name = "crowd_lab"
+description = "Headless crowd lab: one locomotion library retargeted onto three rigs, 240 navigation agents, deterministic digest (spec 85)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia_animation = { workspace = true }
+regia_asset = { workspace = true }
+regia_core = { workspace = true }
+regia_nav = { workspace = true }
+
+[features]
+# Cross-host comparisons (ADR-5176): glam's scalar math, so the crowd digest (the skinning palette
+# and, for clips without a root-motion track, the measured gaits) is the same on x86_64 and aarch64.
+# Off by default; the navigation digest agrees without it.
+cross-platform-determinism = ["regia_animation/cross-platform-determinism"]

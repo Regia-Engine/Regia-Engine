@@ -1,0 +1,26 @@
+// `theme-rules` fuzz target fixture: a v2 theme (ADR-8105 (e)) with a keyboard-only focus layer and three style rules.
+// Everything not listed comes from regia-dark.
+(
+    format_version: 2,
+    name: "my-game-v2",
+    extends: Some("regia-dark"),
+    tokens: {
+        "color.accent": "#e8793a",
+        "game.toolbar-button": "#2a3340",
+    },
+    types: {
+        "Button": (
+            focused: { "border_width": 1 },
+            // Shown only when focus came from the keyboard or a gamepad, never after a click.
+            focus_visible: { "border": [3, "@color.focus-ring"] },
+        ),
+    },
+    rules: [
+        // A descendant selector: any Button inside a Toolbar, at any depth.
+        (inside: Some("Toolbar"), widget: Some("Button"), props: { "background": "@game.toolbar-button" }),
+        // A class selector in the hover state.
+        (classes: ["danger-zone"], state: Some(hover), props: { "background": "@color.danger" }),
+        // A variation in the keyboard-only focus state.
+        (widget: Some("Button"), variation: Some("primary"), state: Some(focus_visible), props: { "focus_ring": ["@color.accent", 3, 2] }),
+    ],
+)

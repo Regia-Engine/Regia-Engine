@@ -1,0 +1,9 @@
+(
+    format: "node-tracks",
+    entries: [(
+        version: 1,
+        file: "v1.bin",
+        origin: "ADR-8157: hand-authored postcard body matching NodeAnimation v1; one source node 7 named door",
+        exercises: "Version, import frame, bind defaults, original node identity and linear translation keys.",
+    )],
+)

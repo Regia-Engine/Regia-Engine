@@ -1,0 +1,441 @@
+<!doctype html>
+<!-- The browser smoke test of the web player (tests/browser_smoke.rs serves this and reads the result it
+     posts; ADR-2541). It drives the public JS API the way a page does. -->
+<html lang="en"><head><meta charset="utf-8"><title>regia_web smoke</title>
+<style>body { margin: 0 } canvas { width: 256px; height: 256px; display: block }</style></head>
+<body><canvas id="view"></canvas>
+<script type="module">
+const q = new URLSearchParams(location.search);
+const results = [];
+const check = (name, ok, detail) => results.push({ name, ok: !!ok, detail: detail === undefined ? "" : JSON.stringify(detail) });
+const post = (path, body) => fetch(path, { method: "POST", body });
+// Evidence names start with `tag` when the test gives one (the Firefox run), so browsers do not overwrite each other.
+const tag = q.get("tag") ? q.get("tag") + "-" : "";
+const frames = (n) => new Promise((done) => { const f = () => (n-- > 0 ? requestAnimationFrame(f) : done()); f(); });
+const code = (fn) => { try { fn(); return null; } catch (e) { return e.code || String(e); } };
+const rejected = async (p) => { try { await p; return null; } catch (e) { return e.code || String(e); } };
+
+// The canvas as RGBA, read in the task that drew it.
+async function pixels(url) {
+  const img = new Image(); img.src = url; await img.decode();
+  const c = document.createElement("canvas"); c.width = img.width; c.height = img.height;
+  const g = c.getContext("2d"); g.drawImage(img, 0, 0);
+  return g.getImageData(0, 0, img.width, img.height).data;
+}
+const differs = (a, b) => { let n = 0; for (let i = 0; i < a.length; i += 4) if (Math.abs(a[i] - b[i]) + Math.abs(a[i+1] - b[i+1]) + Math.abs(a[i+2] - b[i+2]) > 6) n++; return n; };
+
+const pointer = (canvas, type, id, x, y) => {
+  const r = canvas.getBoundingClientRect();
+  canvas.dispatchEvent(new PointerEvent(type, { pointerId: id, pointerType: "touch", clientX: r.left + x, clientY: r.top + y, bubbles: true, cancelable: true, button: 0, buttons: 1 }));
+};
+
+// Real numbers on the machine at hand: the canvas at page width, frames from the browser.
+async function perf(viewer, canvas) {
+  const pct = (a, p) => { const s = [...a].sort((x, y) => x - y); return s.length ? +s[Math.min(s.length - 1, Math.floor(s.length * p))].toFixed(2) : null; };
+  const summary = (a) => ({ n: a.length, p50: pct(a, 0.5), p95: pct(a, 0.95), max: pct(a, 1), over33: a.filter((x) => x > 33.4).length, over17: a.filter((x) => x > 17.5).length });
+  canvas.style.width = "100vw"; canvas.style.height = "100vw";
+  await frames(4);
+  const out = { drawing: viewer.stats().drawing, dpr: devicePixelRatio, ua: navigator.userAgent };
+
+  // Drag on a circle, one move per browser frame.
+  const rect = canvas.getBoundingClientRect();
+  const [cx, cy, radius] = [rect.width / 2, rect.height / 2, rect.width / 4];
+  pointer(canvas, "pointerdown", 21, cx + radius, cy);
+  const deltas = [];
+  await new Promise((done) => {
+    let last = null, i = 0;
+    const tick = (t) => {
+      if (last !== null && i > 5) deltas.push(t - last);
+      last = t;
+      if (i++ >= 305) return done();
+      const a = i / 30;
+      pointer(canvas, "pointermove", 21, cx + radius * Math.cos(a), cy + radius * Math.sin(a));
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  });
+  pointer(canvas, "pointerup", 21, cx, cy);
+  out.drag = summary(deltas);
+  for (let i = 0; i < 400 && viewer.stats().pending; i++) await frames(1);
+
+  // Material-only switches, measured from setPick to the frame on the canvas.
+  const values = (name) => viewer.options().find((g) => g.group === name).values.filter((v) => v.available).map((v) => v.value);
+  const measure = async (group, list, rounds) => {
+    const times = [];
+    for (let i = 0; i < rounds; i++) {
+      viewer.setPick(group, list[i % list.length]);
+      await frames(2);
+      times.push(viewer.stats().lastSwitchMs);
+    }
+    return summary(times);
+  };
+  out.switchMetal = await measure("Material", values("Material"), 20);
+  out.switchGem = await measure("Gem", values("Gem"), 20);
+  // A geometry switch: another part.
+  out.switchGeometry = await measure("Threading", values("Threading"), 20);
+
+  // Idle: three seconds of browser frames with nothing to do.
+  await frames(5);
+  for (let i = 0; i < 400 && viewer.stats().pending; i++) await frames(1);
+  const a = viewer.stats();
+  const t0 = performance.now();
+  while (performance.now() - t0 < 3000) await frames(1);
+  const b = viewer.stats();
+  out.idle = { seconds: 3, draws: b.draws - a.draws, requests: b.requests - a.requests, pending: b.pending };
+
+  await post("/evidence/" + tag + viewer.stats().backend + "-device.png", (() => { viewer.setDeterministic(true); viewer.setView({ tilt: [8, -5], zoom: 1, animate: false }); viewer.step(16); const u = canvas.toDataURL("image/png"); viewer.setDeterministic(false); return u; })());
+  return out;
+}
+
+async function run() {
+  const want = q.get("backend");
+  const expect = q.get("expect") || want;
+  const canvas = document.getElementById("view");
+  const mod = await import("/dist/regia_web.js");
+  await mod.default();
+  const { RegiaViewer } = mod;
+
+  if (expect === "none") {
+    check("no_backend_rejects", (await rejected(RegiaViewer.create(canvas, { backend: want }))) === "backend_unavailable");
+    return;
+  }
+
+  check("bad_options_reject", (await rejected(RegiaViewer.create(canvas, { msaa: 2 }))) === "bad_argument");
+  const spare = () => document.createElement("canvas");
+  check("studio_missing", (await rejected(RegiaViewer.create(spare(), { backend: want, studio: "/nope/" }))) === "studio_fetch_failed");
+  check("studio_damaged", (await rejected(RegiaViewer.create(spare(), { backend: want, studio: "/studio-bad/" }))) === "studio_invalid");
+  const studied = await RegiaViewer.create(spare(), { backend: want, studio: "/studio-good/" });
+  check("studio_loads", studied.stats().backend === expect);
+  studied.destroy();
+  const viewer = await RegiaViewer.create(canvas, { backend: want, msaa: 4 });
+  const stats = () => viewer.stats();
+  check("backend", stats().backend === expect, stats());
+  check("draws_the_looks", stats().looks === true, stats());
+  check("touch_action", canvas.style.touchAction === "none");
+  check("calls_before_open", code(() => viewer.options()) === "no_product");
+
+  const events = [];
+  for (const name of ["ready", "changed", "error"]) viewer.on(name, (e) => events.push(e));
+  let customReady = 0;
+  canvas.addEventListener("regia-ready", () => customReady++);
+  const drop = () => { const n = events.length; events.length = 0; return n; };
+
+  check("missing_package", (await rejected(viewer.open("/packages/nope/"))) === "package_fetch_failed");
+  check("error_event", events.some((e) => e.type === "error" && e.code === "package_fetch_failed"), events);
+  drop();
+  check("damaged_package", (await rejected(viewer.open("/packages-damaged/"))) === "package_hash_mismatch");
+  drop();
+
+  const product = q.get("product");
+  const t0 = performance.now();
+  await viewer.open(product);
+  const openMs = performance.now() - t0;
+  check("ready_event", events.some((e) => e.type === "ready" && e.backend === expect), events);
+  check("regia_ready_on_canvas", customReady === 1, customReady);
+  check("drew_on_open", stats().draws >= 1, stats());
+  // The lazy loop as a page uses it, before anything turns deterministic mode on: a view change draws on the
+  // next browser frames, and the loop goes idle again (the frame create() asked for used to stay pending, so
+  // nothing but open() ever drew).
+  await frames(3);
+  check("lazy_loop_idle_after_open", !stats().pending, stats());
+  const lazyDraws = stats().draws;
+  viewer.setView({ tilt: [6, 0], animate: false });
+  await frames(3);
+  check("lazy_view_change_draws", stats().draws > lazyDraws, stats());
+  viewer.setView({ tilt: [0, 0], animate: false });
+  for (let i = 0; i < 400 && stats().pending; i++) await frames(1);
+  const pipelines = stats().pipelines;
+  check("pipelines_built", pipelines > 0, pipelines);
+  drop();
+
+  const groups = viewer.options();
+  check("options_shape", groups.every((g) => g.group && g.kind && Array.isArray(g.values)), groups);
+  const names = groups.map((g) => g.group);
+  check("options_has_groups", ["Material", "Gem", "Gem Size"].every((n) => names.includes(n)), names);
+  check("build_shape", viewer.build().schema === "jewelry.build/1", viewer.build());
+
+  // Everything visual runs in deterministic mode: a frame comes only from step(), and the canvas is read in
+  // the task that drew it.
+  viewer.setDeterministic(true);
+  const shot = (dt = 16) => { const drew = viewer.step(dt); return { drew, url: canvas.toDataURL("image/png") }; };
+
+  viewer.setView({ tilt: [0, 0], zoom: 1, animate: false });
+  const first = shot(); check("deterministic_step_draws", first.drew === true, stats());
+  const base = await pixels(first.url);
+  const corner = [base[0], base[1], base[2]];
+  let nonBackground = 0;
+  for (let i = 0; i < base.length; i += 4) if (Math.abs(base[i] - corner[0]) + Math.abs(base[i+1] - corner[1]) + Math.abs(base[i+2] - corner[2]) > 12) nonBackground++;
+  const coverage = nonBackground / (base.length / 4);
+  check("the_piece_is_on_canvas", coverage > 0.02 && coverage < 0.9, { coverage });
+  check("no_look_problems", stats().problems.length === 0, stats().problems);
+  await post("/evidence/" + tag + expect + "-first.png", first.url);
+
+  const metal = (g) => g.find((x) => x.group === "Material");
+  const set = (group, value) => viewer.setPick(group, value);
+  const current = metal(viewer.options()).current;
+  const other = metal(viewer.options()).values.find((v) => v.value !== current && v.available).value;
+  const before = stats().draws;
+  const r = set("Material", other);
+  check("pick_returns_build", r.ok === true && r.build.picks.Material === other, r);
+  check("changed_event", events.some((e) => e.type === "changed" && e.cause === "pick"), events);
+  drop();
+  const m = shot();
+  check("pick_draws_one_frame", m.drew && stats().draws === before + 1, stats());
+  const metalPixels = await pixels(m.url);
+  check("metal_changes_the_picture", differs(base, metalPixels) > 20, differs(base, metalPixels));
+  await post("/evidence/" + tag + expect + "-metal.png", m.url);
+
+  const gemValues = viewer.options().find((x) => x.group === "Gem");
+  const gemNext = gemValues.values.find((v) => v.value !== gemValues.current).value;
+  set("Gem", gemNext);
+  drop();
+  const g = shot();
+  check("gem_changes_the_picture", differs(metalPixels, await pixels(g.url)) > 5, differs(metalPixels, await pixels(g.url)));
+  await post("/evidence/" + tag + expect + "-gem.png", g.url);
+
+  // The stand-in does not sell titanium with the larger stone.
+  set("Material", "Titanium"); shot(); drop();
+  const beforeRefuse = JSON.stringify(viewer.build());
+  const drawsRefuse = stats().draws;
+  const avail = viewer.options().find((x) => x.group === "Gem Size").values.find((v) => v.value === "4x2mm");
+  check("unsold_is_marked", avail.available === false && avail.reason === "not_sold_with", avail);
+  check("refusal_throws", code(() => set("Gem Size", "4x2mm")) === "pick_not_sold");
+  check("refusal_keeps_build", JSON.stringify(viewer.build()) === beforeRefuse);
+  check("refusal_draws_nothing", viewer.step(16) === false && stats().draws === drawsRefuse, stats());
+  check("refusal_counted", stats().refused === 1, stats());
+  check("refusal_error_event", events.some((e) => e.code === "pick_not_sold"), events);
+  drop();
+  const adjusted = viewer.setPick("Gem Size", "4x2mm", { adjust: true });
+  check("adjust_names_changes", adjusted.ok && adjusted.adjusted.includes("Material") && adjusted.build.picks.Material !== "Titanium", adjusted);
+  shot(); drop();
+  check("unknown_group", code(() => set("Nope", "x")) === "pick_unknown_group");
+  check("unknown_value", code(() => set("Material", "Nope")) === "pick_unknown_value");
+  // An argument JSON.stringify turns into undefined (a function, a symbol) is a coded refusal, not a bare throw.
+  check("function_argument_is_bad_argument", code(() => set("Material", () => 1)) === "bad_argument");
+  check("symbol_argument_is_bad_argument", code(() => viewer.setView(Symbol("v"))) === "bad_argument");
+  drop();
+  check("pipelines_constant", stats().pipelines === pipelines, stats());
+
+  // Drag: synthetic pointers go the same path as a finger.
+  viewer.setView({ tilt: [0, 0], zoom: 1, animate: false }); shot(); drop();
+  pointer(canvas, "pointerdown", 7, 128, 128);
+  pointer(canvas, "pointermove", 7, 178, 128);
+  pointer(canvas, "pointerup", 7, 178, 128);
+  for (let i = 0; i < 30; i++) viewer.step(16);
+  const tilted = viewer.view();
+  check("drag_turns_the_view", Math.abs(tilted.tilt[0]) > 1, tilted);
+  pointer(canvas, "pointerdown", 8, 10, 128);
+  for (let x = 20; x < 4000; x += 200) pointer(canvas, "pointermove", 8, x, 128);
+  pointer(canvas, "pointerup", 8, 4000, 128);
+  for (let i = 0; i < 120; i++) viewer.step(16);
+  const limit = viewer.view();
+  check("tilt_stays_in_the_cone", Math.hypot(limit.tilt[0], limit.tilt[1]) <= 30.01, limit);
+  check("spin_stays_off", limit.spin === 0, limit);
+  const clamp = viewer.setView({ tilt: [90, 0], animate: false });
+  check("set_view_reports_clamp", clamp.clamped === true && Math.abs(clamp.view.tilt[0]) <= 30.01, clamp);
+  shot(); drop();
+  const tiltShot = shot();
+  viewer.setView({ tilt: [0, 0], animate: false });
+  const frontShot = shot();
+  check("tilt_changes_the_picture", differs(await pixels(tiltShot.url), await pixels(frontShot.url)) > 5);
+  drop();
+
+  // Double tap, wheel and pinch go through the same glue.
+  viewer.setView({ tilt: [20, 0], zoom: 1, animate: false }); shot(); drop();
+  for (const x of [0, 1]) { pointer(canvas, "pointerdown", 30 + x, 128, 128); pointer(canvas, "pointerup", 30 + x, 128, 128); }
+  for (let i = 0; i < 120; i++) viewer.step(16);
+  check("double_tap_resets", Math.abs(viewer.view().tilt[0]) < 0.1, viewer.view());
+  drop();
+  // Tap distances are in CSS pixels: 25 apart is a double tap on any screen, however dense.
+  viewer.setView({ tilt: [20, 0], zoom: 1, animate: false }); shot(); drop();
+  pointer(canvas, "pointerdown", 32, 100, 128); pointer(canvas, "pointerup", 32, 100, 128);
+  pointer(canvas, "pointerdown", 33, 125, 128); pointer(canvas, "pointerup", 33, 125, 128);
+  for (let i = 0; i < 120; i++) viewer.step(16);
+  check("double_tap_in_css_pixels", Math.abs(viewer.view().tilt[0]) < 0.1, { view: viewer.view(), dpr: devicePixelRatio });
+  drop();
+  // Far apart they are two single taps, which leave the view alone.
+  viewer.setView({ tilt: [20, 0], zoom: 1, animate: false }); shot(); drop();
+  pointer(canvas, "pointerdown", 34, 20, 128); pointer(canvas, "pointerup", 34, 20, 128);
+  pointer(canvas, "pointerdown", 35, 230, 128); pointer(canvas, "pointerup", 35, 230, 128);
+  for (let i = 0; i < 60; i++) viewer.step(16);
+  check("far_taps_do_not_reset", Math.abs(viewer.view().tilt[0] - 20) < 0.1, viewer.view());
+  viewer.setView({ tilt: [0, 0], zoom: 1, animate: false }); shot(); drop();
+  const zoom0 = viewer.view().zoom;
+  const wheel = new WheelEvent("wheel", { deltaY: -200, deltaMode: 0, bubbles: true, cancelable: true });
+  canvas.dispatchEvent(wheel);
+  check("wheel_is_ours", wheel.defaultPrevented);
+  for (let i = 0; i < 60; i++) viewer.step(16);
+  const zoom1 = viewer.view().zoom;
+  check("wheel_zooms_in", zoom1 > zoom0, [zoom0, zoom1]);
+  pointer(canvas, "pointerdown", 41, 110, 128); pointer(canvas, "pointerdown", 42, 146, 128);
+  for (let d = 18; d < 60; d += 6) { pointer(canvas, "pointermove", 41, 128 - d, 128); pointer(canvas, "pointermove", 42, 128 + d, 128); }
+  pointer(canvas, "pointerup", 41, 60, 128); pointer(canvas, "pointerup", 42, 196, 128);
+  for (let i = 0; i < 60; i++) viewer.step(16);
+  check("pinch_zooms_in", viewer.view().zoom > zoom1, viewer.view());
+  pointer(canvas, "pointerdown", 43, 128, 128);
+  pointer(canvas, "pointermove", 43, 150, 128);
+  canvas.dispatchEvent(new PointerEvent("pointercancel", { pointerId: 43, pointerType: "touch", bubbles: true }));
+  check("cancel_releases_the_pointer", !stats().pending, stats());
+  viewer.setView({ tilt: [0, 0], zoom: 1, animate: false }); shot(); drop();
+
+  // The same script makes the same picture.
+  const script = async () => {
+    viewer.setView({ tilt: [0, 0], zoom: 1, animate: false }); set("Material", other); set("Gem Size", "3x1.5mm"); viewer.step(16);
+    viewer.setView({ tilt: [12, -7], zoom: 1.3 });
+    let last;
+    for (let i = 0; i < 10; i++) last = shot(16);
+    return last.url;
+  };
+  const a = await script(), b = await script();
+  check("deterministic_repeat", a === b, { a: a.length, b: b.length });
+  drop();
+
+  // JW-L7: a scripted run of setPick and setView, with a fixed clock, makes the same frame hashes every time. The
+  // clock starts over each time deterministic mode turns on; a forced step draws even when nothing changed.
+  const capture = () => {
+    viewer.setDeterministic(false);
+    viewer.setDeterministic(true);
+    viewer.setView({ tilt: [0, 0], zoom: 1, animate: false }); set("Material", first_material); set("Gem Size", "3x1.5mm");
+    const hashes = [], draws = [];
+    const frame = () => { draws.push(viewer.step(1000 / 60, true)); hashes.push(viewer.frameHash()); };
+    frame();
+    viewer.setView({ tilt: [10, -5], zoom: 1.2 });
+    for (let i = 0; i < 6; i++) frame();
+    set("Material", other);
+    frame();
+    frame();
+    set("Gem Size", "4x2mm");
+    frame();
+    return { hashes, draws, clock: stats().scriptClockMs, steps: stats().scriptFrame };
+  };
+  const first_material = viewer.build().picks.Material;
+  const takeA = capture(), takeB = capture();
+  check("capture_same_hashes_twice", JSON.stringify(takeA.hashes) === JSON.stringify(takeB.hashes), { a: takeA.hashes, b: takeB.hashes });
+  check("capture_hashes_are_16_hex", takeA.hashes.every((h) => /^[0-9a-f]{16}$/.test(h)), takeA.hashes);
+  check("capture_every_forced_step_draws", takeA.draws.every((d) => d === true), takeA.draws);
+  check("capture_the_view_moves_the_picture", new Set(takeA.hashes.slice(0, 7)).size > 3, takeA.hashes);
+  check("capture_a_pick_moves_the_picture", takeA.hashes[7] !== takeA.hashes[6], takeA.hashes);
+  check("capture_a_held_frame_hashes_equal", takeA.hashes[8] !== undefined && viewer.frameHash() === takeA.hashes[9], takeA.hashes);
+  check("capture_clock_is_the_script", takeA.steps === 10 && Math.abs(takeA.clock - 10000 / 60) < 1e-6, { steps: takeA.steps, clock: takeA.clock });
+  check("capture_forced_step_needs_deterministic", (() => { viewer.setDeterministic(false); try { viewer.step(16, true); return false; } catch (e) { return e.code === "bad_argument"; } finally { viewer.setDeterministic(true); } })(), {});
+  set("Gem Size", "3x1.5mm"); set("Material", first_material); viewer.setView({ tilt: [0, 0], zoom: 1, animate: false }); viewer.step(16, true);
+  drop();
+
+  // Idle: nothing pending, no draw, no request, across real browser frames.
+  viewer.setDeterministic(false);
+  await frames(4);
+  for (let i = 0; i < 400 && stats().pending; i++) await frames(1);
+  drop();
+  const idle0 = stats();
+  check("idle_nothing_pending", idle0.pending === false, idle0);
+  await frames(20);
+  const idle1 = stats();
+  check("idle_zero_draws", idle1.draws === idle0.draws && idle1.requests === idle0.requests && idle1.frames === idle0.frames, { idle0, idle1 });
+  pointer(canvas, "pointermove", 99, 50, 50);
+  await frames(5);
+  check("hover_wakes_nothing", stats().requests === idle1.requests, stats());
+
+  // A pick through the real loop.
+  const d0 = stats().draws;
+  set("Material", metal(viewer.options()).values.find((v) => v.value !== metal(viewer.options()).current && v.available).value);
+  await frames(3);
+  check("lazy_loop_draws_a_pick", stats().draws === d0 + 1, stats());
+  check("switch_time_reported", typeof stats().lastSwitchMs === "number", stats());
+  const switchMs = stats().lastSwitchMs;
+
+  // Resize.
+  const d1 = stats().draws;
+  canvas.style.width = "128px";
+  await frames(4);
+  check("resize_redraws", stats().draws > d1 && stats().drawing[0] === 128 * Math.min(devicePixelRatio, 2), stats());
+  check("canvas_size_follows", canvas.width === stats().drawing[0], canvas.width);
+  canvas.style.width = "256px";
+  await frames(4);
+  drop();
+
+  // A window resize that leaves the canvas as it is must not clear it.
+  let sizeWrites = 0;
+  for (const side of ["width", "height"]) {
+    const own = Object.getOwnPropertyDescriptor(HTMLCanvasElement.prototype, side);
+    Object.defineProperty(canvas, side, { configurable: true, get() { return own.get.call(this); }, set(v) { sizeWrites++; own.set.call(this, v); } });
+  }
+  const d1b = stats().draws;
+  window.dispatchEvent(new Event("resize"));
+  await frames(2);
+  check("same_size_keeps_the_canvas", sizeWrites === 0 && stats().draws === d1b, { sizeWrites, stats: stats() });
+  delete canvas.width; delete canvas.height;
+
+  // Hidden: no frames at all until visible again.
+  const hide = (hidden) => { Object.defineProperty(document, "hidden", { configurable: true, get: () => hidden }); document.dispatchEvent(new Event("visibilitychange")); };
+  hide(true);
+  check("hidden_seen", stats().visible === false && stats().pending === false, stats());
+  const d2 = stats().draws, r2 = stats().requests;
+  set("Material", metal(viewer.options()).values.find((v) => v.value !== metal(viewer.options()).current && v.available).value);
+  await frames(5);
+  check("hidden_draws_nothing", stats().draws === d2 && stats().requests === r2, stats());
+  hide(false);
+  await frames(4);
+  check("visible_draws_again", stats().draws > d2 && stats().visible === true, stats());
+  delete document.hidden;
+  drop();
+
+  // Context loss (WebGL2 only: WebGPU has no scripted equivalent here).
+  if (expect === "webgl2") {
+    const gl = canvas.getContext("webgl2");
+    const ext = gl && gl.getExtension("WEBGL_lose_context");
+    check("lose_context_available", !!ext);
+    if (ext) {
+      const buildBefore = JSON.stringify(viewer.build().picks);
+      ext.loseContext();
+      for (let i = 0; i < 100 && !events.some((e) => e.code === "device_lost"); i++) await frames(1);
+      check("device_lost_event", events.some((e) => e.code === "device_lost"), events);
+      const d3 = stats().draws;
+      ext.restoreContext();
+      for (let i = 0; i < 300 && stats().draws === d3; i++) await frames(1);
+      check("restored_draws", stats().draws > d3, stats());
+      check("restored_keeps_picks", JSON.stringify(viewer.build().picks) === buildBefore);
+      viewer.setDeterministic(true);
+      viewer.setView({ tilt: [0, 0], zoom: 1, animate: false });
+      const again = await pixels(shot().url);
+      let n = 0; const c = [again[0], again[1], again[2]];
+      for (let i = 0; i < again.length; i += 4) if (Math.abs(again[i] - c[0]) + Math.abs(again[i+1] - c[1]) + Math.abs(again[i+2] - c[2]) > 12) n++;
+      check("restored_piece_on_canvas", n / (again.length / 4) > 0.002, n);
+      viewer.setDeterministic(false);
+      drop();
+    }
+  }
+
+  // Off and on.
+  const seen = [];
+  const listener = (e) => seen.push(e);
+  viewer.on("changed", listener);
+  viewer.off("changed", listener);
+  set("Gem", gemValues.values[0].value);
+  check("off_removes_listener", seen.length === 0);
+  check("bad_event_name", code(() => viewer.on("nope", () => {})) === "bad_argument");
+
+  // A listener may call straight back in.
+  let nested = 0;
+  const reenter = () => { nested++; viewer.off("changed", reenter); viewer.options(); viewer.build(); viewer.setView({ zoom: 1.1 }); };
+  viewer.on("changed", reenter);
+  set("Gem", gemValues.values[1].value);
+  check("listener_reenters", nested === 1, nested);
+  await frames(2);
+
+  const final = stats();
+  results.push({ name: "numbers", ok: true, detail: JSON.stringify({ openMs, switchMs, draws: final.draws, pipelines: final.pipelines, backend: final.backend }) });
+
+  if (q.get("perf")) results.push({ name: "perf", ok: true, detail: JSON.stringify(await perf(viewer, canvas)) });
+
+  const d9 = viewer.stats().draws;
+  viewer.destroy();
+  check("destroyed", code(() => viewer.options()) === "destroyed");
+  pointer(canvas, "pointerdown", 3, 10, 10);
+  await frames(3);
+  check("destroy_stops_the_loop", viewer.stats().pending === false && viewer.stats().draws === d9, viewer.stats());
+}
+
+try { await run(); }
+catch (e) { results.push({ name: "uncaught", ok: false, detail: String(e && e.stack || e) + " code=" + (e && e.code) }); }
+await post("/result", JSON.stringify(results));
+</script></body></html>

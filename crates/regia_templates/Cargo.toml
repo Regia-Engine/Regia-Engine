@@ -1,0 +1,17 @@
+[package]
+name = "regia_templates"
+description = "Project templates for `regia new` and the editor's project browser, compiled in from this crate's own templates/ directory."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+# The game executables' Windows build script (templates/windows_build.rs) is compiled into this
+# crate's tests (ADR-2645): its PNG reader, ICO writer and Regia.toml reading.
+[dev-dependencies]
+png = { workspace = true }
+toml = { workspace = true }

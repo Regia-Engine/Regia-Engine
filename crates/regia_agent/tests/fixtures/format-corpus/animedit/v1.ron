@@ -1,0 +1,33 @@
+(
+    format_version: 1,
+    // Added or replaced by name on the imported skeleton (joint must exist).
+    sockets: [
+        (name: "weapon", joint: "hand_r",
+         offset: (translation: (0.0, -0.05, 0.0), rotation: (0.0, 0.0, 0.0, 1.0), scale: (1.0, 1.0, 1.0))),
+    ],
+    // Two-bone chains for the graph's TwoBoneIK nodes: [root, mid, tip], each the parent of the next.
+    ik_chains: [
+        (name: "LegL", joints: ("thigh_l", "shin_l", "foot_l"), pole_param: Some("LegLPole")),
+    ],
+    clips: [
+        (
+            clip: "Walk",
+            // Replaces the imported clip's notifies (the editor copies them in on the first edit).
+            notifies: [
+                (time: 0.25, name: "Footstep_L", payload: None),
+                (time: 0.75, name: "Footstep_R", payload: Some("(volume: 0.8)")),
+            ],
+            // Named float curves; baked to linear keys at the clip's sample rate plus every key.
+            curves: [
+                (name: "FootPlant_L", curve: (keys: [
+                    (location: 0.0, value: 1.0, kind: Cubic(left_tangent: 0.0, right_tangent: 0.0)),
+                    (location: 0.5, value: 0.0, kind: Linear),
+                ])),
+            ],
+            // Property tracks by reflected path (non-skeletal animation).
+            property_tracks: [],
+            // Root-motion extraction override: None | XZ | XYZ | Yaw (None = keep the import's).
+            root_motion: Some(XZ),
+        ),
+    ],
+)

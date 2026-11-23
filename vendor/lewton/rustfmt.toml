@@ -1,0 +1,3 @@
+# Vendored upstream source (lewton 0.10.2 with the Regia patches in REGIA-PATCHES.md, ADR-2164):
+# `cargo fmt --all` reaches it as a path dependency, so keep upstream formatting byte for byte.
+disable_all_formatting = true

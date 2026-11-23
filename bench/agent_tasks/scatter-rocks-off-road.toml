@@ -1,0 +1,35 @@
+format_version = 1
+id = "scatter-rocks-off-road"
+title = "Scatter thirty rocks on the terrain, none on the road"
+prompt = "The terrain is flat at height 0 and spans 64 m (x and z from -32 to 32). A road runs along the Z axis: every point with |x| < 3. Place 30 rocks, named 'Rock 1' to 'Rock 30', on the ground (y = 0) inside the terrain, with none of them on the road."
+features = ["scene", "terrain"]
+crates = ["regia_agent", "regia_terrain"]
+call_budget = 12
+
+[setup]
+target = "terrain"
+
+[[setup.call]]
+method = "scene.spawn"
+params = { name = "Road", components = { Transform = { translation = [0, 0, 0] } } }
+
+[[check]]
+name = "thirty rocks"
+method = "scene.query_entities"
+params = { name = "Rock*", limit = 100 }
+pointer = "/count"
+expect = { kind = "equals", value = 30 }
+
+[[check]]
+name = "none on the road"
+method = "scene.query_entities"
+params = { name = "Rock*", box = { min = [-3, -1, -50], max = [3, 1, 50] }, limit = 100 }
+pointer = "/count"
+expect = { kind = "equals", value = 0 }
+
+[[check]]
+name = "all on the ground"
+method = "scene.query_entities"
+params = { name = "Rock*", box = { min = [-32, -0.25, -32], max = [32, 0.25, 32] }, limit = 100 }
+pointer = "/count"
+expect = { kind = "equals", value = 30 }

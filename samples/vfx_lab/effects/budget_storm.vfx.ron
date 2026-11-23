@@ -1,0 +1,40 @@
+// Sample: sparks asked for far above their budget (6 000 a second into a 1 500 budget, with
+// short and long lifetimes mixed). The scheduler holds the system at its budget, a death
+// frees its slot the same frame, and the GPU ring never overwrites a live spark
+// (`vfx.stats`: `live` stays at or below `budget`).
+(
+    version: 4,
+    name: "sample_budget_storm",
+    system: (budget: 1500),
+    emitters: [
+        (
+            name: "sparks",
+            delay: 0.0,
+            spawn: (mode: Rate(6000.0), lifetime: (min: 0.15, max: 1.2)),
+            init: (
+                shape: Sphere(radius: (min: 0.0, max: 0.2)),
+                velocity: (mode: Directional(
+                    dir: (0.0, 1.0, 0.0),
+                    spread: 70.0,
+                    speed: (min: 4.0, max: 12.0),
+                )),
+                size: (min: 0.02, max: 0.05),
+                color: [(t: 0.0, color: "#ffd890")],
+            ),
+            update: (
+                gravity: (0.0, -9.81, 0.0),
+                drag: 0.8,
+                color_over_life: [(t: 0.0, color: "#fff2c8"), (t: 1.0, color: "#ff6a20")],
+                alpha_over_life: [(t: 0.0, v: 1.0), (t: 1.0, v: 0.0)],
+            ),
+            render: (
+                mode: Stretched,
+                sprite: Spark,
+                blend: Additive,
+                emissive: 2.0,
+                stretch: (velocity_scale: 0.03, min_length: 0.05),
+                screen_floor_px: 1.5,
+            ),
+        ),
+    ],
+)

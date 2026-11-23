@@ -1,0 +1,36 @@
+[package]
+name = "regia_release_chunks"
+description = "Release chunks under a size cap: deterministic tar members, zstd, JSON, TSV and SHA-256 manifests."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+# Same Ed25519 key file as `regia assets keygen` (ADR-2710). Already a workspace crate.
+blake3 = { workspace = true }
+# Ed25519 (RFC 8032) through the workspace `ring`. No new third-party crate.
+ring = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+toml = { workspace = true }
+walkdir = { workspace = true }
+
+[dev-dependencies]
+# The seeded fuzz tests and the old-bytes corpus test of the `release-signature` reader (`tests/fuzz.rs`,
+# `tests/format_corpus.rs`): the registry's loader harness and mutators, and what the shared corpus
+# support module names (`ron`, `regia_core`). Dev-only, as in `regia_pt` and `regia_xr`; the
+# fuzz-target registry itself stays in `regia_agent`, which no longer links this crate (ADR-10356).
+regia_test_utils = { workspace = true }
+regia_core = { workspace = true }
+ron = { workspace = true }
+
+# The test binary is also the fake hosting CLI (first argument `fake-upload-cli`), so it owns
+# `main` and runs its own cases (ADR-8846).
+[[test]]
+name = "upload_cli"
+harness = false

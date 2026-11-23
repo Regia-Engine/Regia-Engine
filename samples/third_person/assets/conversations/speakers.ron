@@ -1,0 +1,6 @@
+(
+    format_version: 1,
+    speakers: {
+        "guide": (name_key: Some("speaker-guide"), color: Some("#E8C547"), voiced: false),
+    },
+)

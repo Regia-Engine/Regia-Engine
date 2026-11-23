@@ -1,0 +1,11 @@
+// The example of docs/formats/navlanes-ron.md.
+(
+    format_version: 2,
+    join_distance: 0.25,
+    lanes: [
+        (points: [(0.0, 0.0, 0.0), (20.0, 0.0, 0.0)], width: 3.0, next: [1, 2], opposite: Some(3)),
+        (points: [(20.0, 0.0, 0.0), (20.0, 0.0, 30.0)], speed: 1.2, user_id: 7, weight: 3.0),
+        (points: [(20.0, 0.0, 0.0), (45.0, 0.0, 10.0), (60.0, 0.0, 10.0)], flags: 2),
+        (points: [(20.0, 0.0, 0.0), (0.0, 0.0, 0.0)], width: 3.0),
+    ],
+)

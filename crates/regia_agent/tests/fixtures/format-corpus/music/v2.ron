@@ -1,0 +1,34 @@
+(
+    version: 2,
+    name: "combat",
+    bpm: 132.0,
+    beats_per_bar: 4,            // default 4
+    segment_bars: Some(8),       // default None: the length of the longest stem
+    stems: [
+        (
+            name: "drums",
+            sound: "audio/music/combat_drums.ogg",
+            volume_db: 0.0,                         // default 0
+            intensity: [(0.0, -60.0), (1.0, 0.0)],  // default none: the base volume
+        ),
+    ],
+    stingers: [                  // default none
+        (
+            name: "victory",
+            sound: "audio/music/victory.ogg",
+            volume_db: -3.0,     // default 0
+            sync: NextBar,       // default NextBar
+        ),
+    ],
+    transitions: [               // default none
+        (
+            to: "calm",          // a track name, or "*" for every track without its own rule
+            sync: EndOfSegment,  // Immediate, NextBeat, NextBar (default), EndOfSegment
+            crossfade_secs: 2.0, // default 0: equal power, from the switch
+            segment: Some((      // default None: a sound between the two tracks
+                sound: "audio/music/combat_to_calm.ogg",
+                volume_db: 0.0,
+            )),
+        ),
+    ],
+)

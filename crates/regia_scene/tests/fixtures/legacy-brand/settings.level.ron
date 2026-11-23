@@ -1,0 +1,47 @@
+SceneFile(
+    format_version: 10,
+    entities: [],
+    resources: {
+        "ferrite_scene::level::LevelSettings": (
+    gravity: (0.0, -3.71, 0.0),
+    environment: None,
+    game_rules: None,
+    ambient_audio: None,
+    streaming_enabled: false,
+    atmosphere: (
+        preset: Airless,
+        time_of_day: None,
+        sun_illuminance_lux: None,
+        cloud_coverage: 0.0,
+        cloud_type: 0.0,
+        sky_body: None,
+        moons: [],
+        haze: (
+            density: 0.0,
+            scale_height_m: 200.0,
+            base_height_m: 0.0,
+        ),
+        aerosol_turbidity: 0.1,
+    ),
+    look: (
+        exposure_bias_ev: 0.0,
+        min_ev100: None,
+        max_ev100: None,
+        meter: None,
+        contrast: None,
+        saturation: None,
+        grade: None,
+        lut: None,
+        local_exposure: None,
+        baked_gi: None,
+    ),
+    audio_medium: (
+        airborne: None,
+        speed_of_sound_mps: None,
+        level_offset_db: None,
+        absorption_db_per_m_khz2: None,
+        ground: None,
+    ),
+),
+    },
+)

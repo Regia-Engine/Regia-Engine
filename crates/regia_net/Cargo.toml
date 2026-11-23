@@ -1,0 +1,295 @@
+[package]
+name = "regia_net"
+description = "Client-server networking: UDP reliable/unreliable channels, handshake and tokens, sessions, authoritative tick driver, congestion control, relay, port mapping, join codes and a network conditioner. Games plug in their own payloads through traits."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+default = ["ecs"]
+# The ECS half (spec 120 § 3.2, ADR-8032): replication, prediction, interpolation, lag compensation, the
+# recorder, the session plugin, the dedicated-server host, `NetLink` and the message App extension, plus the
+# component/resource derives on the core types. With `--no-default-features` the crate builds the ECS-free
+# core (wire, connection, crypto, handshake, endpoints, tick, session core, relay, lobby core, snapshot delta)
+# and links none of regia_ecs, regia_app, regia_scene, regia_asset or regia_platform.
+ecs = ["dep:regia_ecs", "dep:regia_app", "dep:regia_scene", "dep:regia_asset", "dep:regia_platform"]
+# Voice chat relay and client transport (`regia_net::voice`, specs/59, ADR-1911). Optional so a server that
+# carries no voice links no audio crate. Voice runs on the ECS session, so it needs `ecs`.
+voice = ["ecs", "dep:regia_audio"]
+# QUIC datagrams (RFC 9221) as a `DatagramSocket`. Off unless the crate is built with this feature,
+# so a default build does not link quinn (ADR-3970).
+net-quic = ["dep:quinn"]
+
+[dependencies]
+regia_core = { workspace = true }
+regia_ecs = { workspace = true, optional = true }
+# Playlist rows (map, mode, options). Foundation crate: a downward edge.
+regia_rules = { workspace = true }
+regia_app = { workspace = true, optional = true }
+regia_scene = { workspace = true, optional = true }
+regia_asset = { workspace = true, optional = true }
+regia_macros = { workspace = true }
+# The FTZ/DAZ guard a lockstep step runs under (`lockstep`, ADR-8146); libm only, no ECS.
+regia_detsim = { workspace = true }
+regia_audio = { workspace = true, optional = true }
+# RFC 9221 datagrams, optional TLS provider and runtime only. No CA store or platform verifier.
+# The re-exported rustls provider mints the certificate; Smol drives quinn's own tasks (ADR-3970).
+quinn = { version = "0.11.12", optional = true, default-features = false, features = ["rustls-ring", "runtime-smol"] }
+glam = { workspace = true }
+ron = { workspace = true }
+serde = { workspace = true }
+tracing = { workspace = true }
+thiserror = { workspace = true }
+blake3 = { workspace = true }
+# `SO_REUSEADDR` before `bind` for `LanSocket` (ADR-7989). Already a workspace dependency.
+libc = { workspace = true }
+# `risky-raw-split` exposes the two transport keys of a finished handshake, which the record layer
+# needs to rekey each direction on its own (ADR-2416). Same crate, same version: no new dependency.
+snow = { workspace = true, features = ["risky-raw-split"] }
+toml = { workspace = true }
+# Native crash exit code 70 of the dedicated-server host (spec 76 § 5, ADR-2440); Windows already used it
+# for the console handler.
+# Only the server host and the session plugin use it, so it rides the `ecs` feature (regia_platform links the ECS).
+regia_platform = { path = "../regia_platform", default-features = false, optional = true }
+
+# SIGTERM / SIGINT / SIGHUP for the dedicated-server host (spec 76 § 5, ADR-1663).
+# `libc` sets UDP socket buffers and the DSCP EF mark (ADR-7998).
+[target.'cfg(unix)'.dependencies]
+signal-hook = { workspace = true }
+libc = { workspace = true }
+
+# Windows secret-file DACLs (ADR-4828), native-crash exit code 70 (spec 76 § 5),
+# and UDP socket buffers / DSCP (`Win32_Networking_WinSock`, ADR-7998).
+[target.'cfg(windows)'.dependencies]
+windows-sys = { workspace = true, features = ["Win32_Networking_WinSock"] }
+
+
+[dev-dependencies]
+criterion = { workspace = true }
+# Counting allocator for the lobby-hub soak (NL-06). Dev-only; the library does not depend on it.
+regia_test_utils = { workspace = true }
+# Captures the warn line of `KnownHosts::load_or_recover` (tests/player_data.rs, ADR-3102).
+tracing-subscriber = { workspace = true }
+
+[[bench]]
+name = "entropy"
+harness = false
+
+# These targets exercise the ECS adapters. Core transport tests and net_bench remain
+# available with --no-default-features; default builds still run every ECS test.
+
+# Enters an unprivileged user+net namespace (`unshare` needs a single-threaded process): no
+# libtest harness (ADR-8893).
+[[test]]
+name = "dont_fragment"
+harness = false
+
+[[test]]
+name = "asset_server_handles"
+required-features = ["ecs"]
+
+[[test]]
+name = "coverage_lowest"
+required-features = ["ecs"]
+
+[[test]]
+name = "crypto"
+required-features = ["ecs"]
+
+[[test]]
+name = "derive_enum_wire_eq"
+required-features = ["ecs"]
+
+[[test]]
+name = "derive_net_message"
+required-features = ["ecs"]
+
+[[test]]
+name = "entropy"
+required-features = ["ecs"]
+
+[[test]]
+name = "integration_migrations"
+required-features = ["ecs"]
+
+[[test]]
+name = "interpolation"
+required-features = ["ecs"]
+
+[[test]]
+name = "lag_compensation"
+required-features = ["ecs"]
+
+[[test]]
+name = "lagcomp_input_stream"
+required-features = ["ecs"]
+
+[[test]]
+name = "link_bans"
+required-features = ["ecs"]
+
+[[test]]
+name = "lobby"
+required-features = ["ecs"]
+
+[[test]]
+name = "message_handles"
+required-features = ["ecs"]
+
+[[test]]
+name = "net_acceptance"
+required-features = ["ecs"]
+
+[[test]]
+name = "net_bounds"
+required-features = ["ecs"]
+
+[[test]]
+name = "net_config_replication"
+required-features = ["ecs"]
+
+[[test]]
+name = "net_hardening_wave2"
+required-features = ["ecs"]
+
+[[test]]
+name = "net_model"
+required-features = ["ecs"]
+
+[[test]]
+name = "origin_wire"
+required-features = ["ecs"]
+
+[[test]]
+name = "owner_handoff_histories"
+required-features = ["ecs"]
+
+[[test]]
+name = "position_grid"
+required-features = ["ecs"]
+
+[[test]]
+name = "prediction"
+required-features = ["ecs"]
+
+[[test]]
+name = "recorder"
+required-features = ["ecs"]
+
+[[test]]
+name = "recorder_alloc"
+required-features = ["ecs"]
+
+[[test]]
+name = "relevance"
+required-features = ["ecs"]
+
+[[test]]
+name = "replicated_handles"
+required-features = ["ecs"]
+
+[[test]]
+name = "replication"
+required-features = ["ecs"]
+
+[[test]]
+name = "server_host"
+required-features = ["ecs"]
+
+[[test]]
+name = "server_host_e2e"
+required-features = ["ecs"]
+
+[[test]]
+name = "session"
+required-features = ["ecs"]
+
+[[test]]
+name = "session_post05"
+required-features = ["ecs"]
+
+[[test]]
+name = "session_post05_travel"
+required-features = ["ecs"]
+
+[[test]]
+name = "session_post05w3"
+required-features = ["ecs"]
+
+[[test]]
+name = "session_post05w4"
+required-features = ["ecs"]
+
+[[test]]
+name = "session_post05w4_udp"
+required-features = ["ecs"]
+
+[[test]]
+name = "shared_port"
+required-features = ["ecs"]
+
+[[test]]
+name = "spec_71_72_conformance"
+required-features = ["ecs"]
+
+[[test]]
+name = "state_channel"
+required-features = ["ecs"]
+
+[[test]]
+name = "state_channel_transport"
+required-features = ["ecs"]
+
+[[test]]
+name = "state_frame_fuzz"
+required-features = ["ecs"]
+
+[[test]]
+name = "tq_1104"
+required-features = ["ecs"]
+
+[[test]]
+name = "udp_bridge"
+required-features = ["ecs"]
+
+# Lobby rotation keys and old playlist rows (ADR-8897): `Lobbies` is an ECS resource.
+[[test]]
+name = "playlist_rotation_lobby"
+required-features = ["ecs"]
+
+[[test]]
+name = "state_ring"
+required-features = ["ecs"]
+
+[[example]]
+name = "net_duel"
+required-features = ["ecs"]
+
+[[example]]
+name = "net_interp_bench"
+required-features = ["ecs"]
+
+[[example]]
+name = "net_lagcomp_bench"
+required-features = ["ecs"]
+
+[[example]]
+name = "net_predict_bench"
+required-features = ["ecs"]
+
+[[example]]
+name = "net_relevance_bench"
+required-features = ["ecs"]
+
+[[example]]
+name = "net_replication_bench"
+required-features = ["ecs"]
+
+[[example]]
+name = "net_state_bench"
+required-features = ["ecs"]

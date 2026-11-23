@@ -1,0 +1,48 @@
+[package]
+name = "arena"
+description = "M20 sample: first-person bot arena (GameRules match flow, AI bots, hitscan/pooled weapons, dynamic props, VFX, HUD, determinism)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia = { workspace = true }
+regia_core = { workspace = true }
+regia_ecs = { workspace = true }
+regia_app = { workspace = true }
+regia_platform = { workspace = true }
+regia_scene = { workspace = true }
+regia_render = { workspace = true }
+regia_physics = { workspace = true }
+regia_input = { workspace = true }
+regia_audio = { workspace = true }
+regia_vfx = { workspace = true }
+regia_ui = { workspace = true }
+regia_framework = { workspace = true }
+regia_nav = { workspace = true }
+regia_ai = { workspace = true }
+tracing = { workspace = true }
+# `wgpu` is already in the graph through `regia_render`; the sample names its types directly: `--bench` reads the
+# adapter type (ADR-2952) and the offscreen evidence tests composite the UI overlay onto the colour target.
+wgpu = { workspace = true }
+# `abilities.*` and `chooser.*` are agent-extension methods the host installs (ADR-2134).
+regia_agent = { workspace = true, optional = true }
+
+[features]
+default = ["agent"]
+# Installs the `abilities.*` / `chooser.*` agent methods; off in shipping builds.
+agent = ["dep:regia_agent", "regia/agent"]
+
+[dev-dependencies]
+regia_agent = { workspace = true }
+# tests/repro_check.rs (ADR-537) and tests/replay_soak.rs (ADR-867) record and replay a match.
+regia_test_utils = { workspace = true }
+serde_json = { workspace = true }
+# tests/spawn_hitch.rs times the spawn path's spans.
+tracing-subscriber = { workspace = true }
+png = { workspace = true }

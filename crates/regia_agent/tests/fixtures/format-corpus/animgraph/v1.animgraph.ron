@@ -1,0 +1,106 @@
+// Ferrite animation graph, format version 1. Frozen at M12.
+// On-disk encoding is RON (serde). The logical document is described by
+// docs/formats/animgraph.schema.json. Future versions migrate through
+// ferrite_animation::graph::registered_migrations (empty at v1).
+(
+    format_version: 1,
+    parameters: [
+        ("Speed", Float(0.0)),
+        ("Land", Trigger),
+        ("WaveWeight", Float(0.0)),
+        ("AddWeight", Float(0.0)),
+        ("IkWeight", Float(0.0)),
+        ("HandTarget", Vec3((0.0, 1.0, -0.4))),
+        ("Pole", Vec3((0.3, 1.0, 0.0))),
+        ("LookWeight", Float(0.0)),
+        ("LookTarget", Vec3((0.0, 1.5, -2.0))),
+    ],
+    root: RootMotion((
+        inner: TwoBoneIK((
+            inner: LookAt((
+                inner: Layer((
+                    base: StateMachine((
+                        initial: "Start",
+                        states: [
+                            ("Start", Clip((
+                                clip: "WalkStart",
+                                looping: false,
+                                speed: 1.0,
+                                sync_group: None,
+                            ))),
+                            ("Loop", BlendSpace1D((
+                                space: (
+                                    param: "Speed",
+                                    samples: [
+                                        (value: 0.0, clip: "Idle"),
+                                        (value: 1.6, clip: "Walk"),
+                                        (value: 6.0, clip: "Run"),
+                                    ],
+                                ),
+                                sync_group: Some("Locomotion"),
+                            ))),
+                            ("Land", Clip((
+                                clip: "WalkLand",
+                                looping: false,
+                                speed: 1.0,
+                                sync_group: None,
+                            ))),
+                        ],
+                        transitions: [
+                            (
+                                from: Some("Start"),
+                                to: "Loop",
+                                conditions: [ClipFinished],
+                                duration: 0.15,
+                                curve: Smooth,
+                                interruptible: false,
+                            ),
+                            (
+                                from: Some("Loop"),
+                                to: "Land",
+                                conditions: [Trigger(param: "Land")],
+                                duration: 0.2,
+                                curve: Linear,
+                                interruptible: false,
+                            ),
+                        ],
+                    )),
+                    layers: [
+                        (
+                            graph: Clip((
+                                clip: "Wave",
+                                looping: true,
+                                speed: 1.0,
+                                sync_group: None,
+                            )),
+                            mask: (joints: ["Spine", "Arm_R"], include_children: true),
+                            mode: Override,
+                            weight_param: "WaveWeight",
+                        ),
+                        (
+                            graph: Clip((
+                                clip: "Lean",
+                                looping: true,
+                                speed: 1.0,
+                                sync_group: None,
+                            )),
+                            mask: (joints: ["Spine"], include_children: false),
+                            mode: Additive,
+                            weight_param: "AddWeight",
+                        ),
+                    ],
+                )),
+                joint: "Head",
+                target: Param("LookTarget"),
+                max_yaw: 1.2,
+                max_pitch: 1.0,
+                weight_param: Some("LookWeight"),
+            )),
+            chain: ("Arm_R", "ForeArm_R", "Hand_R"),
+            target: Param("HandTarget"),
+            pole: Some("Pole"),
+            weight_param: Some("IkWeight"),
+        )),
+        mode: XZ,
+    )),
+)

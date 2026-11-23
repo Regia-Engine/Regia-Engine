@@ -1,0 +1,11 @@
+(
+    format: "viscells",
+    entries: [
+        (
+            version: 1,
+            file: "v1.ron",
+            origin: "hand-written current-version file with the fuzz-target registry fixture's cells and portals (lane w9-do27-viscells, ADR-7586; written by hand because the test machine went down before the bless ran)",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+    ],
+)

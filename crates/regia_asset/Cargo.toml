@@ -1,0 +1,64 @@
+[package]
+name = "regia_asset"
+description = "Runtime asset server: handles, loaders, cooked formats, pak files, hot reload."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia_core = { workspace = true }
+regia_ecs = { workspace = true }
+regia_app = { workspace = true }
+regia_platform = { path = "../regia_platform", default-features = false }
+serde = { workspace = true }
+ron = { workspace = true }
+# The texture-set detector reads `[import.texture_sets]` from Regia.toml (ADR-3320).
+toml = { workspace = true }
+# glTF image URIs in a package-parity report, and the JSON form of that report (C-12).
+serde_json = { workspace = true }
+postcard = { workspace = true }
+lz4_flex = { workspace = true }
+memmap2 = { workspace = true }
+uuid = { workspace = true }
+blake3 = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+parking_lot = { workspace = true }
+ktx2 = { workspace = true }
+# `https://` chunk and manifest fetches (spec 40 § 2.6, ADR-1876): the approved ureq + rustls stack
+# (docs/03, ADR-033: `default-features = false, features = ["tls"]`, `ring` provider).
+ureq = { workspace = true, optional = true }
+# Ed25519 checks of signed content manifests (ADR-2710): `ring`, already in the graph through
+# rustls; `default-features = false` plus `alloc` (key generation) and `std`.
+ring = { workspace = true, optional = true }
+
+# `mods://` opens mod files with O_NOFOLLOW | O_NONBLOCK and checks their inode (ADR-2418).
+[target.'cfg(unix)'.dependencies]
+libc = { workspace = true }
+
+[target.'cfg(not(target_os = "android"))'.dependencies]
+notify = { workspace = true, optional = true }
+
+[features]
+# File watching + in-place reload. Enabled by dev builds and the editor; never in shipping.
+dev-assets = ["dep:notify"]
+# `https://` content sources through ureq + rustls (off by default; `http://` needs no feature).
+content-http = ["dep:ureq", "content-signing"]
+# Ed25519 signature checks of fetched content manifests and the signing key type (ADR-2710).
+content-signing = ["dep:ring"]
+
+[dev-dependencies]
+serde_json = { workspace = true }
+regia_test_utils = { workspace = true }
+# ktx2 is already a runtime dependency; re-listed here so the fuzz integration test can build a
+# minimal valid KTX2 blob for the cooked-texture fixture.
+ktx2 = { workspace = true }
+# The `https://` chunk-source test serves a chunks folder over rustls with a self-signed certificate
+# that only the test's ureq agent trusts (same pins as regia_crash's TLS test).
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
+rcgen = "0.14"

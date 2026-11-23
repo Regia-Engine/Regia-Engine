@@ -1,0 +1,27 @@
+(
+    format_version: 5,
+    name: "M_PavingStone",
+    shader: Standard,
+    base: (
+        base_color: (0.42, 0.40, 0.37, 1.0),
+        metallic: 0.0,
+        roughness: 0.8,
+        emissive: (0.0, 0.0, 0.0),
+        emissive_strength: 1.0,
+        orm_packed: true,
+        ior: 1.5,
+    ),
+    hard_surface: (
+        multi_scatter: true,
+        specular_occlusion: true,
+    ),
+    // Spec 99 § 7.3: how rain and snow change it. Absent = porosity from roughness and metallic,
+    // full wetness and snow, no puddles.
+    weather: (
+        porosity: Some(0.6),
+        wet: 1.0,
+        snow: 0.8,
+        puddles: true,
+    ),
+    render_state: (alpha_mode: opaque, queue_offset: 0, alpha_cutoff: 0.5),
+)

@@ -1,0 +1,154 @@
+{
+ "name": "legacy",
+ "image": "legacy.png",
+ "imagewidth": 64,
+ "imageheight": 64,
+ "tilewidth": 16,
+ "tileheight": 16,
+ "tilecount": 16,
+ "columns": 4,
+ "type": "tileset",
+ "terrains": [
+  {
+   "name": "Dirt",
+   "tile": 15
+  }
+ ],
+ "tiles": [
+  {
+   "id": 1,
+   "terrain": [
+    0,
+    -1,
+    -1,
+    -1
+   ]
+  },
+  {
+   "id": 2,
+   "terrain": [
+    -1,
+    0,
+    -1,
+    -1
+   ]
+  },
+  {
+   "id": 3,
+   "terrain": [
+    0,
+    0,
+    -1,
+    -1
+   ]
+  },
+  {
+   "id": 4,
+   "terrain": [
+    -1,
+    -1,
+    -1,
+    0
+   ]
+  },
+  {
+   "id": 5,
+   "terrain": [
+    0,
+    -1,
+    -1,
+    0
+   ]
+  },
+  {
+   "id": 6,
+   "terrain": [
+    -1,
+    0,
+    -1,
+    0
+   ]
+  },
+  {
+   "id": 7,
+   "terrain": [
+    0,
+    0,
+    -1,
+    0
+   ]
+  },
+  {
+   "id": 8,
+   "terrain": [
+    -1,
+    -1,
+    0,
+    -1
+   ]
+  },
+  {
+   "id": 9,
+   "terrain": [
+    0,
+    -1,
+    0,
+    -1
+   ]
+  },
+  {
+   "id": 10,
+   "terrain": [
+    -1,
+    0,
+    0,
+    -1
+   ]
+  },
+  {
+   "id": 11,
+   "terrain": [
+    0,
+    0,
+    0,
+    -1
+   ]
+  },
+  {
+   "id": 12,
+   "terrain": [
+    -1,
+    -1,
+    0,
+    0
+   ]
+  },
+  {
+   "id": 13,
+   "terrain": [
+    0,
+    -1,
+    0,
+    0
+   ]
+  },
+  {
+   "id": 14,
+   "terrain": [
+    -1,
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "id": 15,
+   "terrain": [
+    0,
+    0,
+    0,
+    0
+   ]
+  }
+ ]
+}

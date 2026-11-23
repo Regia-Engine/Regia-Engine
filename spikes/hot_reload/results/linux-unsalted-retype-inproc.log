@@ -1,0 +1,4 @@
+host: mode=Unsalted edit=layout sim=inproc gens=20 os=linux abi=c42f742b0c57a3ec
+gen  1 A build     792 ms | swap    1.5 ms (unload 0.0, snap 0.0, teardown 0.0, load 1.3, register 0.1, restore 0.0, on_load 0.1) | 1st frame 2.0 ms | rss 25.5 MB | restored 0 comps/0 res, defaulted 0, dropped 0 | sim tick 0→1 | Mover TypeId(0x4412574f4bab7740e2e1628b7593f74a) | 
+SUMMARY reloads=1 median: build 745 ms, swap 0.0 ms (unload 1.2, snapshot 5.2, teardown 1.2, load 1.1, register 0.0, restore 0.0, on_load 0.0), first frame 0.0 ms; max build 745 ms; rss start 21.7 MB, after gen1 25.5 MB, end 0.0 MB (-25.47 MB/reload)
+FAILED: gen 2: UNSOUND — TypeId reused with a different layout: game::generated::Mover (registered 16 B, new 24 B). bevy_ecs would store the new type in the old column layout. Reload refused.

@@ -1,0 +1,17 @@
+(
+    format: "playlist-ron",
+    entries: [
+        (
+            version: 1,
+            file: "v1.ron",
+            origin: "hand-written v1 fixture; v1 is the first version of this format (shipped in v0.6.0)",
+            exercises: "the v1 -> v2 step (ADR-10064): the same shape, so the loader reads it as v2 and upgrade-project rewrites only the version number",
+        ),
+        (
+            version: 2,
+            file: "v2.ron",
+            origin: "written by hand for the v2 step (ADR-10064, format batch 2)",
+            exercises: "the current version: `order: weighted(seed)`, `no_repeat_last`, a row weight and a row player gate (min and max)",
+        ),
+    ],
+)

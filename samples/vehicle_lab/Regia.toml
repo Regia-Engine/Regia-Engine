@@ -1,0 +1,8 @@
+[project]
+name = "vehicle_lab"
+id = "dev.regia.vehicle_lab"
+version = "0.1.0"
+build_number = 1
+engine = "0.1"
+startup_level = ""
+organization = "Regia Engine"

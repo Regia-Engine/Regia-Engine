@@ -1,0 +1,4 @@
+# Oracle for light-theme-large-text: the calls a careful agent makes after the setup.
+{"method":"ui.theme_select","params":{"theme":"regia-light"}}
+{"method":"ui.accessibility","params":{"text_scale":1.5}}
+{"method":"play.step","params":{"frames":5}}

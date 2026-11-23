@@ -1,0 +1,24 @@
+TerrainLayers(
+    version: 2,
+    wetness_default: 0.0,        // 0..=1 default wet/dry
+    layers: [
+        LayerDesc(
+            name: "ground",
+            albedo: (0.18, 0.28, 0.10),    // linear RGB, 0..=1 (tint when albedo_texture is set)
+            roughness: 0.95,                 // 0..=1
+            tiling: 8.0,                     // metres per texture repeat
+            slope_min: 0.0,                  // radians from up, inclusive
+            slope_max: 0.6,                  // radians from up, exclusive
+            altitude_min: -1000.0,           // metres
+            altitude_max: 1000.0,            // metres
+            blend_sharpness: 0.15,           // 0.01..=0.5
+            triplanar: false,
+            // v2 additions (a migrated v1 file carries exactly these defaults):
+            albedo_texture: None,            // asset path of a tiling RGBA8 sRGB albedo
+            normal_texture: None,            // asset path of a tiling tangent-space normal map
+            height_texture: None,            // asset path of a tiling height map (R channel)
+            detail_normal_strength: 0.0,     // 0..=2 micro-normal detail (0 = off, distance-faded)
+            height_blend: 0.0,               // 0..=1 height-blended transition sharpness
+        ),
+    ],
+)

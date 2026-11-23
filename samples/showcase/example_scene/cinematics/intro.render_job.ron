@@ -1,0 +1,29 @@
+// Renders the showcase intro (`.render_job.ron` v2, ADR-1880, ADR-2135) through render-out: the
+// job plays `cinematics/intro.seq.ron` on its own external-clock player (the binding table names
+// the showcase entities; `keeper` and `sun` are optional and reported as unbound targets when a
+// scene has neither), one take for the rise and one for the sparkles, 640x360 at 30 fps.
+(
+    version: 2,
+    name: "showcase-intro",
+    sequence: Some("cinematics/intro.seq.ron"),
+    bindings: {
+        "beacon": Name("beacon"),
+    },
+    out: "renders/showcase-intro",
+    path: "{take}/{job}_{take}",
+    output: (
+        width: Some(640),
+        height: Some(360),
+        fps: Some(30),
+        format: Some("png"),
+        hud: Some(false),
+        warmup_frames: Some(8),
+        settle_frames: Some(4),
+        writers: Some(1),
+    ),
+    takes: [
+        (name: "rise", range: Markers(from: "rise", to: "pulse")),
+        (name: "sparkles", range: Seconds(start: 3.0, end: 6.0)),
+    ],
+    cuts: [Marker("pulse")],
+)

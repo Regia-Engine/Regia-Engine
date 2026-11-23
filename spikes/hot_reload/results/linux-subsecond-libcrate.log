@@ -1,0 +1,42 @@
+  0.37s  INFO -----------------------------------------------------------------
+                Serving your app: patch_host! 🚀
+                • Press `ctrl+c` to exit the server
+                • Press `r` to rebuild the app
+                • Press `p` to toggle automatic rebuilds
+                • Press `v` to toggle verbose logging
+                • Press `/` for more commands and shortcuts
+               ----------------------------------------------------------------
+  2.24s  INFO Build completed successfully in 1.91s, launching app! 💫
+  2.57s  INFO PATCHPROBE 1791130255693 start pid=2332262
+  3.22s  INFO PATCHPROBE 1791130256649 lib frame=60 value=60 marker=v1
+  3.22s  INFO PATCHPROBE 1791130256649 frame=60 value=60 marker=v1
+  4.19s  INFO PATCHPROBE 1791130257616 lib frame=120 value=120 marker=v1
+  4.19s  INFO PATCHPROBE 1791130257616 frame=120 value=120 marker=v1
+  4.39s  INFO Hot-patching: patch_game/src/sedWJRt1F took 256ms
+  4.40s  INFO PATCHPROBE 1791130257829 patch-applied
+  5.16s  INFO PATCHPROBE 1791130258586 lib frame=180 value=228 marker=r2
+  5.16s  INFO PATCHPROBE 1791130258586 frame=180 value=180 marker=v1
+  6.13s  INFO PATCHPROBE 1791130259553 lib frame=240 value=348 marker=r2
+  6.13s  INFO PATCHPROBE 1791130259553 frame=240 value=240 marker=v1
+  6.88s  INFO Hot-patching: patch_game/src/sedL52sw0 took 230ms
+  6.89s  INFO PATCHPROBE 1791130260314 patch-applied
+  7.10s  INFO PATCHPROBE 1791130260523 lib frame=300 value=482 marker=r3
+  7.10s  INFO PATCHPROBE 1791130260523 frame=300 value=300 marker=v1
+  8.07s  INFO PATCHPROBE 1791130261496 lib frame=360 value=662 marker=r3
+  8.07s  INFO PATCHPROBE 1791130261496 frame=360 value=360 marker=v1
+  9.04s  INFO PATCHPROBE 1791130262462 lib frame=420 value=842 marker=r3
+  9.04s  INFO PATCHPROBE 1791130262462 frame=420 value=420 marker=v1
+  9.31s  INFO Hot-patching: patch_game/src/sedHQxQ0t took 247ms
+  9.32s  INFO PATCHPROBE 1791130262742 patch-applied
+ 10.01s  INFO PATCHPROBE 1791130263434 lib frame=480 value=1066 marker=r4
+ 10.01s  INFO PATCHPROBE 1791130263434 frame=480 value=480 marker=v1
+ 10.98s  INFO PATCHPROBE 1791130264402 lib frame=540 value=1306 marker=r4
+ 10.98s  INFO PATCHPROBE 1791130264402 frame=540 value=540 marker=v1
+ 11.70s  INFO Hot-patching: patch_game/src/lib.rs took 212ms
+ 11.72s  INFO PATCHPROBE 1791130265143 patch-applied
+ 11.94s  INFO PATCHPROBE 1791130265369 lib frame=600 value=1501 marker=v1
+ 11.94s  INFO PATCHPROBE 1791130265369 frame=600 value=600 marker=v1
+ 12.91s  INFO PATCHPROBE 1791130266336 lib frame=660 value=1561 marker=v1
+ 12.91s  INFO PATCHPROBE 1791130266336 frame=660 value=660 marker=v1
+ 13.88s  INFO PATCHPROBE 1791130267305 lib frame=720 value=1621 marker=v1
+ 13.88s  INFO PATCHPROBE 1791130267305 frame=720 value=720 marker=v1

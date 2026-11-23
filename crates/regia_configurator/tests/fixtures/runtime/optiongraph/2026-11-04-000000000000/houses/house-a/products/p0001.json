@@ -1,0 +1,336 @@
+{
+  "addons": [
+    {
+      "applies_to": null,
+      "geometry_role": "gem",
+      "group": "Gem",
+      "kind": "gem",
+      "multi": false,
+      "required": true,
+      "slot": "s1",
+      "values": [
+        {
+          "available": true,
+          "code": "51",
+          "gem": {
+            "class": "synthetic",
+            "cut": "marquise",
+            "material": "clear-high-dispersion"
+          },
+          "label": "Clear A",
+          "value_key": "Gem=Clear A"
+        },
+        {
+          "available": true,
+          "code": "52",
+          "gem": {
+            "class": "synthetic",
+            "cut": "marquise",
+            "material": "clear-low-index"
+          },
+          "label": "Clear B",
+          "value_key": "Gem=Clear B"
+        },
+        {
+          "available": false,
+          "code": "53",
+          "gem": {
+            "material": "tinted-stone"
+          },
+          "label": "Tinted",
+          "value_key": "Gem=Tinted"
+        },
+        {
+          "available": true,
+          "code": "54-x",
+          "gem": {
+            "cabochon": true,
+            "material": "opal-like"
+          },
+          "label": "Opal-like",
+          "value_key": "Gem=Opal-like"
+        }
+      ]
+    },
+    {
+      "applies_to": [
+        "1003",
+        "1004",
+        "1006"
+      ],
+      "geometry_role": "excluded",
+      "group": "Anodization",
+      "kind": "anodize",
+      "multi": false,
+      "required": false,
+      "values": [
+        {
+          "available": true,
+          "code": "61",
+          "label": "Color 1",
+          "value_key": "Anodization=Color 1"
+        },
+        {
+          "available": true,
+          "code": "62",
+          "label": "Color 2",
+          "value_key": "Anodization=Color 2"
+        }
+      ]
+    },
+    {
+      "geometry_role": "excluded",
+      "group": "Extras",
+      "kind": "finish",
+      "multi": true,
+      "required": false,
+      "values": [
+        {
+          "available": true,
+          "code": "71",
+          "label": "Sandblast",
+          "value_key": "Extras=Sandblast"
+        },
+        {
+          "available": true,
+          "label": "Reverse Set",
+          "value_key": "Extras=Reverse Set"
+        }
+      ]
+    },
+    {
+      "applies_to": [
+        "1005"
+      ],
+      "group": "Engraving",
+      "kind": "other",
+      "multi": false,
+      "required": true,
+      "values": [
+        {
+          "available": true,
+          "code": "81",
+          "label": "Plain",
+          "value_key": "Engraving=Plain"
+        },
+        {
+          "available": true,
+          "code": "82",
+          "label": "Line",
+          "value_key": "Engraving=Line"
+        }
+      ]
+    }
+  ],
+  "axes": [
+    {
+      "group": "Threading",
+      "kind": "thread",
+      "values": [
+        {
+          "available": true,
+          "code": "11",
+          "label": "Threadless",
+          "value_key": "Threading=Threadless"
+        },
+        {
+          "available": true,
+          "code": "12",
+          "label": "Threaded",
+          "value_key": "Threading=Threaded"
+        }
+      ]
+    },
+    {
+      "geometry_role": "excluded",
+      "group": "Material",
+      "kind": "metal",
+      "values": [
+        {
+          "available": true,
+          "code": "21",
+          "label": "Metal A",
+          "value_key": "Material=Metal A"
+        },
+        {
+          "available": true,
+          "code": "22",
+          "label": "Metal B",
+          "value_key": "Material=Metal B"
+        },
+        {
+          "available": false,
+          "code": "23",
+          "label": "Metal C",
+          "value_key": "Material=Metal C"
+        }
+      ]
+    },
+    {
+      "group": "Gauge",
+      "kind": "gauge",
+      "values": [
+        {
+          "available": true,
+          "code": "31",
+          "label": "16g",
+          "value_key": "Gauge=16g"
+        },
+        {
+          "available": true,
+          "code": "32",
+          "label": "18g",
+          "value_key": "Gauge=18g"
+        }
+      ]
+    },
+    {
+      "group": "Gem Size",
+      "kind": "gem_size",
+      "values": [
+        {
+          "available": true,
+          "code": "41",
+          "label": "3x1.5mm",
+          "value_key": "Gem Size=3x1.5mm"
+        },
+        {
+          "available": true,
+          "code": "42",
+          "label": "4x2mm",
+          "value_key": "Gem Size=4x2mm"
+        }
+      ]
+    }
+  ],
+  "canonical_of": null,
+  "cart": {
+    "mode": "shopify_lines",
+    "platform": "shopify"
+  },
+  "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "design_key": "house-a/d0001",
+  "gaps": [],
+  "house": "house-a",
+  "modelling_class": "end-single-gem",
+  "product_key": "house-a/p0001",
+  "product_type": "end",
+  "rules": [
+    {
+      "type": "variant_list"
+    }
+  ],
+  "schema": "jewelry.option_graph/1",
+  "sku_base": "HA-0001",
+  "slots": [
+    {
+      "count": 1,
+      "cut": "marquise",
+      "role": "center",
+      "size_from": "axis:Gem Size",
+      "slot": "s1"
+    }
+  ],
+  "snapshot_id": "2026-11-04-000000000000",
+  "status": "orderable",
+  "title": "End piece",
+  "variants": [
+    {
+      "cost": 40.0,
+      "in_stock": true,
+      "picks": {
+        "Gauge": "16g",
+        "Gem Size": "3x1.5mm",
+        "Material": "Metal A",
+        "Threading": "Threadless"
+      },
+      "sku": "HA-0001-TL-A-16-3",
+      "variant_key": "1001"
+    },
+    {
+      "cost": 40.0,
+      "in_stock": true,
+      "picks": {
+        "Gauge": "16g",
+        "Gem Size": "4x2mm",
+        "Material": "Metal A",
+        "Threading": "Threadless"
+      },
+      "sku": "HA-0001-TL-A-16-4",
+      "variant_key": "1002"
+    },
+    {
+      "cost": 40.0,
+      "in_stock": true,
+      "picks": {
+        "Gauge": "16g",
+        "Gem Size": "3x1.5mm",
+        "Material": "Metal B",
+        "Threading": "Threadless"
+      },
+      "sku": "HA-0001-TL-B-16-3",
+      "variant_key": "1003"
+    },
+    {
+      "cost": 40.0,
+      "in_stock": true,
+      "picks": {
+        "Gauge": "16g",
+        "Gem Size": "4x2mm",
+        "Material": "Metal B",
+        "Threading": "Threadless"
+      },
+      "sku": "HA-0001-TL-B-16-4",
+      "variant_key": "1004"
+    },
+    {
+      "cost": 40.0,
+      "in_stock": true,
+      "picks": {
+        "Gauge": "16g",
+        "Gem Size": "4x2mm",
+        "Material": "Metal A",
+        "Threading": "Threaded"
+      },
+      "sku": "HA-0001-TD-A-16-4",
+      "variant_key": "1005"
+    },
+    {
+      "cost": 40.0,
+      "in_stock": true,
+      "picks": {
+        "Gauge": "18g",
+        "Gem Size": "4x2mm",
+        "Material": "Metal B",
+        "Threading": "Threaded"
+      },
+      "sku": "HA-0001-TD-B-18-4",
+      "variant_key": "1006"
+    },
+    {
+      "cost": 0.0,
+      "in_stock": true,
+      "picks": {
+        "Gauge": "18g",
+        "Gem Size": "4x2mm",
+        "Material": "Metal A",
+        "Threading": "Threadless"
+      },
+      "sku": "HA-0001-TL-A-18-4",
+      "variant_key": "1007"
+    },
+    {
+      "cost": 40.0,
+      "discontinued": true,
+      "in_stock": true,
+      "picks": {
+        "Gauge": "18g",
+        "Gem Size": "3x1.5mm",
+        "Material": "Metal A",
+        "Threading": "Threaded"
+      },
+      "sku": "HA-0001-TD-A-18-3",
+      "variant_key": "1008"
+    }
+  ]
+}

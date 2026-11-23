@@ -1,0 +1,12 @@
+(
+    version: 1,            // optional: a file without it is version 1
+    holes: [],             // legacy ellipses: HoleEllipse (center, radius, rotation_radians)
+    shapes: [              // HoleShape, externally tagged, snake case
+        polygon(points: [(-15.0, -9.0), (14.0, -10.0), (16.0, 8.0), (0.0, 12.0), (-14.0, 9.0)]),
+        rect(center: (40.0, 2.0), half_extents: (10.0, 12.5), rotation_radians: 0.7),
+        ellipse((center: (-40.0, 0.0), radius: (6.0, 4.0), rotation_radians: 0.0)),
+        // raster((center: (x, z), half_extents: (hx, hz), rotation_radians: r,
+        //         width: w, height: h, coverage: [0..255; w * h])), row = local z;
+        // inside where the bilinear coverage reaches 50 %.
+    ],
+)

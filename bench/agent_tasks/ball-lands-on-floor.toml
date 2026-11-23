@@ -1,0 +1,27 @@
+format_version = 1
+id = "ball-lands-on-floor"
+title = "Drop a ball and let it come to rest"
+prompt = "A static floor (its top surface is at y = 0) is already in the level. Create a dynamic body named 'Ball' with a sphere collider of radius 0.5, drop it from 5 m above the origin, and run the physics until it rests on the floor."
+features = ["physics", "scene"]
+crates = ["regia_agent", "regia_physics"]
+call_budget = 10
+
+[setup]
+target = "physics"
+
+[[setup.call]]
+method = "scene.spawn"
+params = { name = "Floor", components = { Transform = { translation = [0, -0.5, 0] }, RigidBody = { kind = "Static" }, Collider = { shape = { Box = { half_extents = [10, 0.5, 10] } } } } }
+
+[[check]]
+name = "ball rests on the floor"
+method = "play.expect"
+params = { assertions = [{ name = "above", condition = { entity = { name = "Ball" }, component = "Transform", path = "translation.y", op = "gte", value = 0.45 } }, { name = "below", condition = { entity = { name = "Ball" }, component = "Transform", path = "translation.y", op = "lte", value = 0.55 } }] }
+pointer = "/pass"
+expect = { kind = "equals", value = true }
+
+[[check]]
+name = "one dynamic body"
+method = "physics.stats"
+pointer = "/dynamic"
+expect = { kind = "equals", value = 1 }

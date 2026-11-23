@@ -1,0 +1,17 @@
+(
+    format: "montage",
+    entries: [
+        (
+            version: 1,
+            file: "v1.montage.ron",
+            origin: "git d9dac604a6d4e2fe77ecadb99b14202cd0405f25:samples/anim_lab/assets/wave.montage.ron",
+            exercises: "baseline: tracks, sections with next, notifies, blend_in/blend_out (v2 adds warp options, follow links, rate curve)",
+        ),
+        (
+            version: 2,
+            file: "v2.ron",
+            origin: "frozen copy of the fuzz-target registry fixture",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+    ],
+)

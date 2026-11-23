@@ -1,0 +1,5 @@
+(format_version: 1, name: "rocket", description: "Pooled rocket; waits for the shot cadence too",
+ kind_tags: ["Weapon.Rocket"], run_tags: ["State.Firing"],
+ owner_forbids: Some(Has("Cooldown.Rifle")),
+ cost: Some("effects/rocket_cost.effect.ron"), cooldown: Some("effects/rocket_cooldown.effect.ron"),
+ charge: OnStart, max_run_ticks: Some(1))

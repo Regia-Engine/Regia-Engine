@@ -1,0 +1,420 @@
+{
+  "library_version": 1,
+  "materials": [
+    {
+      "calibration": {
+        "method": "none"
+      },
+      "catalogue_facets": [
+        "Material=Metal A"
+      ],
+      "conductor": {
+        "f0_rgb_linear": [
+          0.6,
+          0.58,
+          0.55
+        ],
+        "roughness": 0.12
+      },
+      "display_name": "Grey metal A",
+      "kind": "conductor",
+      "material_id": "grey-metal-a",
+      "source": {
+        "citation": "synthetic fixture values",
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "calibration": {
+        "method": "none"
+      },
+      "catalogue_facets": [
+        "Material=Metal B"
+      ],
+      "conductor": {
+        "f0_rgb_linear": [
+          0.95,
+          0.75,
+          0.4
+        ],
+        "f82_tint_rgb": [
+          1.0,
+          0.99,
+          0.98
+        ],
+        "plating": "none",
+        "roughness": 0.1
+      },
+      "display_name": "Yellow metal B",
+      "kind": "conductor",
+      "material_id": "yellow-metal-b",
+      "source": {
+        "citation": "synthetic fixture values",
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "anodized": {
+        "catalogue_name": "Film color 1",
+        "fresnel_lut": {
+          "cos_theta": "uniform_0_1",
+          "entries": [
+            [
+              0.85,
+              0.56677,
+              0.51927
+            ],
+            [
+              0.7323,
+              0.43233,
+              0.41833
+            ],
+            [
+              0.64159,
+              0.32788,
+              0.34753
+            ],
+            [
+              0.57214,
+              0.24782,
+              0.30091
+            ],
+            [
+              0.51905,
+              0.18735,
+              0.27337
+            ],
+            [
+              0.47819,
+              0.14245,
+              0.26052
+            ],
+            [
+              0.44617,
+              0.10973,
+              0.25867
+            ],
+            [
+              0.42023,
+              0.08645,
+              0.26478
+            ],
+            [
+              0.39819,
+              0.07041,
+              0.27635
+            ],
+            [
+              0.37842,
+              0.0599,
+              0.2914
+            ],
+            [
+              0.35971,
+              0.05365,
+              0.30838
+            ],
+            [
+              0.34126,
+              0.05071,
+              0.32613
+            ],
+            [
+              0.3226,
+              0.05047,
+              0.34383
+            ],
+            [
+              0.30352,
+              0.05252,
+              0.36089
+            ],
+            [
+              0.28399,
+              0.05664,
+              0.37694
+            ],
+            [
+              0.26415,
+              0.06271,
+              0.39173
+            ]
+          ]
+        },
+        "substrate_material_id": "grey-metal-a"
+      },
+      "calibration": {
+        "method": "none"
+      },
+      "catalogue_facets": [
+        "Anodization=Color 1"
+      ],
+      "display_name": "Film color 1",
+      "kind": "anodized",
+      "material_id": "grey-metal-a-film-1",
+      "source": {
+        "citation": "synthetic smooth curve for tests, not a physical film",
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "anodized": {
+        "catalogue_name": "Film color 2",
+        "color_rgb_linear": [
+          0.1,
+          0.45,
+          0.5
+        ],
+        "substrate_material_id": "grey-metal-a"
+      },
+      "calibration": {
+        "method": "none"
+      },
+      "catalogue_facets": [
+        "Anodization=Color 2"
+      ],
+      "display_name": "Film color 2",
+      "kind": "anodized",
+      "material_id": "grey-metal-a-film-2",
+      "source": {
+        "citation": "plain color preset",
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "calibration": {
+        "method": "none"
+      },
+      "catalogue_facets": [
+        "Gem=Clear A"
+      ],
+      "display_name": "Clear stone (high index)",
+      "gem_dielectric": {
+        "abbe_vd": 55.3,
+        "attenuation_rgb_per_mm": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "n_d": 2.417
+      },
+      "kind": "gem_dielectric",
+      "material_id": "clear-high-dispersion",
+      "source": {
+        "citation": "published refractive index and Abbe number",
+        "retrieved": "2026-11-04"
+      },
+      "status": "measured"
+    },
+    {
+      "calibration": {
+        "method": "none"
+      },
+      "catalogue_facets": [
+        "Gem=Clear B"
+      ],
+      "display_name": "Clear stone (low index)",
+      "gem_dielectric": {
+        "abbe_vd": 64.2,
+        "attenuation_rgb_per_mm": [
+          0.0,
+          0.002,
+          0.004
+        ],
+        "n_d": 1.5168
+      },
+      "kind": "gem_dielectric",
+      "material_id": "clear-low-index",
+      "source": {
+        "citation": "published refractive index and Abbe number",
+        "retrieved": "2026-11-04"
+      },
+      "status": "measured"
+    },
+    {
+      "calibration": {
+        "method": "none"
+      },
+      "catalogue_facets": [],
+      "display_name": "Polish",
+      "finish": {
+        "finish_kind": "polish",
+        "roughness": 0.03
+      },
+      "kind": "finish",
+      "material_id": "finish-polish",
+      "source": {
+        "citation": "finish preset",
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "calibration": {
+        "method": "none"
+      },
+      "catalogue_facets": [
+        "Material=Metal C"
+      ],
+      "conductor": {
+        "f0_rgb_linear": [
+          0.55,
+          0.55,
+          0.56
+        ],
+        "nk": {
+          "k": [
+            3.1,
+            3.4,
+            3.8
+          ],
+          "n": [
+            2.3,
+            2.5,
+            2.7
+          ],
+          "wavelength_nm": [
+            465.0,
+            532.0,
+            630.0
+          ]
+        },
+        "roughness": 0.2
+      },
+      "display_name": "Grey metal C",
+      "kind": "conductor",
+      "material_id": "grey-metal-c",
+      "source": {
+        "citation": "synthetic fixture values",
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "calibration": {
+        "method": "none"
+      },
+      "catalogue_facets": [
+        "Gem=Tinted"
+      ],
+      "display_name": "Tinted stone",
+      "gem_dielectric": {
+        "abbe_vd": null,
+        "absorption_spectrum": {
+          "per_mm": [
+            0.6,
+            0.2,
+            0.05
+          ],
+          "wavelength_nm": [
+            450.0,
+            550.0,
+            650.0
+          ]
+        },
+        "attenuation_rgb_per_mm": null,
+        "n_d": 1.77,
+        "sellmeier": {
+          "b": [
+            1.43,
+            0.65,
+            5.34
+          ],
+          "c_um2": [
+            0.0053,
+            0.0142,
+            325.0
+          ]
+        },
+        "sparkle": 0.4
+      },
+      "kind": "gem_dielectric",
+      "material_id": "tinted-stone",
+      "source": {
+        "citation": "published refractive index and Abbe number",
+        "retrieved": "2026-11-04"
+      },
+      "status": "measured"
+    },
+    {
+      "calibration": {
+        "method": "none"
+      },
+      "catalogue_facets": [
+        "Gem=Frosted"
+      ],
+      "display_name": "Frosted stone",
+      "gem_dielectric": {
+        "n_d": 1.54,
+        "surface": "frosted",
+        "surface_roughness": 0.45,
+        "tint_rgb_linear": [
+          0.8,
+          0.85,
+          0.9
+        ]
+      },
+      "kind": "gem_dielectric",
+      "material_id": "frosted-stone",
+      "source": {
+        "citation": "synthetic fixture values",
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "calibration": {
+        "method": "none"
+      },
+      "catalogue_facets": [
+        "Gem=Opal-like"
+      ],
+      "display_name": "Play-of-color stone",
+      "gem_special": {
+        "body_rgb_linear": [
+          0.8,
+          0.82,
+          0.85
+        ],
+        "model": "opal",
+        "patch_scale_mm": 0.4
+      },
+      "kind": "gem_special",
+      "material_id": "opal-like",
+      "source": {
+        "citation": "synthetic fixture values",
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    },
+    {
+      "calibration": {
+        "method": "none"
+      },
+      "catalogue_facets": [],
+      "display_name": "Brushed",
+      "finish": {
+        "anisotropy": {
+          "direction_source": "tangent",
+          "strength": 0.8
+        },
+        "feature_scale_mm": 0.02,
+        "finish_kind": "brushed",
+        "roughness": 0.22
+      },
+      "kind": "finish",
+      "material_id": "finish-brushed",
+      "source": {
+        "citation": "finish preset",
+        "retrieved": "2026-11-04"
+      },
+      "status": "estimate"
+    }
+  ],
+  "schema": "jewelry.material_library/1",
+  "working_space": "linear_rec709"
+}

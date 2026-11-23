@@ -1,0 +1,3 @@
+(version: 9, root: (children: [
+    (name: "logo", image: (asset: "assets/textures/hud.png")),
+]))

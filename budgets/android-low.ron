@@ -1,0 +1,19 @@
+// Android low-end budgets (`docs/06-testing-and-ci.md` § 3 "Android low": Mobile Low >= 30 fps).
+// `cargo xtask android-pass --budgets budgets/android-low.ron`. A `None` row has no budget.
+(
+    tier: "android_low",
+    preset: "mobile_low",
+    frame_p99_ms: None,
+    // Mobile Low targets 30 fps (two refreshes on a 60 Hz panel): no one-refresh row (ADR-4947).
+    presented_p99_refresh_ratio: None,
+    // Mobile Low >= 30 fps.
+    frame_p50_ms: Some(33.3),
+    cpu_p99_ms: None,
+    longest_frame_ms: None,
+    pss_mb: None,
+    cold_start_ms: None,
+    level_load_ms: None,
+    thermal_status: None,
+    thermal_p50_growth_pct: None,
+    pacing_late_pct: Some(5.0),
+)

@@ -1,0 +1,17 @@
+(
+    format: "logic",
+    entries: [
+        (
+            version: 1,
+            file: "v1.ron",
+            origin: "frozen copy of the fuzz-target registry fixture",
+            exercises: "v1 (ADR-8900): reads as v2 with no entity_vars or world_vars; only the number moves",
+        ),
+        (
+            version: 2,
+            file: "v2.ron",
+            origin: "v07-fmt-logic-uianim (ADR-8900), the `logic-vars` fuzz target's fixture",
+            exercises: "the current version: typed entity_vars (int, string, bool) and world_vars (int, float) on a declared board, written with values of their types",
+        ),
+    ],
+)

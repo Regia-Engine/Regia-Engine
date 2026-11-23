@@ -1,0 +1,18 @@
+// The example of docs/formats/retarget-ron.md.
+(
+    format_version: 1,
+    name: "mixamo-to-guard",
+    // How each side's roles are found: Guess (default) | ByName | Profile("generic-humanoid" | "vrm")
+    // | Explicit({ role: joint }). `overrides` replace single roles afterwards.
+    source: (roles: Guess, overrides: { "leftHand": "mixamorig:LeftHand" }),
+    target: (roles: Profile("generic-humanoid")),
+    // Per-role settings (all optional).
+    roles: {
+        "hips": (translation: Some(Scaled)),                 // Bind | Animated | Scaled
+        "leftUpperArm": (rest_offset_deg: (0.0, 0.0, -10.0)),  // XYZ Euler degrees, object space
+        "rightToes": (skip: true),                           // leave unmapped (keeps its bind pose)
+    },
+    translation_scale: HipHeight,   // HipHeight (default) | Fixed(f32 > 0)
+    root_motion: Auto,              // Auto (default: the translation scale) | Fixed(f32 >= 0) | Off
+    align_facing: true,             // default true: turn the source by the 90°-snapped facing yaw
+)

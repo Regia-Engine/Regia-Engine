@@ -1,0 +1,211 @@
+# Compiled documentation examples per stable crate (ADR-2527 crates), held by `cargo xtask doc-examples`.
+# `*_compiled` are floors (untagged, rust, no_run, should_panic and compile_fail fences); `*_ignored_max`
+# are ceilings (ignore fences). `crate_` rows count `//!` in lib.rs, `item_` rows everything else under src.
+# A `waiver` excuses the missing crate-level example of one crate for the reason given. `--update`
+# records a raise; a lower floor or higher ceiling needs `--lower "<why>"`, which appends to `lowered`.
+
+format_version = 1
+
+[crates.regia]
+crate_compiled = 1
+crate_ignored_max = 0
+item_compiled = 3
+item_ignored_max = 0
+
+[crates.regia_2d]
+crate_compiled = 0
+crate_ignored_max = 0
+item_compiled = 3
+item_ignored_max = 0
+waiver = "follow-up: item-level examples exist, the crate-level getting-started example is outside sprint doc-examples-stable"
+
+[crates.regia_agent]
+crate_compiled = 0
+crate_ignored_max = 0
+item_compiled = 2
+item_ignored_max = 0
+waiver = "follow-up: item-level examples exist, the crate-level getting-started example is outside sprint doc-examples-stable"
+
+[crates.regia_ai]
+crate_compiled = 0
+crate_ignored_max = 1
+item_compiled = 2
+item_ignored_max = 0
+waiver = "follow-up: item-level examples exist, the crate-level getting-started example is outside sprint doc-examples-stable"
+
+[crates.regia_animation]
+crate_compiled = 1
+crate_ignored_max = 0
+item_compiled = 3
+item_ignored_max = 1
+
+[crates.regia_app]
+crate_compiled = 1
+crate_ignored_max = 0
+item_compiled = 3
+item_ignored_max = 0
+
+[crates.regia_asset]
+crate_compiled = 1
+crate_ignored_max = 0
+item_compiled = 4
+item_ignored_max = 0
+
+[crates.regia_audio]
+crate_compiled = 1
+crate_ignored_max = 0
+item_compiled = 12
+item_ignored_max = 0
+
+[crates.regia_core]
+crate_compiled = 1
+crate_ignored_max = 0
+item_compiled = 37
+item_ignored_max = 8
+
+[crates.regia_crash]
+crate_compiled = 1
+crate_ignored_max = 0
+item_compiled = 0
+item_ignored_max = 0
+
+[crates.regia_ecs]
+crate_compiled = 1
+crate_ignored_max = 0
+item_compiled = 3
+item_ignored_max = 0
+
+[crates.regia_framework]
+crate_compiled = 0
+crate_ignored_max = 0
+item_compiled = 39
+item_ignored_max = 1
+waiver = "follow-up: item-level examples exist, the crate-level getting-started example is outside sprint doc-examples-stable"
+
+[crates.regia_input]
+crate_compiled = 1
+crate_ignored_max = 0
+item_compiled = 9
+item_ignored_max = 0
+
+[crates.regia_matgraph]
+crate_compiled = 1
+crate_ignored_max = 0
+item_compiled = 0
+item_ignored_max = 0
+
+[crates.regia_media]
+crate_compiled = 1
+crate_ignored_max = 0
+item_compiled = 3
+item_ignored_max = 0
+
+[crates.regia_nav]
+crate_compiled = 1
+crate_ignored_max = 0
+item_compiled = 4
+item_ignored_max = 0
+
+[crates.regia_net]
+crate_compiled = 1
+crate_ignored_max = 0
+item_compiled = 2
+item_ignored_max = 0
+
+[crates.regia_physics]
+crate_compiled = 0
+crate_ignored_max = 0
+item_compiled = 8
+item_ignored_max = 0
+waiver = "follow-up: item-level examples exist, the crate-level getting-started example is outside sprint doc-examples-stable"
+
+[crates.regia_pick]
+crate_compiled = 1
+crate_ignored_max = 1
+item_compiled = 4
+item_ignored_max = 0
+
+[crates.regia_platform]
+crate_compiled = 1
+crate_ignored_max = 0
+item_compiled = 3
+item_ignored_max = 0
+
+[crates.regia_procgen]
+crate_compiled = 1
+crate_ignored_max = 0
+item_compiled = 3
+item_ignored_max = 0
+
+[crates.regia_quick]
+crate_compiled = 1
+crate_ignored_max = 0
+item_compiled = 3
+item_ignored_max = 0
+
+[crates.regia_render]
+crate_compiled = 0
+crate_ignored_max = 0
+item_compiled = 31
+item_ignored_max = 1
+waiver = "follow-up: item-level examples exist, the crate-level getting-started example is outside sprint doc-examples-stable"
+
+[crates.regia_scene]
+crate_compiled = 0
+crate_ignored_max = 0
+item_compiled = 16
+item_ignored_max = 0
+waiver = "follow-up: item-level examples exist, the crate-level getting-started example is outside sprint doc-examples-stable"
+
+[crates.regia_script_lua]
+crate_compiled = 1
+crate_ignored_max = 0
+item_compiled = 4
+item_ignored_max = 0
+
+[crates.regia_steam]
+crate_compiled = 0
+crate_ignored_max = 0
+item_compiled = 1
+item_ignored_max = 3
+waiver = "follow-up: item-level examples exist, the crate-level getting-started example is outside sprint doc-examples-stable"
+
+[crates.regia_telemetry]
+crate_compiled = 0
+crate_ignored_max = 0
+item_compiled = 0
+item_ignored_max = 0
+waiver = "lane testgaps-quick-telemetry-templates owns the crate-level example"
+
+[crates.regia_terrain]
+crate_compiled = 0
+crate_ignored_max = 0
+item_compiled = 1
+item_ignored_max = 2
+waiver = "follow-up: item-level examples exist, the crate-level getting-started example is outside sprint doc-examples-stable"
+
+[crates.regia_ui]
+crate_compiled = 1
+crate_ignored_max = 0
+item_compiled = 3
+item_ignored_max = 1
+
+[crates.regia_vfx]
+crate_compiled = 0
+crate_ignored_max = 0
+item_compiled = 1
+item_ignored_max = 1
+waiver = "follow-up: item-level examples exist, the crate-level getting-started example is outside sprint doc-examples-stable"
+
+[crates.regia_world]
+crate_compiled = 1
+crate_ignored_max = 0
+item_compiled = 3
+item_ignored_max = 0
+
+[crates.regia_xr]
+crate_compiled = 0
+crate_ignored_max = 0
+item_compiled = 0
+item_ignored_max = 0
+waiver = "lane 884 owns the crate-level example"

@@ -1,0 +1,20 @@
+ProcGraph(
+    format_version: 1,
+    description: "Road network: splines tagged `road` become ribbons with junction patches and markings (spec 64 § 7)",
+    nodes: {
+        1: (ty: "in.entities", settings: {tags: ["road"], as: "splines", within: "world"}, at: (0.0, 0.0)),
+        2: (ty: "in.ground", settings: {}, at: (0.0, 160.0)),
+        3: (ty: "road.junctions", settings: {}, at: (240.0, 0.0)),
+        4: (ty: "road.ribbon", settings: {}, at: (480.0, 0.0)),
+        5: (ty: "road.markings", settings: {}, at: (480.0, 160.0)),
+    },
+    edges: [
+        (from: (1, "out"), to: (3, "splines")),
+        (from: (2, "out"), to: (3, "ground")),
+        (from: (3, "out_splines"), to: (4, "splines")),
+        (from: (2, "out"), to: (4, "ground")),
+        (from: (3, "out_splines"), to: (5, "splines")),
+        (from: (2, "out"), to: (5, "ground")),
+    ],
+    flags: (starter: true),
+)

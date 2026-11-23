@@ -1,0 +1,45 @@
+// A 24 m corridor, 2.4 m wide and 3 m tall, open at its south end (z = 0) and closed at the
+// north. Three windows (1.2 x 1.2 m, sill at 1 m) in the east wall let the low sun in as three
+// patches on the floor and the west wall; the west wall is ochre, so its bounce tints the
+// corridor. What it checks: light carried down a long, narrow interior away from its openings
+// (the far end is lit by bounce alone) and the windows' patches against the reference.
+// Look-review pack scene (ADR-1326), read by `cargo xtask gi-compare`.
+(
+    format_version: 1,
+    name: "corridor",
+    purpose: "light carried down a long corridor from an open end and three windows",
+    sun: Some((toward: (0.6, 0.55, 0.25), color: (1.0, 0.95, 0.88), lux: 100000.0)),
+    sky_lux: 15000.0,
+    materials: [
+        (name: "ground", albedo: (0.3, 0.28, 0.25)),
+        (name: "wall", albedo: (0.62, 0.62, 0.6)),
+        (name: "ochre", albedo: (0.7, 0.45, 0.22)),
+    ],
+    terrain: Some((size: (96.0, 96.0), spacing: 2.0, height: 0.0, material: "ground")),
+    shapes: [
+        (name: "roof", kind: Box(half: (1.4, 0.1, 12.1)), material: "wall", at: (0.0, 3.1, -12.0)),
+        (name: "west", kind: Box(half: (0.1, 1.5, 12.1)), material: "ochre", at: (-1.3, 1.5, -12.0)),
+        (name: "north", kind: Box(half: (1.4, 1.5, 0.1)), material: "wall", at: (0.0, 1.5, -24.1)),
+        (name: "east_0", kind: Box(half: (0.1, 1.5, 2.7)), material: "wall", at: (1.3, 1.5, -2.7)),
+        (name: "east_1", kind: Box(half: (0.1, 1.5, 2.4)), material: "wall", at: (1.3, 1.5, -9.0)),
+        (name: "east_2", kind: Box(half: (0.1, 1.5, 2.4)), material: "wall", at: (1.3, 1.5, -15.0)),
+        (name: "east_3", kind: Box(half: (0.1, 1.5, 2.8)), material: "wall", at: (1.3, 1.5, -21.4)),
+        (name: "sill_0", kind: Box(half: (0.1, 0.5, 0.6)), material: "wall", at: (1.3, 0.5, -6.0)),
+        (name: "sill_1", kind: Box(half: (0.1, 0.5, 0.6)), material: "wall", at: (1.3, 0.5, -12.0)),
+        (name: "sill_2", kind: Box(half: (0.1, 0.5, 0.6)), material: "wall", at: (1.3, 0.5, -18.0)),
+        (name: "lintel_0", kind: Box(half: (0.1, 0.4, 0.6)), material: "wall", at: (1.3, 2.6, -6.0)),
+        (name: "lintel_1", kind: Box(half: (0.1, 0.4, 0.6)), material: "wall", at: (1.3, 2.6, -12.0)),
+        (name: "lintel_2", kind: Box(half: (0.1, 0.4, 0.6)), material: "wall", at: (1.3, 2.6, -18.0)),
+    ],
+    layout: (
+        terrain: Some((spacing: (4.0, 4.0), levels: [0.5, 1.5, 3.0, 6.0])),
+        // The corridor's air, one interior brick. The lattice lies on the interior's box (the
+        // walls' inner faces), as `regia bake-gi --from-scene` places it (ADR-1364).
+        bricks: [(min: (-1.2, 0.0, -24.0), max: (1.2, 3.0, 0.0), spacing: 0.5)],
+        interiors: [(min: (-1.2, 0.0, -24.0), max: (1.2, 3.0, 0.0))],
+        moment_resolution: 8,
+        max_distance: 16.0,
+    ),
+    // regia bake-gi's defaults (ProbeTraceSettings::default): 256 rays x 16 samples, 8 bounces.
+    bake: (rays_per_probe: 256, samples: 16, max_bounces: 8, seed: 1),
+)

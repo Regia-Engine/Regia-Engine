@@ -1,0 +1,87 @@
+// The showcase's opening (`.seq.ron` v2, ADR-1880, ADR-2135): every v2 track kind on one clock.
+// A beacon rises out of the valley on a weighted Bezier path and pulses, the sun brightens, a
+// body clip crossfades into a wave, wind plays under it all, and a shared sparkle effect plays
+// twice on the beacon's lamp (the second time later into the effect and faster). The sparkle
+// holds a twinkle of its own, so the sub-sequence tree is two levels deep.
+(
+    version: 2,
+    name: "showcase-intro",
+    fps: 30.0,
+    tracks: [
+        // Up out of the valley: a slow start (long first handle), a quick settle (short second one).
+        (
+            name: "beacon-rise",
+            target: "beacon",
+            property: "transform.position",
+            keys: Vec3([
+                (time: 0.0, value: (0.0, -6.0, -100.0), ease: Bezier, tangent: Flat, weights: Some((0.5, 0.6))),
+                (time: 2.5, value: (0.0, 4.0, -100.0), ease: Bezier, tangent: Aligned((0.0, 1.5, 0.0)), weights: Some((0.2, 0.4))),
+                (time: 6.0, value: (0.0, 5.0, -100.0), tangent: Flat),
+            ]),
+        ),
+        // Two pulses: broken tangents give a sharp rise and a soft fall.
+        (
+            name: "beacon-pulse",
+            target: "beacon",
+            property: "transform.scale",
+            keys: Float([
+                (time: 2.5, value: 1.0, ease: Bezier),
+                (time: 3.0, value: 1.6, ease: Bezier, tangent: Broken(4.0, -0.5)),
+                (time: 3.75, value: 1.0, ease: Bezier, tangent: Auto),
+                (time: 4.25, value: 1.4, ease: Smooth),
+                (time: 5.0, value: 1.0),
+            ]),
+        ),
+        // The beacon appears just before it clears the ground.
+        (
+            name: "beacon-visible",
+            target: "beacon",
+            property: "visible",
+            keys: Bool([
+                (time: 0.0, value: false),
+                (time: 0.5, value: true),
+            ]),
+        ),
+        // The sun comes up with it (a directional light's illuminance, lux).
+        (
+            name: "sun-up",
+            target: "sun",
+            property: "light.intensity",
+            keys: Float([
+                (time: 0.0, value: 20000.0, ease: Bezier, weights: Some((0.3, 0.6))),
+                (time: 4.0, value: 90000.0, ease: Linear, tangent: Flat),
+                (time: 6.0, value: 90000.0),
+            ]),
+        ),
+        // The beacon's keeper idles, then crossfades into a wave over half a second.
+        (
+            name: "keeper-body",
+            target: "keeper",
+            keys: Clip([
+                (clip: "idle", start: 0.0, end: 3.5, looping: true, blend_out: 0.5),
+                (clip: "wave", start: 3.0, end: 6.0, blend_in: 0.5, speed: 1.25, weight: 0.9),
+            ]),
+        ),
+        // Wind under the whole sequence, a chime on the first pulse.
+        (
+            name: "ambience",
+            keys: Audio([
+                (sound: "wind_loop", start: 0.0, end: 6.0, volume_db: -9.0, fade_in: 1.0, fade_out: 1.5, bus: Some("Ambience")),
+                (sound: "chime", start: 3.0, end: 4.5, offset: 0.05, volume_db: -3.0, fade_out: 0.5, bus: Some("Sfx")),
+            ]),
+        ),
+        // The shared sparkle on the beacon's lamp: once at its own pace, then later into it and faster.
+        (
+            name: "sparkle",
+            keys: Sub([
+                (sequence: "cinematics/fx/sparkle.seq.ron", start: 2.5, end: 4.0, bindings: {"lamp": "beacon"}),
+                (sequence: "cinematics/fx/sparkle.seq.ron", start: 4.5, end: 6.0, offset: 0.25, speed: 1.5, bindings: {"lamp": "beacon"}),
+            ]),
+        ),
+    ],
+    markers: [
+        (name: "rise", time: 0.0, payload: "cue:wind_loop"),
+        (name: "pulse", time: 3.0),
+        (name: "end", time: 6.0, payload: "flow:showcase"),
+    ],
+)

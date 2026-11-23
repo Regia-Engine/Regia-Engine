@@ -1,0 +1,31 @@
+// Handwritten `.vfx.ron` v3 (from the ferrite_vfx v3 struct definitions at 78549d889): v3 only adds the
+// FireAnim sprite (8-frame flame flipbook); the v4 field heat_haze does not exist yet.
+(
+    version: 3,
+    name: "flame",
+    system: (budget: 64),
+    emitters: [
+        (
+            name: "flame",
+            delay: 0.0,
+            spawn: (
+                mode: Burst(4),
+                lifetime: (min: 0.5, max: 1.0),
+            ),
+            init: (
+                size: (min: 1.0, max: 1.0),
+                color: [(t: 0.0, color: "#ffffff")],
+            ),
+            update: (
+                alpha_over_life: [(t: 0.0, v: 1.0), (t: 1.0, v: 0.0)],
+            ),
+            render: (
+                mode: Billboard,
+                sprite: FireAnim,
+                flipbook: Some((cols: 8, rows: 1, frames: 8, mode: OverLife)),
+                blend: Alpha,
+                emissive: 6.0,
+            ),
+        ),
+    ],
+)

@@ -1,0 +1,42 @@
+// A six-leg walker with four patterns (wave, ripple, an explicit pattern, tripod), a posture with a
+// height slew limit, a body joint, and legs that mix hip offset and reach overrides with none.
+(
+    format_version: 1,
+    patterns: [
+        Wave(6),
+        Ripple(6),
+        Explicit(offsets: [0.0, 0.5, 0.5, 0.0, 0.0, 0.5], duty: 0.55),
+        Tripod,
+    ],
+    switch_speeds: [0.4, 0.9, 1.5],
+    hysteresis: 0.1,
+    speeds: (forward: 2.0, reverse: 0.8, strafe: 0.6, acceleration: 3.0, idle: 0.03, yaw_rate: 1.2),
+    step_length: 0.45,
+    swing_lift: 0.15,
+    clearance: 0.55,
+    max_slope: 1.0,
+    max_reach: Some(1.1),
+    settle: (distance: 0.05, period: 0.25),
+    turn: (step_distance: 0.12, step_angle: 0.35),
+    ground_band: Some(0.8),
+    foothold: (candidates: 16, spacing: 0.15),
+    hang_drop: 0.25,
+    posture: Some((
+        swing_weight: 0.5,
+        height_tau: 0.08,
+        height_slew: Some(0.6),
+        attitude_weight: 1.0,
+        max_pitch: 0.44,
+        max_roll: 0.35,
+        attitude_tau: 0.1,
+    )),
+    body: Some("thorax"),
+    legs: [
+        (root: "coxa_fl", tip: "foot_fl", hip_offset: Some((-0.45, 0.6)), max_reach: Some(1.3)),
+        (root: "coxa_fr", tip: "foot_fr", hip_offset: Some((0.45, 0.6)), max_reach: Some(1.3)),
+        (root: "coxa_ml", tip: "foot_ml"),
+        (root: "coxa_mr", tip: "foot_mr"),
+        (root: "coxa_rl", tip: "foot_rl", max_reach: Some(1.0)),
+        (root: "coxa_rr", tip: "foot_rr", hip_offset: Some((0.5, -0.6))),
+    ],
+)

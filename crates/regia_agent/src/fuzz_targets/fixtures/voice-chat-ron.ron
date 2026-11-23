@@ -1,0 +1,16 @@
+(
+    format_version: 1,
+    quality: Standard,            // Narrow (16 kHz) | Standard (24 kHz) | High (48 kHz)
+    mode: PushToTalk,             // Open | Vad | PushToTalk | Toggle
+    frames_per_packet: 1,         // 1 or 2 (2 is not sent yet)
+    max_mixed_speakers: 8,        // 1..=16
+    jitter: (min_ms: 40, max_ms: 200, start_ms: 60),
+    processing: (noise_suppression: Off, echo_cancel: false, agc: false),
+    report_buffer_seconds: 0,     // 0..=30; 0 never keeps packets
+    channels: [
+        (id: 1, name: "team", kind: Team, priority: 3),
+        (id: 2, name: "nearby", kind: Proximity, radius: 25.0, spatial: true, priority: 2),
+        (id: 3, name: "party", kind: Party, priority: 1),
+        (id: 4, name: "all", kind: Global, priority: 0),
+    ],
+)

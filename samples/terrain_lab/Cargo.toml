@@ -1,0 +1,22 @@
+[package]
+name = "terrain_lab"
+description = "M13 sample: offscreen terrain render with CDLOD, water, scatter, holes and crater deformation."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia_asset = { workspace = true }
+regia_core = { workspace = true }
+regia_render = { workspace = true }
+regia_terrain = { workspace = true }
+png = { workspace = true }
+wgpu = { workspace = true }
+
+[dev-dependencies]
+regia_test_utils = { workspace = true }

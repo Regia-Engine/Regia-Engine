@@ -1,0 +1,62 @@
+(
+    format_version: 4,
+    parameters: [
+        ("TailTarget", Vec3((0.3, 0.4, 0.6))),
+        ("TailPole", Vec3((1.0, 0.5, 0.0))),
+        ("TailWeight", Float(1.0)),
+        ("AimTarget", Vec3((0.0, 1.6, -10.0))),
+        ("AimWeight", Float(1.0)),
+    ],
+    root: BodyAim((
+        inner: ChainIK((
+            inner: Clip((
+                clip: "Idle",
+                looping: true,
+                speed: 1.0,
+                sync_group: None,
+            )),
+            root: "tail_01",
+            tip: "tail_06",
+            solver: Fabrik,
+            target: Param("TailTarget"),
+            pole: Some("TailPole"),
+            limits: Some(PerJoint([
+                (
+                    joint: "tail_01",
+                    limit: Cone(
+                        max_swing: 0.6,
+                        min_twist: -0.2,
+                        max_twist: 0.2,
+                    ),
+                ),
+                (
+                    joint: "tail_03",
+                    limit: Hinge(
+                        axis: (1.0, 0.0, 0.0),
+                        min: -0.8,
+                        max: 0.8,
+                    ),
+                ),
+            ])),
+            iterations: 24,
+            tolerance: 0.001,
+            weight_param: Some("TailWeight"),
+        )),
+        joints: [
+            ("spine_01", 1.0),
+            ("spine_02", 1.0),
+            ("neck", 0.5),
+            ("head", 1.0),
+        ],
+        aim_joint: "head",
+        axis: (0.0, 0.0, -1.0),
+        target: Param("AimTarget"),
+        limits: Some(Uniform(Cone(
+            max_swing: 0.7,
+            min_twist: -0.3,
+            max_twist: 0.3,
+        ))),
+        passes: 4,
+        weight_param: Some("AimWeight"),
+    )),
+)

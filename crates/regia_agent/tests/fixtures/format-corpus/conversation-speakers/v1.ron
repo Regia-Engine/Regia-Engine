@@ -1,0 +1,7 @@
+(
+    format_version: 1,
+    speakers: {
+        "guard": (name_key: Some("speaker-guard"), color: Some("#c0a040"), voiced: true, narration: false, side: Start),
+        "narrator": (narration: true, voiced: false),
+    },
+)

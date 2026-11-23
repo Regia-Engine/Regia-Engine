@@ -1,0 +1,14 @@
+# GI validation record (ADR-423): scene technique rel_rmse shadow_bias energy_ratio
+# measured on: llvmpipe (LLVM 23.1.4, 256 bits) (llvmpipe; Mesa 26.2.6-arch1.1 (LLVM 23.1.4))
+# Re-record with REGIA_GI_RECORD=1 on lavapipe; say why in the commit message.
+# 2026-11-07 (lane sprint-gi-leak-plates-p95): the probe rows re-recorded after
+# lane/sprint-dyn-gi-remainder's plate layouts (every probe row tightened 3x; the colour room's
+# shadow bias is now positive: the settled probes over-light the room, which the spec 27 row
+# attributes). The flat-sky rows (ambient/ssgi/baked) keep their old records: the layout change
+# moved their baselines ~0.8 % and a record never loosens.
+color_room direct 0.10959 - 0.99958
+color_room ambient 0.87850 -0.57205 0.38604
+color_room ssgi 0.84975 -0.56455 0.40309
+color_room probes 0.17408 0.10606 1.06219
+color_room probes_ssgi 0.15090 0.12379 1.08912
+color_room baked 0.87850 -0.57205 0.38604

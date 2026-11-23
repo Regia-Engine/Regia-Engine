@@ -1,0 +1,68 @@
+format_version = 4
+
+[server]
+name = "My Game Server"           # shown in server lists and the welcome message
+bind = "0.0.0.0"                  # address to listen on
+port = 7777                       # UDP game port
+max_players = 16                  # players, not peers (split-screen counts per player)
+password = ""                     # empty = no password
+tick_hz = 60                      # simulation rate
+motd = ""                         # message of the day, sent with the welcome
+idle_tick_hz = 10                 # tick rate while empty, if the game allows it
+
+[levels]
+rotation = ["levels/arena.level.ron"]  # played in order; loops
+start_index = 0
+match_end_delay_s = 10
+
+[net]
+interrupt_ms = 1500              # report a connection problem without dropping the seat
+timeout_ms = 20000               # silence-only removal
+start_grace_ms = 30000           # admission floor before game traffic
+mtu_probing = false               # probe the path for packets over 1200 bytes (1280/1400/1452)
+# client_rate_bytes = 49152       # per client; absent = config/net.ron decides
+# server_rate_bytes = 0           # 0 = no total cap; absent = config/net.ron decides
+# send_every_ticks = 2            # absent = config/net.ron decides
+# entropy = "off"                 # off | range; absent = config/net.ron decides (spec 72 § 18)
+encryption = "auto"               # auto = every non-loopback peer; required = all; off = none
+identity_file = "server.key"      # the server's key; clients pin its public half
+
+[bots]
+min_players = 0                   # desired humans + bots; 0 = no fill
+max_bots = 0                      # 0 disables filler and reconnect-takeover bots
+join_delay_ticks = 30             # human joins replace bots after this stable delay
+leave_delay_ticks = 30            # missing filler bots return after this stable delay
+seed = 0                          # deterministic patrol, perception and aim noise
+reaction_ticks = 12
+aim_error_radians = 0.03
+perception_radius = 40.0
+
+[admin]
+token_file = "admin.token"        # remote admin token; missing file = remote admin off
+
+[status]
+enabled = false                   # HTTP health endpoint
+bind = "127.0.0.1"
+port = 7778
+
+[logs]
+dir = "logs"                      # relative to the server directory
+keep_files = 10
+
+[persistence]
+enabled = false                   # keep the world across restarts (persistent co-op, survival)
+dir = "saves"                     # relative to the server directory; one folder per level
+autosave_ticks = 18000            # host ticks between autosaves (18000 = 5 min at 60 Hz); 0 = off
+keep = 5                          # saves kept per level; a bad newest save falls back to the next
+save_on_shutdown = true           # after the drain of a graceful shutdown
+save_on_level_change = true       # the level being left, before a travel
+player_identity = "platform"      # platform = authenticator id only; platform_or_name = else the name
+
+[lockstep]
+enabled = true                    # host a lockstep match (the game's lockstep type) instead of the game
+max_seats = 40                    # seats the match takes at most (1..=4096)
+input_delay_ticks = 4             # the input delay the match starts with
+observer = true                   # step the simulation here too and vote in the hash quorum
+checkpoint_ticks = 30             # ticks between hash votes; 0 = none
+observer_max_lag_ticks = 60       # an observer further behind leaves the quorum until it catches up
+observer_max_backlog_ticks = 600  # an observer further behind is detached for the match

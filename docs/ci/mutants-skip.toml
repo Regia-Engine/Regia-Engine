@@ -1,0 +1,66 @@
+# Mutants that are intentionally not tested (`cargo xtask mutants`, ADR-3389, docs/06-testing-and-ci.md § 20).
+#
+# Each [[skip]] names a source file (exact path from the workspace root) and optionally the function, as
+# `cargo mutants --list` prints it (`Type::method`, `<impl Display for T>::fmt`), a piece of the mutation text
+# (`with "xyzzy"`, `delete !`) and the line, when the other fields would also match a mutant that must stay in the run. A mutant matching every given field is left out of the run and counted as skipped.
+# `reason` is required: say why a test of this code would not be worth having. An entry that matches no mutant of a
+# file the run covered is printed as a warning: remove or fix it.
+#
+# Not here: code a test could reasonably pin. A missed mutant in real logic gets a test, not an entry.
+
+version = 1
+
+[[skip]]
+file = "crates/regia_ecs/src/serialize/mod.rs"
+function = "<impl EntityIdMapper for EntityIdMap>::id_to_entity"
+mutation = "replace match guard id != 0 with true"
+reason = "Equivalent: EntityIdMap::insert refuses id 0, so the table never holds it and the guard cannot change a lookup. It stays as defense in depth."
+
+[[skip]]
+file = "crates/regia_ecs/src/serialize/mod.rs"
+function = "canonical_pretty_config"
+mutation = "with Default::default()"
+reason = "Equivalent on the Linux mutation host: every explicit setting equals ron 0.12's default there. The list pins the layout where the default differs (ron writes \\r\\n on Windows) and against a future default change; describe_attrs_mutants::canonical_layout_is_pinned pins the output text on every host."
+
+[[skip]]
+file = "crates/regia_ecs/src/serialize/de.rs"
+mutation = "::expecting -> fmt::Result with Ok(Default::default())"
+reason = "serde Visitor::expecting only writes the 'expected ...' text of a decode error message; no behavior depends on it and the error tests match on Regia's own messages."
+
+[[skip]]
+file = "crates/regia_ecs/src/serialize/de.rs"
+function = "StructVisitor<'_, '_, '_, '_, '_, F>::fill_missing"
+mutation = "delete !"
+reason = "The `!self.skipped(index)` test only decides whether a tracing::debug line names a filled-in field; the filled value is the same either way."
+
+[[skip]]
+file = "crates/regia_ecs/src/serialize/de.rs"
+function = "<impl Visitor<'de> for TopLevelSeed<'_, '_, '_, '_, '_>>::visit_map"
+mutation = "replace match guard !self.text with false"
+reason = "Equivalent through the public API: binary (postcard) data of an unregistered type fails either way (the Skip and Preserve branches need a self-describing format postcard is not), and postcard drops custom error text, so only the error message, which callers never see, differs."
+
+[[skip]]
+file = "crates/regia_input/src/config.rs"
+function = "InputSource::raw"
+mutation = "delete match arm ActionKind::Button"
+line = 229
+reason = "Equivalent: without the arm a Keys2D source feeds a button its raw axis, and ActionKind::clamp turns any non-zero button value into 1, as the arm does."
+
+[[skip]]
+file = "crates/regia_input/src/config.rs"
+function = "InputSource::raw"
+mutation = "delete match arm ActionKind::Axis1D"
+line = 206
+reason = "Equivalent: for a gamepad button the fallback arm builds the same Vec3::new(value, 0, 0). (The Keys2D Axis1D arm at line 230 is not equivalent; rebind_config_mutants pins it.)"
+
+[[skip]]
+file = "crates/regia_input/src/config.rs"
+function = "InputSource::raw"
+mutation = "axis.length_squared() > 1.0"
+reason = "Equivalent: four keys give each component -1, 0 or 1, so the length squared is 0, 1 or 2; normalizing at exactly 1 (or always) leaves a unit or zero vector unchanged."
+
+[[skip]]
+file = "crates/regia_input/src/config.rs"
+function = "InputSource::raw"
+mutation = "replace > with >= in InputSource::raw"
+reason = "Equivalent: see the entry above; at length squared 1 the vector is already unit length."

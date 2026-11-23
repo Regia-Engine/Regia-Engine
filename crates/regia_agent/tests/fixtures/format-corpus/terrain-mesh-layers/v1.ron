@@ -1,0 +1,23 @@
+(
+    version: 1,
+    chunk_m: 64.0,
+    geom: (max_floors: 5, wall_pad_m: 6.5),
+    ground: Full,
+    ground_tile_cells: 16,
+    sections: (section_chord_m: 4.0, plug_length_m: 6.0),
+    layers: [
+        (
+            id: "tubes",
+            source: Passages(path: "demo.passages.ron"),
+            fills: ["north_mouth"],
+            cast_shadows: true,
+            material: "materials/rock.mat.ron",
+            look: (detail: Some((normal_displace: 0.0, noise_amplitude: 0.02, noise_scale: 0.9, seed: 7)), uv_tile_m: 4.0),
+        ),
+        (
+            id: "arch",
+            source: Gltf(path: "arch.glb", node: None, collision_node: Some("collision")),
+            map_layer: 2,
+        ),
+    ],
+)

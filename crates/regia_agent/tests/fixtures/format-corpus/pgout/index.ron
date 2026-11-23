@@ -1,0 +1,35 @@
+(
+    format: "pgout",
+    entries: [
+        (
+            version: 1,
+            file: "v1.pgout",
+            origin: "handwritten from v0.2.6 (git ec48c68efa32cd3cce4e5c676cf001316e0a9469:crates/regia_procgen/src/pgout.rs and exec.rs); written by /tmp script, blake3 output hash checked against the empty-input test vector",
+            exercises: "Binary RPGO version 1: one untiled cell whose table entry is i, j, offset, len (no tier, no cell hash); one instance set, one prefab, empty tables/points/masks.",
+        ),
+        (
+            version: 2,
+            file: "v2.pgout",
+            origin: "handwritten from v0.2.7 (git 535007fe551af1b3062f0e1891191723cdcb23fd:crates/regia_procgen/src/pgout.rs and exec.rs); same content as v1",
+            exercises: "Binary RPGO version 2: the cell table entry gains tier (u8 + 3 pad) and the cell\'s 32-byte output hash.",
+        ),
+        (
+            version: 3,
+            file: "v3.bin",
+            origin: "frozen copy of the fuzz-target registry fixture (v0.2.8 to v0.5)",
+            exercises: "Binary RPGO version 3: sections end after the road decals (no set layers).",
+        ),
+        (
+            version: 4,
+            file: "v4.bin",
+            origin: "frozen copy of the fuzz-target registry fixture (ADR-7214): v3.bin with the version set to 4 and the empty set_layers count appended to its one section",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+        (
+            version: 4,
+            file: "v4-overrides.bin",
+            origin: "frozen copy of the fuzz-target registry fixture after ADR-7750 (the ADR-7724 (h) fold): two prefab records, the second with two spawn.prefab overrides",
+            exercises: "the optional override section of version 4 (index, component, field, one-value attribute column per override), after the set layers; v4.bin is the same version without it",
+        ),
+    ],
+)

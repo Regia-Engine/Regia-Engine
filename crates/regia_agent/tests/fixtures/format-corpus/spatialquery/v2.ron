@@ -1,0 +1,21 @@
+(
+    format_version: 2,
+    name: "flank_position",
+    item_type: Point,
+    server_only: false,
+    default_pick: Best,
+    params: { "radius": Float(4.0) },
+    generator: Union(children: [
+        Lattice(center: Asker, half_size: ParamF32("radius"), spacing: 1.0),
+        Custom(name: "game_cover_points", center: Asker, args: { "reach": ParamF32("radius"), "rows": 2.0 }),
+    ]),
+    tests: [
+        Cast(id: "sees_player", purpose: Filter, from: Candidate(height: 1.0), to: Entity(tag: "player", height: 1.0),
+             shape: Line, layers: [], want_hit: false),
+        Distance(id: "near", purpose: Score, to: Entity(tag: "player"), mode: Planar,
+                 score: (shape: Linear, weight: -1.0, clamp_min: Seen, clamp_max: Seen)),
+        Custom(id: "custom_exposure", purpose: Both, name: "game_exposure", value: Float, to: Entity(tag: "player"),
+               args: { "falloff": 2.0 }, max: 5.0, score: (shape: Falling, weight: 1.0)),
+        Custom(id: "custom_quiet", purpose: Filter, name: "game_quiet", want: false),
+    ],
+)

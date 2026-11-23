@@ -1,0 +1,5 @@
+(format_version: 1, name: "fire_bolt", kind_tags: ["Ability.Spell.Fire"], run_tags: ["State.Casting"],
+ blocks: Some(Has("Ability.Spell")), owner_forbids: Some(Has("Status.Silenced")),
+ cost: Some("effects/mana_10.effect.ron"), cooldown: Some("effects/cd_fire_bolt.effect.ron"),
+ charge: OnStart, run_state: ScratchOnly, when_running: Reject, triggers: [], max_run_ticks: Some(120),
+ input_code: Some(1), run_site: HostOnly, cues: [(tag: "Cue.Cast.Fire", at: Applied)])

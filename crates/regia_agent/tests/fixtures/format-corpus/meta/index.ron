@@ -1,0 +1,17 @@
+(
+    format: "meta",
+    entries: [
+        (
+            version: 1,
+            file: "v1.ron",
+            origin: "frozen copy of the fuzz-target registry fixture",
+            exercises: "a v1 sidecar migrates to v2 (ADR-7819): no lossless_clips key, so only the version moves",
+        ),
+        (
+            version: 2,
+            file: "v2.ron",
+            origin: "frozen copy of the fuzz-target registry fixture",
+            exercises: "the current version: the lossless_clips import setting and a clip sub-asset row",
+        ),
+    ],
+)

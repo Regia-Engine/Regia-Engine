@@ -1,0 +1,4 @@
+(format_version: 1, name: "rocket_cooldown", description: "2.4 s between rockets; also starts the shot cadence",
+ lifetime: Timed(Const(2.4)),
+ status_tags: ["Cooldown.Rocket"],
+ chain: (on_apply: ["effects/rifle_cooldown.effect.ron"]))

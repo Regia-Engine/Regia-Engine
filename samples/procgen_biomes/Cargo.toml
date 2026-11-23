@@ -1,0 +1,24 @@
+[package]
+name = "procgen_biomes"
+description = "Spec 65 acceptance sample: pine forest, meadow and riverbed biomes on a terrain with a river and a road whose exclusion clears the road."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+procgen_common = { path = "../procgen_common" }
+regia_app = { workspace = true }
+regia_core = { workspace = true }
+regia_procgen = { workspace = true }
+regia_scene = { workspace = true }
+regia_terrain = { workspace = true }
+serde_json = { workspace = true }
+
+[dev-dependencies]
+regia_agent = { workspace = true }
+regia_test_utils = { workspace = true }

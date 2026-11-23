@@ -1,0 +1,11 @@
+(
+    format: "ambience",
+    entries: [
+        (
+            version: 1,
+            file: "v1.ambience.ron",
+            origin: "docs/formats/glade.ambience.ron from lane/sprint-audio-convolution-ambience 9684675f6 (the format's documented example)",
+            exercises: "the current version: beds, seeded one-shots with interval, ring distance, height and level ranges",
+        ),
+    ],
+)

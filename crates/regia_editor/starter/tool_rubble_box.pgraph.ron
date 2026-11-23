@@ -1,0 +1,16 @@
+ProcGraph(
+    format_version: 1,
+    description: "Rubble box tool preset: rocks scattered over the Box tool's box Shape (spec 67 § 5)",
+    nodes: {
+        1: (ty: "in.self", settings: {}, at: (0.0, 0.0)),
+        2: (ty: "sample.region", settings: {spacing_m: 1.5}, at: (220.0, 0.0)),
+        3: (ty: "points.jitter", settings: {offset: [(-0.6, 0.0, -0.6), (0.6, 0.0, 0.6)]}, at: (440.0, 0.0)),
+        4: (ty: "spawn.mesh", settings: {entries: [(mesh: "props/rock_small", weight: 3.0, draw_distance_m: 150.0, fade_m: 20.0), (mesh: "props/rock_large", weight: 1.0, draw_distance_m: 250.0, fade_m: 30.0)]}, at: (660.0, 0.0)),
+    },
+    edges: [
+        (from: (1, "out"), to: (2, "region")),
+        (from: (2, "out"), to: (3, "in")),
+        (from: (3, "out"), to: (4, "in")),
+    ],
+    flags: (starter: true, tool: Some("box")),
+)

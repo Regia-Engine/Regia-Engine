@@ -1,0 +1,12 @@
+LevelVariant(
+    format_version: 1,
+    base: "asset:3f7a1c2e-8b64-4a35-9d20-6f1e2b3c4d5b",
+    overrides: [(target: "9b2e6f0a-1e42-4c11-8d5a-3c2f7e10d0ab", component: "regia_scene::transform::Transform", path: ".translation", value: (5.0, 0.0, 0.0))],
+    added_components: [(target: "9b2e6f0a-1e42-4c11-8d5a-3c2f7e10d0ab", component: "game::Flicker", value: (rate: 2.5))],
+    removed_components: [(target: "9b2e6f0a-1e42-4c11-8d5a-3c2f7e10d0ab", component: "game::Tags")],
+    record_edits: [(target: "9b2e6f0a-1e42-4c11-8d5a-3c2f7e10d0ab", field: "name", value: Some("Night gate"))],
+    added_entities: [(guid: "1c0ffee0-0000-4000-8000-000000000002", name: "Crate", parent: Some("9b2e6f0a-1e42-4c11-8d5a-3c2f7e10d0ab"), components: {})],
+    removed_entities: ["3f7a1c2e-8b64-4a35-9d20-6f1e2b3c4d5b"],
+    resources: {"game::Weather": (rain: true)},
+    removed_resources: ["game::Fog"],
+)

@@ -1,0 +1,11 @@
+   Compiling regia_framework v0.2.23 (<build-dir>)
+    Finished `test` profile [optimized + debuginfo] target(s) in 7.07s
+  Executable tests\feedback_crash.rs (C:/work/regia/v05-windows-final-a/t\debug\deps\feedback_crash-63103d6baa7cfc6f.exe)
+    Finished `test` profile [optimized + debuginfo] target(s) in 1.87s
+     Running tests\feedback_crash.rs (C:/work/regia/v05-windows-final-a/t\debug\deps\feedback_crash-63103d6baa7cfc6f.exe)
+
+running 1 test
+test panic_hook_writes_a_crash_bundle_and_the_next_launch_reports_it ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+

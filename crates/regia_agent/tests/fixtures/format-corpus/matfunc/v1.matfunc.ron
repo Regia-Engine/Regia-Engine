@@ -1,0 +1,16 @@
+// Handwritten from 56252c2eb (the commit that introduced .matfunc.ron v1): a material function in its
+// own file, with named inputs, a node map using Input nodes, and named outputs.
+(
+    format_version: 1,
+    name: "edge_wear",
+    inputs: [(name: "base", ty: Vec3), (name: "amount", ty: Float)],
+    nodes: {
+        "b": Input("base"),
+        "a": Input("amount"),
+        "grey": Vec3((0.75, 0.76, 0.78)),
+        "worn": Lerp(a: "b", b: "grey", t: "a"),
+        "rough_base": Float(0.4),
+        "rough": Mul("rough_base", "a"),
+    },
+    outputs: { "color": "worn", "roughness": "rough" },
+)

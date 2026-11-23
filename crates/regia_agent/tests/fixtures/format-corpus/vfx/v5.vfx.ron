@@ -1,0 +1,200 @@
+(
+    version: 5,
+    name: "muzzle_flash",
+    system: (
+        budget: 256,
+        lod: Some((
+            distances: [
+                20.0,
+                80.0,
+            ],
+            rate_scale: [
+                1.0,
+                0.5,
+                0.0,
+            ],
+        )),
+    ),
+    emitters: [
+        (
+            name: "flash",
+            delay: 0.0,
+            duration: None,
+            spawn: (
+                mode: Burst(24),
+                lifetime: (
+                    min: 0.05,
+                    max: 0.12,
+                ),
+                count_scale: 1.0,
+            ),
+            init: (
+                shape: Cone(
+                    angle: 12.0,
+                    length: (
+                        min: 0.2,
+                        max: 0.8,
+                    ),
+                ),
+                velocity: (
+                    mode: Directional(
+                        dir: (0.0, 0.0, -1.0),
+                        spread: 8.0,
+                        speed: (
+                            min: 8.0,
+                            max: 20.0,
+                        ),
+                    ),
+                    inherit: 0.0,
+                ),
+                size: (
+                    min: 0.1,
+                    max: 0.4,
+                ),
+                rotation: (
+                    min: 0.0,
+                    max: 0.0,
+                ),
+                spin: (
+                    min: 0.0,
+                    max: 0.0,
+                ),
+                color: [
+                    (
+                        t: 0.0,
+                        color: "#fff2c8",
+                    ),
+                ],
+            ),
+            update: (
+                gravity: (0.0, 0.0, 0.0),
+                drag: 6.0,
+                curl: None,
+                vortex: None,
+                attractor: None,
+                size_over_life: [],
+                color_over_life: [],
+                alpha_over_life: [],
+                rotation_over_life: [],
+                kill_below: None,
+                depth_collision: None,
+            ),
+            render: (
+                mode: Billboard,
+                sprite: Flare,
+                flipbook: None,
+                blend: Additive,
+                softness: 0.0,
+                alpha_scale: 1.0,
+                stretch: (
+                    velocity_scale: 0.02,
+                    min_length: 0.02,
+                ),
+                light: None,
+                emissive: 1.0,
+                lit: false,
+                self_shadow: 0.65,
+                screen_floor_px: 0.0,
+                heat_haze: 0.0,
+            ),
+        ),
+        (
+            name: "smoke_puff",
+            delay: 0.02,
+            duration: None,
+            spawn: (
+                mode: Burst(12),
+                lifetime: (
+                    min: 0.3,
+                    max: 0.7,
+                ),
+                count_scale: 1.0,
+            ),
+            init: (
+                shape: Sphere(
+                    radius: (
+                        min: 0.05,
+                        max: 0.15,
+                    ),
+                    surface: false,
+                ),
+                velocity: (
+                    mode: Radial(
+                        speed: (
+                            min: 0.5,
+                            max: 2.0,
+                        ),
+                    ),
+                    inherit: 0.0,
+                ),
+                size: (
+                    min: 0.15,
+                    max: 0.4,
+                ),
+                rotation: (
+                    min: 0.0,
+                    max: 0.0,
+                ),
+                spin: (
+                    min: 0.0,
+                    max: 0.0,
+                ),
+                color: [
+                    (
+                        t: 0.0,
+                        color: "#88888880",
+                    ),
+                ],
+            ),
+            update: (
+                gravity: (0.0, 0.5, 0.0),
+                drag: 2.0,
+                curl: None,
+                vortex: None,
+                attractor: None,
+                size_over_life: [
+                    (
+                        t: 0.0,
+                        v: 1.0,
+                    ),
+                    (
+                        t: 1.0,
+                        v: 3.0,
+                    ),
+                ],
+                color_over_life: [],
+                alpha_over_life: [
+                    (
+                        t: 0.0,
+                        v: 1.0,
+                    ),
+                    (
+                        t: 1.0,
+                        v: 0.0,
+                    ),
+                ],
+                rotation_over_life: [],
+                kill_below: None,
+                depth_collision: None,
+            ),
+            render: (
+                mode: Billboard,
+                sprite: Puff,
+                flipbook: None,
+                blend: Alpha,
+                softness: 0.0,
+                alpha_scale: 1.0,
+                stretch: (
+                    velocity_scale: 0.05,
+                    min_length: 0.02,
+                ),
+                light: None,
+                emissive: 1.0,
+                lit: false,
+                self_shadow: 0.65,
+                screen_floor_px: 0.0,
+                heat_haze: 0.0,
+            ),
+        ),
+    ],
+)

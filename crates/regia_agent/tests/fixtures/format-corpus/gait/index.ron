@@ -1,0 +1,29 @@
+(
+    format: "gait",
+    entries: [
+        (
+            version: 1,
+            file: "v1.ron",
+            origin: "handwritten for format version 1; the anim.gait fuzz fixture and regia_animation's tests/gait_asset.rs read this file",
+            exercises: "the current version: a preset pattern, every required block, the shared reach limit, a finite ground band, the body joint and every leg with a hip offset override",
+        ),
+        (
+            version: 1,
+            file: "v1-hexapod-switching.ron",
+            origin: "handwritten for format version 1 (the v1 freeze); regia_animation's tests/gait_v1_freeze.rs reads this file",
+            exercises: "the full v1 shape on six legs: four patterns (Wave, Ripple, an Explicit offsets-and-duty pattern, Tripod) with switch speeds and hysteresis, a posture with a height slew limit, a body joint, and legs that mix hip offset and reach overrides with none (format batch 2 freeze, ADR-10266)",
+        ),
+        (
+            version: 1,
+            file: "v1-quadruped.ron",
+            origin: "handwritten for format version 1 (the v1 freeze); regia_animation's tests/gait_v1_freeze.rs reads this file",
+            exercises: "every four-leg preset (QuadrupedWalk, Pace, Trot, Bound) with switch speeds, a posture without a height slew limit, no reach limit, no ground band, no body joint and no leg overrides (format batch 2 freeze, ADR-10266)",
+        ),
+        (
+            version: 1,
+            file: "v1-biped.ron",
+            origin: "handwritten for format version 1 (the v1 freeze); regia_animation's tests/gait_v1_freeze.rs reads this file",
+            exercises: "BipedWalk alone with only the required fields: no switch speeds or hysteresis, no reach limit, no ground band, no posture, no body joint, no foothold search and no leg overrides (format batch 2 freeze, ADR-10266)",
+        ),
+    ],
+)

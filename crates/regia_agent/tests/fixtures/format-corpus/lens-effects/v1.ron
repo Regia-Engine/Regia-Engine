@@ -1,0 +1,12 @@
+{
+    "regia_render::lens_effects::LensEffects": (
+        format_version: 1,
+        flare_intensity: 1.5,
+        flare_threshold: 4.0,
+        coating: 1.0,
+        dirt_intensity: 0.0,
+        chromatic_aberration: 0.0,
+        starburst: 2.0,
+        after_dof: true,
+    ),
+}

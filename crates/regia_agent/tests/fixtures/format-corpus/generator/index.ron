@@ -1,0 +1,11 @@
+(
+    format: "generator",
+    entries: [
+        (
+            version: 1,
+            file: "v1.toml",
+            origin: "frozen copy of the fixture text of crates/regia_asset_pipeline/tests/fuzz.rs",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+    ],
+)

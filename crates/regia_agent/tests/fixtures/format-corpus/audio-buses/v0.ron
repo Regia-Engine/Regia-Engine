@@ -1,0 +1,29 @@
+// `config/audio.ron` as v0.5.0 wrote it: `BusLayout::default_tree()`, no version field (audio-buses v0).
+(
+    buses: [
+        (name: "Master", parent: None, volume_db: 0.0, mute: false, effects: [], sends: [], bypass_medium: false),
+        (name: "Music", parent: Some("Master"), volume_db: -3.0, mute: false, effects: [], sends: [], bypass_medium: true),
+        (name: "Sfx", parent: Some("Master"), volume_db: 0.0, mute: false, effects: [], sends: [], bypass_medium: false),
+        (
+            name: "World",
+            parent: Some("Sfx"),
+            volume_db: 0.0,
+            mute: false,
+            effects: [LowPass(cutoff_hz: 20000.0, resonance: 0.0)],
+            sends: [(bus: "Reverb", volume_db: -60.0)],
+            bypass_medium: false,
+        ),
+        (name: "Ui", parent: Some("Sfx"), volume_db: 0.0, mute: false, effects: [], sends: [], bypass_medium: true),
+        (name: "Voice", parent: Some("Master"), volume_db: 0.0, mute: false, effects: [], sends: [], bypass_medium: true),
+        (
+            name: "Ambience",
+            parent: Some("Master"),
+            volume_db: -6.0,
+            mute: false,
+            effects: [],
+            sends: [(bus: "Reverb", volume_db: -60.0)],
+            bypass_medium: false,
+        ),
+    ],
+    send_buses: [(name: "Reverb", effects: [Reverb(feedback: 0.85, damping: 0.4, stereo_width: 0.7, mix: 1.0)])],
+)

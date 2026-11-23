@@ -1,0 +1,11 @@
+(
+    format: "gpu-breadcrumbs",
+    entries: [
+        (
+            version: 1,
+            file: "v1.json",
+            origin: "registry fixture (fuzz target gpu-breadcrumbs) written by serde_json at version 1",
+            exercises: "the current version: a fenced device-loss report with suspects and frames must stay readable",
+        ),
+    ],
+)

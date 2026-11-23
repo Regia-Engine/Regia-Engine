@@ -1,0 +1,11 @@
+(
+    format: "xr-actions",
+    entries: [
+        (
+            version: 1,
+            file: "v1.ron",
+            origin: "frozen copy of the fixture text of crates/regia_xr/tests/fuzz.rs (the example on the format page)",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+    ],
+)

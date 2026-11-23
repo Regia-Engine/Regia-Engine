@@ -1,0 +1,24 @@
+[package]
+name = "product_viewer_android"
+description = "Android entry point of the product viewer (GameActivity, lib name `main`)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[lib]
+name = "main"
+doc = false
+crate-type = ["cdylib"]
+
+[lints]
+workspace = true
+
+[features]
+default = []
+# The agent protocol on the device (dev builds; links the whole engine, so never in a sideloaded release).
+agent = ["product_viewer/agent"]
+
+[dependencies]
+product_viewer = { path = ".." }

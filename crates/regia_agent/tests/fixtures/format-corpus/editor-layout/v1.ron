@@ -1,0 +1,10 @@
+(
+    format_version: 1,
+    root: Split(
+        axis: Horizontal,
+        fraction: 0.2,
+        first: Tabs(tabs: ["outliner"], active: 0),
+        second: Tabs(tabs: ["viewport", "content"], active: 0),
+    ),
+    known_panels: ["viewport", "outliner", "content"],
+)

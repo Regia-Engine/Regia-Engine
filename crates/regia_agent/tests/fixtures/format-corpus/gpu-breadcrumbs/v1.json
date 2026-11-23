@@ -1,0 +1,73 @@
+{
+  "format_version": 1,
+  "level": "fenced",
+  "adapter": {
+    "name": "llvmpipe",
+    "backend": "vulkan",
+    "device_type": "cpu",
+    "driver": "",
+    "driver_info": "",
+    "vendor": 0,
+    "device": 0
+  },
+  "lost": {
+    "reason": "unknown",
+    "message": "device lost",
+    "frame": 41,
+    "unix_ms": 1
+  },
+  "counters": {
+    "submitted": 9,
+    "completed": 7,
+    "acknowledged_frame": 40
+  },
+  "suspects": [
+    {
+      "name": "shadow_cascades",
+      "frame": 41,
+      "submission": 8
+    },
+    {
+      "name": "opaque",
+      "frame": 41,
+      "submission": 9
+    }
+  ],
+  "frames": [
+    {
+      "frame": 41,
+      "passes": [
+        "shadow_cascades",
+        "opaque"
+      ],
+      "submissions": [
+        [
+          8,
+          0,
+          2
+        ],
+        [
+          9,
+          2,
+          4
+        ]
+      ],
+      "truncated": false
+    },
+    {
+      "frame": 40,
+      "passes": [
+        "opaque"
+      ],
+      "submissions": [
+        [
+          7,
+          0,
+          2
+        ]
+      ],
+      "truncated": false
+    }
+  ],
+  "truncated": false
+}

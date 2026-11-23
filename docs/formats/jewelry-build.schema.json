@@ -1,0 +1,474 @@
+{
+  "$defs": {
+    "camera": {
+      "additionalProperties": false,
+      "description": "The view state.",
+      "properties": {
+        "dof": {
+          "type": "boolean"
+        },
+        "f_stop": {
+          "exclusiveMinimum": 0,
+          "maximum": 256,
+          "type": "number"
+        },
+        "focal_length_mm": {
+          "exclusiveMinimum": 0,
+          "maximum": 2000,
+          "type": "number"
+        },
+        "focus_distance_mm": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "pan_mm": {
+          "items": {
+            "maximum": 1000,
+            "minimum": -1000,
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "rig_preset": {
+          "enum": [
+            "front",
+            "pan",
+            "tilt",
+            "spin"
+          ],
+          "type": "string"
+        },
+        "sensor_mm": {
+          "exclusiveMinimum": 0,
+          "maximum": 200,
+          "type": "number"
+        },
+        "spin_deg": {
+          "maximum": 360,
+          "minimum": -360,
+          "type": "number"
+        },
+        "tilt_azimuth_deg": {
+          "description": "Direction of the tilt around the front axis (0 = up). Absent: 0.",
+          "maximum": 180,
+          "minimum": -180,
+          "type": "number"
+        },
+        "tilt_deg": {
+          "description": "Angle between the view and the front axis.",
+          "maximum": 90,
+          "minimum": 0,
+          "type": "number"
+        },
+        "tilt_xy_deg": {
+          "description": "The viewer's tilt as x about the up axis, then y about the right axis.",
+          "items": {
+            "maximum": 90,
+            "minimum": -90,
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "zoom": {
+          "exclusiveMinimum": 0,
+          "maximum": 100,
+          "type": "number"
+        }
+      },
+      "required": [
+        "pan_mm",
+        "spin_deg",
+        "tilt_deg",
+        "zoom"
+      ],
+      "type": "object"
+    },
+    "made_to_order": {
+      "additionalProperties": false,
+      "properties": {
+        "attrs": {
+          "additionalProperties": {
+            "maxLength": 64,
+            "minLength": 0,
+            "type": "string"
+          },
+          "description": "Attribute name -> the supplier's code.",
+          "maxProperties": 32,
+          "type": "object"
+        },
+        "metal_code": {
+          "maxLength": 64,
+          "minLength": 1,
+          "type": "string"
+        },
+        "statement": {
+          "maxLength": 600,
+          "minLength": 1,
+          "type": "string"
+        },
+        "style_sku": {
+          "maxLength": 120,
+          "minLength": 1,
+          "type": "string"
+        },
+        "variation_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "statement"
+      ],
+      "type": "object"
+    },
+    "picks": {
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "maxLength": 200,
+            "minLength": 0,
+            "type": "string"
+          },
+          {
+            "items": {
+              "maxLength": 200,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 32,
+            "type": "array"
+          }
+        ]
+      },
+      "description": "Option group name -> value label (multi groups take a list).",
+      "maxProperties": 64,
+      "propertyNames": {
+        "maxLength": 120,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "reason": {
+      "additionalProperties": false,
+      "description": "Why a combination is refused; the kit builder's option graph schema lists the codes.",
+      "properties": {
+        "code": {
+          "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$",
+          "type": "string"
+        },
+        "group": {
+          "maxLength": 120,
+          "minLength": 1,
+          "type": "string"
+        },
+        "value": {
+          "maxLength": 200,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "code"
+      ],
+      "type": "object"
+    },
+    "resolution": {
+      "additionalProperties": false,
+      "properties": {
+        "cart_lines": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              "quantity": {
+                "maximum": 999,
+                "minimum": 1,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id",
+              "quantity"
+            ],
+            "type": "object"
+          },
+          "maxItems": 64,
+          "type": "array"
+        },
+        "cart_mode": {
+          "enum": [
+            "shopify_lines",
+            "manual_line"
+          ],
+          "type": "string"
+        },
+        "made_to_order_line": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "maxLength": 400,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "#/$defs/made_to_order"
+            }
+          ],
+          "description": "The line a person places: text, or the fields resolve() fills."
+        },
+        "orderable": {
+          "type": "boolean"
+        },
+        "reasons": {
+          "items": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "$ref": "#/$defs/reason"
+              }
+            ]
+          },
+          "maxItems": 32,
+          "type": "array"
+        },
+        "sku": {
+          "maxLength": 120,
+          "minLength": 1,
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "statement": {
+          "description": "The statement line resolve() writes.",
+          "maxLength": 600,
+          "minLength": 0,
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "variant_key": {
+          "maxLength": 64,
+          "minLength": 1,
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "cart_lines",
+        "cart_mode",
+        "made_to_order_line",
+        "orderable",
+        "reasons",
+        "sku",
+        "statement",
+        "variant_key"
+      ],
+      "type": "object"
+    },
+    "wear": {
+      "additionalProperties": false,
+      "properties": {
+        "mirror": {
+          "type": "boolean"
+        },
+        "preset_id": {
+          "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$",
+          "type": "string"
+        },
+        "rotation_deg": {
+          "items": {
+            "maximum": 360,
+            "minimum": -360,
+            "type": "number"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "type": "array"
+        }
+      },
+      "required": [
+        "mirror",
+        "preset_id",
+        "rotation_deg"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://regia.invalid/formats/jewelry-build.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "One configured piece: the picks, the view state, what they resolve to (SKU and the catalog's house_variant_id). Holds no client data, no cost and no price, ever. Owner: Regia. Page: docs/formats/jewelry-build.md.",
+  "properties": {
+    "build_hash": {
+      "description": "docs/formats/jewelry-build.md, section build_hash.",
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "build_id": {
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+      "type": "string"
+    },
+    "camera": {
+      "$ref": "#/$defs/camera"
+    },
+    "content_build_id": {
+      "maxLength": 128,
+      "minLength": 1,
+      "type": "string"
+    },
+    "design_key": {
+      "description": "`<house>/<sku_base>`, else the `product_key`.",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,39}/[^\\s/][^/]{0,127}$",
+      "type": "string"
+    },
+    "engine_version": {
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "type": "string"
+    },
+    "front_still_ref": {
+      "description": "A relative path inside the folder: `/`-separated, no `..`, no leading `/` or `.`.",
+      "maxLength": 200,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.-]*(/[A-Za-z0-9_][A-Za-z0-9_.-]*)*$",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "geometry_key": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "house": {
+      "description": "Supplier slug (`interfaces.md` § 0.2), or `shared` for generic parts.",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,39}$",
+      "type": "string"
+    },
+    "house_variant_id": {
+      "description": "The catalog's variant id. When present, equals `resolution.variant_key`.",
+      "maxLength": 64,
+      "minLength": 1,
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "output_gamut": {
+      "enum": [
+        "srgb",
+        "p3"
+      ],
+      "type": "string"
+    },
+    "picks": {
+      "$ref": "#/$defs/picks"
+    },
+    "product_key": {
+      "description": "`<house>/<products.house_key>`: a natural key, never a DB row id.",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,39}/[^\\s/][^/]{0,127}$",
+      "type": "string"
+    },
+    "recipe": {
+      "additionalProperties": false,
+      "properties": {
+        "design_key": {
+          "description": "`<house>/<sku_base>`, else the `product_key`.",
+          "pattern": "^[a-z0-9][a-z0-9-]{0,39}/[^\\s/][^/]{0,127}$",
+          "type": "string"
+        },
+        "hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "design_key",
+        "hash",
+        "version"
+      ],
+      "type": "object"
+    },
+    "resolution": {
+      "$ref": "#/$defs/resolution"
+    },
+    "schema": {
+      "const": "jewelry.build/1"
+    },
+    "sku": {
+      "description": "When present, equals `resolution.sku`.",
+      "maxLength": 120,
+      "minLength": 1,
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "snapshot_id": {
+      "description": "`<UTC date>-<sha256[:12]>` of the catalog copy.",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9a-f]{12}$",
+      "type": "string"
+    },
+    "studio_id": {
+      "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$",
+      "type": "string"
+    },
+    "tenant_id": {
+      "description": "`house:<slug>` (a supplier) or `shop:<slug>` (a business): which content it may load, never a person.",
+      "pattern": "^(house|shop):[a-z0-9][a-z0-9-]{0,39}$",
+      "type": "string"
+    },
+    "tier": {
+      "description": "A viewer writes `interactive`.",
+      "enum": [
+        "interactive",
+        "still",
+        "offline"
+      ],
+      "type": "string"
+    },
+    "wear": {
+      "$ref": "#/$defs/wear"
+    }
+  },
+  "required": [
+    "build_hash",
+    "camera",
+    "design_key",
+    "engine_version",
+    "geometry_key",
+    "house",
+    "picks",
+    "product_key",
+    "recipe",
+    "resolution",
+    "schema",
+    "snapshot_id",
+    "wear"
+  ],
+  "title": "Build",
+  "type": "object"
+}

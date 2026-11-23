@@ -1,0 +1,3 @@
+(version: 9, root: (children: [
+    (name: "textures/secret.png"),
+]))

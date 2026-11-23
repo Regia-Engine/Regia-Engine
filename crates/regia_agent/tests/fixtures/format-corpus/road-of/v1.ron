@@ -1,0 +1,6 @@
+{
+    "regia_procgen::road::RoadOf": (
+        profile: "roads/main.road.ron",
+        format_version: 1,
+    ),
+}

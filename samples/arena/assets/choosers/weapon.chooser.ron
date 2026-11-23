@@ -1,0 +1,20 @@
+// Which weapon a bot fires (spec 51). First passing row wins; "none" means hold fire.
+(
+    format_version: 1,
+    mode: First,
+    result: Value(Name),
+    inputs: { "distance": Float, "ammo": Int, "rifle_ready": Bool, "rocket_ready": Bool },
+    columns: [
+        (id: "rocket_ready", input: "rocket_ready", kind: Bool),
+        (id: "rifle_ready", input: "rifle_ready", kind: Bool),
+        (id: "distance", input: "distance", kind: FloatRange),
+        (id: "ammo", input: "ammo", kind: IntRange),
+    ],
+    rows: [
+        (id: "rocket", cells: { "rocket_ready": True, "distance": (5.0, 30.0), "ammo": (4, 99) },
+         result: Value("rocket"), note: "Mid range with ammunition to spare"),
+        (id: "rifle", cells: { "rifle_ready": True, "distance": (0.0, 30.0), "ammo": (1, 99) },
+         result: Value("rifle")),
+    ],
+    catch_all: Some((result: Value("none"), outputs: {})),
+)

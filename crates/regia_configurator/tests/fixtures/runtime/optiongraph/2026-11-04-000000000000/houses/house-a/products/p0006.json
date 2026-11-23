@@ -1,0 +1,62 @@
+{
+  "addons": [
+    {
+      "geometry_role": "excluded",
+      "group": "Charms",
+      "kind": "finish",
+      "multi": true,
+      "required": true,
+      "values": [
+        {
+          "available": true,
+          "code": "81",
+          "label": "Charm A",
+          "value_key": "Charms=Charm A"
+        },
+        {
+          "available": true,
+          "code": "82",
+          "label": "Charm B",
+          "value_key": "Charms=Charm B"
+        }
+      ]
+    }
+  ],
+  "axes": [
+    {
+      "group": "Metal",
+      "kind": "metal",
+      "values": [
+        {
+          "available": true,
+          "code": "1",
+          "label": "Metal A",
+          "value_key": "Metal=Metal A"
+        }
+      ]
+    }
+  ],
+  "canonical_of": null,
+  "cart": {
+    "mode": "shopify_lines",
+    "platform": "shopify"
+  },
+  "design_key": "house-a/d0006",
+  "house": "house-a",
+  "product_key": "house-a/p0006",
+  "schema": "jewelry.option_graph/1",
+  "snapshot_id": "2026-11-04-000000000000",
+  "status": "orderable",
+  "title": "Charm piece",
+  "variants": [
+    {
+      "cost": 30.0,
+      "in_stock": true,
+      "picks": {
+        "Metal": "Metal A"
+      },
+      "sku": "HA-0006-A",
+      "variant_key": "6001"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+[package]
+name = "vehicle_lab"
+description = "Vehicle lab: a rear-wheel drive car with a geared drivetrain and a hover craft on a flat track with a ramp, driven through the agent protocol (ADR-2598)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia = { workspace = true }
+regia_core = { workspace = true }
+regia_physics = { workspace = true }
+regia_render = { workspace = true }
+regia_scene = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+regia_agent = { workspace = true }
+regia_platform = { workspace = true }
+regia_test_utils = { workspace = true }
+serde_json = { workspace = true }
+png = { workspace = true }

@@ -1,0 +1,27 @@
+(
+    format_version: 3,
+    name: "M_Canopy",
+    shader: Standard,
+    base: (
+        base_color: (1.0, 1.0, 1.0, 1.0),
+        metallic: 0.0,
+        roughness: 0.15,
+        normal_map: "textures/canopy_normal.png",
+        orm_map: "textures/canopy_orm.png",
+        emissive: (0.0, 0.0, 0.0),
+        emissive_strength: 1.0,
+        orm_packed: true,
+        ior: 1.52,
+    ),
+    hard_surface: (
+        multi_scatter: true,
+        specular_occlusion: true,
+    ),
+    transmission: (
+        factor: 0.92,
+        thickness: 0.012,
+        attenuation_color: (0.75, 0.88, 0.84),
+        attenuation_distance: 0.08,
+    ),
+    render_state: (alpha_mode: opaque, cull_mode: none, queue_offset: 0, alpha_cutoff: 0.5),
+)

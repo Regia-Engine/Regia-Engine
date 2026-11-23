@@ -1,0 +1,6 @@
+(
+    format_version: 1,
+    tests: {
+        "door_opens": { "final_pose": (translation: [1.0, 0.0, 2.0]) },
+    },
+)

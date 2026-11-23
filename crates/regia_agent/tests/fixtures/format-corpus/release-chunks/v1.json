@@ -1,0 +1,23 @@
+{
+  "format_version": 1,
+  "platform": "linux",
+  "tag": "demo",
+  "product_version": "0.6.0",
+  "source_commit": "d6ed37677",
+  "libc_required": "",
+  "tier": "",
+  "chunks": [
+    {
+      "name": "core-000",
+      "group": "core",
+      "buckets": 1,
+      "asset": "core-000.tar.zst",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0,
+      "unpacked": 0,
+      "files": [],
+      "content_key": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "links": []
+}

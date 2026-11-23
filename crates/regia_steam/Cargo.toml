@@ -1,0 +1,56 @@
+[package]
+name = "regia_steam"
+description = "Steam integration (specs/24): achievements, stats, rich presence, overlay, cloud saves, Steam Deck detection, desktop only, feature-gated."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia_agent = { workspace = true }
+regia_app = { workspace = true }
+regia_core = { workspace = true }
+regia_ecs = { workspace = true }
+regia_input = { workspace = true }
+regia_net = { workspace = true }
+regia_platform = { workspace = true }
+serde = { workspace = true }
+ron = { workspace = true }
+toml = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+serde_json = { workspace = true }
+# The cloud backends implement the framework's save store (spec 91 § 2.2, ADR-1691).
+regia_framework = { workspace = true }
+# Subscribed Workshop items mount at `mods://` (ADR-2418).
+regia_asset = { workspace = true }
+
+# The cloud-save integration test drives the framework's SaveGame through the mock backend.
+[dev-dependencies]
+regia_scene = { workspace = true }
+regia_test_utils = { workspace = true }
+# `tests/net_soak_steam.rs` (ADR-7899): `SteamSocket` over the net soak's impairment network.
+regia_net_soak = { workspace = true }
+
+# The real Steamworks bindings. Desktop only: steamworks-sys's build script has no Android
+# support, so the dependency itself is target-gated. Requires Valve's Steamworks SDK at build
+# time (STEAM_SDK_LOCATION); see README.md.
+[target.'cfg(not(target_os = "android"))'.dependencies]
+steamworks = { workspace = true, optional = true }
+
+[features]
+default = []
+# Link the real Steamworks backend (`steamworks` 0.13 bindings). Without this feature (and on
+# Android regardless) the plugin compiles to a graceful no-op: SteamState::Unavailable, every
+# call degrades to `SteamError::Unavailable`, the game keeps running.
+steamworks = ["dep:steamworks"]
+
+# The real-client smoke test (tests/real_client.rs): built only with `--features steamworks`,
+# because only that links the SDK. Inside, it skips (never fails) when Steam is not running.
+[[test]]
+name = "real_client"
+required-features = ["steamworks"]

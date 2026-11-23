@@ -1,0 +1,70 @@
+// A forearm rig: twist joints between the elbow and the wrist, an elbow bend driver, an
+// expression driver, a material (wrinkle) driver and a pose-space corrective at a deep bend.
+(
+    format_version: 1,
+    twists: [
+        (
+            name: "forearm_twist",
+            source: "hand",
+            axis: (0.0, 1.0, 0.0),
+            driven: [
+                (joint: "twist1", weight: 0.3333333),
+                (joint: "twist2", weight: 0.6666667),
+            ],
+            source_keep: 1.0,
+        ),
+    ],
+    helpers: [
+        (
+            name: "elbow_pad",
+            joint: "pad",
+            source: "fore",
+            follow: 0.5,
+            offset: [
+                (angle_deg: 0.0, offset: (0.0, 0.0, 0.0)),
+                (angle_deg: 100.0, offset: (0.0, 0.0, 0.03)),
+            ],
+        ),
+    ],
+    drivers: [
+        (
+            name: "elbow_bulge",
+            input: JointAngle(joint: "fore", axis: (1.0, 0.0, 0.0)),
+            curve: (keys: [
+                (location: 0.0, value: 0.0, kind: Linear),
+                (location: 100.0, value: 1.0, kind: Linear),
+            ]),
+            output: Morph("elbow_bulge"),
+        ),
+        (
+            name: "smile",
+            input: Param("smile"),
+            curve: (keys: [
+                (location: 0.0, value: 0.0, kind: Linear),
+                (location: 1.0, value: 0.8, kind: Linear),
+            ]),
+            output: Morph("mouth_smile"),
+            blend: Add,
+            weight: 1.0,
+        ),
+        (
+            name: "elbow_wrinkle",
+            input: JointRotation(joint: "fore"),
+            curve: (keys: [
+                (location: 30.0, value: 0.0, kind: Linear),
+                (location: 100.0, value: 1.0, kind: Linear),
+            ]),
+            output: Material("wrinkle_elbow"),
+        ),
+    ],
+    correctives: [
+        (
+            name: "elbow_crease",
+            joints: ["fore"],
+            poses: [
+                (name: "bent100", rotations: [(100.0, 0.0, 0.0)], morphs: [("elbow_crease", 1.0)]),
+            ],
+            radius: 0.8,
+        ),
+    ],
+)

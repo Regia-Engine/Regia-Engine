@@ -1,0 +1,9 @@
+[package]
+name = "patch_game"
+description = "Game code in a library crate (the Regia Engine layout: game = rlib, launcher = bin) — is it patched?"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+regia = { path = "../../../../crates/regia" }

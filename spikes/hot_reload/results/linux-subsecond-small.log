@@ -1,0 +1,96 @@
+  0.37s  INFO -----------------------------------------------------------------
+                Serving your app: patch_host! 🚀
+                • Press `ctrl+c` to exit the server
+                • Press `r` to rebuild the app
+                • Press `p` to toggle automatic rebuilds
+                • Press `v` to toggle verbose logging
+                • Press `/` for more commands and shortcuts
+               ----------------------------------------------------------------
+ 57.68s  INFO Build completed successfully in 57.31s, launching app! 💫
+ 58.00s  INFO PATCHPROBE 1791129615938 start pid=2226624
+ 58.65s  INFO PATCHPROBE 1791129616890 frame=60 value=60 marker=v1
+ 59.62s  INFO PATCHPROBE 1791129617859 frame=120 value=120 marker=v1
+ 60.59s  INFO PATCHPROBE 1791129618828 frame=180 value=180 marker=v1
+ 61.56s  INFO PATCHPROBE 1791129619797 frame=240 value=240 marker=v1
+ 62.53s  INFO PATCHPROBE 1791129620766 frame=300 value=300 marker=v1
+ 63.50s  INFO PATCHPROBE 1791129621736 frame=360 value=360 marker=v1
+ 64.47s  INFO PATCHPROBE 1791129622705 frame=420 value=420 marker=v1
+ 65.44s  INFO PATCHPROBE 1791129623672 frame=480 value=480 marker=v1
+ 66.41s  INFO PATCHPROBE 1791129624644 frame=540 value=540 marker=v1
+ 67.38s  INFO PATCHPROBE 1791129625613 frame=600 value=600 marker=v1
+ 68.35s  INFO PATCHPROBE 1791129626583 frame=660 value=660 marker=v1
+ 69.32s  INFO PATCHPROBE 1791129627552 frame=720 value=720 marker=v1
+ 70.29s  INFO PATCHPROBE 1791129628522 frame=780 value=780 marker=v1
+ 71.20s  INFO Hot-patching: patch_host/src/seduULNdG took 358ms
+ 71.21s  INFO PATCHPROBE 1791129629443 patch-applied
+ 71.26s  INFO PATCHPROBE 1791129629491 frame=840 value=844 marker=r2
+ 72.23s  INFO PATCHPROBE 1791129630461 frame=900 value=964 marker=r2
+ 73.20s  INFO PATCHPROBE 1791129631431 frame=960 value=1084 marker=r2
+ 73.62s  INFO Hot-patching: patch_host/src/sedopFtxy took 353ms
+ 73.63s  INFO PATCHPROBE 1791129631867 patch-applied
+ 74.16s  INFO PATCHPROBE 1791129632399 frame=1020 value=1238 marker=r3
+ 75.13s  INFO PATCHPROBE 1791129633368 frame=1080 value=1418 marker=r3
+ 76.05s  INFO Hot-patching: patch_host/src/sedshFJl1 took 353ms
+ 76.05s  INFO PATCHPROBE 1791129634286 patch-applied
+ 76.10s  INFO PATCHPROBE 1791129634334 frame=1140 value=1602 marker=r4
+ 77.07s  INFO PATCHPROBE 1791129635304 frame=1200 value=1842 marker=r4
+ 78.04s  INFO PATCHPROBE 1791129636271 frame=1260 value=2082 marker=r4
+ 78.47s  INFO Hot-patching: patch_host/src/sedy7udfV took 351ms
+ 78.49s  INFO PATCHPROBE 1791129636722 patch-applied
+ 79.00s  INFO PATCHPROBE 1791129637238 frame=1320 value=2355 marker=r5
+ 79.97s  INFO PATCHPROBE 1791129638205 frame=1380 value=2655 marker=r5
+ 80.94s  INFO PATCHPROBE 1791129639172 frame=1440 value=2955 marker=r5
+ 80.96s  INFO Hot-patching: patch_host/src/sedISCVf8 took 406ms
+ 80.97s  INFO PATCHPROBE 1791129639204 patch-applied
+ 81.91s  INFO PATCHPROBE 1791129640141 frame=1500 value=3314 marker=r6
+ 82.87s  INFO PATCHPROBE 1791129641110 frame=1560 value=3674 marker=r6
+ 83.47s  INFO Hot-patching: patch_host/src/main.rs took 393ms
+ 83.47s  INFO PATCHPROBE 1791129641708 patch-applied
+ 83.84s  INFO PATCHPROBE 1791129642080 frame=1620 value=3914 marker=v1
+ 84.81s  INFO PATCHPROBE 1791129643049 frame=1680 value=3974 marker=v1
+ 85.78s  INFO PATCHPROBE 1791129644019 frame=1740 value=4034 marker=v1
+ 86.76s  INFO PATCHPROBE 1791129644994 frame=1800 value=4094 marker=v1
+ 87.73s  INFO PATCHPROBE 1791129645963 frame=1860 value=4154 marker=v1
+ 88.70s  INFO PATCHPROBE 1791129646932 frame=1920 value=4214 marker=v1
+ 89.66s  INFO PATCHPROBE 1791129647900 frame=1980 value=4274 marker=v1
+ 90.64s  INFO PATCHPROBE 1791129648877 frame=2040 value=4334 marker=v1
+ 91.63s  INFO PATCHPROBE 1791129649861 frame=2100 value=4394 marker=v1
+ 92.61s  INFO PATCHPROBE 1791129650840 frame=2160 value=4454 marker=v1
+ 93.58s  INFO PATCHPROBE 1791129651814 frame=2220 value=4514 marker=v1
+ 94.56s  INFO PATCHPROBE 1791129652800 frame=2280 value=4574 marker=v1
+ 94.65s  INFO Hot-patching: patch_host/src/main.rs took 867ms
+ 94.66s  INFO PATCHPROBE 1791129652898 patch-applied
+ 95.63s  INFO PATCHPROBE extra=[2285, 4579, 0, 420]
+ 95.63s  INFO PATCHPROBE 1791129653863 frame=60 value=60 marker=layout
+ 96.61s  INFO PATCHPROBE extra=[2285, 4579, 0, 840]
+ 96.61s  INFO PATCHPROBE 1791129654848 frame=120 value=120 marker=layout
+ 97.60s  INFO PATCHPROBE extra=[2285, 4579, 0, 1260]
+ 97.60s  INFO PATCHPROBE 1791129655832 frame=180 value=180 marker=layout
+ 98.58s  INFO PATCHPROBE extra=[2285, 4579, 0, 1680]
+ 98.58s  INFO PATCHPROBE 1791129656819 frame=240 value=240 marker=layout
+ 99.57s  INFO PATCHPROBE extra=[2285, 4579, 0, 2100]
+ 99.57s  INFO PATCHPROBE 1791129657806 frame=300 value=300 marker=layout
+100.55s  INFO PATCHPROBE extra=[2285, 4579, 0, 2520]
+100.55s  INFO PATCHPROBE 1791129658790 frame=360 value=360 marker=layout
+101.53s  INFO PATCHPROBE extra=[2285, 4579, 0, 2940]
+101.53s  INFO PATCHPROBE 1791129659765 frame=420 value=420 marker=layout
+102.50s  INFO PATCHPROBE extra=[2285, 4579, 0, 3360]
+102.50s  INFO PATCHPROBE 1791129660734 frame=480 value=480 marker=layout
+103.47s  INFO PATCHPROBE extra=[2285, 4579, 0, 3780]
+103.47s  INFO PATCHPROBE 1791129661702 frame=540 value=540 marker=layout
+104.44s  INFO PATCHPROBE extra=[2285, 4579, 0, 4200]
+104.44s  INFO PATCHPROBE 1791129662670 frame=600 value=600 marker=layout
+105.40s  INFO PATCHPROBE extra=[2285, 4579, 0, 4620]
+105.40s  INFO PATCHPROBE 1791129663638 frame=660 value=660 marker=layout
+106.37s  INFO PATCHPROBE extra=[2285, 4579, 0, 5040]
+106.37s  INFO PATCHPROBE 1791129664605 frame=720 value=720 marker=layout
+107.34s  INFO PATCHPROBE extra=[2285, 4579, 0, 5460]
+107.34s  INFO PATCHPROBE 1791129665572 frame=780 value=780 marker=layout
+108.30s  INFO PATCHPROBE extra=[2285, 4579, 0, 5880]
+108.30s  INFO PATCHPROBE 1791129666539 frame=840 value=840 marker=layout
+109.27s  INFO PATCHPROBE extra=[2285, 4579, 0, 6300]
+109.27s  INFO PATCHPROBE 1791129667505 frame=900 value=900 marker=layout
+110.24s  INFO PATCHPROBE extra=[2285, 4579, 0, 6720]
+110.24s  INFO PATCHPROBE 1791129668473 frame=960 value=960 marker=layout
+111.20s  INFO PATCHPROBE extra=[2285, 4579, 0, 7140]
+111.20s  INFO PATCHPROBE 1791129669440 frame=1020 value=1020 marker=layout

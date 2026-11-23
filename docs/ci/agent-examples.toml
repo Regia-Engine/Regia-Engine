@@ -1,0 +1,33 @@
+# Findings of `cargo xtask agent-examples` that are not fixed yet (page versus code). One row per finding; a new
+# finding or a row with no finding fails the check. Fix the page (or decide in code), then delete the row.
+format_version = 1
+
+[[row]]
+file = "book/agents/gpu-breadcrumbs-and-trace.md"
+class = "unknown_method"
+key = "render.fault_inject"
+reason = "Exists only on the `test-hooks` extension: `breadcrumbs::install_breadcrumb_methods` registers it in a `test-hooks` build, while `install_builtin_extensions` calls `install_breadcrumb_read_methods`, which does not, so the check's protocol has no row for it."
+
+[[row]]
+file = "book/agents/montages.md"
+class = "unknown_result_key"
+key = "anim.montage_slot_edit:unparsed"
+reason = "The handler (`anim_montage_edit.rs`) returns `unparsed` (files that may name the slot but do not parse), but the schema `result` `{ path, op, slots, rewritten: [paths] }` omits it. The page is right; the schema row's `result` string is stale."
+
+[[row]]
+file = "book/agents/showcase-tunnels.md"
+class = "unknown_method"
+key = "tunnels.state"
+reason = "Registered on the `AgentExtension` (capability `showcase_tunnels`) by the showcase sample host (`samples/showcase/src/tunnels_agent.rs`), not by the runtime schema or `install_builtin_extensions`, so the check's protocol has no row for it."
+
+[[row]]
+file = "book/agents/showcase-tunnels.md"
+class = "unknown_method"
+key = "tunnels.view"
+reason = "Registered on the `AgentExtension` (capability `showcase_tunnels`) by the showcase sample host (`samples/showcase/src/tunnels_agent.rs`), not by the runtime schema or `install_builtin_extensions`, so the check's protocol has no row for it."
+
+[[row]]
+file = "book/agents/release-sign.md"
+class = "unknown_method"
+key = "release.upload_dry_run"
+reason = "Registered on the `AgentExtension` by the editor host (`regia_editor::release_agent`, installed by `regia_editor::agent_ext::install`) since the release tools left the runtime schema (ADR-10356), so the check's protocol has no row for it."

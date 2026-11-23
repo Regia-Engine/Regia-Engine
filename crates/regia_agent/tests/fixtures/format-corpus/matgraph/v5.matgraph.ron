@@ -1,0 +1,25 @@
+// A v5 graph with a Code node (ADR-7852): typed inputs wired to nodes, an unwired input, a
+// texture input, a Vec3 output and a body that samples the texture.
+(
+    format_version: 5,
+    name: "code_tint",
+    params: [(name: "tint", value: Color((0.8, 0.4, 0.2)))],
+    textures: [(name: "albedo", path: "textures/albedo.png", color_space: Srgb)],
+    nodes: {
+        "uv": TexCoord,
+        "tint": Param("tint"),
+        "k": Float(0.5),
+        "shade": Code(
+            inputs: [
+                (name: "uv", ty: Vec2, node: "uv"),
+                (name: "tint", ty: Vec3, node: "tint"),
+                (name: "amount", ty: Float, node: "k"),
+                (name: "spare", ty: Float),
+            ],
+            textures: ["albedo"],
+            output: Vec3,
+            code: "let s = textureSample(albedo, material_sampler, uv).rgb;\nreturn mix(s, s * tint, amount);",
+        ),
+    },
+    output: (base_color: Some("shade")),
+)

@@ -1,0 +1,337 @@
+// Regia Engine's GPU → quality tier table (regia_render::quality, book user-guide/auto-quality.md).
+//
+// Rows are tried top to bottom; the first match wins. A row matches on `vendor` (PCI id), `class`,
+// `device_ids` OR a name substring from `any`, every substring of `all`, and none of `none`
+// (names compare case-insensitively). Unmatched GPUs go to `fallback` (integrated / CPU / VRAM).
+// Every result is then capped by `fallback.limits` and stepped down while VRAM < `vram_floors`.
+//
+// Tiers: VeryLow = Desktop Low at 1/3 scale + SGSR (ADR-7882), Low = Desktop Low,
+// Medium = Desktop High at 0.67 scale + Balanced lighting,
+// High = Desktop High, Ultra = Desktop Ultra, Deck, MobileHigh, MobileLow.
+//
+// Evidence: Measured(...) rows were run with `cargo xtask bench-do27` (DO27's Bore Twelve and
+// Switchbacks, 3 path segments, 1800 frames after warm-up; GPU frame p50/p95 in ms). ByClass(...)
+// rows are table-by-class, NOT measured: the tier of the nearest measured row, scaled by public
+// relative raster performance. Guess(...) rows (phones) have no measured neighbour. The first
+// launch's 3 s probe steps a by-class or guessed tier down when it misses 60 fps. Add a row (or turn
+// a ByClass into Measured) when a GPU is benched.
+//
+// Coverage: the Steam Hardware & Software Survey, September 2026, "All video cards" (share of
+// Steam users). Its top 40 all match a row below (rank. card share → row → tier):
+//   1. RTX 5070 6.15 → nvidia_rtx_5070_4070 High      21. AMD Radeon Graphics 1.51 → amd_integrated Low
+//   2. RTX 5060 4.40 → nvidia_rtx_3070_4060ti_5060 Med 22. RX 9070 XT 1.42 → amd_rx_9070_7900 Ultra
+//   3. RTX 5060 Ti 4.06 → same, Medium                 23. GTX 1060 1.34 → nvidia_older Low
+//   4. RTX 4060 3.89 → nvidia_rtx_3060_4060.. Medium   24. RTX 3080 1.30 → nvidia_rtx_3080_3090 High (measured 3080 Ti)
+//   5. RTX 3060 3.66 → same, Medium                    25. GTX 1660 SUPER 1.26 → nvidia_older Low
+//   6. RTX 4060 Laptop 3.50 → nvidia_laptop_mid Medium 26. Intel UHD Graphics 1.06 → intel_integrated Low
+//   7. RTX 3050 2.90 → nvidia_older Low                27. GTX 1050 Ti 1.03 → nvidia_older Low
+//   8. RTX 4060 Ti 2.85 → nvidia_rtx_3070.. Medium     28. RTX 4070 Ti 0.88 → nvidia_rtx_5070_4070 High
+//   9. RTX 5060 Laptop 2.45 → nvidia_laptop_mid Medium 29. RTX 3070 Ti 0.88 → nvidia_rtx_3070.. Medium
+//  10. GTX 1650 2.19 → nvidia_older Low                30. RTX 4070 Laptop 0.86 → nvidia_laptop_mid Medium
+//  11. RTX 4070 2.11 → nvidia_rtx_5070_4070 High      31. AMD Radeon(TM) Graphics 0.82 → amd_integrated Low
+//  12. RTX 3060 Ti 2.08 → nvidia_rtx_3060.. Medium     32. GTX 1660 Ti 0.78 → nvidia_older Low
+//  13. RTX 5080 1.98 → nvidia_rtx_5090_5080 Ultra (measured) 33. RX 9060 XT 0.77 → amd_rx_mid Medium
+//  14. RTX 3070 1.97 → nvidia_rtx_3070.. Medium        34. RX 6600 0.75 → amd_rx_older Low
+//  15. RTX 5070 Ti 1.87 → nvidia_rtx_4090_4080_5070ti Ultra 35. RTX 2060 SUPER 0.71 → nvidia_older Low
+//  16. RTX 4070 SUPER 1.74 → nvidia_rtx_5070_4070 High 36. RTX 4070 Ti SUPER 0.71 → nvidia_rtx_5070_4070 High
+//  17. RTX 3060 Laptop 1.66 → nvidia_laptop_low Low    37. RTX 4090 0.67 → nvidia_rtx_4090_4080_5070ti Ultra
+//  18. RTX 4050 Laptop 1.59 → nvidia_laptop_entry Low  38. RTX 3050 6GB Laptop 0.64 → nvidia_laptop_entry Low
+//  19. RTX 2060 1.53 → nvidia_older Low                39. RTX 5070 Laptop 0.64 → nvidia_laptop_mid Medium
+//  20. Intel Iris Xe 1.52 → intel_integrated Low       40. RTX 4080 SUPER 0.63 → nvidia_rtx_4090_4080_5070ti Ultra
+// (Ranks 41-96 are covered too, e.g. RX 7800 XT High, GTX 1070 / 1080 Low measured, RX 5700 XT Medium,
+// RTX 3080 Ti High measured, RTX 5090 Ultra measured, RX 7900 XTX Ultra; the share list is data only,
+// nothing in the engine fetches it.)
+(
+    version: 1,
+    rules: [
+        // ---- Handhelds -------------------------------------------------------------------------
+        (
+            id: "steam_deck",
+            vendor: Some(0x1002),
+            device_ids: [0x163f, 0x1435],
+            any: ["vangogh", "sephiroth", "custom gpu 0405", "custom gpu 0932"],
+            tier: Deck,
+            evidence: Measured("Steam Deck LCD (SteamOS 3.8.16, Mesa 26.0 RADV VANGOGH, Plasma Wayland, wall power, 2026-10-14 device-runs): vfx_lab --deck-check, Deck preset, 5 min at the 40 fps cap: 11955 frames, p50 24.99 / p95 27.26 / p99 29.09 ms, 0.52 % missed deadlines, GPU frame mean 10.3 / max 13.8 ms (forward 3.5, post 2.7, taau 1.5, shadows 1.0, ssao 0.7, contact shadows 0.8), peak 53 C. Uncapped: 46 fps, GPU 10.0 ms. Lab scene, not a DO27 map"),
+        ),
+
+        // ---- NVIDIA laptops (before the desktop rows: same model numbers, far less power) -----
+        (
+            id: "nvidia_laptop_top",
+            vendor: Some(0x10de),
+            any: ["rtx 5090", "rtx 5080", "rtx 4090", "rtx 4080"],
+            all: ["laptop"],
+            tier: High,
+            evidence: ByClass("laptop 4080/4090/5080/5090 ≈ desktop RTX 3080 Ti class (measured High row)"),
+        ),
+        (
+            id: "nvidia_laptop_entry",
+            vendor: Some(0x10de),
+            any: ["rtx 5050", "rtx 4050", "rtx 3050", "rtx 2050"],
+            all: ["laptop"],
+            tier: Low,
+            evidence: ByClass("entry laptop GPUs ≤ GTX 1080 class (measured Low row); Steam Sep 2026: 4050 Laptop 1.59 %, 3050 6GB Laptop 0.64 %, 3050 Ti Laptop 0.56 %"),
+        ),
+        (
+            id: "nvidia_laptop_mid",
+            vendor: Some(0x10de),
+            any: ["rtx 50", "rtx 40", "rtx 3080", "rtx 3070"],
+            all: ["laptop"],
+            tier: Medium,
+            evidence: ByClass("laptop 4060-5070 / 3070-3080 ≈ desktop 3060-3070"),
+        ),
+        (
+            id: "nvidia_laptop_low",
+            vendor: Some(0x10de),
+            all: ["laptop"],
+            tier: Low,
+            evidence: ByClass("remaining NVIDIA laptop GPUs (3050/3060 laptop, GTX 16, MX) ≤ GTX 1080 (measured Low row)"),
+        ),
+
+        // ---- NVIDIA desktop --------------------------------------------------------------------
+        (
+            id: "nvidia_rtx_5090_5080",
+            vendor: Some(0x10de),
+            any: ["rtx 5090", "rtx 5080"],
+            tier: Ultra,
+            evidence: Measured("RTX 5080 (the test machine, 2026-10-09 do27-perf): Ultra 1440p GPU p50 5.05 / 6.53, p95 5.68 / 7.90; Ultra 4K p95 12.03 / 15.92. RTX 5090 (gpu-farm4 0351 sweep): High 1440p 3.32 / 2.88"),
+        ),
+        (
+            id: "nvidia_rtx_4090_4080_5070ti",
+            vendor: Some(0x10de),
+            any: ["rtx 4090", "rtx 4080", "rtx 5070 ti"],
+            tier: Ultra,
+            evidence: ByClass("RTX 4080/4090 ≈ RTX 5080 (measured Ultra row); 5070 Ti ≈ 4080"),
+        ),
+        (
+            id: "nvidia_rtx_5070_4070",
+            vendor: Some(0x10de),
+            any: ["rtx 5070", "rtx 4070"],
+            tier: High,
+            evidence: ByClass("RTX 4070/5070 ≈ RTX 3080 Ti (measured High row)"),
+        ),
+        (
+            id: "nvidia_rtx_3080_3090",
+            vendor: Some(0x10de),
+            any: ["rtx 3090", "rtx 3080"],
+            tier: High,
+            evidence: Measured("RTX 3080 Ti (ampere box, 2026-10-09 minspec-hw): High 1080p GPU p50 6.60 / 7.79, p95 14.25 / 10.92; Ultra 1080p p50 6.84 / 8.31, p95 13.22 / 11.32"),
+        ),
+        (
+            id: "nvidia_rtx_3070_4060ti_5060",
+            vendor: Some(0x10de),
+            any: ["rtx 3070", "rtx 4060 ti", "rtx 5060", "rtx 2080 ti"],
+            tier: Medium,
+            evidence: ByClass("≈ 70 % of an RTX 3080 Ti: High at 1440p misses 60 fps, Medium (High at 0.67) fits"),
+        ),
+        (
+            id: "nvidia_rtx_3060_4060_2070_2080",
+            vendor: Some(0x10de),
+            any: ["rtx 3060", "rtx 4060", "rtx 2080", "rtx 2070"],
+            tier: Medium,
+            evidence: ByClass("≈ 1.3x a GTX 1080 (measured: High 1080p p50 23.2 / 37.6); Medium ≈ half of High's cost (gpu-farm4: 4K High at 0.67 3.30 vs 6.55 ms)"),
+        ),
+        (
+            id: "nvidia_gtx_1080_1070",
+            vendor: Some(0x10de),
+            any: ["gtx 1080", "gtx 1070"],
+            tier: Low,
+            evidence: Measured("GTX 1080 (minspec box, 2026-10-09 minspec-hw): Low 1080p GPU p50 12.72 / 22.94, p95 21.89 / 32.71; High 1080p p50 23.20 / 37.63 — below 60 fps on Switchbacks even at Low"),
+        ),
+        (
+            id: "nvidia_older",
+            vendor: Some(0x10de),
+            any: ["rtx 2060", "rtx 2050", "rtx 3050", "rtx 5050", "gtx 16", "gtx 10", "gtx 9", "gt 10", "titan x"],
+            tier: Low,
+            evidence: ByClass("≤ GTX 1080 class (measured Low row)"),
+        ),
+
+        // ---- AMD laptops (before the desktop rows: `rx 7900` and `rx 6800` match `RX 7900M` and
+        // `RX 6800M`). Their driver names carry an M or S suffix and no "laptop" (audit G render5).
+        (
+            id: "amd_laptop_top",
+            vendor: Some(0x1002),
+            any: ["rx 7900m"],
+            tier: High,
+            evidence: ByClass("RX 7900M ≈ laptop RTX 4080 class (the NVIDIA laptop High row)"),
+        ),
+        (
+            id: "amd_laptop_mid",
+            vendor: Some(0x1002),
+            any: ["rx 7800m", "rx 7700s", "rx 7600m xt", "rx 6850m", "rx 6800m"],
+            tier: Medium,
+            evidence: ByClass("RX 7800M / 7700S / 7600M XT / 6850M XT / 6800M ≈ laptop RTX 4060-4070, 3070 (the NVIDIA laptop Medium row)"),
+        ),
+        (
+            id: "amd_laptop_low",
+            vendor: Some(0x1002),
+            any: [
+                "rx 7600m", "rx 7600s", "rx 6800s", "rx 6700m", "rx 6700s", "rx 6650m", "rx 6600m",
+                "rx 6600s", "rx 6550m", "rx 6500m", "rx 5700m", "rx 5600m", "rx 5500m", "rx 5300m",
+            ],
+            tier: Low,
+            evidence: ByClass("remaining Radeon RX M/S laptop GPUs ≈ laptop RTX 3060 / 4050 or below (the NVIDIA laptop Low rows)"),
+        ),
+
+        // ---- AMD desktop -----------------------------------------------------------------------
+        (
+            id: "amd_rx_7900_gre",
+            vendor: Some(0x1002),
+            any: ["rx 7900 gre"],
+            tier: High,
+            evidence: ByClass("≈ RTX 4070 (High row)"),
+        ),
+        (
+            id: "amd_rx_9070_7900",
+            vendor: Some(0x1002),
+            any: ["rx 9070", "rx 7900"],
+            tier: Ultra,
+            evidence: ByClass("RX 7900 XT/XTX ≈ RTX 4080; RX 9070 (XT) ≈ RTX 5070 Ti (Ultra rows)"),
+        ),
+        (
+            id: "amd_rx_7800_6800",
+            vendor: Some(0x1002),
+            any: ["rx 7800", "rx 6950", "rx 6900", "rx 6800"],
+            tier: High,
+            evidence: ByClass("≈ RTX 3080 (measured High row: 3080 Ti)"),
+        ),
+        (
+            id: "amd_rx_mid",
+            vendor: Some(0x1002),
+            any: ["rx 9060", "rx 7700", "rx 7600", "rx 6750", "rx 6700", "rx 6650", "rx 6600 xt", "rx 5700"],
+            tier: Medium,
+            evidence: ByClass("≈ RTX 3060-3070 (Medium rows)"),
+        ),
+        (
+            id: "amd_rx_older",
+            vendor: Some(0x1002),
+            any: ["rx 6600", "rx 6500", "rx 6400", "rx 5", "rx 4", "vega"],
+            class: Some(Discrete),
+            tier: Low,
+            evidence: ByClass("≤ GTX 1080 class (measured Low row)"),
+        ),
+
+        // ---- Integrated GPUs (also the fallback; named so the survey's iGPUs are covered) -------
+        (
+            id: "amd_integrated",
+            vendor: Some(0x1002),
+            class: Some(Integrated),
+            tier: Low,
+            evidence: ByClass("APU graphics (Radeon Graphics / 680M / 780M / Vega): Low; Steam Sep 2026: Radeon Graphics 1.51 %, Radeon(TM) Graphics 0.82 %, 780M 0.27 %, Vega 8 0.26 %"),
+        ),
+        // Intel N-series built-in graphics (ADR-7882): the N150 laptop, the engine's Windows minimum, runs Desktop
+        // Low at about 14 fps (GPU-bound), so its row picks Very Low (Low at 1/3 scale with SGSR); its unmeasured
+        // siblings stay on Low (ADR-7979). Matched by PCI device id: Windows names them all "Intel(R) Graphics".
+        (
+            id: "intel_n_series",
+            vendor: Some(0x8086),
+            device_ids: [0x46d4],
+            class: Some(Integrated),
+            tier: VeryLow,
+            evidence: Measured("Intel N150 (Twin Lake, PCI 8086:46d4), the min-spec Windows laptop MiniBook X, Intel driver 32.0.101.7088, Windows 11: showcase Desktop Low 1280x720 GPU p50 71.9 ms (perf-log 2026-11-14), forest demo Low 14-17 fps; Very Low rows in perf-log 2026-11-15 (ADR-7882)"),
+        ),
+        (
+            id: "intel_n_series_adl",
+            vendor: Some(0x8086),
+            device_ids: [0x46d0, 0x46d1, 0x46d2, 0x46d3],
+            any: ["adl-n"],
+            class: Some(Integrated),
+            tier: Low,
+            evidence: ByClass("Alder Lake-N / Twin Lake (N100, N200, N97, i3-N300/N305, N250/N355): the same 24-32 EU Xe-LP class as the measured N150 row, kept on Low until each id is measured (ADR-7979): the probe is off by default, so an unmeasured sibling that holds Low at 30 fps would stay on Very Low for the session"),
+        ),
+        (
+            id: "intel_integrated",
+            vendor: Some(0x8086),
+            class: Some(Integrated),
+            tier: Low,
+            evidence: ByClass("Iris Xe / UHD / Arc iGPU: Low; Steam Sep 2026: Iris Xe 1.52 %, UHD 1.06 % + 0.61 %, Intel(R) Graphics 0.47 %"),
+        ),
+
+        // ---- Intel discrete --------------------------------------------------------------------
+        // Regia Engine's terrain pass costs 2-4x more on ANV than on NVIDIA relative to the rest of the
+        // frame (arc-sweep, 2026-10-11): the measured BMG G31 runs at 1.1-1.4x a GTX 1080, so
+        // every Arc row is Low. Low on a >= 6 GB discrete card also turns the terrain virtual
+        // texture on (ADR-157 addendum v0.1.2): G31 Switchbacks 57 -> 93 fps, Bore Twelve 98 -> 115.
+        (
+            id: "intel_arc_bmg_g31",
+            vendor: Some(0x8086),
+            device_ids: [0xe222],
+            any: ["bmg g31"],
+            tier: Low,
+            evidence: Measured("Intel BMG G31 32 GB, PCI 8086:e222, Mesa 26.1.6 ANV (owner bench, 2026-10-11 arc-sweep): 1080p Low GPU p50 8.5 / 17.7, p95 17.7 / 25.8 (98 / 57 fps); Medium 1080p p50 8.6 / 17.0 (105 / 60 fps); High 1080p p50 15.8 / 28.8 (61 / 35 fps); Desktop High 1440p 29.2 / 35.3. Below 60 fps on Switchbacks at Low, as with the GTX 1080; Low + VT (v0.1.2) 1080p 115 / 93 fps"),
+        ),
+        (
+            id: "intel_arc_mid",
+            vendor: Some(0x8086),
+            any: ["bmg g21", "b580", "b570", "a770", "a750"],
+            tier: Low,
+            evidence: ByClass("Arc B580/B570 and the Pro B50/B60 (BMG G21), A770/A750: smaller than the measured BMG G31 (1.1-1.4x a GTX 1080 on Regia Engine, arc-sweep 2026-10-11), so Low like the GTX 1080 row; was Medium by raster class"),
+        ),
+        (
+            id: "intel_arc_low",
+            vendor: Some(0x8086),
+            any: ["a580", "a380", "a310"],
+            tier: Low,
+            evidence: ByClass("Arc A3xx/A580 ≤ GTX 1080 class"),
+        ),
+
+        // ---- Android ---------------------------------------------------------------------------
+        (
+            id: "adreno_7_8",
+            vendor: Some(0x5143),
+            // The Snapdragon 8-class bins by number: a prefix (`adreno (tm) 7`) also took the
+            // 6- and 4-class Adreno 710 and 702 and the 7s-class 810 (audit G render5).
+            any: [
+                "adreno (tm) 730", "adreno (tm) 735", "adreno (tm) 740", "adreno (tm) 750",
+                "adreno (tm) 825", "adreno (tm) 830", "adreno (tm) 840",
+                "adreno 730", "adreno 735", "adreno 740", "adreno 750", "adreno 825", "adreno 830", "adreno 840",
+            ],
+            tier: MobileHigh,
+            evidence: Guess("Snapdragon 8 Gen 1+ class (Adreno 730/735/740/750, 825/830/840): Mobile High is the Android default (specs/13 § 3)"),
+        ),
+        (
+            id: "mali_high",
+            vendor: Some(0x13b5),
+            any: ["mali-g7", "mali-g9", "mali-g6", "immortalis"],
+            tier: MobileHigh,
+            evidence: Guess("Mali-G7x/G6xx/Immortalis (Pixel 6 = Mali-G78 runs Mobile High, lane android-device)"),
+        ),
+        (
+            id: "mobile_low",
+            any: ["adreno", "mali", "powervr"],
+            tier: MobileLow,
+            evidence: Guess("older Adreno 5xx/6xx, Mali-G5x and PowerVR"),
+        ),
+    ],
+    vram_floors: [
+        // Desktop High's memory budget is 10 GiB on a 12 GB card; Minimum's is 6.5 GiB on an
+        // 8 GB card (memory_budget.rs, docs/evidence/perf/memory-20261007.md).
+        (min_mb: 11000, tier: Ultra),
+        (min_mb: 7600, tier: High),
+        (min_mb: 5600, tier: Medium),
+    ],
+    fallback: (
+        cpu: Low,
+        virtual_gpu: Low,
+        integrated: Low,
+        android: MobileHigh,
+        discrete_by_vram: [
+            // Conservative: an unknown card with a lot of memory may still be an old workstation
+            // part (a 16 GB Quadro P5000 is GTX 1080 class = Low). Since v0.1.0 no probe corrects
+            // the first launch (ADR-173: off by default), so the fallback sits one tier below the
+            // VRAM guess it used to make (High / Medium / Low): never Ultra or High; the player's
+            // preset menu is the correction path.
+            (min_mb: 15000, tier: Medium),
+            (min_mb: 0, tier: Low),
+        ],
+        // Unknown VRAM (DX12 does not report it) with no matching row: Low (was Medium).
+        unknown_vram: Low,
+        // The engine's own minimum without fallbacks (minspec-features audit, ADR-153).
+        limits: (
+            max_texture_dimension_2d: 16384,
+            max_storage_buffers_per_shader_stage: 10,
+            max_bind_groups: 5,
+            block_compression: true,
+            cap: Low,
+        ),
+    ),
+)

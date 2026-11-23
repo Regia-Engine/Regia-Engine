@@ -1,0 +1,32 @@
+format_version = 1
+id = "crates-in-the-zone"
+title = "Put exactly three crates inside the trigger zone"
+prompt = "'Zone Marker' sits at (20, 1, 0). Place exactly three static crates (box colliders, half extent 0.5) so that their centers are within 3 m of the marker, and nothing else is there. One crate named 'Far Crate' already stands elsewhere; leave it. Let the physics world see the new crates before you check."
+features = ["physics", "scene"]
+crates = ["regia_agent", "regia_physics"]
+call_budget = 10
+
+[setup]
+target = "physics"
+
+[[setup.call]]
+method = "scene.spawn"
+params = { name = "Zone Marker", components = { Transform = { translation = [20, 1, 0] } } }
+
+[[setup.call]]
+method = "scene.spawn"
+params = { name = "Far Crate", components = { Transform = { translation = [-20, 0.5, 0] }, RigidBody = { kind = "Static" }, Collider = { shape = { Box = { half_extents = [0.5, 0.5, 0.5] } } } } }
+
+[[check]]
+name = "three colliders in the zone"
+method = "physics.overlap"
+params = { shape = { kind = "sphere", radius = 3.0 }, position = [20, 1, 0] }
+pointer = "/count"
+expect = { kind = "equals", value = 3 }
+
+[[check]]
+name = "the far crate stayed"
+method = "physics.overlap"
+params = { shape = { kind = "sphere", radius = 1.0 }, position = [-20, 0.5, 0] }
+pointer = "/count"
+expect = { kind = "equals", value = 1 }

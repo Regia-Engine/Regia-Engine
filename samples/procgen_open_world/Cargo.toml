@@ -1,0 +1,24 @@
+[package]
+name = "procgen_open_world"
+description = "Spec 66 acceptance sample: 4 km of procedural terrain generated around a flying camera in cells, with biomes on a 256 m tier and clutter on a 32 m tier."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+procgen_common = { path = "../procgen_common" }
+regia_app = { workspace = true }
+regia_core = { workspace = true }
+regia_procgen = { workspace = true }
+regia_render = { workspace = true }
+regia_scene = { workspace = true }
+regia_terrain = { workspace = true }
+serde_json = { workspace = true }
+
+[dev-dependencies]
+regia_test_utils = { workspace = true }

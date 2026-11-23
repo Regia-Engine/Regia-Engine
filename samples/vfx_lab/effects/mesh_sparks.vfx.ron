@@ -1,0 +1,27 @@
+// Sample (.vfx.ron v7): sparks off a mesh surface. The lab registers "lab/plane" (a 2 m quad,
+// normal +Y); triangles are picked by area through an alias table built when the mesh is
+// registered, and each spark leaves along the face normal. A box kill volume that kills outside
+// keeps the sparks inside a 6 m room.
+(
+    version: 7,
+    name: "sample_mesh_sparks",
+    system: (budget: 600),
+    emitters: [
+        (
+            name: "sparks",
+            spawn: (mode: Rate(150.0), lifetime: (min: 0.8, max: 1.6)),
+            init: (
+                shape: MeshSurface(mesh: "lab/plane"),
+                velocity: (mode: Normal(speed: (min: 1.5, max: 3.0))),
+                size: (min: 0.03, max: 0.06),
+                color: [(t: 0.0, color: "#ffd890")],
+            ),
+            update: (
+                gravity: (0.0, -6.0, 0.0),
+                kill_volume: Some((shape: Box(half_extents: (3.0, 3.0, 3.0)), center: (0.0, 2.0, 0.0), kill: Outside)),
+                alpha_over_life: [(t: 0.0, v: 1.0), (t: 1.0, v: 0.0)],
+            ),
+            render: (mode: Stretched, sprite: Spark, blend: Additive, emissive: 4.0),
+        ),
+    ],
+)

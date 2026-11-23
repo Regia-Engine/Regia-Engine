@@ -1,0 +1,10 @@
+(
+    format_version: 1,
+    name: "Crate",
+    icon: "crate",
+    color: "#c08a3e",
+    description: "A supply crate both builds simulate",
+    category: Some("Props"),
+    required: ["regia_scene::transform::Transform"],
+    marker: None,
+)

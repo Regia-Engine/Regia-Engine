@@ -1,0 +1,8 @@
+(
+    format_version: 1,
+    searches: [
+        (name: "Lights", query: "e: kind:light", providers: []),
+        (name: "Rock assets", query: "rock", providers: ["assets"]),
+    ],
+    favorites: ["view.toggle_grid"],
+)

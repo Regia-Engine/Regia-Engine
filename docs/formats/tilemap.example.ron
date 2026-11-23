@@ -1,0 +1,56 @@
+// A 6×4 map of 8-px tiles over a 4-column tileset: a solid floor, a one-way plank, an animated tile,
+// a mirrored tile and a spawn point. Row 0 of `data` is the TOP row; GIDs start at `first_gid`;
+// 0x80000000 = horizontal flip (2147483650 = GID 2 mirrored).
+(
+    version: 2,
+    orientation: Orthogonal,
+    width: 6,
+    height: 4,
+    tile_width: 8,
+    tile_height: 8,
+    background: Some("#ff203040"),
+    tilesets: [
+        (
+            name: "terrain",
+            first_gid: 1,
+            image: "tiles/terrain.png",
+            image_width: 32,
+            image_height: 16,
+            tile_width: 8,
+            tile_height: 8,
+            columns: 4,
+            tile_count: 8,
+            spacing: 0,
+            margin: 0,
+            tiles: [
+                (id: 0, class: "solid", collision: Solid),
+                (id: 1, collision: Solid, properties: {"material": String("stone")}),
+                (id: 2, collision: OneWay),
+                (id: 3, animation: [(tile: 3, duration_ms: 200), (tile: 7, duration_ms: 200)]),
+            ],
+        ),
+    ],
+    layers: [
+        Tiles((
+            name: "ground",
+            visible: true,
+            opacity: 1.0,
+            offset: (0.0, 0.0),
+            data: [
+                0, 0, 0, 0, 4, 0,
+                0, 3, 3, 0, 0, 0,
+                0, 0, 0, 0, 0, 2147483650,
+                1, 1, 1, 1, 1, 2,
+            ],
+        )),
+        Objects((
+            name: "spawns",
+            objects: [
+                (id: 1, name: "player_start", class: "spawn", position: (12.0, 20.0), shape: Point),
+                (id: 2, name: "exit", class: "trigger", position: (40.0, 8.0), size: (8.0, 16.0), shape: Rect,
+                 properties: {"next_level": String("level2")}),
+            ],
+        )),
+    ],
+    properties: {"gravity": Float(400.0)},
+)

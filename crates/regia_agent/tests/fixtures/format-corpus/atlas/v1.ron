@@ -1,0 +1,15 @@
+// Sprites packed into one atlas at cook time. Paths are relative to this file. `pivot` (0,0) =
+// bottom-left of the sprite; `nine_slice` = (left, top, right, bottom) borders in pixels; `grid`
+// cuts a sheet into cells named `name_0`, `name_1`, … row by row.
+(
+    version: 1,
+    max_size: 1024,
+    padding: 1,
+    extrude: 1,
+    trim: true,
+    sprites: [
+        (name: "hero", image: "hero.png", pivot: (0.5, 0.0)),
+        (name: "hero_run", image: "hero_run.png", grid: Some((16, 16)), pivot: (0.5, 0.0)),
+        (name: "panel", image: "ui/panel.png", nine_slice: Some((4, 4, 4, 4))),
+    ],
+)

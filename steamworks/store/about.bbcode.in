@@ -1,0 +1,23 @@
+[h2]A forest to wander[/h2]
+{{DEMO_NAME}} is a free, self-contained scene made to show what Regia Engine renders in real time. There are no goals, enemies or timers: fly the camera over the hills and through the trees, watch the light change, and stop wherever you like.
+
+[h2]What you can do[/h2]
+[list]
+[*][b]Fly freely[/b] with keyboard and mouse or a gamepad. Hold the sprint key to cover ground, rise and sink to look over the trees.
+[*][b]Change the time of day[/b] from sunrise to sunset with one slider; the sun, sky and shadows follow.
+[*][b]Change the sky[/b] from clear to cloudy, at once or as a slow transition.
+[*][b]Pick a quality tier[/b], or let the demo detect one. It tells you in plain words why it chose that tier for your GPU.
+[*][b]Take screenshots[/b] with F12. They are saved as PNG files in a folder the demo shows you.
+[*][b]Run the benchmark[/b]: a fixed flythrough that writes a table of frame times you can compare between settings or machines.
+[*][b]Read the credits[/b]: every asset in the scene is listed with its author and licence.
+[/list]
+
+[h2]Good to know[/h2]
+[list]
+[*]Plays offline. No account, no telemetry sent anywhere, no crash uploads, no purchases.
+[*]Runs on Windows and on Linux.
+[*]The on-screen frame rate is measured, not estimated.
+[/list]
+
+[h2]About Regia Engine[/h2]
+Regia Engine is a game engine written in Rust. This demo is a showcase of the engine's renderer and tools, not a full game.

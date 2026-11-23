@@ -1,0 +1,11 @@
+# error
+# Laid out by hand from docs/formats/dcc-feed-protocol-v1.md (spec 60 section 8 test 1).
+2a 00 00 00                                          # len = 42
+3f 00                                                # msg_type 0x003f
+00 00                                                # flags
+01 00 00 00                                          # seq 1
+03 00 00 00                                          # ref_seq 3
+02 00 00 00                                          # handle 2
+0c 00 75 6e 6b 6e 6f 77 6e 5f 69 74 65 6d            # code "unknown_item"
+09 00 6e 6f 20 69 74 65 6d 20 32                     # message "no item 2"
+00                                                   # fatal 0

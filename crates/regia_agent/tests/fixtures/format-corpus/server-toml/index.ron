@@ -1,0 +1,41 @@
+(
+    format: "server-toml",
+    entries: [
+        (
+            version: 1,
+            file: "v1.ron",
+            origin: "frozen copy of the fuzz-target registry fixture",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+        (
+            version: 2,
+            file: "v2.ron",
+            origin: "frozen copy of the fuzz-target registry fixture",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+        (
+            version: 3,
+            file: "v3.ron",
+            origin: "frozen copy of the fuzz-target registry fixture",
+            exercises: "version 3 still loads; upgrade-project rewrites it to version 4",
+        ),
+        (
+            version: 4,
+            file: "v4.ron",
+            origin: "frozen copy of the fuzz-target registry fixture (ADR-7950 silence policy keys in [net])",
+            exercises: "the current version: what the loader writes today must stay readable; interrupt_ms, timeout_ms and start_grace_ms",
+        ),
+        (
+            version: 4,
+            file: "v4-playlist.ron",
+            origin: "v4.ron with levels.rotation replaced by levels.playlist and [net] mtu_probing set (ADR-8345 folded into v4, ADR-8529, ADR-8553)",
+            exercises: "the same version 4: levels.playlist (exclusive with rotation) is read and recorded, and mtu_probing (ADR-8300)",
+        ),
+        (
+            version: 4,
+            file: "v4-lockstep.ron",
+            origin: "the default template with `[lockstep]` on (ADR-8558, folded into the unreleased v4 by ADR-7724)",
+            exercises: "the additive `[lockstep]` section of version 4: a lockstep server with an observer",
+        ),
+    ],
+)

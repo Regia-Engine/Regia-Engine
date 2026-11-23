@@ -1,0 +1,20 @@
+{
+    "regia_procgen::world::ProcGenerator": (
+        graph: "",
+        params: {},
+        seed: None,
+        mode: Baked,
+        bounds: Box(
+            half_extents: (32.0, 64.0, 32.0),
+        ),
+        live: true,
+        refresh_on_change: false,
+        limits: None,
+        editor_only: false,
+        dependency_priority: 0,
+        quality_tier: None,
+        allow_terrain_edits: false,
+        tiles: None,
+        format_version: 2,
+    ),
+}

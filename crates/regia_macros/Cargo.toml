@@ -1,0 +1,19 @@
+[package]
+name = "regia_macros"
+description = "Procedural macros: #[derive(Script)], #[derive(BtTask)], #[derive(Replicate)], #[derive(NetMessage)] and #[derive(Asset)]."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+proc-macro = true
+
+[lints]
+workspace = true
+
+[dependencies]
+syn = { workspace = true }
+quote = { workspace = true }
+proc-macro2 = { workspace = true }

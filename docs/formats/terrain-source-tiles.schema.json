@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://regia.engine/schemas/terrain-source-tiles.schema.json",
+  "title": "Terrain source tile set",
+  "description": "A heightfield source split over several files (CT-22, ADR-8595, docs/formats/terrain.md § 15): one global count grid, its mapping, and the schema-2 JSON or 16-bit PNG files that cover it. Neighboring tiles may share a border of at most max_overlap samples, whose counts must be equal. Unknown fields are an error. Kept in step with the serde fields by regia_terrain's test `the_tile_set_schema_names_every_descriptor_field`.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["terrain_source_tiles", "grid", "units", "tiles"],
+  "properties": {
+    "terrain_source_tiles": {
+      "const": 1,
+      "description": "Descriptor version. Another version is refused with terrain_tiles_version before any other field is read."
+    },
+    "grid": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cols", "rows", "cell_m", "sample0_m"],
+      "properties": {
+        "cols": { "type": "integer", "minimum": 2, "description": "Global columns (X), west to east." },
+        "rows": { "type": "integer", "minimum": 2, "description": "Global rows (Z), south to north." },
+        "cell_m": { "type": "number", "exclusiveMinimum": 0, "description": "Sample spacing on X and Z, meters." },
+        "sample0_m": {
+          "type": "array",
+          "items": { "type": "number" },
+          "minItems": 2,
+          "maxItems": 2,
+          "description": "World X/Z of global sample (0, 0), the south-west sample center."
+        }
+      }
+    },
+    "units": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["meters_per_count", "zero_counts"],
+      "properties": {
+        "meters_per_count": { "type": "number", "exclusiveMinimum": 0, "description": "Meters per raw count." },
+        "zero_counts": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "The count at height zero (the datum)." }
+      }
+    },
+    "max_overlap": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 1,
+      "description": "Widest border two tiles may share, samples. A wider shared region is refused with terrain_tiles_overlap."
+    },
+    "tiles": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4096,
+      "description": "The tiles, in any order (the reader sorts them by origin row, then column).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "origin", "size"],
+        "properties": {
+          "path": {
+            "type": "string",
+            "pattern": "^[^/\\\\:]+(/[^/\\\\:]+)*\\.([jJ][sS][oO][nN]|[pP][nN][gG])$",
+            "description": "File relative to the descriptor's folder, '/'-separated, no '.' or '..' segment: a schema-2 JSON source (its own sample0 must sit within 1 mm of its origin's position) or a 16-bit grayscale PNG (placed by the descriptor; a datum tEXt, if any, must equal zero_counts)."
+          },
+          "origin": {
+            "type": "array",
+            "items": { "type": "integer", "minimum": 0 },
+            "minItems": 2,
+            "maxItems": 2,
+            "description": "Global [column, row] of the tile's sample (0, 0)."
+          },
+          "size": {
+            "type": "array",
+            "items": { "type": "integer", "minimum": 2 },
+            "minItems": 2,
+            "maxItems": 2,
+            "description": "[columns, rows] the tile file holds (terrain_tiles_dimensions when the file differs)."
+          }
+        }
+      }
+    }
+  }
+}

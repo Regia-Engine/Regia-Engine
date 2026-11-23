@@ -1,0 +1,41 @@
+// `config/weather.ron`, format v1 (docs/formats/weather-ron.md, spec 99 § 7.1).
+// Every field has a default, so a file names only what it changes.
+(
+    format_version: 1,
+    // Named weathers beside the built-in ones. Each starts from `base` and replaces the given fields.
+    presets: [
+        (name: "monsoon", base: "storm", temperature_c: Some(27.0), precipitation: Some(1.0), gustiness: Some(0.5)),
+    ],
+    // Which effects run. Each is false when absent; `regia new` writes all three as true.
+    effects: (precipitation: true, surface: true, scene_wind: true),
+    // A preset to start in when a level opens without a Weather resource (None: leave the sky alone).
+    start: None,
+    precipitation: (
+        max_rain_mm_per_h: 50.0,
+        max_snow_we_mm_per_h: 5.0,
+        snow_all_below_c: 0.0,
+        rain_all_above_c: 2.5,
+        snow_ratio: 10.0,
+        visible_drop_mm: 1.0,
+        density_scale: 1.0,
+        streak_exposure_s: 0.0167,
+        splashes: true,
+    ),
+    wind: (
+        mode: Weather,          // Weather | Manual | Off: the SceneWind mode the plugin inserts
+        surface_factor: None,   // None: (10 m / cloud base)^(1/7)
+        veer_deg: 0.0,
+        gust_scale: 1.0,
+    ),
+    surface: (
+        wet_mm: 0.2,
+        dry_time_s: 1800.0,
+        drain_mm_per_h: 2.5,
+        puddle_mm: 5.0,
+        puddle_dry_time_s: 3600.0,
+        full_cover_m: 0.03,
+        melt_mm_per_c_day: 4.0,
+        melt_scale: 1.0,
+    ),
+    visibility: (couple_fog: true, rain_visibility_m: 3000.0, snow_visibility_m: 400.0),
+)

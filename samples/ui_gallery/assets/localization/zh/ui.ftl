@@ -1,0 +1,14 @@
+gallery-title = 界面图库
+gallery-theme = 主题
+gallery-language = 语言
+gallery-widgets = 控件
+gallery-text = 文本（RTL / 中文 / 表情）
+gallery-list = 虚拟列表
+menu-start = 开始
+btn-toggle-theme = 切换主题
+btn-cycle-locale = 切换语言
+label-slider = 音量
+label-progress = 加载中
+label-input = 名称
+label-toggle = 音乐
+item-row = 项目 { $n }

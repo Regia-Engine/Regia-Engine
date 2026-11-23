@@ -1,0 +1,22 @@
+[package]
+name = "procgen_common"
+description = "Shared host of the procgen samples: a headless or windowed app with terrain, simple meshes, a view, and an agent script runner."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia = { workspace = true }
+regia_agent = { workspace = true }
+regia_app = { workspace = true }
+regia_core = { workspace = true }
+regia_procgen = { workspace = true }
+regia_render = { workspace = true }
+regia_scene = { workspace = true }
+regia_terrain = { workspace = true }
+serde_json = { workspace = true }

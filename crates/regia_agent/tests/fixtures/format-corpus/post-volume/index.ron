@@ -1,0 +1,23 @@
+(
+    format: "post-volume",
+    entries: [
+        (
+            version: 1,
+            file: "v1.post-volume.ron",
+            origin: "git fbce38f6b75e646c9892fda6d661f0404b951d2a:docs/formats/post-volume-v1.md (fenced ron block, component entry fragment)",
+            exercises: "baseline: shape, priority, blend_distance, weight and the optional overrides incl. eye",
+        ),
+        (
+            version: 2,
+            file: "v2.post-volume.ron",
+            origin: "git 2d92d40d4f547cf892f5b373353a2981ad4ad94f:docs/formats/post-volume-v2.md (fenced ron block, component entry fragment)",
+            exercises: "adds the lens-effect overrides (lens_flare_intensity, lens_flare_threshold, lens_dirt_intensity, chromatic_aberration)",
+        ),
+        (
+            version: 3,
+            file: "v3.ron",
+            origin: "frozen copy of the fuzz-target registry fixture",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+    ],
+)

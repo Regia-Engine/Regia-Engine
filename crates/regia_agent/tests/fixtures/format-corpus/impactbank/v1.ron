@@ -1,0 +1,42 @@
+// A small contact-sound bank (docs/formats/impactbank.md, ADR-3270). Sound names are placeholders.
+(
+    format_version: 1,
+    materials: {
+        "wood": (
+            impacts: ["impact/wood_1", "impact/wood_2", "impact/wood_3", "impact/wood_4"],
+            scrape: Some("impact/wood_scrape"),
+            roll: Some("impact/wood_roll"),
+            breaks: ["impact/wood_break_1", "impact/wood_break_2"],
+            volume_db: -3.0,
+            pitch: 1.0,
+            pitch_jitter: 0.05,
+            volume_jitter_db: 1.5,
+        ),
+        "concrete": (
+            impacts: ["impact/concrete_1", "impact/concrete_2", "impact/concrete_3"],
+            scrape: Some("impact/concrete_scrape"),
+        ),
+        "default": (
+            impacts: ["impact/thud_1", "impact/thud_2"],
+        ),
+    },
+    pairs: [
+        (a: "metal", b: "concrete", set: (impacts: ["impact/clank_1", "impact/clank_2"])),
+    ],
+    default_material: "default",
+    destruction_materials: { "brick": "concrete", "plank": "wood" },
+    curves: (
+        min_impulse_ns: 0.05,
+        min_normal_speed_m_s: 0.25,
+        reference_impulse_ns: 10.0,
+        impulse_db_per_doubling: 4.0,
+    ),
+    budget: (
+        cooldown_steps: 6,
+        max_new_impacts_per_step: 8,
+        fade_steps: 6,
+        max_loop_voices: 16,
+    ),
+    bus: "World",
+    max_distance_m: 40.0,
+)

@@ -1,0 +1,18 @@
+// A level written before the rename to Regia Engine (ADR-1388): its component keys name the
+// engine crates by their old names. `xtask rename-brand` keeps this file byte for byte
+// (`xtask/rename-keep.txt`, `**/legacy-brand/**`); `tests/legacy_brand.rs` loads it.
+(
+    format_version: 1,
+    entities: [
+        (
+            guid: "3f7a1c2e-8b64-4a35-9d20-6f1e2b3c4d5a",
+            name: "Yard",
+            components: {
+                "ferrite_scene::transform::Transform": (
+                    translation: (1.0, 2.0, 3.0),
+                ),
+                "ferrite_scene::components::Tags": (["ground", "walkable"]),
+            },
+        ),
+    ],
+)

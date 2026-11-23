@@ -1,0 +1,148 @@
+[package]
+name = "regia_agent"
+description = "Agent protocol server: JSON-RPC 2.0 surface over the engine for AI agents and tools (MCP adapter in regia_cli)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+# Render-out format `webm`: AV1 and Opus encoded in-process (regia_media `media-encode`, ADR-3369). Off by
+# default; tools and the CLI turn it on, a shipped game never needs it.
+media-encode = ["regia_media/media-encode"]
+# `render.fault_inject` (spec 54 § 5.1): provoke a device loss, a stall or an out-of-memory signal in
+# tests. Never in a shipped game: the method does not exist without it.
+test-hooks = ["regia_render/test-hooks"]
+# The spec 58 XR surface (`regia_xr`: app state, options, recenter, eye capture, the simulator's
+# pose/input/session drives). On by default; without it those answer `installed: false`.
+default = ["xr"]
+xr = ["dep:regia_xr"]
+# Links the reference path tracer for `seeing.reference_trace` and `seeing.compare`.
+reference-trace = ["dep:regia_pt"]
+# `seeing.reference_trace(denoise: true)`: OIDN previews (links Intel's native OIDN library;
+# desktop tools only, never a shipped game; regia_pt's `denoise`).
+denoise = ["reference-trace", "regia_pt/denoise"]
+# The DCC scene feed (specs/60): wire codec, sockets, sessions, entity mapping, `dcc_feed.*` methods.
+# Dev builds only; never default and never in a shipping profile.
+dcc-feed = []
+# Mesh, texture and clip items on top of `dcc-feed` (on in the editor, spec 60 § 9.2); a runtime build
+# with `dcc-feed` alone answers `kind_not_supported` for them.
+dcc-feed-assets = ["dcc-feed"]
+
+[dependencies]
+regia_core = { workspace = true }
+regia_ecs = { workspace = true }
+regia_app = { workspace = true }
+regia_ai = { workspace = true, features = ["spatial-query-probe"] }
+regia_platform = { workspace = true }
+# `report.outbox_status` reads the report outbox ledger (ADR-8402); already a dependency through regia_asset.
+regia_crash = { workspace = true }
+regia_xr = { workspace = true, optional = true }
+# `net`: `physics.destruction_net` reads `regia_framework::destruction_net`; regia_net is a dependency here anyway.
+# `functional-tests`: `functest.*` reads `regia_framework::functional` (specs/41 § 9).
+# `media`: `sequencer.video_sections` and render-out play video sections (regia_media is a dependency here anyway).
+regia_framework = { workspace = true, features = ["net", "functional-tests", "media"] }
+regia_telemetry = { workspace = true }
+regia_media = { workspace = true }
+# `configurator.contract_check` validates the product viewer contracts (ADR-2480).
+regia_configurator = { workspace = true, features = ["fs"] }
+# `viewer.view_simulate` and `viewer.pack_verify`: the product viewer drag view and packages (ADR-2540).
+regia_viewer_view = { workspace = true }
+regia_viewer_pack = { workspace = true }
+# `.render_job.ron` v3: a product job draws through the web player's core (ADR-2757).
+regia_web = { workspace = true }
+# `viewer.*` renders and checks the product viewer headlessly (ADR-2539).
+regia_viewer = { workspace = true, features = ["tools"] }
+# `looks.*` answers from the product looks and renders the look board through the viewer (ADR-2538).
+regia_looks = { workspace = true, features = ["viewer"] }
+regia_animation = { workspace = true }
+regia_physics = { workspace = true }
+regia_nav = { workspace = true }
+regia_vfx = { workspace = true }
+regia_2d = { workspace = true }
+regia_scene = { workspace = true }
+regia_world = { workspace = true }
+regia_audio = { workspace = true }
+regia_render = { workspace = true }
+regia_terrain = { workspace = true }
+# The meshlayers formats' fuzz targets (spec 121 § 9, ADR-8112); the terrain.* world-geometry methods later (W-28);
+# `stage_b` for `geometry.body_probe` (W-30, ADR-8323; the feature is additive and never changes compat bits).
+regia_world_geom = { workspace = true, features = ["stage_b"] }
+regia_pick = { workspace = true }
+regia_matgraph = { workspace = true }
+# `procgen.*` (specs/62 § 9). `pipeline`: the agent is a dev tool (shipping builds leave it out), so it may
+# write graph saves and bakes.
+regia_procgen = { workspace = true, features = ["pipeline"] }
+# `gen.mesh`: procedural mesh recipes (spec 23 § 6, ADR-7240).
+regia_gen = { workspace = true }
+# `fluid.*` (book/agents/fluid.md, ADR-2441): the particle liquid's simulations and bakes.
+regia_fluid = { workspace = true, features = ["physics"] }
+# The reference path tracer behind `seeing.reference_trace` / `seeing.compare` (specs/27 § 5);
+# an offline tool, so it is opt-in and never in a shipped game.
+regia_pt = { workspace = true, optional = true }
+regia_asset = { workspace = true }
+regia_input = { workspace = true }
+regia_quick = { workspace = true }
+regia_net = { workspace = true, features = ["voice"] }
+# `ui.layers` (book agents/ui-input.md).
+regia_ui = { workspace = true }
+crossbeam-channel = { workspace = true }
+uuid = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tungstenite = { workspace = true }
+png = { workspace = true }
+# Render-out `format: "exr"` and the EXR AOV files (ADR-1521): pure Rust, BSD-3-Clause.
+exr = { workspace = true }
+# The render-out AOV pass draws its own small pipeline (ADR-1521); the same wgpu regia_render uses.
+wgpu = { workspace = true }
+toml = { workspace = true }
+tracing = { workspace = true }
+# The `hover_params_step` fuzz target reads hover hulls as RON (the crate's `serde` derives); the
+# `det_state_snapshot` fuzz target (DC-3.7a) reads lockstep state snapshots.
+regia_detsim = { workspace = true, features = ["serde"] }
+
+# `bake_export`: the input hash of a level's bake (ADR-310) and the `.bake.ron` writer.
+blake3 = { workspace = true }
+ron = { workspace = true }
+
+[dev-dependencies]
+# The `sim.tick_profile` dispatcher test builds a ManualClock profiler (ADR-8498).
+regia_detsim = { workspace = true }
+# `tests/render_out_product.rs` cooks the stand-in product.
+regia_viewer_pack = { workspace = true, features = ["cook"] }
+# Temp dirs (tests/protocol_transport.rs, unique temp project roots for the `bake_export` tests)
+# and, for `tests/dispatch_fuzz.rs` (ADR-538), the shared seed-stable mutators.
+regia_test_utils = { workspace = true }
+regia_macros = { workspace = true }
+# Writes cooked skeleton and clip fixtures for the `assets.skin_check` tests.
+postcard = { workspace = true }
+sim_bridge = { workspace = true }
+png = { workspace = true }
+# Encodes PNG fixtures for the `assets.texture_sets` tests.
+image = { workspace = true }
+# Glyph images for the `ui.glyph_atlas` test (ADR-8832); already a regia_ui dependency.
+cosmic-text = { workspace = true }
+regia = { workspace = true, features = ["agent"] }
+regia_asset = { workspace = true }
+regia_asset_pipeline = { workspace = true }
+regia_render = { workspace = true }
+uuid = { workspace = true }
+serde_json = { workspace = true }
+# Records real spans into a frame profiler for the `profiler.*` tests (ADR-2323).
+tracing-subscriber = { workspace = true }
+# `tests/audio_portal_sound.rs` cooks DO27's Switchbacks layout fixture (W-25, ADR-8416), and so
+# does the `terrain.*` dispatcher e2e (spec 121 § 12, ADR-8386); `fixtures` stays off production builds.
+regia_world_geom = { workspace = true, features = ["stage_b", "fixtures"] }
+# (wgpu is a normal dependency above: the tests also build `regia_render::hwrt` reports for the
+# `render.hwrt` tests and swapchain plans from wgpu values for the `render.swapchain` tests, ADR-525.)
+[target.'cfg(windows)'.dependencies]
+# The local transport's named pipe (spec 23 § 2): CreateNamedPipeW/ConnectNamedPipeW and the
+# client-side CreateFileW. The owner-only DACL comes from regia_net::private_file (ADR-4828).
+# MIT OR Apache-2.0; already a workspace dependency through winit/wgpu.
+windows-sys = { workspace = true }

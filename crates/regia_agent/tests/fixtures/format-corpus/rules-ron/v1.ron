@@ -1,0 +1,38 @@
+// A `.rules.ron` v1 rule set (ADR-8694): a longer capture-the-flag that extends the shipped `ctf`.
+(
+    format_version: 1,
+    id: "ctf_long",
+    name_key: "mode.ctf_long",
+    extends: "ctf",
+    teams: [
+        (id: 1, name_key: "team.red", color: (196, 64, 64, 255), max_seats: 8),
+        (id: 2, name_key: "team.blue", color: (64, 112, 196, 255), max_seats: 8),
+    ],
+    session: (
+        flow: (start_delay_ticks: 300),
+        phases: (
+            time_limit_ticks: 36000,
+            on_time_up: (kind: "overtime", ticks: 3600),
+        ),
+        objectives: (
+            capture_limit: 5,
+            flag_touch_radius: 2.5,
+            touch_height: 1.75,
+            flag_return_ticks: 1800,
+        ),
+        teams: (switch: (policy: between_matches)),
+        respawn: (
+            default: (kind: "delay", ticks: 180),
+            spawn: Scored(enemy: 12, team_radius: 6.5),
+            seed: 27,
+        ),
+    ),
+    win_conditions: [],
+    options: [
+        (key: "capture_limit", kind: int, default: "5", min: "1", max: "10"),
+        (key: "wind", kind: float, default: "0.25", min: "0", max: "1.5"),
+        (key: "night", kind: bool, default: "false"),
+        (key: "sky", kind: enum, default: "day", choices: ["day", "dusk", "night"]),
+        (key: "banner", kind: string, default: "Long CTF"),
+    ],
+)

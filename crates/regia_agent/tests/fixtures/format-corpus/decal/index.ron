@@ -1,0 +1,29 @@
+(
+    format: "decal",
+    entries: [
+        (
+            version: 1,
+            file: "v1.ron",
+            origin: "git 213b66fe5:crates/regia_agent/src/fuzz_targets/fixtures/decal.example.ron (the fuzz-target registry fixture at format version 1)",
+            exercises: "baseline: albedo, receivers and atlas fields before forward decals",
+        ),
+        (
+            version: 2,
+            file: "v2.ron",
+            origin: "frozen copy of the fuzz-target registry fixture",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+        (
+            version: 3,
+            file: "v3.ron",
+            origin: "P-17 v3 fixture authored with custom texture reference (ADR-8121)",
+            exercises: "optional image path, metallic and shading; parse without filesystem access",
+        ),
+        (
+            version: 3,
+            file: "v3-surface.ron",
+            origin: "format batch 2 fold into v3: footstep surface fixture authored for ADR-8829",
+            exercises: "the optional footstep `surface` added inside the unreleased v3 step; v3.ron stays byte-identical",
+        ),
+    ],
+)

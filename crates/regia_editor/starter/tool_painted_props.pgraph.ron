@@ -1,0 +1,14 @@
+ProcGraph(
+    format_version: 1,
+    description: "Painted props tool preset: a prop on every painted point, turned by the brush's random yaw (spec 67 § 5)",
+    nodes: {
+        1: (ty: "in.self", settings: {}, at: (0.0, 0.0)),
+        2: (ty: "items.by_tag", settings: {tags: ["painted"]}, at: (220.0, 0.0)),
+        3: (ty: "spawn.mesh", settings: {entries: [(mesh: "props/rock_small", weight: 2.0, draw_distance_m: 150.0, fade_m: 20.0), (mesh: "plants/tree_broadleaf", weight: 1.0, draw_distance_m: 400.0, fade_m: 40.0)]}, at: (440.0, 0.0)),
+    },
+    edges: [
+        (from: (1, "out"), to: (2, "in")),
+        (from: (2, "inside"), to: (3, "in")),
+    ],
+    flags: (starter: true, tool: Some("paint")),
+)

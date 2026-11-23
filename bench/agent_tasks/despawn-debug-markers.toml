@@ -1,0 +1,80 @@
+format_version = 1
+id = "despawn-debug-markers"
+title = "Remove the debug markers, keep the spawn points"
+prompt = "The level has eight entities named 'Debug Marker 1' to 'Debug Marker 8' left over from testing and four named 'Spawn Point 1' to 'Spawn Point 4'. Remove every debug marker and leave the spawn points alone."
+features = ["scene"]
+crates = ["regia_agent"]
+call_budget = 14
+
+[setup]
+target = "scene"
+
+[[setup.call]]
+method = "scene.spawn"
+params = { name = "Debug Marker 1", components = { Transform = { translation = [0, 0.1, 0] } } }
+save = { d0 = "/entity" }
+
+[[setup.call]]
+method = "scene.spawn"
+params = { name = "Debug Marker 2", components = { Transform = { translation = [1, 0.1, 0] } } }
+save = { d1 = "/entity" }
+
+[[setup.call]]
+method = "scene.spawn"
+params = { name = "Debug Marker 3", components = { Transform = { translation = [2, 0.1, 0] } } }
+save = { d2 = "/entity" }
+
+[[setup.call]]
+method = "scene.spawn"
+params = { name = "Debug Marker 4", components = { Transform = { translation = [3, 0.1, 0] } } }
+save = { d3 = "/entity" }
+
+[[setup.call]]
+method = "scene.spawn"
+params = { name = "Debug Marker 5", components = { Transform = { translation = [4, 0.1, 0] } } }
+save = { d4 = "/entity" }
+
+[[setup.call]]
+method = "scene.spawn"
+params = { name = "Debug Marker 6", components = { Transform = { translation = [5, 0.1, 0] } } }
+save = { d5 = "/entity" }
+
+[[setup.call]]
+method = "scene.spawn"
+params = { name = "Debug Marker 7", components = { Transform = { translation = [6, 0.1, 0] } } }
+save = { d6 = "/entity" }
+
+[[setup.call]]
+method = "scene.spawn"
+params = { name = "Debug Marker 8", components = { Transform = { translation = [7, 0.1, 0] } } }
+save = { d7 = "/entity" }
+
+[[setup.call]]
+method = "scene.spawn"
+params = { name = "Spawn Point 1", components = { Transform = { translation = [0, 0, 5] } } }
+
+[[setup.call]]
+method = "scene.spawn"
+params = { name = "Spawn Point 2", components = { Transform = { translation = [10, 0, 5] } } }
+
+[[setup.call]]
+method = "scene.spawn"
+params = { name = "Spawn Point 3", components = { Transform = { translation = [20, 0, 5] } } }
+
+[[setup.call]]
+method = "scene.spawn"
+params = { name = "Spawn Point 4", components = { Transform = { translation = [30, 0, 5] } } }
+
+[[check]]
+name = "no debug markers"
+method = "scene.query_entities"
+params = { name = "Debug Marker*" }
+pointer = "/count"
+expect = { kind = "equals", value = 0 }
+
+[[check]]
+name = "spawn points kept"
+method = "scene.query_entities"
+params = { name = "Spawn Point*" }
+pointer = "/count"
+expect = { kind = "equals", value = 4 }

@@ -1,0 +1,63 @@
+(
+    format_version: 2,
+    name: "free",
+    params: {},
+    variables: [
+        (
+            name: "rise",
+            default: Float(0.0),
+            local_only: false,
+        ),
+        (
+            name: "sprint",
+            default: Bool(false),
+            local_only: false,
+        ),
+    ],
+    inputs: [
+        (
+            name: "look",
+            kind: Axis2,
+            speed: (120.0, 90.0),
+            pitch_clamp: (-90.0, 90.0),
+            invert_pitch: false,
+            normalize: false,
+            pull_toward_var: None,
+            pull_weight: 0.1,
+        ),
+        (
+            name: "move",
+            kind: Axis2,
+            speed: (120.0, 90.0),
+            pitch_clamp: (-90.0, 90.0),
+            invert_pitch: false,
+            normalize: false,
+            pull_toward_var: None,
+            pull_weight: 0.1,
+        ),
+    ],
+    rigs: [
+        (
+            name: "main",
+            tags: [],
+            root: [
+                LookInput(
+                    slot: "look",
+                    additive: false,
+                ),
+                Fly(
+                    slot: "move",
+                    speed: 10.0,
+                    sprint_multiplier: 4.0,
+                    accel: 10.0,
+                    rise: Var("rise"),
+                    sprint: Var("sprint"),
+                ),
+            ],
+            transitions: [],
+            blend_out: None,
+        ),
+    ],
+    transitions: [],
+    director: Fixed("main"),
+)

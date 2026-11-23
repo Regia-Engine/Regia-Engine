@@ -1,0 +1,17 @@
+(
+    format: "netprofile",
+    entries: [
+        (
+            version: 1,
+            file: "v1.ron",
+            origin: "frozen copy of the fuzz-target registry fixture",
+            exercises: "a version 1 profile: it loads without rate tiers",
+        ),
+        (
+            version: 2,
+            file: "v2.ron",
+            origin: "written for ADR-8031 (spec 120 § 8.3 distance rate tiers); one unreleased v2 with extrapolation_gate_m (ADR-8572 (5)), the fuzz-target registry fixture's frozen copy",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+    ],
+)

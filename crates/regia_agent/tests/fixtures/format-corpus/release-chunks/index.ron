@@ -1,0 +1,4 @@
+(format: "release-chunks", entries: [
+    (version: 1, file: "v1.json", origin: "hand-written from canonical_example at pin d6ed37677 (regia-absorb-1), ADR-8404",
+     exercises: "one empty chunk, every field present, the empty SHA-256, source_commit d6ed37677"),
+])

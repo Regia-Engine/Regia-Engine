@@ -1,0 +1,14 @@
+[package]
+name = "bike_lab"
+description = "Headless 10 s two-wheel balance run. No window. The lab calls regia_physics::vehicle_bike."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia_physics = { workspace = true }

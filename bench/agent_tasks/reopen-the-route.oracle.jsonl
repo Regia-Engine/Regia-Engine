@@ -1,0 +1,2 @@
+# Oracle for reopen-the-route: the calls a careful agent makes after the setup.
+{"method":"nav.remove_obstacle","params":{"id":"$o"}}

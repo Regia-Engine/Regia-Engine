@@ -1,0 +1,7 @@
+(
+    format_version: 1,
+    pins: {
+        "regia_scene::transform::Transform": ["translation", "scale"],
+        "regia_render::light::PointLight": ["intensity"],
+    },
+)

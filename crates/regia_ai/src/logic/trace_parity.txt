@@ -1,0 +1,1105 @@
+== step 30 (64 lines)
+tick 14: rule_matched n_seen on changed:local/n
+tick 14: event_received pong
+tick 14: rule_matched pong on pong
+tick 15: event_received timer:tick3
+tick 15: rule_matched tick3 on timer:tick3
+tick 15: action_started tick3 0 logic::SetBlackboard
+tick 15: event_received timer:slow
+tick 15: rule_matched slow on timer:slow (cooldown 2)
+tick 16: event_received changed:hp
+tick 16: rule_matched hp on changed:hp
+tick 16: action_started hp 0 logic::SetBlackboard
+tick 16: event_received changed:local/n
+tick 16: rule_matched n_seen on changed:local/n
+tick 18: event_received ping
+tick 18: rule_matched ping on ping
+tick 18: action_started ping 0 test::Wait3
+tick 19: event_received timer:tick3
+tick 19: rule_matched tick3 on timer:tick3
+tick 19: action_started tick3 0 logic::SetBlackboard
+tick 20: action_started ping 1 logic::EmitEvent
+tick 20: event_received timer:slow
+tick 20: rule_matched slow on timer:slow
+tick 20: action_started slow 0 logic::EmitEvent
+tick 20: event_received changed:local/n
+tick 20: rule_matched n_seen on changed:local/n
+tick 21: event_received timer:tick3
+tick 21: rule_matched tick3 on timer:tick3
+tick 21: action_started tick3 0 logic::SetBlackboard
+tick 21: event_received changed:hp
+tick 21: rule_rejected hp on changed:hp
+tick 21: event_received pong
+tick 21: rule_matched pong on pong
+tick 21: event_received pong
+tick 21: rule_matched pong on pong
+tick 22: event_received changed:local/n
+tick 22: rule_matched n_seen on changed:local/n
+tick 24: event_received timer:tick3
+tick 24: rule_matched tick3 on timer:tick3
+tick 24: action_started tick3 0 logic::SetBlackboard
+tick 25: event_received timer:slow
+tick 25: rule_matched slow on timer:slow (cooldown 7)
+tick 25: event_received changed:local/n
+tick 25: rule_matched n_seen on changed:local/n
+tick 25: event_received ping
+tick 25: rule_matched ping on ping
+tick 25: action_started ping 0 test::Wait3
+tick 26: event_received changed:hp
+tick 26: rule_rejected hp on changed:hp
+tick 27: action_started ping 1 logic::EmitEvent
+tick 28: event_received pong
+tick 28: rule_matched pong on pong
+tick 29: event_received timer:tick3
+tick 29: rule_matched tick3 on timer:tick3
+tick 29: action_started tick3 0 logic::SetBlackboard
+tick 30: event_received timer:slow
+tick 30: rule_matched slow on timer:slow (cooldown 2)
+tick 30: event_received changed:local/n
+tick 30: rule_matched n_seen on changed:local/n
+tick 31: event_received timer:tick3
+tick 31: rule_matched tick3 on timer:tick3
+tick 31: action_started tick3 0 logic::SetBlackboard
+tick 31: event_received changed:hp
+tick 31: rule_matched hp on changed:hp
+tick 31: action_started hp 0 logic::SetBlackboard
+== step 45 (64 lines)
+tick 33: action_started tick3 0 logic::SetBlackboard
+tick 34: action_started ping 1 logic::EmitEvent
+tick 34: event_received changed:local/n
+tick 34: rule_matched n_seen on changed:local/n
+tick 35: event_received timer:slow
+tick 35: rule_matched slow on timer:slow
+tick 35: action_started slow 0 logic::EmitEvent
+tick 35: event_received pong
+tick 35: rule_matched pong on pong
+tick 36: event_received timer:tick3
+tick 36: rule_matched tick3 on timer:tick3
+tick 36: action_started tick3 0 logic::SetBlackboard
+tick 36: event_received changed:hp
+tick 36: rule_matched hp on changed:hp
+tick 36: action_started hp 0 logic::SetBlackboard
+tick 36: event_received pong
+tick 36: rule_matched pong on pong
+tick 37: event_received changed:local/n
+tick 37: rule_matched n_seen on changed:local/n
+tick 39: event_received ping
+tick 39: rule_matched ping on ping
+tick 39: action_started ping 0 test::Wait3
+tick 40: event_received timer:slow
+tick 40: rule_matched slow on timer:slow (cooldown 7)
+tick 41: action_started ping 1 logic::EmitEvent
+tick 41: event_received timer:tick3
+tick 41: rule_matched tick3 on timer:tick3
+tick 41: action_started tick3 0 logic::SetBlackboard
+tick 41: event_received changed:hp
+tick 41: rule_rejected hp on changed:hp
+tick 41: event_received boom
+tick 41: rule_matched boom on boom
+tick 41: action_started boom 0 test::Fail
+tick 41: action_failed boom 0 test::Fail: failure
+tick 42: event_received timer:tick3
+tick 42: rule_matched tick3 on timer:tick3
+tick 42: action_started tick3 0 logic::SetBlackboard
+tick 42: event_received changed:local/n
+tick 42: rule_matched n_seen on changed:local/n
+tick 42: event_received pong
+tick 42: rule_matched pong on pong
+tick 42: event_received bad
+tick 42: rule_matched bad on bad
+tick 42: action_started bad 0 logic::SetBlackboard
+tick 42: action_failed bad 0 logic::SetBlackboard: key missing is not a string
+tick 43: event_received changed:local/n
+tick 43: rule_matched n_seen on changed:local/n
+tick 43: event_received aim
+tick 43: rule_matched aim on aim
+tick 43: action_started aim 0 logic::EmitEvent
+tick 43: action_failed aim 0 logic::EmitEvent: target local/nobody is not set
+tick 45: event_received timer:tick3
+tick 45: rule_matched tick3 on timer:tick3
+tick 45: action_started tick3 0 logic::SetBlackboard
+tick 45: event_received timer:slow
+tick 45: rule_matched slow on timer:slow (cooldown 2)
+tick 46: event_received changed:hp
+tick 46: rule_matched hp on changed:hp
+tick 46: action_started hp 0 logic::SetBlackboard
+tick 46: event_received changed:local/n
+tick 46: rule_matched n_seen on changed:local/n
+tick 46: event_received ping
+tick 46: rule_matched ping on ping
+tick 46: action_started ping 0 test::Wait3
+== step 52 (64 lines)
+tick 41: rule_matched boom on boom
+tick 41: action_started boom 0 test::Fail
+tick 41: action_failed boom 0 test::Fail: failure
+tick 42: event_received timer:tick3
+tick 42: rule_matched tick3 on timer:tick3
+tick 42: action_started tick3 0 logic::SetBlackboard
+tick 42: event_received changed:local/n
+tick 42: rule_matched n_seen on changed:local/n
+tick 42: event_received pong
+tick 42: rule_matched pong on pong
+tick 42: event_received bad
+tick 42: rule_matched bad on bad
+tick 42: action_started bad 0 logic::SetBlackboard
+tick 42: action_failed bad 0 logic::SetBlackboard: key missing is not a string
+tick 43: event_received changed:local/n
+tick 43: rule_matched n_seen on changed:local/n
+tick 43: event_received aim
+tick 43: rule_matched aim on aim
+tick 43: action_started aim 0 logic::EmitEvent
+tick 43: action_failed aim 0 logic::EmitEvent: target local/nobody is not set
+tick 45: event_received timer:tick3
+tick 45: rule_matched tick3 on timer:tick3
+tick 45: action_started tick3 0 logic::SetBlackboard
+tick 45: event_received timer:slow
+tick 45: rule_matched slow on timer:slow (cooldown 2)
+tick 46: event_received changed:hp
+tick 46: rule_matched hp on changed:hp
+tick 46: action_started hp 0 logic::SetBlackboard
+tick 46: event_received changed:local/n
+tick 46: rule_matched n_seen on changed:local/n
+tick 46: event_received ping
+tick 46: rule_matched ping on ping
+tick 46: action_started ping 0 test::Wait3
+tick 48: action_started ping 1 logic::EmitEvent
+tick 48: event_received timer:tick3
+tick 48: rule_matched tick3 on timer:tick3
+tick 48: action_started tick3 0 logic::SetBlackboard
+tick 49: event_received changed:local/n
+tick 49: rule_matched n_seen on changed:local/n
+tick 49: event_received pong
+tick 49: rule_matched pong on pong
+tick 50: event_received timer:slow
+tick 50: rule_matched slow on timer:slow
+tick 50: action_started slow 0 logic::EmitEvent
+tick 51: event_received changed:hp
+tick 51: rule_matched hp on changed:hp
+tick 51: action_started hp 0 logic::SetBlackboard
+tick 51: event_received pong
+tick 51: rule_matched pong on pong
+tick 51: event_received noise (dropped: no rule)
+tick 52: event_received timer:tick3
+tick 52: rule_matched tick3 on timer:tick3
+tick 52: action_started tick3 0 logic::SetBlackboard
+tick 52: event_received sequence_marker:seq/a.seq.ron#door
+tick 52: rule_matched marker on sequence_marker:seq/a.seq.ron#door
+tick 52: action_started marker 0 logic::SetBlackboard
+tick 53: event_received changed:hp
+tick 53: rule_matched hp on changed:hp
+tick 53: action_started hp 0 logic::SetBlackboard
+tick 53: event_received changed:local/n
+tick 53: rule_matched n_seen on changed:local/n
+tick 53: event_received ping
+tick 53: rule_matched ping on ping
+tick 53: action_started ping 0 test::Wait3
+== step 61 (64 lines)
+tick 48: event_received timer:tick3
+tick 48: rule_matched tick3 on timer:tick3
+tick 48: action_started tick3 0 logic::SetBlackboard
+tick 49: event_received changed:local/n
+tick 49: rule_matched n_seen on changed:local/n
+tick 49: event_received pong
+tick 49: rule_matched pong on pong
+tick 50: event_received timer:slow
+tick 50: rule_matched slow on timer:slow
+tick 50: action_started slow 0 logic::EmitEvent
+tick 51: event_received changed:hp
+tick 51: rule_matched hp on changed:hp
+tick 51: action_started hp 0 logic::SetBlackboard
+tick 51: event_received pong
+tick 51: rule_matched pong on pong
+tick 51: event_received noise (dropped: no rule)
+tick 52: event_received timer:tick3
+tick 52: rule_matched tick3 on timer:tick3
+tick 52: action_started tick3 0 logic::SetBlackboard
+tick 52: event_received sequence_marker:seq/a.seq.ron#door
+tick 52: rule_matched marker on sequence_marker:seq/a.seq.ron#door
+tick 52: action_started marker 0 logic::SetBlackboard
+tick 53: event_received changed:hp
+tick 53: rule_matched hp on changed:hp
+tick 53: action_started hp 0 logic::SetBlackboard
+tick 53: event_received changed:local/n
+tick 53: rule_matched n_seen on changed:local/n
+tick 53: event_received ping
+tick 53: rule_matched ping on ping
+tick 53: action_started ping 0 test::Wait3
+tick 55: action_started ping 1 logic::EmitEvent
+tick 55: event_received timer:tick3
+tick 55: rule_matched tick3 on timer:tick3
+tick 55: action_started tick3 0 logic::SetBlackboard
+tick 55: event_received timer:slow
+tick 55: rule_matched slow on timer:slow (cooldown 7)
+tick 56: event_received changed:hp
+tick 56: rule_rejected hp on changed:hp
+tick 56: event_received changed:local/n
+tick 56: rule_matched n_seen on changed:local/n
+tick 56: event_received pong
+tick 56: rule_matched pong on pong
+tick 59: event_received timer:tick3
+tick 59: rule_matched tick3 on timer:tick3
+tick 59: action_started tick3 0 logic::SetBlackboard
+tick 60: event_received timer:tick3
+tick 60: rule_matched tick3 on timer:tick3
+tick 60: action_started tick3 0 logic::SetBlackboard
+tick 60: event_received timer:slow
+tick 60: rule_matched slow on timer:slow (cooldown 2)
+tick 60: event_received changed:local/n
+tick 60: rule_matched n_seen on changed:local/n
+tick 60: event_received ping
+tick 60: rule_matched ping on ping
+tick 60: action_started ping 0 test::Wait3
+tick 61: event_received changed:hp
+tick 61: rule_matched hp on changed:hp
+tick 61: action_started hp 0 logic::SetBlackboard
+tick 61: event_received changed:local/n
+tick 61: rule_matched n_seen on changed:local/n
+tick 61: event_received ping
+tick 61: rule_matched ping on ping
+tick 61: chain_busy ping
+tick 62: action_started ping 1 logic::EmitEvent
+== step 100 (64 lines)
+tick 101: event_received flood12 (dropped: no rule)
+tick 101: event_received flood13 (dropped: no rule)
+tick 101: event_received flood14 (dropped: no rule)
+tick 101: event_received flood15 (dropped: no rule)
+tick 101: event_received flood16 (dropped: no rule)
+tick 101: event_received flood17 (dropped: no rule)
+tick 101: event_received flood18 (dropped: no rule)
+tick 101: event_received flood19 (dropped: no rule)
+tick 101: event_received flood20 (dropped: no rule)
+tick 101: event_received flood21 (dropped: no rule)
+tick 101: event_received flood22 (dropped: no rule)
+tick 101: event_received flood23 (dropped: no rule)
+tick 101: event_received flood24 (dropped: no rule)
+tick 101: event_received flood25 (dropped: no rule)
+tick 101: event_received flood26 (dropped: no rule)
+tick 101: event_received flood27 (dropped: no rule)
+tick 101: event_received flood28 (dropped: no rule)
+tick 101: event_received flood29 (dropped: no rule)
+tick 101: event_received flood30 (dropped: no rule)
+tick 101: event_received flood31 (dropped: no rule)
+tick 101: event_received flood32 (dropped: no rule)
+tick 101: event_received flood33 (dropped: no rule)
+tick 101: event_received flood34 (dropped: no rule)
+tick 101: event_received flood35 (dropped: no rule)
+tick 101: event_received flood36 (dropped: no rule)
+tick 101: event_received flood37 (dropped: no rule)
+tick 101: event_received flood38 (dropped: no rule)
+tick 101: event_received flood39 (dropped: no rule)
+tick 101: event_received flood40 (dropped: no rule)
+tick 101: event_received flood41 (dropped: no rule)
+tick 101: event_received flood42 (dropped: no rule)
+tick 101: event_received flood43 (dropped: no rule)
+tick 101: event_received flood44 (dropped: no rule)
+tick 101: event_received flood45 (dropped: no rule)
+tick 101: event_received flood46 (dropped: no rule)
+tick 101: event_received flood47 (dropped: no rule)
+tick 101: event_received flood48 (dropped: no rule)
+tick 101: event_received flood49 (dropped: no rule)
+tick 101: event_received flood50 (dropped: no rule)
+tick 101: event_received flood51 (dropped: no rule)
+tick 101: event_received flood52 (dropped: no rule)
+tick 101: event_received flood53 (dropped: no rule)
+tick 101: event_received flood54 (dropped: no rule)
+tick 101: event_received flood55 (dropped: no rule)
+tick 101: event_received flood56 (dropped: no rule)
+tick 101: event_received flood57 (dropped: no rule)
+tick 101: event_received flood58 (dropped: no rule)
+tick 101: event_received flood59 (dropped: no rule)
+tick 101: event_received flood60 (dropped: no rule)
+tick 101: event_received flood61 (dropped: no rule)
+tick 101: event_received flood62 (dropped: no rule)
+tick 101: event_received flood63 (dropped: no rule)
+tick 101: event_received flood64 (dropped: no rule)
+tick 101: event_received flood65 (dropped: no rule)
+tick 101: event_received flood66 (dropped: no rule)
+tick 101: event_received flood67 (dropped: no rule)
+tick 101: event_received flood68 (dropped: no rule)
+tick 101: event_received flood69 (dropped: no rule)
+tick 101: inbox_overflow flood0
+tick 101: inbox_overflow flood1
+tick 101: inbox_overflow flood2
+tick 101: inbox_overflow flood3
+tick 101: inbox_overflow flood4
+tick 101: inbox_overflow flood5
+== step 101 (64 lines)
+tick 101: event_received flood20 (dropped: no rule)
+tick 101: event_received flood21 (dropped: no rule)
+tick 101: event_received flood22 (dropped: no rule)
+tick 101: event_received flood23 (dropped: no rule)
+tick 101: event_received flood24 (dropped: no rule)
+tick 101: event_received flood25 (dropped: no rule)
+tick 101: event_received flood26 (dropped: no rule)
+tick 101: event_received flood27 (dropped: no rule)
+tick 101: event_received flood28 (dropped: no rule)
+tick 101: event_received flood29 (dropped: no rule)
+tick 101: event_received flood30 (dropped: no rule)
+tick 101: event_received flood31 (dropped: no rule)
+tick 101: event_received flood32 (dropped: no rule)
+tick 101: event_received flood33 (dropped: no rule)
+tick 101: event_received flood34 (dropped: no rule)
+tick 101: event_received flood35 (dropped: no rule)
+tick 101: event_received flood36 (dropped: no rule)
+tick 101: event_received flood37 (dropped: no rule)
+tick 101: event_received flood38 (dropped: no rule)
+tick 101: event_received flood39 (dropped: no rule)
+tick 101: event_received flood40 (dropped: no rule)
+tick 101: event_received flood41 (dropped: no rule)
+tick 101: event_received flood42 (dropped: no rule)
+tick 101: event_received flood43 (dropped: no rule)
+tick 101: event_received flood44 (dropped: no rule)
+tick 101: event_received flood45 (dropped: no rule)
+tick 101: event_received flood46 (dropped: no rule)
+tick 101: event_received flood47 (dropped: no rule)
+tick 101: event_received flood48 (dropped: no rule)
+tick 101: event_received flood49 (dropped: no rule)
+tick 101: event_received flood50 (dropped: no rule)
+tick 101: event_received flood51 (dropped: no rule)
+tick 101: event_received flood52 (dropped: no rule)
+tick 101: event_received flood53 (dropped: no rule)
+tick 101: event_received flood54 (dropped: no rule)
+tick 101: event_received flood55 (dropped: no rule)
+tick 101: event_received flood56 (dropped: no rule)
+tick 101: event_received flood57 (dropped: no rule)
+tick 101: event_received flood58 (dropped: no rule)
+tick 101: event_received flood59 (dropped: no rule)
+tick 101: event_received flood60 (dropped: no rule)
+tick 101: event_received flood61 (dropped: no rule)
+tick 101: event_received flood62 (dropped: no rule)
+tick 101: event_received flood63 (dropped: no rule)
+tick 101: event_received flood64 (dropped: no rule)
+tick 101: event_received flood65 (dropped: no rule)
+tick 101: event_received flood66 (dropped: no rule)
+tick 101: event_received flood67 (dropped: no rule)
+tick 101: event_received flood68 (dropped: no rule)
+tick 101: event_received flood69 (dropped: no rule)
+tick 101: inbox_overflow flood0
+tick 101: inbox_overflow flood1
+tick 101: inbox_overflow flood2
+tick 101: inbox_overflow flood3
+tick 101: inbox_overflow flood4
+tick 101: inbox_overflow flood5
+tick 102: event_received timer:tick3
+tick 102: rule_matched tick3 on timer:tick3
+tick 102: action_started tick3 0 logic::SetBlackboard
+tick 102: event_received changed:local/n
+tick 102: rule_matched n_seen on changed:local/n
+tick 102: event_received ping
+tick 102: rule_matched ping on ping
+tick 102: action_started ping 0 test::Wait3
+== step 152 (64 lines)
+tick 136: action_started tick3 0 logic::SetBlackboard
+tick 136: event_received changed:hp
+tick 136: rule_matched hp on changed:hp
+tick 136: action_started hp 0 logic::SetBlackboard
+tick 137: event_received changed:local/n
+tick 137: rule_matched n_seen on changed:local/n
+tick 137: event_received ping
+tick 137: rule_matched ping on ping
+tick 137: action_started ping 0 test::Wait3
+tick 138: event_received timer:tick3
+tick 138: rule_matched tick3 on timer:tick3
+tick 138: action_started tick3 0 logic::SetBlackboard
+tick 139: action_started ping 1 logic::EmitEvent
+tick 139: event_received changed:local/n
+tick 139: rule_matched n_seen on changed:local/n
+tick 140: event_received timer:slow
+tick 140: rule_matched slow on timer:slow
+tick 140: action_started slow 0 logic::EmitEvent
+tick 140: event_received pong
+tick 140: rule_rejected pong on pong
+tick 141: event_received changed:hp
+tick 141: rule_matched hp on changed:hp
+tick 141: action_started hp 0 logic::SetBlackboard
+tick 141: event_received pong
+tick 141: rule_rejected pong on pong
+tick 142: event_received timer:tick3
+tick 142: rule_matched tick3 on timer:tick3
+tick 142: action_started tick3 0 logic::SetBlackboard
+tick 143: event_received changed:local/n
+tick 143: rule_matched n_seen on changed:local/n
+tick 144: event_received ping
+tick 144: rule_matched ping on ping
+tick 144: action_started ping 0 test::Wait3
+tick 145: event_received timer:tick3
+tick 145: rule_matched tick3 on timer:tick3
+tick 145: action_started tick3 0 logic::SetBlackboard
+tick 145: event_received timer:slow
+tick 145: rule_matched slow on timer:slow (cooldown 7)
+tick 146: action_started ping 1 logic::EmitEvent
+tick 146: event_received changed:hp
+tick 146: rule_rejected hp on changed:hp
+tick 146: event_received changed:local/n
+tick 146: rule_matched n_seen on changed:local/n
+tick 147: event_received pong
+tick 147: rule_rejected pong on pong
+tick 148: event_received timer:tick3
+tick 148: rule_matched tick3 on timer:tick3
+tick 148: action_started tick3 0 logic::SetBlackboard
+tick 149: event_received changed:local/n
+tick 149: rule_matched n_seen on changed:local/n
+tick 150: event_received timer:tick3
+tick 150: rule_matched tick3 on timer:tick3
+tick 150: action_started tick3 0 logic::SetBlackboard
+tick 150: event_received timer:slow
+tick 150: rule_matched slow on timer:slow (cooldown 2)
+tick 151: event_received changed:hp
+tick 151: rule_matched hp on changed:hp
+tick 151: action_started hp 0 logic::SetBlackboard
+tick 151: event_received changed:local/n
+tick 151: rule_matched n_seen on changed:local/n
+tick 151: breakpoint rule n_seen
+tick 151: event_received ping
+tick 151: rule_matched ping on ping
+tick 151: action_started ping 0 test::Wait3
+== step 157 (64 lines)
+tick 136: action_started hp 0 logic::SetBlackboard
+tick 137: event_received changed:local/n
+tick 137: rule_matched n_seen on changed:local/n
+tick 137: event_received ping
+tick 137: rule_matched ping on ping
+tick 137: action_started ping 0 test::Wait3
+tick 138: event_received timer:tick3
+tick 138: rule_matched tick3 on timer:tick3
+tick 138: action_started tick3 0 logic::SetBlackboard
+tick 139: action_started ping 1 logic::EmitEvent
+tick 139: event_received changed:local/n
+tick 139: rule_matched n_seen on changed:local/n
+tick 140: event_received timer:slow
+tick 140: rule_matched slow on timer:slow
+tick 140: action_started slow 0 logic::EmitEvent
+tick 140: event_received pong
+tick 140: rule_rejected pong on pong
+tick 141: event_received changed:hp
+tick 141: rule_matched hp on changed:hp
+tick 141: action_started hp 0 logic::SetBlackboard
+tick 141: event_received pong
+tick 141: rule_rejected pong on pong
+tick 142: event_received timer:tick3
+tick 142: rule_matched tick3 on timer:tick3
+tick 142: action_started tick3 0 logic::SetBlackboard
+tick 143: event_received changed:local/n
+tick 143: rule_matched n_seen on changed:local/n
+tick 144: event_received ping
+tick 144: rule_matched ping on ping
+tick 144: action_started ping 0 test::Wait3
+tick 145: event_received timer:tick3
+tick 145: rule_matched tick3 on timer:tick3
+tick 145: action_started tick3 0 logic::SetBlackboard
+tick 145: event_received timer:slow
+tick 145: rule_matched slow on timer:slow (cooldown 7)
+tick 146: action_started ping 1 logic::EmitEvent
+tick 146: event_received changed:hp
+tick 146: rule_rejected hp on changed:hp
+tick 146: event_received changed:local/n
+tick 146: rule_matched n_seen on changed:local/n
+tick 147: event_received pong
+tick 147: rule_rejected pong on pong
+tick 148: event_received timer:tick3
+tick 148: rule_matched tick3 on timer:tick3
+tick 148: action_started tick3 0 logic::SetBlackboard
+tick 149: event_received changed:local/n
+tick 149: rule_matched n_seen on changed:local/n
+tick 150: event_received timer:tick3
+tick 150: rule_matched tick3 on timer:tick3
+tick 150: action_started tick3 0 logic::SetBlackboard
+tick 150: event_received timer:slow
+tick 150: rule_matched slow on timer:slow (cooldown 2)
+tick 151: event_received changed:hp
+tick 151: rule_matched hp on changed:hp
+tick 151: action_started hp 0 logic::SetBlackboard
+tick 151: event_received changed:local/n
+tick 151: rule_matched n_seen on changed:local/n
+tick 151: breakpoint rule n_seen
+tick 151: event_received ping
+tick 151: rule_matched ping on ping
+tick 151: action_started ping 0 test::Wait3
+tick 152: event_received changed:hp
+tick 152: rule_matched hp on changed:hp
+tick 152: action_started hp 0 logic::SetBlackboard
+== step 159 (64 lines)
+tick 137: rule_matched ping on ping
+tick 137: action_started ping 0 test::Wait3
+tick 138: event_received timer:tick3
+tick 138: rule_matched tick3 on timer:tick3
+tick 138: action_started tick3 0 logic::SetBlackboard
+tick 139: action_started ping 1 logic::EmitEvent
+tick 139: event_received changed:local/n
+tick 139: rule_matched n_seen on changed:local/n
+tick 140: event_received timer:slow
+tick 140: rule_matched slow on timer:slow
+tick 140: action_started slow 0 logic::EmitEvent
+tick 140: event_received pong
+tick 140: rule_rejected pong on pong
+tick 141: event_received changed:hp
+tick 141: rule_matched hp on changed:hp
+tick 141: action_started hp 0 logic::SetBlackboard
+tick 141: event_received pong
+tick 141: rule_rejected pong on pong
+tick 142: event_received timer:tick3
+tick 142: rule_matched tick3 on timer:tick3
+tick 142: action_started tick3 0 logic::SetBlackboard
+tick 143: event_received changed:local/n
+tick 143: rule_matched n_seen on changed:local/n
+tick 144: event_received ping
+tick 144: rule_matched ping on ping
+tick 144: action_started ping 0 test::Wait3
+tick 145: event_received timer:tick3
+tick 145: rule_matched tick3 on timer:tick3
+tick 145: action_started tick3 0 logic::SetBlackboard
+tick 145: event_received timer:slow
+tick 145: rule_matched slow on timer:slow (cooldown 7)
+tick 146: action_started ping 1 logic::EmitEvent
+tick 146: event_received changed:hp
+tick 146: rule_rejected hp on changed:hp
+tick 146: event_received changed:local/n
+tick 146: rule_matched n_seen on changed:local/n
+tick 147: event_received pong
+tick 147: rule_rejected pong on pong
+tick 148: event_received timer:tick3
+tick 148: rule_matched tick3 on timer:tick3
+tick 148: action_started tick3 0 logic::SetBlackboard
+tick 149: event_received changed:local/n
+tick 149: rule_matched n_seen on changed:local/n
+tick 150: event_received timer:tick3
+tick 150: rule_matched tick3 on timer:tick3
+tick 150: action_started tick3 0 logic::SetBlackboard
+tick 150: event_received timer:slow
+tick 150: rule_matched slow on timer:slow (cooldown 2)
+tick 151: event_received changed:hp
+tick 151: rule_matched hp on changed:hp
+tick 151: action_started hp 0 logic::SetBlackboard
+tick 151: event_received changed:local/n
+tick 151: rule_matched n_seen on changed:local/n
+tick 151: breakpoint rule n_seen
+tick 151: event_received ping
+tick 151: rule_matched ping on ping
+tick 151: action_started ping 0 test::Wait3
+tick 152: event_received changed:hp
+tick 152: rule_matched hp on changed:hp
+tick 152: action_started hp 0 logic::SetBlackboard
+tick 153: action_started ping 1 logic::EmitEvent
+tick 153: event_received ping
+tick 153: rule_matched ping on ping
+tick 153: action_started ping 0 test::Wait3
+== step 165 (64 lines)
+tick 146: action_started ping 1 logic::EmitEvent
+tick 146: event_received changed:hp
+tick 146: rule_rejected hp on changed:hp
+tick 146: event_received changed:local/n
+tick 146: rule_matched n_seen on changed:local/n
+tick 147: event_received pong
+tick 147: rule_rejected pong on pong
+tick 148: event_received timer:tick3
+tick 148: rule_matched tick3 on timer:tick3
+tick 148: action_started tick3 0 logic::SetBlackboard
+tick 149: event_received changed:local/n
+tick 149: rule_matched n_seen on changed:local/n
+tick 150: event_received timer:tick3
+tick 150: rule_matched tick3 on timer:tick3
+tick 150: action_started tick3 0 logic::SetBlackboard
+tick 150: event_received timer:slow
+tick 150: rule_matched slow on timer:slow (cooldown 2)
+tick 151: event_received changed:hp
+tick 151: rule_matched hp on changed:hp
+tick 151: action_started hp 0 logic::SetBlackboard
+tick 151: event_received changed:local/n
+tick 151: rule_matched n_seen on changed:local/n
+tick 151: breakpoint rule n_seen
+tick 151: event_received ping
+tick 151: rule_matched ping on ping
+tick 151: action_started ping 0 test::Wait3
+tick 152: event_received changed:hp
+tick 152: rule_matched hp on changed:hp
+tick 152: action_started hp 0 logic::SetBlackboard
+tick 153: action_started ping 1 logic::EmitEvent
+tick 153: event_received ping
+tick 153: rule_matched ping on ping
+tick 153: action_started ping 0 test::Wait3
+tick 154: event_received changed:hp
+tick 154: rule_matched hp on changed:hp
+tick 154: action_started hp 0 logic::SetBlackboard
+tick 154: event_received pong
+tick 154: rule_rejected pong on pong
+tick 155: action_started ping 1 logic::EmitEvent
+tick 155: event_received timer:tick3
+tick 155: rule_matched tick3 on timer:tick3
+tick 155: action_started tick3 0 logic::SetBlackboard
+tick 155: event_received timer:slow
+tick 155: rule_matched slow on timer:slow
+tick 155: action_started slow 0 logic::EmitEvent
+tick 156: event_received timer:tick3
+tick 156: rule_matched tick3 on timer:tick3
+tick 156: action_started tick3 0 logic::SetBlackboard
+tick 156: event_received changed:local/n
+tick 156: rule_matched n_seen on changed:local/n
+tick 156: event_received pong
+tick 156: rule_rejected pong on pong
+tick 156: event_received pong
+tick 156: rule_rejected pong on pong
+tick 157: event_received changed:local/n
+tick 157: rule_matched n_seen on changed:local/n
+tick 158: event_received ping
+tick 158: rule_matched ping on ping
+tick 158: action_started ping 0 test::Wait3
+tick 159: event_received timer:tick3
+tick 159: rule_matched tick3 on timer:tick3
+tick 159: action_started tick3 0 logic::SetBlackboard
+tick 159: event_received changed:hp
+tick 159: rule_rejected hp on changed:hp
+== step 171 (64 lines)
+tick 151: event_received changed:local/n
+tick 151: rule_matched n_seen on changed:local/n
+tick 151: breakpoint rule n_seen
+tick 151: event_received ping
+tick 151: rule_matched ping on ping
+tick 151: action_started ping 0 test::Wait3
+tick 152: event_received changed:hp
+tick 152: rule_matched hp on changed:hp
+tick 152: action_started hp 0 logic::SetBlackboard
+tick 153: action_started ping 1 logic::EmitEvent
+tick 153: event_received ping
+tick 153: rule_matched ping on ping
+tick 153: action_started ping 0 test::Wait3
+tick 154: event_received changed:hp
+tick 154: rule_matched hp on changed:hp
+tick 154: action_started hp 0 logic::SetBlackboard
+tick 154: event_received pong
+tick 154: rule_rejected pong on pong
+tick 155: action_started ping 1 logic::EmitEvent
+tick 155: event_received timer:tick3
+tick 155: rule_matched tick3 on timer:tick3
+tick 155: action_started tick3 0 logic::SetBlackboard
+tick 155: event_received timer:slow
+tick 155: rule_matched slow on timer:slow
+tick 155: action_started slow 0 logic::EmitEvent
+tick 156: event_received timer:tick3
+tick 156: rule_matched tick3 on timer:tick3
+tick 156: action_started tick3 0 logic::SetBlackboard
+tick 156: event_received changed:local/n
+tick 156: rule_matched n_seen on changed:local/n
+tick 156: event_received pong
+tick 156: rule_rejected pong on pong
+tick 156: event_received pong
+tick 156: rule_rejected pong on pong
+tick 157: event_received changed:local/n
+tick 157: rule_matched n_seen on changed:local/n
+tick 158: event_received ping
+tick 158: rule_matched ping on ping
+tick 158: action_started ping 0 test::Wait3
+tick 159: event_received timer:tick3
+tick 159: rule_matched tick3 on timer:tick3
+tick 159: action_started tick3 0 logic::SetBlackboard
+tick 159: event_received changed:hp
+tick 159: rule_rejected hp on changed:hp
+tick 160: action_started ping 1 logic::EmitEvent
+tick 160: event_received timer:slow
+tick 160: rule_matched slow on timer:slow (cooldown 7)
+tick 160: event_received changed:local/n
+tick 160: rule_matched n_seen on changed:local/n
+tick 161: event_received pong
+tick 161: rule_rejected pong on pong
+tick 163: event_received timer:tick3
+tick 163: rule_matched tick3 on timer:tick3
+tick 163: action_started tick3 0 logic::SetBlackboard
+tick 164: event_received changed:hp
+tick 164: rule_matched hp on changed:hp
+tick 164: action_started hp 0 logic::SetBlackboard
+tick 164: event_received changed:local/n
+tick 164: rule_matched n_seen on changed:local/n
+tick 164: breakpoint event boom
+tick 164: event_received boom
+tick 164: rule_matched boom on boom
+tick 164: action_started boom 0 test::Fail
+tick 164: action_failed boom 0 test::Fail: failure
+== step 199 (64 lines)
+tick 175: event_received timer:slow
+tick 175: rule_matched slow on timer:slow (cooldown 7)
+tick 175: event_received changed:local/n
+tick 175: rule_matched n_seen on changed:local/n
+tick 178: event_received changed:hp
+tick 178: rule_rejected hp on changed:hp
+tick 178: event_received ping
+tick 178: rule_matched ping on ping
+tick 178: action_started ping 0 test::Wait3
+tick 179: event_received timer:tick3
+tick 179: rule_matched tick3 on timer:tick3
+tick 179: action_started tick3 0 logic::SetBlackboard
+tick 180: action_started ping 1 logic::EmitEvent
+tick 180: event_received timer:slow
+tick 180: rule_matched slow on timer:slow (cooldown 2)
+tick 180: event_received changed:local/n
+tick 180: rule_matched n_seen on changed:local/n
+tick 181: event_received timer:tick3
+tick 181: rule_matched tick3 on timer:tick3
+tick 181: action_started tick3 0 logic::SetBlackboard
+tick 181: event_received pong
+tick 181: rule_rejected pong on pong
+tick 182: event_received changed:local/n
+tick 182: rule_matched n_seen on changed:local/n
+tick 183: event_received timer:tick3
+tick 183: rule_matched tick3 on timer:tick3
+tick 183: action_started tick3 0 logic::SetBlackboard
+tick 183: event_received changed:hp
+tick 183: rule_matched hp on changed:hp
+tick 183: action_started hp 0 logic::SetBlackboard
+tick 184: event_received changed:local/n
+tick 184: rule_matched n_seen on changed:local/n
+tick 185: event_received timer:slow
+tick 185: rule_matched slow on timer:slow
+tick 185: action_started slow 0 logic::EmitEvent
+tick 185: event_received ping
+tick 185: rule_matched ping on ping
+tick 185: action_started ping 0 test::Wait3
+tick 186: event_received pong
+tick 186: rule_rejected pong on pong
+tick 187: action_started ping 1 logic::EmitEvent
+tick 188: event_received timer:tick3
+tick 188: rule_matched tick3 on timer:tick3
+tick 188: action_started tick3 0 logic::SetBlackboard
+tick 188: event_received changed:hp
+tick 188: rule_matched hp on changed:hp
+tick 188: action_started hp 0 logic::SetBlackboard
+tick 188: event_received pong
+tick 188: rule_rejected pong on pong
+tick 189: event_received timer:tick3
+tick 189: rule_matched tick3 on timer:tick3
+tick 189: action_started tick3 0 logic::SetBlackboard
+tick 189: event_received changed:local/n
+tick 189: rule_matched n_seen on changed:local/n
+tick 190: event_received timer:slow
+tick 190: rule_matched slow on timer:slow (cooldown 7)
+tick 190: event_received changed:local/n
+tick 190: rule_matched n_seen on changed:local/n
+tick 192: event_received timer:tick3
+tick 192: rule_matched tick3 on timer:tick3
+tick 192: action_started tick3 0 logic::SetBlackboard
+tick 192: event_received ping
+tick 192: rule_matched ping on ping
+tick 192: action_started ping 0 test::Wait3
+== step 200 (64 lines)
+tick 178: rule_rejected hp on changed:hp
+tick 178: event_received ping
+tick 178: rule_matched ping on ping
+tick 178: action_started ping 0 test::Wait3
+tick 179: event_received timer:tick3
+tick 179: rule_matched tick3 on timer:tick3
+tick 179: action_started tick3 0 logic::SetBlackboard
+tick 180: action_started ping 1 logic::EmitEvent
+tick 180: event_received timer:slow
+tick 180: rule_matched slow on timer:slow (cooldown 2)
+tick 180: event_received changed:local/n
+tick 180: rule_matched n_seen on changed:local/n
+tick 181: event_received timer:tick3
+tick 181: rule_matched tick3 on timer:tick3
+tick 181: action_started tick3 0 logic::SetBlackboard
+tick 181: event_received pong
+tick 181: rule_rejected pong on pong
+tick 182: event_received changed:local/n
+tick 182: rule_matched n_seen on changed:local/n
+tick 183: event_received timer:tick3
+tick 183: rule_matched tick3 on timer:tick3
+tick 183: action_started tick3 0 logic::SetBlackboard
+tick 183: event_received changed:hp
+tick 183: rule_matched hp on changed:hp
+tick 183: action_started hp 0 logic::SetBlackboard
+tick 184: event_received changed:local/n
+tick 184: rule_matched n_seen on changed:local/n
+tick 185: event_received timer:slow
+tick 185: rule_matched slow on timer:slow
+tick 185: action_started slow 0 logic::EmitEvent
+tick 185: event_received ping
+tick 185: rule_matched ping on ping
+tick 185: action_started ping 0 test::Wait3
+tick 186: event_received pong
+tick 186: rule_rejected pong on pong
+tick 187: action_started ping 1 logic::EmitEvent
+tick 188: event_received timer:tick3
+tick 188: rule_matched tick3 on timer:tick3
+tick 188: action_started tick3 0 logic::SetBlackboard
+tick 188: event_received changed:hp
+tick 188: rule_matched hp on changed:hp
+tick 188: action_started hp 0 logic::SetBlackboard
+tick 188: event_received pong
+tick 188: rule_rejected pong on pong
+tick 189: event_received timer:tick3
+tick 189: rule_matched tick3 on timer:tick3
+tick 189: action_started tick3 0 logic::SetBlackboard
+tick 189: event_received changed:local/n
+tick 189: rule_matched n_seen on changed:local/n
+tick 190: event_received timer:slow
+tick 190: rule_matched slow on timer:slow (cooldown 7)
+tick 190: event_received changed:local/n
+tick 190: rule_matched n_seen on changed:local/n
+tick 192: event_received timer:tick3
+tick 192: rule_matched tick3 on timer:tick3
+tick 192: action_started tick3 0 logic::SetBlackboard
+tick 192: event_received ping
+tick 192: rule_matched ping on ping
+tick 192: action_started ping 0 test::Wait3
+tick 192: reload_kept
+tick 193: event_received changed:hp
+tick 193: rule_rejected hp on changed:hp
+tick 193: event_received changed:local/n
+tick 193: rule_matched n_seen on changed:local/n
+== step 201 (64 lines)
+tick 178: event_received ping
+tick 178: rule_matched ping on ping
+tick 178: action_started ping 0 test::Wait3
+tick 179: event_received timer:tick3
+tick 179: rule_matched tick3 on timer:tick3
+tick 179: action_started tick3 0 logic::SetBlackboard
+tick 180: action_started ping 1 logic::EmitEvent
+tick 180: event_received timer:slow
+tick 180: rule_matched slow on timer:slow (cooldown 2)
+tick 180: event_received changed:local/n
+tick 180: rule_matched n_seen on changed:local/n
+tick 181: event_received timer:tick3
+tick 181: rule_matched tick3 on timer:tick3
+tick 181: action_started tick3 0 logic::SetBlackboard
+tick 181: event_received pong
+tick 181: rule_rejected pong on pong
+tick 182: event_received changed:local/n
+tick 182: rule_matched n_seen on changed:local/n
+tick 183: event_received timer:tick3
+tick 183: rule_matched tick3 on timer:tick3
+tick 183: action_started tick3 0 logic::SetBlackboard
+tick 183: event_received changed:hp
+tick 183: rule_matched hp on changed:hp
+tick 183: action_started hp 0 logic::SetBlackboard
+tick 184: event_received changed:local/n
+tick 184: rule_matched n_seen on changed:local/n
+tick 185: event_received timer:slow
+tick 185: rule_matched slow on timer:slow
+tick 185: action_started slow 0 logic::EmitEvent
+tick 185: event_received ping
+tick 185: rule_matched ping on ping
+tick 185: action_started ping 0 test::Wait3
+tick 186: event_received pong
+tick 186: rule_rejected pong on pong
+tick 187: action_started ping 1 logic::EmitEvent
+tick 188: event_received timer:tick3
+tick 188: rule_matched tick3 on timer:tick3
+tick 188: action_started tick3 0 logic::SetBlackboard
+tick 188: event_received changed:hp
+tick 188: rule_matched hp on changed:hp
+tick 188: action_started hp 0 logic::SetBlackboard
+tick 188: event_received pong
+tick 188: rule_rejected pong on pong
+tick 189: event_received timer:tick3
+tick 189: rule_matched tick3 on timer:tick3
+tick 189: action_started tick3 0 logic::SetBlackboard
+tick 189: event_received changed:local/n
+tick 189: rule_matched n_seen on changed:local/n
+tick 190: event_received timer:slow
+tick 190: rule_matched slow on timer:slow (cooldown 7)
+tick 190: event_received changed:local/n
+tick 190: rule_matched n_seen on changed:local/n
+tick 192: event_received timer:tick3
+tick 192: rule_matched tick3 on timer:tick3
+tick 192: action_started tick3 0 logic::SetBlackboard
+tick 192: event_received ping
+tick 192: rule_matched ping on ping
+tick 192: action_started ping 0 test::Wait3
+tick 192: reload_kept
+tick 193: event_received changed:hp
+tick 193: rule_rejected hp on changed:hp
+tick 193: event_received changed:local/n
+tick 193: rule_matched n_seen on changed:local/n
+tick 194: action_started ping 1 logic::EmitEvent
+== step 250 (64 lines)
+tick 226: rule_matched n_seen on changed:local/n
+tick 227: event_received ping
+tick 227: rule_matched ping on ping
+tick 227: action_started ping 0 test::Wait3
+tick 228: event_received timer:tick3b
+tick 228: rule_matched tick3b on timer:tick3b
+tick 228: action_started tick3b 0 logic::SetBlackboard
+tick 228: event_received changed:hp
+tick 228: rule_rejected hp on changed:hp
+tick 229: action_started ping 1 logic::EmitEvent
+tick 229: event_received changed:local/n
+tick 229: rule_matched n_seen on changed:local/n
+tick 230: event_received timer:slow
+tick 230: rule_matched slow on timer:slow
+tick 230: action_started slow 0 logic::EmitEvent
+tick 230: event_received pong
+tick 230: rule_rejected pong on pong
+tick 231: event_received pong
+tick 231: rule_rejected pong on pong
+tick 232: event_received timer:tick3b
+tick 232: rule_matched tick3b on timer:tick3b
+tick 232: action_started tick3b 0 logic::SetBlackboard
+tick 233: event_received changed:hp
+tick 233: rule_rejected hp on changed:hp
+tick 233: event_received changed:local/n
+tick 233: rule_matched n_seen on changed:local/n
+tick 234: event_received ping
+tick 234: rule_matched ping on ping
+tick 234: action_started ping 0 test::Wait3
+tick 235: event_received timer:tick3b
+tick 235: rule_matched tick3b on timer:tick3b
+tick 235: action_started tick3b 0 logic::SetBlackboard
+tick 235: event_received timer:slow
+tick 235: rule_matched slow on timer:slow (cooldown 7)
+tick 236: action_started ping 1 logic::EmitEvent
+tick 236: event_received changed:local/n
+tick 236: rule_matched n_seen on changed:local/n
+tick 237: event_received timer:tick3b
+tick 237: rule_matched tick3b on timer:tick3b
+tick 237: action_started tick3b 0 logic::SetBlackboard
+tick 237: event_received pong
+tick 237: rule_rejected pong on pong
+tick 238: event_received changed:hp
+tick 238: rule_matched hp on changed:hp
+tick 238: action_started hp 0 logic::SetBlackboard
+tick 238: event_received changed:local/n
+tick 238: rule_matched n_seen on changed:local/n
+tick 240: event_received timer:slow
+tick 240: rule_matched slow on timer:slow (cooldown 2)
+tick 241: event_received timer:tick3b
+tick 241: rule_matched tick3b on timer:tick3b
+tick 241: action_started tick3b 0 logic::SetBlackboard
+tick 241: event_received ping
+tick 241: rule_matched ping on ping
+tick 241: action_started ping 0 test::Wait3
+tick 242: event_received changed:local/n
+tick 242: rule_matched n_seen on changed:local/n
+tick 0: reload_restarted
+tick 1: event_received start
+tick 1: rule_matched boot on start
+tick 1: action_started boot 0 logic::SetBlackboard
+tick 1: action_started boot 1 logic::SetBlackboard
+tick 1: rule_matched boot2 on start
+tick 1: action_started boot2 0 test::Wait3
+== step 251 (64 lines)
+tick 228: rule_matched tick3b on timer:tick3b
+tick 228: action_started tick3b 0 logic::SetBlackboard
+tick 228: event_received changed:hp
+tick 228: rule_rejected hp on changed:hp
+tick 229: action_started ping 1 logic::EmitEvent
+tick 229: event_received changed:local/n
+tick 229: rule_matched n_seen on changed:local/n
+tick 230: event_received timer:slow
+tick 230: rule_matched slow on timer:slow
+tick 230: action_started slow 0 logic::EmitEvent
+tick 230: event_received pong
+tick 230: rule_rejected pong on pong
+tick 231: event_received pong
+tick 231: rule_rejected pong on pong
+tick 232: event_received timer:tick3b
+tick 232: rule_matched tick3b on timer:tick3b
+tick 232: action_started tick3b 0 logic::SetBlackboard
+tick 233: event_received changed:hp
+tick 233: rule_rejected hp on changed:hp
+tick 233: event_received changed:local/n
+tick 233: rule_matched n_seen on changed:local/n
+tick 234: event_received ping
+tick 234: rule_matched ping on ping
+tick 234: action_started ping 0 test::Wait3
+tick 235: event_received timer:tick3b
+tick 235: rule_matched tick3b on timer:tick3b
+tick 235: action_started tick3b 0 logic::SetBlackboard
+tick 235: event_received timer:slow
+tick 235: rule_matched slow on timer:slow (cooldown 7)
+tick 236: action_started ping 1 logic::EmitEvent
+tick 236: event_received changed:local/n
+tick 236: rule_matched n_seen on changed:local/n
+tick 237: event_received timer:tick3b
+tick 237: rule_matched tick3b on timer:tick3b
+tick 237: action_started tick3b 0 logic::SetBlackboard
+tick 237: event_received pong
+tick 237: rule_rejected pong on pong
+tick 238: event_received changed:hp
+tick 238: rule_matched hp on changed:hp
+tick 238: action_started hp 0 logic::SetBlackboard
+tick 238: event_received changed:local/n
+tick 238: rule_matched n_seen on changed:local/n
+tick 240: event_received timer:slow
+tick 240: rule_matched slow on timer:slow (cooldown 2)
+tick 241: event_received timer:tick3b
+tick 241: rule_matched tick3b on timer:tick3b
+tick 241: action_started tick3b 0 logic::SetBlackboard
+tick 241: event_received ping
+tick 241: rule_matched ping on ping
+tick 241: action_started ping 0 test::Wait3
+tick 242: event_received changed:local/n
+tick 242: rule_matched n_seen on changed:local/n
+tick 0: reload_restarted
+tick 1: event_received start
+tick 1: rule_matched boot on start
+tick 1: action_started boot 0 logic::SetBlackboard
+tick 1: action_started boot 1 logic::SetBlackboard
+tick 1: rule_matched boot2 on start
+tick 1: action_started boot2 0 test::Wait3
+tick 2: event_received changed:hp
+tick 2: rule_matched hp on changed:hp
+tick 2: action_started hp 0 logic::SetBlackboard
+tick 2: event_received changed:world/w/count
+tick 2: rule_matched w_seen on changed:world/w/count
+== step 299 (64 lines)
+tick 33: action_started tick3b 0 logic::SetBlackboard
+tick 34: event_received changed:local/n
+tick 34: rule_matched n_seen on changed:local/n
+tick 34: event_received ping
+tick 34: rule_matched ping on ping
+tick 34: action_started ping 0 test::Wait3
+tick 35: event_received timer:slow
+tick 35: rule_matched slow on timer:slow
+tick 35: action_started slow 0 logic::EmitEvent
+tick 36: action_started ping 1 logic::EmitEvent
+tick 36: event_received timer:tick3b
+tick 36: rule_matched tick3b on timer:tick3b
+tick 36: action_started tick3b 0 logic::SetBlackboard
+tick 36: event_received changed:hp
+tick 36: rule_matched hp on changed:hp
+tick 36: action_started hp 0 logic::SetBlackboard
+tick 36: event_received pong
+tick 36: rule_rejected pong on pong
+tick 37: event_received changed:local/n
+tick 37: rule_matched n_seen on changed:local/n
+tick 37: event_received pong
+tick 37: rule_rejected pong on pong
+tick 40: event_received timer:slow
+tick 40: rule_matched slow on timer:slow (cooldown 7)
+tick 41: event_received timer:tick3b
+tick 41: rule_matched tick3b on timer:tick3b
+tick 41: action_started tick3b 0 logic::SetBlackboard
+tick 41: event_received changed:hp
+tick 41: rule_rejected hp on changed:hp
+tick 41: event_received ping
+tick 41: rule_matched ping on ping
+tick 41: action_started ping 0 test::Wait3
+tick 42: event_received timer:tick3b
+tick 42: rule_matched tick3b on timer:tick3b
+tick 42: action_started tick3b 0 logic::SetBlackboard
+tick 42: event_received changed:local/n
+tick 42: rule_matched n_seen on changed:local/n
+tick 43: action_started ping 1 logic::EmitEvent
+tick 43: event_received changed:local/n
+tick 43: rule_matched n_seen on changed:local/n
+tick 44: event_received pong
+tick 44: rule_rejected pong on pong
+tick 45: event_received timer:tick3b
+tick 45: rule_matched tick3b on timer:tick3b
+tick 45: action_started tick3b 0 logic::SetBlackboard
+tick 45: event_received timer:slow
+tick 45: rule_matched slow on timer:slow (cooldown 2)
+tick 46: event_received changed:hp
+tick 46: rule_matched hp on changed:hp
+tick 46: action_started hp 0 logic::SetBlackboard
+tick 46: event_received changed:local/n
+tick 46: rule_matched n_seen on changed:local/n
+tick 48: event_received timer:tick3b
+tick 48: rule_matched tick3b on timer:tick3b
+tick 48: action_started tick3b 0 logic::SetBlackboard
+tick 48: event_received ping
+tick 48: rule_matched ping on ping
+tick 48: action_started ping 0 test::Wait3
+tick 49: event_received changed:local/n
+tick 49: rule_matched n_seen on changed:local/n
+tick 50: action_started ping 1 logic::EmitEvent
+tick 50: event_received timer:slow
+tick 50: rule_matched slow on timer:slow
+tick 50: action_started slow 0 logic::EmitEvent

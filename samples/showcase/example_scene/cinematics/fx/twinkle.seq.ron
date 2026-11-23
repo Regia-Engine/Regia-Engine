@@ -1,0 +1,19 @@
+// A twinkle (`.seq.ron` v2): the `lamp` target's color flickers warm to white and back. Played by
+// `cinematics/fx/sparkle.seq.ron`, two levels under the showcase intro.
+(
+    version: 2,
+    name: "twinkle",
+    fps: 30.0,
+    tracks: [
+        (
+            name: "tint",
+            target: "lamp",
+            property: "light.color",
+            keys: Vec3([
+                (time: 0.0, value: (1.0, 0.8, 0.5), ease: Smooth),
+                (time: 0.6, value: (1.0, 1.0, 1.0), ease: Bezier, tangent: Auto),
+                (time: 1.4, value: (1.0, 0.8, 0.5)),
+            ]),
+        ),
+    ],
+)

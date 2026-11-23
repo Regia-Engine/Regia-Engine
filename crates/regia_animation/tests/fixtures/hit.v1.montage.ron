@@ -1,0 +1,13 @@
+// A hand-written format_version 1 montage (audit-v035-formats 16): the shape v1 files on disk
+// have. Do not edit it to match a newer format; add a new fixture instead.
+(
+    format_version: 1,
+    name: "hit",
+    rate: 1.25,
+    tracks: [
+        (slot: "upper", segments: [(clip: "hit_a"), (clip: "hit_b", loops: 2)]),
+    ],
+    sections: [(name: "start", start: 0.0), (name: "recover", start: 0.4)],
+    auto_blend_out: false,
+    root_motion: false,
+)

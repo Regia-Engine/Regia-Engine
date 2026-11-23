@@ -1,0 +1,29 @@
+[package]
+name = "ui_gallery"
+description = "M7 sample: runtime UI widget gallery, themes, RTL/CJK, virtualised list, focus navigation."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia = { workspace = true }
+regia_ui = { workspace = true }
+regia_render = { workspace = true }
+# World positions of the minimap's blips.
+regia_scene = { workspace = true }
+
+[dev-dependencies]
+regia_test_utils = { workspace = true }
+# The audit test compiles the first-person template's controls screen, which uses it (ADR-3025).
+regia_input = { workspace = true }
+image = { workspace = true }
+wgpu = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+crossbeam-channel = { workspace = true }
+serde_json = { workspace = true }

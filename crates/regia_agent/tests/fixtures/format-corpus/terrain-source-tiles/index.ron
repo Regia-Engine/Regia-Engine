@@ -1,0 +1,11 @@
+(
+    format: "terrain-source-tiles",
+    entries: [
+        (
+            version: 1,
+            file: "v1.json",
+            origin: "hand-copied from docs/formats/terrain-source-tiles.example.json (the schema example; equal to the fuzz-target registry fixture terrain.source_tiles), lane v06-terrain-import-chain, ADR-8639",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+    ],
+)

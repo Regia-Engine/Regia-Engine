@@ -1,0 +1,40 @@
+[package]
+name = "regia_audio"
+description = "kira integration: buses, spatial audio, streaming, effects."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia_core = { workspace = true }
+regia_ecs = { workspace = true }
+regia_app = { workspace = true }
+regia_asset = { workspace = true }
+regia_scene = { workspace = true }
+regia_platform = { workspace = true }
+regia_input = { workspace = true }
+kira = { workspace = true }
+# The bounded whole-file decoder (ADR-4922): the same symphonia kira decodes with.
+symphonia = { workspace = true }
+rustfft = { workspace = true }
+cpal = { workspace = true }
+serde = { workspace = true }
+ron = { workspace = true }
+thiserror = { workspace = true }
+crossbeam-channel = { workspace = true }
+tracing = { workspace = true }
+# Sound over cooked world geometry (W-25, ADR-8416): the portal graph, the segment test and the section
+# reverb presets of a loaded `<map>.meshlayers` (`stage_b` is the native query API).
+regia_world_geom = { workspace = true, features = ["stage_b"] }
+
+[dev-dependencies]
+# The portal-sound acceptance tests cook DO27's Switchbacks layout fixture.
+regia_world_geom = { workspace = true, features = ["stage_b", "fixtures"] }
+# The hot-reload test drives the dev source watcher.
+regia_asset = { workspace = true, features = ["dev-assets"] }
+regia_test_utils = { workspace = true }

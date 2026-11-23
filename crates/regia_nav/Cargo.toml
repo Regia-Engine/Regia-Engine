@@ -1,0 +1,40 @@
+[package]
+name = "regia_nav"
+description = "Navigation: Recast-style navmesh generation, A* + string-pulling pathfinding, dynamic obstacles and ORCA crowd avoidance."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+# The layered bake of a world-geometry map and its blocker and ground-edit feed (`layered::geom`, plan row
+# W-20, ADR-8486): needs regia_world_geom's native query (additive; Stage A bits unchanged).
+stage_b = ["regia_world_geom/stage_b"]
+
+[dependencies]
+regia_core = { workspace = true }
+# The layered bake (`layered`, `layered::geom`) and the integration tests use the lockstep kit's `det_*` extrema and
+# golden harness (ADR-8012 A-4, ADR-8049).
+regia_detsim = { workspace = true }
+# The deterministic navigation, re-exported as `regia_nav::det` (ADR-8877; it was this crate's `det` module).
+regia_nav_det = { workspace = true }
+# The layered bake of a world-geometry map (`layered`, `layered::geom`) reads the world-geometry layer (ADR-8486).
+regia_world_geom = { workspace = true }
+regia_ecs = { workspace = true }
+regia_app = { workspace = true }
+regia_scene = { workspace = true }
+serde = { workspace = true }
+ron = { workspace = true }
+tracing = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+regia_test_utils = { workspace = true }
+# The four-deck collision fixture (plan row W-01), the tunnel-nav proofs and the bake's doc example
+# (plan row W-04) arm the compat layer's fixture layouts. Test data only; this crate does not depend on
+# world geometry at runtime.
+regia_world_geom = { workspace = true, features = ["fixtures"] }

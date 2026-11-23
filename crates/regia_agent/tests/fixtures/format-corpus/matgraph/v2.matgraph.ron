@@ -1,0 +1,44 @@
+// Handwritten from 56252c2eb (the commit that introduced matgraph v2): a v2 graph that uses what v2 added
+// over v1: static switches, a material function (inline) with a Call node, TexCoord1, ObjectPosition,
+// Sin, Frac, a Switch node, the world_position_offset output and shading.max_vertex_offset.
+(
+    format_version: 2,
+    name: "sway_panel",
+    switches: [(name: "sway", default: true)],
+    functions: {
+        "wobble": Inline((
+            format_version: 1,
+            name: "wobble",
+            inputs: [(name: "phase", ty: Float)],
+            nodes: {
+                "p": Input("phase"),
+                "s": Sin("p"),
+                "k": Float(0.05),
+                "out": Mul("s", "k"),
+            },
+            outputs: { "value": "out" },
+        )),
+    },
+    nodes: {
+        "uv1": TexCoord1,
+        "u": Swizzle(input: "uv1", channels: "x"),
+        "op": ObjectPosition,
+        "opx": Swizzle(input: "op", channels: "x"),
+        "phase": Add("u", "opx"),
+        "w": Call(function: "wobble", args: { "phase": "phase" }, output: Some("value")),
+        "wz": Float(0.0),
+        "wxy": Append("w", "wz"),
+        "wxyz": Append("wxy", "w"),
+        "still": Vec3((0.0, 0.0, 0.0)),
+        "offset": Switch(switch: "sway", on: "wxyz", off: "still"),
+        "f": Frac("u"),
+        "tint": Vec3((0.3, 0.5, 0.35)),
+        "rough": Float(0.7),
+    },
+    output: (
+        base_color: Some("tint"),
+        roughness: Some("rough"),
+        world_position_offset: Some("offset"),
+    ),
+    shading: (max_vertex_offset: 0.1),
+)

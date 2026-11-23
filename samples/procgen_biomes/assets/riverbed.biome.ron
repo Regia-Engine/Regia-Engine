@@ -1,0 +1,24 @@
+BiomeDef(
+    format_version: 1,
+    name: "Riverbed",
+    color: (0.55, 0.5, 0.42),
+    priority: 30,
+    layers: [
+        (
+            name: "stones",
+            rank: 40,
+            source: Ground(spacing_m: 2.5, jitter: 0.95),
+            entries: [
+                (
+                    name: "stone",
+                    spawn: Mesh("rocks/stone"),
+                    weight: 1.0,
+                    filters: [WaterDistance(min_m: -30.0, max_m: 18.0, feather: 6.0)],
+                    footprint: (core_m: Some(0.3), spread_m: Some(0.6)),
+                    placement: (upright: 0.2, scale: Range(0.5, 1.4), yaw: Random),
+                    render: (cast_shadows: true, draw_distance_m: 500.0, fade_m: 50.0, collision: None),
+                ),
+            ],
+        ),
+    ],
+)

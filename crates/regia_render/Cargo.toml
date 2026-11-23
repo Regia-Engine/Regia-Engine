@@ -1,0 +1,98 @@
+[package]
+name = "regia_render"
+description = "wgpu renderer: render graph, materials, lighting, shadows, post-processing."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia_core = { workspace = true }
+# DLSS Super Resolution through NGX (ADR-2002), only with the `dlss` feature.
+regia_dlss = { workspace = true, optional = true }
+regia_xess = { workspace = true, optional = true }
+regia_ecs = { workspace = true }
+regia_app = { workspace = true }
+regia_platform = { workspace = true }
+regia_asset = { workspace = true }
+regia_scene = { workspace = true }
+wgpu = { workspace = true, features = ["naga-ir"] }
+naga_oil = { workspace = true }
+naga = { workspace = true, features = ["hlsl-out", "msl-out", "spv-out", "wgsl-in", "wgsl-out"] }
+bevy_mikktspace = { workspace = true }
+bytemuck = { workspace = true }
+blake3 = { workspace = true }
+ktx2 = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+log = { workspace = true }
+png = { workspace = true }
+libm = { workspace = true }
+# The GPU tier table (`quality/gpu_tiers.ron`).
+serde = { workspace = true }
+# `gpu_breadcrumbs.json` (spec 54): the report is sized against its 64 KiB cap.
+serde_json = { workspace = true }
+ron = { workspace = true }
+
+[target.'cfg(any(target_os = "linux", target_os = "android", target_os = "macos", windows))'.dependencies]
+# The sky worker's thread priority and the exit hook (`platform/linux.rs`, `platform/macos.rs`, `platform/windows.rs`).
+libc = { workspace = true }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+# `MTLDevice.currentAllocatedSize` for `MemoryReport::device_allocated_bytes` (`platform/macos.rs`,
+# ADR-5860). Already in the graph through wgpu-hal's Metal backend, same version and feature.
+objc2-metal = { version = "0.3.2", default-features = false, features = ["std", "MTLDevice"] }
+
+[build-dependencies]
+# `build.rs` hashes every engine shader source for the pipeline-cache key (`src/shader_sources.rs`).
+blake3 = { workspace = true }
+
+[features]
+# Dev runs and the editor watch the engine's WGSL in this build's source checkout
+# (`shader_reload::engine_shader_dir`). Off in shipped games: the path is a build-machine path and
+# must not be embedded in a packaged binary (`regia package` checks the strings).
+dev-assets = ["regia_asset/dev-assets"]
+# Windows DX12: compile shaders with the statically linked DXC (Shader Model 6, no dxcompiler.dll to
+# ship) instead of FXC. wgpu builds mach-dxcompiler (a large C++ build) for it, and its default
+# `Dx12Compiler::Auto` then prefers the static DXC and falls back to FXC. Windows x86_64 only.
+static-dxc = ["wgpu/static-dxc"]
+# Out-of-memory test hooks (`texture_stream::inject_stream_texture_oom`, `inject_stream_upload_oom`,
+# `gpu_health::release_texture_mip_hold`). Off in shipped games: they allocate a TiB-class texture
+# on purpose. This crate's own tests turn it on through the dev-dependency below.
+test-hooks = []
+# FSR 3 frame generation (ADR-514, ADR-2067): the WGSL optical flow and interpolator passes and the
+# present path. Off by default; with the feature it still stays off until FrameGenSettings::enabled.
+# This crate's own tests turn it on through the dev-dependency below.
+frame-gen = []
+# DLSS Super Resolution through NGX (ADR-2002): the device-creation hook and the `DlssNgx`
+# binding. Links NVIDIA's NGX SDK when DLSS_SDK names an SDK checkout at build time (never
+# committed); without it the binding is the stub and reports `not_bundled`. The DLSS runtime
+# library ships next to the executable or in REGIA_DLSS_PATH. Off by default.
+dlss = ["dep:regia_dlss", "regia_dlss/sdk"]
+# Intel XeSS SR, external Windows SDK; other builds retain a stub (ADR-4656).
+xess = ["dep:regia_xess", "regia_xess/sdk"]
+
+[dev-dependencies]
+regia_test_utils = { workspace = true }
+# The integration tests use the out-of-memory test hooks.
+regia_render = { path = ".", features = ["test-hooks", "frame-gen"] }
+tracing-subscriber = { workspace = true }
+# `tests/frame_pipelining_s0.rs`'s window bench opens its own window (ADR-2798).
+winit = { workspace = true }
+# The shader hot-reload test drives the dev source watcher.
+regia_asset = { workspace = true, features = ["dev-assets"] }
+# `tests/unit_budget.rs` cooks its hulls through the real importer (meshopt LOD chain), BC7/BC5
+# encoder and meshlet cooker. Dev-only: the shipped renderer never links the pipeline.
+regia_asset_pipeline = { workspace = true }
+
+# ADR-3373: in debug builds objc2 checks every Objective-C message's type encoding against the
+# runtime, which allocates on each call the Metal backend makes (about 1500 of the 1873 heap
+# allocations of a steady 500-material frame on the M5), so the allocation-count tests measured
+# objc2 on macOS, not the renderer. Tests only (release builds never run the check); objc2 0.6 is
+# already in the graph through wgpu-hal.
+[target.'cfg(target_os = "macos")'.dev-dependencies]
+objc2 = { version = "0.6.4", features = ["disable-encoding-assertions"] }

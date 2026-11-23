@@ -1,0 +1,17 @@
+(
+    format: "delivery-contract",
+    entries: [
+        (
+            version: 1,
+            file: "v1.ron",
+            origin: "hand-written v1 fixture for the first version of the format",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+        (
+            version: 1,
+            file: "v1-kit.ron",
+            origin: "hand-written v1 fixture that sets every kit field (ADR-8450: kit fields folded into v1 before any tag)",
+            exercises: "the same version 1: joint influences, required nodes, sockets and clips, material and texture caps, footprint and socket clearance are read",
+        ),
+    ],
+)

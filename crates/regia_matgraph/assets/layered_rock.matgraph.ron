@@ -1,0 +1,93 @@
+// A layered desert rock built only from graph nodes (no hand-written counterpart): triplanar
+// sandstone strata under the mesh's baked cavity colour, wind-blown sand settled on the
+// up-facing faces with a height-aware edge (scales stay low: lab textures carry no mip chain), a reoriented (RNM) detail normal on the stone that
+// the sand buries, and a Fresnel rim on the sand. Rendered by tests/parity.rs for a by-eye check.
+(
+    format_version: 1,
+    name: "layered_rock",
+    params: [
+        (name: "rock_tint", value: Color((1.0, 0.9, 0.82))),
+        (name: "strata_scale", value: Float(0.3)),
+        (name: "sand_tint", value: Color((0.62, 0.40, 0.25))),
+        (name: "sand_scale", value: Float(0.7)),
+        (name: "sand_amount", value: Float(1.0)),
+        (name: "sand_rim", value: Float(0.25)),
+        (name: "rock_roughness", value: Float(0.82)),
+        (name: "sand_roughness", value: Float(0.97)),
+        (name: "detail_scale", value: Vec2((2.0, 2.0))),
+    ],
+    textures: [
+        (name: "rock_albedo", path: "textures/rock_albedo.png", color_space: Srgb),
+        (name: "rock_normal", path: "textures/rock_normal.png", color_space: Linear),
+        (name: "rock_height", path: "textures/rock_height.png", color_space: Linear),
+        (name: "sand_albedo", path: "textures/sand_albedo.png", color_space: Srgb),
+        (name: "sand_height", path: "textures/sand_height.png", color_space: Linear),
+    ],
+    nodes: {
+        "zero": Float(0.0),
+        "one": Float(1.0),
+        "flat": Vec3((0.0, 0.0, 1.0)),
+
+        // Stone: triplanar strata × baked cavity × tint.
+        "strata_scale": Param("strata_scale"),
+        "strata": Triplanar(texture: "rock_albedo", scale: "strata_scale", sharpness: 6.0),
+        "strata_rgb": Swizzle(input: "strata", channels: "rgb"),
+        "strata_h4": Triplanar(texture: "rock_height", scale: "strata_scale", sharpness: 6.0),
+        "rock_h": Swizzle(input: "strata_h4", channels: "r"),
+        "vcol": VertexColor,
+        "cavity": Swizzle(input: "vcol", channels: "rgb"),
+        "rock_tint": Param("rock_tint"),
+        "stone_tinted": Mul("strata_rgb", "rock_tint"),
+        "stone": Mul("stone_tinted", "cavity"),
+
+        // Sand: triplanar, settles where the surface faces up.
+        "sand_scale": Param("sand_scale"),
+        "sand": Triplanar(texture: "sand_albedo", scale: "sand_scale", sharpness: 4.0),
+        "sand_rgb": Swizzle(input: "sand", channels: "rgb"),
+        "sand_tint": Param("sand_tint"),
+        "sand_col": Mul("sand_rgb", "sand_tint"),
+        "sand_h4": Triplanar(texture: "sand_height", scale: "sand_scale", sharpness: 4.0),
+        "sand_h": Swizzle(input: "sand_h4", channels: "r"),
+        "normal_ws": WorldNormal,
+        "up": Swizzle(input: "normal_ws", channels: "y"),
+        "settle_lo": Float(0.25),
+        "settle_hi": Float(0.8),
+        "settle": Smoothstep(edge0: "settle_lo", edge1: "settle_hi", x: "up"),
+        "sand_amount": Param("sand_amount"),
+        "sand_t": Mul("settle", "sand_amount"),
+        "sand_mask": HeightBlend(a: "zero", b: "one", height_a: "rock_h", height_b: "sand_h", t: "sand_t", depth: 0.12),
+
+        // Fresnel rim on the sand grains.
+        "five": Float(5.0),
+        "rim": Fresnel(power: "five"),
+        "sand_rim": Param("sand_rim"),
+        "rim_amount": Mul("rim", "sand_rim"),
+        "rim_light": Mul("sand_col", "rim_amount"),
+        "sand_lit": Add("sand_col", "rim_light"),
+        "base": Lerp(a: "stone", b: "sand_lit", t: "sand_mask"),
+
+        "rock_roughness": Param("rock_roughness"),
+        "sand_roughness": Param("sand_roughness"),
+        "roughness": Lerp(a: "rock_roughness", b: "sand_roughness", t: "sand_mask"),
+
+        // Stone normal: the bake's normal at two scales, reoriented onto each other.
+        "uv": TexCoord,
+        "macro_uv_scale": Vec2((0.75, 0.75)),
+        "macro_uv": Mul("uv", "macro_uv_scale"),
+        "macro_n": Sample(texture: "rock_normal", uv: "macro_uv"),
+        "macro_unpacked": UnpackNormal("macro_n"),
+        "detail_scale": Param("detail_scale"),
+        "detail_uv": UvTransform(uv: "uv", scale: (1.0, 1.0), offset: (0.25, 0.5), rotation: 0.6),
+        "detail_uv_scaled": Mul("detail_uv", "detail_scale"),
+        "detail_n": Sample(texture: "rock_normal", uv: "detail_uv_scaled"),
+        "detail_unpacked": UnpackNormal("detail_n"),
+        "stone_normal": BlendNormals(base: "macro_unpacked", detail: "detail_unpacked", mode: Rnm),
+        "normal": Lerp(a: "stone_normal", b: "flat", t: "sand_mask"),
+    },
+    output: (
+        base_color: Some("base"),
+        roughness: Some("roughness"),
+        normal: Some("normal"),
+        normal_space: Tangent,
+    ),
+)

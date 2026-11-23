@@ -1,0 +1,56 @@
+// `.ui.ron` v11, the containers, markup and focus-neighbors fold (ADR-7827, the ADR-7724 fold rule):
+// split, foldable and tabs containers, text `markup`, node `nav` neighbors by name.
+(
+    version: 11,
+    root: (
+        name: "settings",
+        style: (direction: column, gap: (8, 8)),
+        children: [
+            (
+                name: "title",
+                style: (size: (480, 32)),
+                text: (spans: ["<b>Settings</b> for <color=#ff8800>Regia</color>"], markup: true),
+            ),
+            (
+                name: "body",
+                style: (size: (480, 240)),
+                widget: split((axis: horizontal, ratio: 0.3, min_ratio: 0.2, max_ratio: 0.8)),
+                children: [
+                    (
+                        name: "sections",
+                        style: (direction: column),
+                        children: [
+                            (
+                                name: "audio_fold",
+                                widget: foldable((title: "Audio", open: true, group: "sections")),
+                                children: [(name: "volume", style: (size: (120, 24)), widget: slider(0.5, 0, 1, 0))],
+                            ),
+                            (
+                                name: "video_fold",
+                                widget: foldable((title: "Video", group: "sections")),
+                                children: [(name: "vsync", style: (size: (120, 24)), widget: toggle(true))],
+                            ),
+                        ],
+                    ),
+                    (
+                        name: "pages",
+                        widget: tabs((tabs: ["General", "Controls"], active: 1)),
+                        children: [
+                            (name: "general", text: (spans: ["General"])),
+                            (name: "controls", text: (spans: ["Controls"])),
+                        ],
+                    ),
+                ],
+            ),
+            (
+                name: "row",
+                style: (direction: row, gap: (16, 16)),
+                children: [
+                    (name: "apply", style: (size: (96, 32)), widget: button, nav: (right: "reset", down: "quit")),
+                    (name: "reset", style: (size: (96, 32)), widget: button, nav: (left: "apply")),
+                    (name: "quit", style: (size: (96, 32)), widget: button, nav: (up: "apply")),
+                ],
+            ),
+        ],
+    ),
+)

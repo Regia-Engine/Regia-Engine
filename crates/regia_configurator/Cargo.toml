@@ -1,0 +1,29 @@
+[package]
+name = "regia_configurator"
+description = "Product configurator (ADR-2480, ADR-2534, ADR-2535): the runtime that resolves picks against the option graph and writes builds, and the JSON boundary formats Regia owns (part kit, material library, build, product package), a JSON Schema 2020-12 validator and the contract checks. Generic; nothing supplier-specific."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+default = ["validate"]
+# The JSON Schema validator (`schema`), the only part that needs `regex`. A web player builds without it
+# (ADR-2535); `check`, the contract checks and the hashes stay.
+validate = ["dep:regex"]
+# `source::DirSource`: read content from a directory (desktop and Android hosts; never the browser).
+fs = []
+
+[dependencies]
+serde_json = { workspace = true }
+# Typed reading of the option graph, recipe, kit and library (configurator runtime, ADR-2534).
+serde = { workspace = true }
+# The hashes of a product package's files (specs/42 § 8.2); the tests also check the format hashes with it.
+blake3 = { workspace = true }
+# `pattern` keywords of the contract schemas (already in the tree through naga_oil; docs/03 row).
+regex = { workspace = true, optional = true }
+

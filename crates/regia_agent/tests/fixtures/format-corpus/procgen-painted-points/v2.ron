@@ -1,0 +1,16 @@
+{
+    "regia_procgen::painted::PaintedPoints": (
+        points: [
+            (
+                position: (0.0, 0.0, 0.0),
+                normal: (0.0, 0.0, 0.0),
+                layer: 0,
+                yaw: 0.0,
+            ),
+        ],
+        layer_names: [
+            "trees",
+        ],
+        format_version: 2,
+    ),
+}

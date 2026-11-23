@@ -1,0 +1,23 @@
+SceneFile(
+    format_version: 10,
+    entities: [
+        (guid: "00000000-0000-0000-0000-0000000000a1", name: "Room", components: {
+            "regia_scene::transform::Transform": (translation: (0.0, 0.0, 0.0)),
+            "regia_scene::components::GiMobility": Static,
+            "regia_render::runtime::MeshSource": (mesh: "assets/meshes/room.gltf", material: ""),
+        }),
+        (guid: "00000000-0000-0000-0000-0000000000b2", name: "Marker", components: {
+            "regia_scene::transform::Transform": (translation: (24.0, 0.0, 0.0), scale: (0.2, 0.2, 0.2)),
+            "regia_scene::components::GiMobility": Static,
+            "regia_render::runtime::MeshSource": (mesh: "assets/meshes/room.gltf", material: ""),
+        }),
+        (guid: "00000000-0000-0000-0000-0000000000c3", name: "Rover", components: {
+            "regia_scene::transform::Transform": (translation: (12.0, 0.0, 9.0), scale: (0.2, 0.2, 0.2)),
+            "regia_scene::components::GiMobility": Dynamic,
+            "regia_render::runtime::MeshSource": (mesh: "assets/meshes/room.gltf", material: ""),
+        }),
+    ],
+    resources: {
+        "regia_scene::level::LevelSettings": (atmosphere: (preset: Earth, time_of_day: Some((hour: 12.0, day_of_year: 172, latitude_deg: 40.0)))),
+    },
+)

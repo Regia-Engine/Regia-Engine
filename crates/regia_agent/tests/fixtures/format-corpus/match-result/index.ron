@@ -1,0 +1,11 @@
+(
+    format: "match-result",
+    entries: [
+        (
+            version: 1,
+            file: "v1.json",
+            origin: "handwritten from the first version (MatchResult::example)",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+    ],
+)

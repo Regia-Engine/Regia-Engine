@@ -1,0 +1,16 @@
+ProcGraph(
+    format_version: 1,
+    description: "Forest area tool preset: trees scattered inside the Area tool's closed outline (spec 64, spec 67 § 5)",
+    nodes: {
+        1: (ty: "in.self", settings: {}, at: (0.0, 0.0)),
+        2: (ty: "items.by_kind", settings: {kinds: ["Spline"]}, at: (220.0, 0.0)),
+        3: (ty: "sample.spline", settings: {place: "inside", spacing_m: 5.0, jitter: 0.8}, at: (440.0, 0.0)),
+        4: (ty: "spawn.mesh", settings: {entries: [(mesh: "plants/tree_broadleaf", weight: 3.0, draw_distance_m: 400.0, fade_m: 40.0), (mesh: "plants/tree_conifer", weight: 2.0, draw_distance_m: 400.0, fade_m: 40.0)]}, at: (660.0, 0.0)),
+    },
+    edges: [
+        (from: (1, "out"), to: (2, "in")),
+        (from: (2, "inside"), to: (3, "in")),
+        (from: (3, "out"), to: (4, "in")),
+    ],
+    flags: (starter: true, tool: Some("area")),
+)

@@ -1,0 +1,23 @@
+(
+    format: "editor-layout",
+    entries: [
+        (
+            version: 1,
+            file: "v1.ron",
+            origin: "handwritten from 77f2fb79e (the v1 writer: no `floating`; the module docs' example)",
+            exercises: "an older version: the loader and upgrade-project migrate it to v2",
+        ),
+        (
+            version: 2,
+            file: "v2.ron",
+            origin: "handwritten from 7a87c9394 (the v1 fixture plus a floating window, as the v2 writer adds them)",
+            exercises: "an older version: the loader and upgrade-project migrate it to v3",
+        ),
+        (
+            version: 3,
+            file: "v3.ron",
+            origin: "handwritten for ADR-8105 (a) (w13-ui-panel-instances: two Outliners with their own searches and columns, a second Content Browser floating with a folder, a locked second Inspector)",
+            exercises: "the current version: panel instance ids and their saved state must stay readable",
+        ),
+    ],
+)

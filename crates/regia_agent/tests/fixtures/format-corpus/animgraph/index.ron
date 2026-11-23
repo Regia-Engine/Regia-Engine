@@ -1,0 +1,29 @@
+(
+    format: "animgraph",
+    entries: [
+        (
+            version: 1,
+            file: "v1.animgraph.ron",
+            origin: "git 72901b883ee21389d0970b0b51d23a716288e427:docs/formats/locomotion.animgraph.ron",
+            exercises: "baseline: M12 freeze; comments carry the Ferrite brand",
+        ),
+        (
+            version: 2,
+            file: "v2.animgraph.ron",
+            origin: "handwritten from b76cf8b9362ad8451b4784a73b95e892047a516f",
+            exercises: "adds per-transition blend (Inertialize, InertializeSpring) and per-layer weight_inertialize",
+        ),
+        (
+            version: 3,
+            file: "v3.ron",
+            origin: "registry fixture (version 1) loaded and re-encoded by the loader at version 3",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+        (
+            version: 4,
+            file: "v4.animgraph.ron",
+            origin: "handwritten with ADR-8475 (docs/formats/chain_ik.animgraph.ron)",
+            exercises: "adds the ChainIK (FABRIK, pole, per-joint cone and hinge limits) and BodyAim (shares, axis, uniform limit, passes) nodes",
+        ),
+    ],
+)

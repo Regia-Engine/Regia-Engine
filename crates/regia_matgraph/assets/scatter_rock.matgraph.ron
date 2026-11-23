@@ -1,0 +1,33 @@
+// The scatter stand-in rock (`regia_terrain::scatter::rock`) as a graph: the mesh bakes its
+// layers (cavity, mineral mottle, sandstone bedding) into the vertex colour, the material
+// tints them. One graph serves every rock style; each style is an instance that overrides
+// `tint` and `roughness` (crates/regia_matgraph/tests/parity.rs renders Mars style 0).
+(
+    format_version: 1,
+    name: "scatter_rock",
+    params: [
+        (name: "tint", value: Color((0.08, 0.052, 0.034))),
+        (name: "roughness", value: Float(0.95)),
+    ],
+    nodes: {
+        "tint": Param("tint"),
+        "vcol": VertexColor,
+        "layers": Swizzle(input: "vcol", channels: "rgb"),
+        "coverage": Swizzle(input: "vcol", channels: "a"),
+        "base": Mul("tint", "layers"),
+        "roughness": Param("roughness"),
+        "dielectric": Float(0.0),
+    },
+    output: (
+        base_color: Some("base"),
+        alpha: Some("coverage"),
+        metallic: Some("dielectric"),
+        roughness: Some("roughness"),
+    ),
+    // The stand-in rock's `LabMaterial` keeps the lab defaults: no authored specular
+    // occlusion, single-scatter specular.
+    shading: (
+        specular_occlusion: false,
+        multi_scatter: false,
+    ),
+)

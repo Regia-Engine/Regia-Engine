@@ -1,0 +1,22 @@
+// Input script for soaks of `samples/sim_bridge` (`cargo xtask soak --input ...`), exercising
+// the sample's own bindings: WASD drive the "Move" action, cursor drags drive "Look", F1–F3 are
+// the camera-mode hotkeys. The timeline loops until the session ends.
+(
+    loop: true,
+    steps: [
+        // Wander: hold each direction a while.
+        (at: 0.0, action: Hold(key: "KeyW", until: 2.0)),
+        (at: 2.0, action: Hold(key: "KeyA", until: 4.0)),
+        (at: 4.0, action: Hold(key: "KeyS", until: 5.5)),
+        (at: 5.5, action: Hold(key: "KeyD", until: 7.0)),
+        // Look around between the holds: 30 Hz cursor drags.
+        (at: 1.0, action: Look(from: (400.0, 300.0), delta: (200.0, -80.0), for_secs: 2.0)),
+        (at: 4.0, action: Look(from: (600.0, 300.0), delta: (-300.0, 100.0), for_secs: 2.5)),
+        // Camera mode hotkeys (third person → overhead → free → back).
+        (at: 6.0, action: Press(key: "F2")),
+        (at: 7.0, action: Press(key: "F3")),
+        (at: 7.5, action: Press(key: "F1")),
+        // A wheel tick and a tap of the movement keys to close the loop.
+        (at: 7.8, action: Raw([(type: "wheel", dy: -1.0)])),
+    ],
+)

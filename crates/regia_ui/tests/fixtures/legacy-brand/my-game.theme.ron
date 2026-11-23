@@ -1,0 +1,42 @@
+// A game theme: orange accent, sharper corners, a branded body font. Everything not listed
+// comes from ferrite-dark. Hover, pressed, selection, slider fill and toggle-on follow the accent
+// because ferrite-dark derives them from `color.accent`.
+(
+    format_version: 1,
+    name: "my-game",
+    extends: Some("ferrite-dark"),
+    tokens: {
+        "color.accent": "#e8793a",
+        "color.on-accent": "#140a04",
+        "radius.sm": 2,
+        "radius.md": 3,
+        "radius.lg": 4,
+        "font.body": "Rajdhani",
+        // A token of the game's own; unknown keys are kept and the linter warns about them.
+        "game.hud-warning": "mix(@color.warning, @color.danger, 0.5)",
+    },
+    densities: {
+        "compact": { "size.control.md": 26 },
+    },
+    fonts: {
+        "Rajdhani": (files: ["fonts/Rajdhani-Regular.ttf", "fonts/Rajdhani-Bold.ttf"]),
+    },
+    types: {
+        "Button": (
+            props: { "radius": "@radius.md", "transition": ["@motion.fast", "@ease.standard"] },
+            hover: { "background": "lighten(@color.surface-raised, 0.04)" },
+        ),
+    },
+    variations: {
+        "Button.primary": (
+            extends: "Button",
+            props: { "background": "@color.accent", "text_color": "@color.on-accent", "border": [0, "#00000000"] },
+            hover: { "background": "@color.accent-hover" },
+            pressed: { "background": "@color.accent-pressed" },
+        ),
+        "Button.danger": (
+            extends: "Button.primary",
+            props: { "background": "@color.danger", "text_color": "@color.on-danger" },
+        ),
+    },
+)

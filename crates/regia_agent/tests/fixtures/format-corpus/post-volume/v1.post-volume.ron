@@ -1,0 +1,16 @@
+"regia_render::post_volumes::PostVolume": (
+    format_version: 1,
+    enabled: true,
+    shape: Box(half_extents: (6.0, 3.0, 10.0)),
+    priority: 1,
+    blend_distance: 2.0,
+    weight: 1.0,
+    overrides: (
+        exposure_compensation: Some(0.5),
+        white_balance_kelvin: Some(3600.0),
+        saturation: Some(1.1),
+        tonemap: Some(Neutral),
+        fog_tint: Some((1.0, 0.85, 0.7)),
+        eye: Some((ev_min: 6.0, ev_max: 8.0, adapt_up_speed: 2.0, adapt_down_speed: 1.5)),
+    ),
+),

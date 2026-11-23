@@ -1,0 +1,23 @@
+[package]
+name = "procgen_roads"
+description = "Spec 64 acceptance sample: three roads with a crossing and a T, curbs, markings, fences along cut field polygons, rocks cleared from the road, terrain flattened at bake time."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+procgen_common = { path = "../procgen_common" }
+regia_app = { workspace = true }
+regia_core = { workspace = true }
+regia_procgen = { workspace = true }
+regia_scene = { workspace = true }
+regia_terrain = { workspace = true }
+serde_json = { workspace = true }
+
+[dev-dependencies]
+regia_test_utils = { workspace = true }

@@ -1,0 +1,3 @@
+Sim Bridge — Regia Engine M3 mock hover slice
+Left half drag: move | Right half drag: look | WASD + mouse on desktop
+Shipped inside the APK and read through the VFS (assets://about.txt).

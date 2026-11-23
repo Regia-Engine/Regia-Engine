@@ -1,0 +1,27 @@
+[package]
+name = "render_lab"
+description = "Renderer golden scenes and stress tests (M5)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[lints.rust]
+unsafe_code = "deny"
+
+[[bin]]
+name = "render_lab"
+path = "src/main.rs"
+
+[dependencies]
+regia = { workspace = true }
+regia_pt = { workspace = true }
+regia_render = { workspace = true }
+regia_scene = { workspace = true }
+regia_test_utils = { workspace = true }
+glam = { workspace = true }
+image = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+wgpu = { workspace = true }

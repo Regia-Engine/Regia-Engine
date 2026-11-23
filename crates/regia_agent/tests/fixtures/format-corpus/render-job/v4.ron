@@ -1,0 +1,74 @@
+(
+    version: 4,
+    name: "trailer",
+    shots: Some("cinematics/trailer.shots.ron"),
+    sequence: Some("cinematics/trailer.seq.ron"),
+    bindings: {
+        "hero": Name("Hero"),
+        "lamp": Guid("00000000-0000-0000-0000-00000000002a"),
+    },
+    out: "renders/trailer",
+    path: "{date}/{take}/{job}_{take}",
+    output: (
+        width: Some(1920),
+        height: Some(1080),
+        fps: Some(24),
+        fps_den: None,
+        supersample: Some(2),
+        format: Some("png"),
+        hud: Some(false),
+        layout: None,
+        calibration: None,
+        warmup_frames: Some(16),
+        settle_frames: Some(16),
+        subframes: Some(4),
+        shutter_angle: Some(180.0),
+        bit_depth: None,
+        png_compression: None,
+        writers: None,
+        aovs: [],
+        aov_format: None,
+        audio: Some((
+            sample_rate: None,
+            format: None,
+            stems: [
+                "music",
+            ],
+            timeline: None,
+        )),
+        time_map: [],
+        encode: None,
+    ),
+    takes: [
+        (
+            name: "opening",
+            range: Shots(
+                first: "wide",
+                last: "close",
+            ),
+            path: None,
+        ),
+        (
+            name: "blast",
+            range: Markers(
+                from: "boom",
+                to: "dust_settled",
+            ),
+            path: None,
+        ),
+        (
+            name: "tail",
+            range: Seconds(
+                start: 42.0,
+                end: 48.5,
+            ),
+            path: Some("{take}/tail_{frame}"),
+        ),
+    ],
+    cuts: [
+        Marker("flash"),
+        Seconds(30.0),
+    ],
+    max_preroll_frames: Some(2400),
+    product: None,
+)

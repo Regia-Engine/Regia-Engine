@@ -1,0 +1,351 @@
+# Licence record for every binary asset tracked in the repository outside `docs/`, `spikes/` and
+# `vendor/` (ADR-2760).
+#
+# Hand-maintained. `cargo xtask notices --check` fails when a tracked binary file (the extension
+# list is `ASSET_EXTENSIONS` in `xtask/src/notices.rs`) matches no row, when a row matches no file, or when
+# a row is incomplete. A row with `licence = "unknown"` is a warning; `cargo xtask notices --check
+# --strict` fails on it. `cargo xtask sbom` lists these rows in its inventory.
+#
+# Fields:
+#   path    repository-relative path or glob (`*` stays inside one folder, `**` crosses folders)
+#   origin  "authored"    written or drawn for Regia Engine
+#           "generated"   written by a tool or test (renders, encoder output, recorded traces)
+#           "third_party" taken from another project
+#   source  where it came from, in words
+#   licence SPDX identifier or expression; `LicenseRef-Regia-Engine` for our own work; "unknown" when
+#           nobody has recorded it yet
+#   ships   true when a packaged build or the published manual can contain the file
+#
+# Do not guess a licence: put "unknown" and ask the owner (docs/progress.md, "Questions for owner").
+
+# ---- Shipped ---------------------------------------------------------------------------------
+
+[[asset]]
+path = "crates/regia_ui/assets/fonts/*.ttf"
+origin = "third_party"
+source = "google/fonts (Inter, Noto families) and googlefonts/noto-emoji; subsets made by subset.py; see the README in that folder"
+licence = "OFL-1.1"
+ships = true
+
+[[asset]]
+path = "crates/regia_editor/assets/fonts/*.ttf"
+origin = "third_party"
+source = "JetBrains Mono 2.304 (JetBrains/JetBrainsMono), Space Mono 1.003 (googlefonts/spacemono) and Geist 1.900 (vercel/geist-font), unmodified, copied from the owner's piercingxx-branding ui/fonts-src (sha256 in that folder's README); editor only; licence texts OFL-*.txt beside the files (ADR-8585)"
+licence = "OFL-1.1"
+ships = true
+
+[[asset]]
+path = "book/theme/fonts/*.woff2"
+origin = "third_party"
+source = "Space Mono and JetBrains Mono, subset to Latin; licence texts OFL-SpaceMono.txt and OFL-JetBrainsMono.txt beside the files"
+licence = "OFL-1.1"
+ships = true
+
+[[asset]]
+path = "book/theme/logomark.svg"
+origin = "authored"
+source = "PiercingXX logomark, copied from the owner's PiercingXX/TxxT repository (header comment in the file)"
+licence = "LicenseRef-PiercingXX-owner"
+ships = true
+
+[[asset]]
+path = "crates/regia_render/luts/*"
+origin = "third_party"
+source = "SMAA area and search tables (Jimenez et al.), taken from Bevy's KTX2 files at commit fd98063564; see luts/README.md and docs/ported-sources.toml"
+licence = "MIT"
+ships = true
+
+[[asset]]
+path = "crates/regia_render/data/ltc_ggx.bin"
+origin = "generated"
+source = "Regia Engine's own linearly-transformed-cosines fit (regenerate_ltc_table test in crates/regia_render/src/ltc.rs)"
+licence = "LicenseRef-Regia-Engine"
+ships = true
+
+[[asset]]
+path = "samples/sim_bridge/assets/meshes/packaging_probe.gltf"
+origin = "authored"
+source = "probe mesh written for the packaged sim_bridge end-to-end test"
+licence = "LicenseRef-Regia-Engine"
+ships = true
+
+[[asset]]
+path = "samples/render_lab/lightmap_room/assets/meshes/room.gltf"
+origin = "authored"
+source = "hand-written fixture mesh for the lightmap sample (its generator field: regia bake_e2e fixture)"
+licence = "LicenseRef-Regia-Engine"
+ships = true
+
+[[asset]]
+path = "samples/showcase/example_scene/heightfield.png"
+origin = "generated"
+source = "16-bit height map written by showcase::example::heightfield_samples (procedural value noise, regia_terrain::noise::fbm2); the test the_committed_example_matches_its_generator (samples/showcase/tests/scene.rs) byte-compares it with the generator output (ADR-5556)"
+licence = "LicenseRef-Regia-Engine"
+ships = true
+
+[[asset]]
+path = "samples/showcase/tunnels_scene/heightfield.png"
+origin = "generated"
+source = "16-bit flat canyon floor (every sample 8192, -256 m) written by showcase::tunnels_example::heightfield_samples; the test the_committed_tunnels_scene_matches_its_generator (samples/showcase/tests/tunnels_scene.rs) byte-compares it with the generator output (ADR-8825)"
+licence = "LicenseRef-Regia-Engine"
+ships = true
+
+# ---- Test data and goldens: not packaged -------------------------------------------------------
+
+[[asset]]
+path = "crates/regia_test_utils/goldens/sponza.png"
+origin = "generated"
+source = "render of Khronos glTF-Sample-Assets Sponza (Crytek); the model is not in the repository (docs/benchmark-scenes.md marks it local only)"
+licence = "unknown"
+ships = false
+
+[[asset]]
+path = "crates/regia_test_utils/goldens/skinned_fox.png"
+origin = "generated"
+source = "render of the Khronos Fox sample model (CC0 mesh, CC-BY-4.0 rig and animation); the model is not in the repository"
+licence = "unknown"
+ships = false
+
+[[asset]]
+path = "crates/*/goldens/*.png"
+origin = "generated"
+source = "golden images rendered by the engine's own test scenes"
+licence = "LicenseRef-Regia-Engine"
+ships = false
+
+[[asset]]
+path = "samples/*/goldens/*.png"
+origin = "generated"
+source = "golden images rendered by the engine's own sample scenes"
+licence = "LicenseRef-Regia-Engine"
+ships = false
+
+[[asset]]
+path = "crates/regia_asset_pipeline/tests/fixtures/tiled/tileset.png"
+origin = "third_party"
+source = "macroquad examples at commit 8d602d3 (Fedor Logachev); crates/regia_asset_pipeline/tests/fixtures/tiled/README.md"
+licence = "MIT"
+ships = false
+
+[[asset]]
+path = "crates/regia_asset_pipeline/tests/fixtures/tiled/macroquad_map.tmj"
+origin = "third_party"
+source = "macroquad examples at commit 8d602d3 (Fedor Logachev); crates/regia_asset_pipeline/tests/fixtures/tiled/README.md"
+licence = "MIT"
+ships = false
+
+[[asset]]
+path = "crates/regia_media/tests/fixtures/*.webm"
+origin = "generated"
+source = "ffmpeg 7.1 (libaom-av1, libopus, libvorbis) from synthetic lavfi sources; tests/fixtures/README.md"
+licence = "LicenseRef-Regia-Engine"
+ships = false
+
+[[asset]]
+path = "crates/regia_media/fuzz/seeds/**"
+origin = "generated"
+source = "hand-built Opus packets and fuzz corpus entries (ADR-1869)"
+licence = "LicenseRef-Regia-Engine"
+ships = false
+
+[[asset]]
+path = "crates/regia_audio/tests/fixtures/*"
+origin = "generated"
+source = "1 kHz sine test tones (synthetic, no third-party content), added with spec 95"
+licence = "LicenseRef-Regia-Engine"
+ships = false
+
+[[asset]]
+path = "crates/*/tests/fixtures/**"
+origin = "generated"
+source = "test inputs written by Regia Engine's own tools and tests (saves, replays, cooked scenes, lightmaps, meshes, traces)"
+licence = "LicenseRef-Regia-Engine"
+ships = false
+
+[[asset]]
+path = "crates/*/tests/data/**"
+origin = "generated"
+source = "recorded engine traces used as test inputs"
+licence = "LicenseRef-Regia-Engine"
+ships = false
+
+[[asset]]
+path = "crates/*/src/fuzz_targets/fixtures/**"
+origin = "generated"
+source = "fuzz seed inputs written by the engine's own writers"
+licence = "LicenseRef-Regia-Engine"
+ships = false
+
+[[asset]]
+path = "crates/regia_viewer/assets/dfg32.bin"
+origin = "generated"
+source = "Regia viewer bake_dfg(DFG_SIZE, 1024); regia_viewer::bake::tests::the_shipped_table_is_what_the_bake_produces checks the committed table"
+licence = "LicenseRef-Regia-Engine"
+ships = true
+
+[[asset]]
+path = "samples/product_viewer/assets/fonts/Inter-Regular.ttf"
+origin = "third_party"
+source = "Byte-identical copy of crates/regia_ui/assets/fonts/Inter-Regular.ttf; bundled LICENSE-Inter.txt (Inter Project Authors)"
+licence = "OFL-1.1"
+ships = true
+
+[[asset]]
+path = "crates/regia_media/fuzz/findings/**"
+origin = "generated"
+source = "fuzz crashers saved by the media decoders' fuzz targets (ADR-1869); extensionless binary corpora"
+licence = "LicenseRef-Regia-Engine"
+ships = false
+
+[[asset]]
+path = "crates/regia_templates/templates/third_person/smoke/playback.frec"
+origin = "generated"
+source = "input recording written by scripts/write-package-smoke-recordings.sh for `cargo xtask package-smoke` (ADR-3968); a smoke-test input of the template, not game content"
+licence = "LicenseRef-Regia-Engine"
+ships = false
+
+[[asset]]
+path = "samples/sim_bridge/smoke/playback.frec"
+origin = "generated"
+source = "input recording written by scripts/write-package-smoke-recordings.sh for `cargo xtask package-smoke` (ADR-3968)"
+licence = "LicenseRef-Regia-Engine"
+ships = false
+
+[[asset]]
+path = "crates/regia_editor/assets/icon/regia-editor.svg"
+origin = "authored"
+source = "PiercingXX logomark on its Ink tile, copied from the owner's piercingxx-branding branding/assets/logomark.svg (header comment in the file); the one source of the Regia Editor's app icons (ADR-20000)"
+licence = "LicenseRef-PiercingXX-owner"
+ships = true
+
+[[asset]]
+path = "crates/regia_editor/assets/icon/regia-editor-*.png"
+origin = "generated"
+source = "the Regia Editor's app icon PNGs (16 to 1024 pixels) drawn from regia-editor.svg by `cargo xtask editor-icons` (ADR-20000)"
+licence = "LicenseRef-PiercingXX-owner"
+ships = true
+
+[[asset]]
+path = "crates/regia_editor/assets/icon/regia-editor.ic*"
+origin = "generated"
+source = "the Regia Editor's app icon files (.ico, .icns) drawn from regia-editor.svg by `cargo xtask editor-icons` (ADR-20000)"
+licence = "LicenseRef-PiercingXX-owner"
+ships = true
+
+[[asset]]
+path = "crates/regia_cli/assets/editor-icon/regia-editor.svg"
+origin = "authored"
+source = "byte-identical copy of crates/regia_editor/assets/icon/regia-editor.svg (the PiercingXX logomark) that `regia editor install-launcher` installs; written by `cargo xtask editor-icons` (ADR-20000, ADR-1485)"
+licence = "LicenseRef-PiercingXX-owner"
+ships = true
+
+[[asset]]
+path = "crates/regia_cli/assets/editor-icon/regia-editor-*.png"
+origin = "generated"
+source = "byte-identical copies of the editor's icon PNGs (16 to 512 pixels) that `regia editor install-launcher` installs; written by `cargo xtask editor-icons` (ADR-20000, ADR-1485)"
+licence = "LicenseRef-PiercingXX-owner"
+ships = true
+
+[[asset]]
+path = "crates/regia_cli/assets/editor-icon/regia-editor.ic*"
+origin = "generated"
+source = "byte-identical copies of the editor's icon files (.ico, .icns) that `regia editor install-launcher` installs; written by `cargo xtask editor-icons` (ADR-20000, ADR-1485)"
+licence = "LicenseRef-PiercingXX-owner"
+ships = true
+
+# ---- Notices (ADR-8888) ----------------------------------------------------------------------
+#
+# Every tracked file whose row above is `origin = "third_party"` and `ships = true` must be covered
+# by a `[[notice]]` row, or `cargo xtask notices --check` fails. `cargo xtask notices` writes each
+# row into THIRD_PARTY_NOTICES.md ("Bundled fonts and assets") with the `Copyright` lines of its
+# licence file, and the licence text once per licence (the full SIL OFL 1.1 text for fonts).
+#
+# Fields:
+#   name          display name
+#   licence       SPDX identifier the files are used under
+#   files         repository-relative paths or globs of the covered files
+#   licence_file  the licence text that ships beside the files (its `Copyright` lines are copied;
+#                 never type them by hand)
+#   ported        instead of licence_file: the `project` of the docs/ported-sources.toml entry
+#                 that carries the copyright and licence
+
+[[notice]]
+name = "Geist"
+licence = "OFL-1.1"
+files = ["crates/regia_editor/assets/fonts/Geist-wght.ttf"]
+licence_file = "crates/regia_editor/assets/fonts/OFL-Geist.txt"
+
+[[notice]]
+name = "Inter"
+licence = "OFL-1.1"
+files = [
+    "crates/regia_ui/assets/fonts/Inter-*.ttf",
+    "samples/product_viewer/assets/fonts/Inter-Regular.ttf",
+]
+licence_file = "crates/regia_ui/assets/fonts/LICENSE-Inter.txt"
+
+[[notice]]
+name = "JetBrains Mono"
+licence = "OFL-1.1"
+files = [
+    "crates/regia_editor/assets/fonts/JetBrainsMono-wght.ttf",
+    "book/theme/fonts/JetBrainsMono-latin.woff2",
+]
+licence_file = "crates/regia_editor/assets/fonts/OFL-JetBrainsMono.txt"
+
+[[notice]]
+name = "Noto Color Emoji (subset)"
+licence = "OFL-1.1"
+files = ["crates/regia_ui/assets/fonts/NotoColorEmoji-subset.ttf"]
+licence_file = "crates/regia_ui/assets/fonts/LICENSE-NotoColorEmoji.txt"
+
+[[notice]]
+name = "Noto Naskh Arabic (subset)"
+licence = "OFL-1.1"
+files = ["crates/regia_ui/assets/fonts/NotoNaskhArabic-400-subset.ttf"]
+licence_file = "crates/regia_ui/assets/fonts/LICENSE-NotoNaskhArabic.txt"
+
+[[notice]]
+name = "Noto Sans Devanagari (subset)"
+licence = "OFL-1.1"
+files = ["crates/regia_ui/assets/fonts/NotoSansDevanagari-400-subset.ttf"]
+licence_file = "crates/regia_ui/assets/fonts/LICENSE-NotoSansDevanagari.txt"
+
+[[notice]]
+name = "Noto Sans Hebrew (subset)"
+licence = "OFL-1.1"
+files = ["crates/regia_ui/assets/fonts/NotoSansHebrew-400-subset.ttf"]
+licence_file = "crates/regia_ui/assets/fonts/LICENSE-NotoSansHebrew.txt"
+
+[[notice]]
+name = "Noto Sans KR (subset)"
+licence = "OFL-1.1"
+files = ["crates/regia_ui/assets/fonts/NotoSansKR-400-subset.ttf"]
+licence_file = "crates/regia_ui/assets/fonts/LICENSE-NotoSansKR.txt"
+
+[[notice]]
+name = "Noto Sans SC (subset)"
+licence = "OFL-1.1"
+files = ["crates/regia_ui/assets/fonts/NotoSansSC-400-subset.ttf"]
+licence_file = "crates/regia_ui/assets/fonts/LICENSE-NotoSansSC.txt"
+
+[[notice]]
+name = "Noto Sans Thai (subset)"
+licence = "OFL-1.1"
+files = ["crates/regia_ui/assets/fonts/NotoSansThai-400-subset.ttf"]
+licence_file = "crates/regia_ui/assets/fonts/LICENSE-NotoSansThai.txt"
+
+[[notice]]
+name = "SMAA lookup tables"
+licence = "MIT"
+files = ["crates/regia_render/luts/smaa_area.rg8", "crates/regia_render/luts/smaa_search.r8"]
+ported = "Bevy (SMAA 1x WGSL port and lookup tables; SMAA by Jimenez et al.)"
+
+[[notice]]
+name = "Space Mono"
+licence = "OFL-1.1"
+files = [
+    "crates/regia_editor/assets/fonts/SpaceMono-Regular.ttf",
+    "book/theme/fonts/SpaceMono-*-latin.woff2",
+]
+licence_file = "crates/regia_editor/assets/fonts/OFL-SpaceMono.txt"

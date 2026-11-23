@@ -1,0 +1,17 @@
+// Handwritten from the v0.2.6 ProcGenerator struct (regia_procgen/src/world.rs, procgen-generator v1): the component
+// entry as a level's component table holds it (format_version 1 at the end).
+"regia_procgen::world::ProcGenerator": (
+    graph: "assets/procgen/forest.pgraph.ron",
+    params: {"density": "2.0", "mesh": "\"meshes/pine.glb\""},
+    seed: Some(1234),
+    mode: Baked,
+    bounds: Box(half_extents: (32.0, 8.0, 32.0)),
+    live: true,
+    refresh_on_change: false,
+    limits: Some((points_per_item: Some(100000), total_elements: None, memory_bytes: None, prefabs_per_generator: Some(2000))),
+    editor_only: false,
+    dependency_priority: 0,
+    quality_tier: Some(High),
+    allow_terrain_edits: false,
+    format_version: 1,
+),

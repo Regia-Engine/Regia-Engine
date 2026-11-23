@@ -1,0 +1,15 @@
+(
+    format_version: 1,
+    id: "67e55044-10b1-426f-9247-bb680e5fe0c8",
+    importer: "gltf",
+    settings: "(forward: Convert, generate_tangents: true)",
+    sub_assets: [
+        (path: "mesh/Helmet", id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890", type_path: "regia_asset::CpuMesh"),
+    ],
+    provenance: (
+        origin: "Khronos DamagedHelmet",
+        tool: import,
+        reviewer: pending,
+        created_utc: "2026-04-04T12:00:00Z",
+    ),
+)

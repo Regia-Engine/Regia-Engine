@@ -1,0 +1,95 @@
+(
+    format: "scene",
+    entries: [
+        (
+            version: 1,
+            file: "v1.level.ron",
+            origin: "git de2994381548e09cf43d973a4457ab7a7b0ab9f2:crates/ferrite_scene/tests/fixtures/level.example.ron (pre-rename brand: ferrite_scene:: type paths)",
+            exercises: "first scene format: entities with guid/name/components, prefab instances with overrides, no LevelSettings atmosphere",
+        ),
+        (
+            version: 2,
+            file: "v2.level.ron",
+            origin: "git c82c5e4935c9b7a03ec900eab39e594ab75a5c54:docs/formats/level.example.ron (ferrite brand)",
+            exercises: "per-map level atmosphere in LevelSettings (preset, time_of_day, sky body, clouds)",
+        ),
+        (
+            version: 3,
+            file: "v3.level.ron",
+            origin: "git 54d489f128b3cd0b913dcd693d5fb3171c605380:docs/formats/level.example.ron (ferrite brand)",
+            exercises: "atmosphere moons and haze, and the per-map LevelLook (exposure bias, min/max EV, meter, contrast, saturation, grade)",
+        ),
+        (
+            version: 4,
+            file: "v4.level.ron",
+            origin: "git b4dcddcf5075dda1a4c90f32d652c59b2c17215b:docs/formats/level.example.ron (ferrite brand)",
+            exercises: "LevelLook::lut colour LUT path (.cube or PNG strip)",
+        ),
+        (
+            version: 5,
+            file: "v5.level.ron",
+            origin: "git 1784f11717e0e8b0e970a3ca68780ae775fc6c99:docs/formats/level.example.ron (ferrite brand)",
+            exercises: "SkyBody::fill_lux (planet-shine override); the docs example only changes the version number, sky_body is None",
+        ),
+        (
+            version: 6,
+            file: "v6.level.ron",
+            origin: "git 8ee267c88110c0d3fd0aafb017861221196a2d8a:docs/formats/level.example.ron (ferrite brand)",
+            exercises: "LevelSettings::audio_medium (propagation medium override)",
+        ),
+        (
+            version: 7,
+            file: "v7.level.ron",
+            origin: "git 4c09fcdf54da98e59474ab988ceb58b36b3ffe0d:docs/formats/level.example.ron (ferrite brand)",
+            exercises: "LevelMeter::bright_threshold_cd_m2 and bright_bias_ev (snow compensation)",
+        ),
+        (
+            version: 8,
+            file: "v8.level.ron",
+            origin: "git fc65b2ed3c084ab26e3296fa82298d6dda34f3ae:docs/formats/level.example.ron (ferrite brand)",
+            exercises: "LevelAtmosphere::aerosol_turbidity",
+        ),
+        (
+            version: 9,
+            file: "v9.level.ron",
+            origin: "handwritten from 6beb60f480dc8a2c11b8686566917356c7f296b2 (LevelLocalExposure in crates/ferrite_scene/src/level.rs): body is git 6c912a5a20b93770a9f9d717219d0f1fba0214d6 (6beb60f48^):docs/formats/level.example.ron with format_version 9 and one added look.local_exposure line; no v9 level file exists in history",
+            exercises: "LevelLook::local_exposure (shadow_contrast, highlight_contrast, detail_strength)",
+        ),
+        (
+            version: 10,
+            file: "v10.level.ron",
+            origin: "git e9ba699000f7e3c48f567359faeb74ccb0230da9:crates/ferrite_cli/tests/fixtures/bake_e2e/assets/levels/courtyard.level.ron (ferrite brand)",
+            exercises: "real v10 level with GiMobility static/dynamic markers for baked GI (does not set LevelLook::baked_gi itself)",
+        ),
+        (
+            version: 11,
+            file: "v11.level.ron",
+            origin: "git 337e4e822be3d4cf4654a407f5116b57a87ac8f8:samples/render_lab/lightmap_room/assets/levels/room.level.ron",
+            exercises: "LevelLook::lightmap (Some((file: ...)))",
+        ),
+        (
+            version: 12,
+            file: "v12.level.ron",
+            origin: "registry fixture (version 8) loaded and re-encoded by the loader at version 12",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+        (
+            version: 13,
+            file: "v13.ron",
+            origin: "registry fixture (version 8) loaded and re-encoded by the loader at version 13",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+        (
+            version: 14,
+            file: "v14.ron",
+            origin: "registry fixture (version 8) loaded and re-encoded by the loader at version 14",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+        (
+            version: 14,
+            file: "v14-cell-centered.level.ron",
+            origin: "handwritten from v13.ron at this lane's base 02381fd90 (ADR-10079): format_version 14 and a LevelSettings::terrain block with sample_layout: CellCentered appended in the writer's layout",
+            exercises: "LevelTerrain::sample_layout (CellCentered) with world_width_m as the cells' extent",
+        ),
+    ],
+)

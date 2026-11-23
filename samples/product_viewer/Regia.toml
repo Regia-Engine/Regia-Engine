@@ -1,0 +1,20 @@
+[project]
+name = "Product Viewer"
+id = "com.regiaengine.samples.product_viewer"
+version = "0.1.0"
+build_number = 1
+engine = "0.1"
+
+[platforms.android]
+min_sdk = 29
+target_sdk = 35
+orientation = "sensor"
+abis = ["arm64-v8a"]
+permissions = ["android.permission.INTERNET"]
+cargo_package = "product_viewer_android"
+# Release signing comes from the environment, never from a file in the repo. Without these `regia package --profile
+# shipping` errors; dev packages use the debug key. The key for a store release is the owner's.
+keystore = "env:REGIA_ANDROID_KEYSTORE"
+keystore_password = "env:REGIA_ANDROID_KEYSTORE_PASSWORD"
+key_alias = "env:REGIA_ANDROID_KEY_ALIAS"
+key_password = "env:REGIA_ANDROID_KEY_PASSWORD"

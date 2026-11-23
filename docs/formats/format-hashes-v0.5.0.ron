@@ -1,0 +1,770 @@
+// Frozen format table of the v0.5.0 release: the baseline of `cargo xtask check-formats`'s one-step-per-release
+// rule (ADR-7724, book/changing-a-content-format.md). Never edit by hand and never run --update on it.
+// Source: `git show origin/lane/sprint-integ-v050rc6:docs/formats/format-hashes.ron` at ed43351dc (2026-11-14), the
+// newest v0.5.0 release candidate: no v0.5.0 tag existed when this copy was taken. origin/lane/sprint-integ-v051c
+// (32f3d249f) has the same 190 rows plus `viscells` v1, a v0.5.1 addition. When the tag exists, replace this file
+// with `git show v0.5.0:docs/formats/format-hashes.ron` (plus this header) if they differ.
+(
+    formats: {
+        "ability": (
+            version: 1,
+            hash: "08a0a2e4a850dcc408d44bd1accc9c53dd0befd7cb522010a032791c04a9505f",
+        ),
+        "agent-task": (
+            version: 1,
+            hash: "7ecbdc7f321d956c6055873041a4fe5556204753e88b9bbe674583425063760b",
+        ),
+        "aircraft": (
+            version: 1,
+            hash: "9b85c8fdbde7f6ddd79a8c5357885de6a53a67cb384d3d36b50fbc542f11b2fc",
+        ),
+        "ambience": (
+            version: 1,
+            hash: "bfea2f80706c6723c48394473112f291cce8f423ca1bd4d91f93380da84b7523",
+        ),
+        "animedit": (
+            version: 1,
+            hash: "7ba305a7d48533a860d4cd5d77cbe97a5c39ce90935ab12a9857267b77c856eb",
+        ),
+        "animgraph": (
+            version: 3,
+            hash: "dee8d17cbcede8958c735fe89b373427193d9f3cbb86560557b5f838c77218fe",
+        ),
+        "asset-registry": (
+            version: 1,
+            hash: "c319de2450a0be4c193a72141580be74d64cb955b1ff24866ea5e4358a6db32e",
+        ),
+        "asset-tags": (
+            version: 1,
+            hash: "f52557a87b20c4b175ed4619a1c885ed7fefc7b9bddf618e7957295261989d85",
+        ),
+        "atlas": (
+            version: 1,
+            hash: "ebce7b4687d726dd164de2c1c704ffededede1d10c0dbf12172447eecba34db5",
+        ),
+        "attrs": (
+            version: 1,
+            hash: "23534cf2ab4428a7cae2c351f45bbc8ec39a1311d061bf1895659799c7ea807f",
+        ),
+        "audiopatch": (
+            version: 1,
+            hash: "1f96329a6a251aa9ad202fddd3d7ff9e846235d87ba2bef6a20c50851db4f96d",
+        ),
+        "autotile": (
+            version: 2,
+            hash: "060639557afb107fb6087d00c6928a4d85fb67c9f5c92e779c12ddc56213c653",
+        ),
+        "bake": (
+            version: 2,
+            hash: "43f7127b414e2753b337c0e41c0680466f04ca090084ae4b84702c64174372e5",
+        ),
+        "bake-checkpoint": (
+            version: 1,
+            hash: "f0ba50d06c8d64c1689657502ab59f98af8d8dd1384242a0112baefe1c8c291d",
+        ),
+        "baked-gi": (
+            version: 5,
+            hash: "542a053a57824fce038f760f63c629cd232e387f3546059752aba3f886a11a0f",
+        ),
+        "bans": (
+            version: 2,
+            hash: "837c390924312ac49a7771f893efe262ac8367daedb44c8281551af4ee0a7a6e",
+        ),
+        "biome": (
+            version: 1,
+            hash: "364f8f2ba18c716fd94a59841f3c58c91c574c6c0a186b566fc221003d517e84",
+        ),
+        "biome-area": (
+            version: 1,
+            hash: "8b0b1d118f6ba5abf3f3c165cd8904ff0ccc045e0d6ce9e1c4132d6f135b3077",
+        ),
+        "bt": (
+            version: 2,
+            hash: "80499d2f8e0e758574f6c19e0a8b252e8df3e5ecfd22cc1d8e2780f0742d9efc",
+        ),
+        "camera": (
+            version: 2,
+            hash: "ee4ccb6fa07097ab47fc6b78cdff909d31f4b1150ef70b5b54416a55b3b318f8",
+        ),
+        "cell-blob": (
+            version: 1,
+            hash: "882414d4bc8e845568e7b543755ac302a0201329ac39886d1e4ae8f2937c5542",
+        ),
+        "chooser": (
+            version: 1,
+            hash: "d9ad5e2ade915299d90b53d08044b77bb4c26393d65f060ad6602ed0255a914d",
+        ),
+        "chooser-cooked": (
+            version: 1,
+            hash: "7ab906cc70d1f051b4fbfb35e9176c8e1ed5991896d2f71b64f4617c0189c0af",
+        ),
+        "chunk-map": (
+            version: 1,
+            hash: "7bb69ba19a36bbf738d9de4b2a71fe3b58a4eb5ede936d2d676f507c4cb45450",
+        ),
+        "chunk-why": (
+            version: 1,
+            hash: "a5af0281e46c178c17d7f14329c69a3582d4fa8d6022ccbbe6f6392a83bf4d63",
+        ),
+        "cloth": (
+            version: 1,
+            hash: "df7210758f98c0e53bd2de7fdbd6d607e628181bdb186201e5744bbfa5855f7a",
+        ),
+        "collision-set": (
+            version: 1,
+            hash: "50137f63206b8b673902dce4e881bc19ce8462fec2b7e6d6c97286b233242c36",
+        ),
+        "content-host": (
+            version: 1,
+            hash: "81c7d020e850459952406d429ab8c29b4cfa4ed351f1ba25ec17c00dce6e5d4c",
+        ),
+        "content-manifest": (
+            version: 1,
+            hash: "ecb605e63366547f63dede80c816837ec530bd1fbf68e627ae4095be8149f0a8",
+        ),
+        "content-signature": (
+            version: 1,
+            hash: "bb6161a41becc8adc34779046377de2f3a0e7862792b2babf17969a322e33045",
+        ),
+        "content-trust": (
+            version: 1,
+            hash: "47250f26622279bdd7dab0692dd3f43e92b619ba6ba55aaed357f1e95bdd473b",
+        ),
+        "convc": (
+            version: 1,
+            hash: "62f83b52849cdad8b5db42320fcca0a5529f451b0cac3dee92b54aa504f8112f",
+        ),
+        "conversation": (
+            version: 1,
+            hash: "9413f29d4375f7a0de74691f1275e30b9a0425fdee84977392f5bbf4a0046fe4",
+        ),
+        "conversation-cue-events": (
+            version: 1,
+            hash: "bb3a01b1e5331cba3e7496a75caa72d71e0f186bdda64fa9dbb50cafa039bb07",
+        ),
+        "conversation-settings": (
+            version: 1,
+            hash: "5b671067396c697a1d4978065c099559c6522a33bb78627f1fcb5066ff6b9c8c",
+        ),
+        "conversation-speakers": (
+            version: 1,
+            hash: "7d9c658b483cfd40334720f2388b7096a221ba32da935a04c4d336df8b282d11",
+        ),
+        "cooked-clip": (
+            version: 2,
+            hash: "81b49d1348e0d7e17e473f1ad1b1710f2d456634d1dc6afea94a0cd5e96f8de5",
+        ),
+        "cooked-cloth": (
+            version: 1,
+            hash: "2b3c36f178d8131586ebf2ce148a7a6bb66cee61885a9f24f482f8dfa37488ed",
+        ),
+        "cooked-mesh": (
+            version: 3,
+            hash: "c33c05fa2c22d51fc63d92360bc539452b58b231aeb79e44b1f5b2e5ce46d911",
+        ),
+        "cooked-soft": (
+            version: 1,
+            hash: "79e4f6fbfe0446db61a51f572d95f789e67dd3df92d20b0d6599e1ea6e9e1e07",
+        ),
+        "cooked-sound": (
+            version: 1,
+            hash: "74db6dc4432b2a9d432bd1736a6f769bd53eb31573ed98d16c60cb3b20e3ab78",
+        ),
+        "cooked-video": (
+            version: 1,
+            hash: "dffb7b016806c2746337f14e3bc64d7afcd08c93cd2d2a20f4bdaec5c7e06710",
+        ),
+        "cue": (
+            version: 3,
+            hash: "3ef97c6daa22b22b8e82d221229ad70829b0bc9b309e75ebb8b51030c8f2e6a0",
+        ),
+        "curves": (
+            version: 1,
+            hash: "22d2466e9090c70a18647afcabdc24d9037dfa1c4a9a582c0019f134d2302a23",
+        ),
+        "curves-cooked": (
+            version: 1,
+            hash: "df19b8a83b7a7bf4f9bc6e0252de9bebf395289be5d27a22bdd703abf9f77d9e",
+        ),
+        "data-table": (
+            version: 1,
+            hash: "e5f9b52ec0a2eb374e4f64e23f80506cb2b36c69967c81ff730b409d82831b94",
+        ),
+        "data-table-cooked": (
+            version: 1,
+            hash: "5fe2c2aedff6c2f0926532a30f5c9a2bd04d4cbb2cc0ccf61bfb6ac735dbbb1a",
+        ),
+        "decal": (
+            version: 2,
+            hash: "8b081f59ae5d69a8185138fa8b3aa3da334bbb40ea781c4d4eea61c49dc88119",
+        ),
+        "demo": (
+            version: 2,
+            hash: "496fc7fc99887c4a1dfe38feadbac3e2b6ef43ff2040e4174e8b0541563874f1",
+        ),
+        "destructible": (
+            version: 2,
+            hash: "fd8dc8f5fb07c15717c3b384aec61f41e1e692c52e2fa95e968db3cb0022be38",
+        ),
+        "destructionfx": (
+            version: 1,
+            hash: "1d2287e04adf3c497c38b91b47e84ee80fe1e47feadef2d28672eab2ee97805a",
+        ),
+        "dialogue": (
+            version: 1,
+            hash: "9e49205fa834cb0fd9c224527fd0da9508ea91473810826d7bca8330e90c98b7",
+        ),
+        "drivers": (
+            version: 1,
+            hash: "72f99b9792e5e592b41f76abe1514fce4646fd33584621b6cb3a77097a4d7de7",
+        ),
+        "ecology": (
+            version: 1,
+            hash: "e05efa4be45722e841a78da6444d3e47f7eaaeaf4ea8f9a0a2615c50583f8a80",
+        ),
+        "effect": (
+            version: 1,
+            hash: "77e04c018bc988685c1ed1bb71e88114981701bcd7d2125592c327ac0fc507d3",
+        ),
+        "engine-release": (
+            version: 1,
+            hash: "d7363e7c89168c62cba52f2d9a7b6bb231b539260eabc46a6852d283083a0022",
+        ),
+        "expected-values": (
+            version: 1,
+            hash: "8d63b9c8d1949dd7938e377afa1d3b6dfa9b3135da54c1eb2c3bfe9449ccbc9d",
+        ),
+        "extensions-ron": (
+            version: 1,
+            hash: "95c27205069191059c6e35b85ccc387ae43e45b685b58bd81b5d0541a149cc81",
+        ),
+        "fcap": (
+            version: 1,
+            hash: "5c32a8cb461772f444ecff0d5fa562f9fcab0f022202276eb8a9e5b8de30b489",
+        ),
+        "fluidcache": (
+            version: 1,
+            hash: "234739d85f1cfc30f2d852ef5203056f6f893b3a1783a04c33992aef3a02e42e",
+        ),
+        "fracture": (
+            version: 2,
+            hash: "bcc34abb8e98282abe8481025513fb61e4528bb27151295f6b317a0057de94b9",
+        ),
+        "frec": (
+            version: 1,
+            hash: "ae23150c30a4babf5074516c8c2e8de4737856655fc05172f812b8df42270fda",
+        ),
+        "functest-script": (
+            version: 1,
+            hash: "e1be075cb97ba4e4da23fa4dd7cf2c113466c742c1de293b85171120de252be7",
+        ),
+        "functional-test": (
+            version: 1,
+            hash: "980dc0078b84ef959130f665b19a8431a4c9b167d5ddbec7b5301cd2bf687b96",
+        ),
+        "generator": (
+            version: 1,
+            hash: "653e4af648800301b6aea7b4f192e11079d108f469da3fec38d9ebb033546b96",
+        ),
+        "glasscrack": (
+            version: 1,
+            hash: "4ab0cdbcb690718123146dbfff7b6fe35e399bce727d6dc923797c9b6d66f024",
+        ),
+        "glossary": (
+            version: 1,
+            hash: "05aabb70fa80aef41666b0c61234b42cf250896c7cf1302d99b11a6ed68d8538",
+        ),
+        "gpu-mesh": (
+            version: 2,
+            hash: "0ec9a00a0ad1a0080696df1ce216c1bc50890791c3a79cbff6d675260644b658",
+        ),
+        "grass": (
+            version: 1,
+            hash: "ef8d3940c8f5b92b984bb587f9f796934d6fa206da9594c2de62c9b848108de1",
+        ),
+        "grass-density": (
+            version: 1,
+            hash: "ef789624212a5811f736b2cf67b6797c5d3df35d33fedaba288625b74b942753",
+        ),
+        "hlod-voxels": (
+            version: 1,
+            hash: "3be51876b19d356607c1c64c3f88582580ffa7d14e43d8d419567a579163ab65",
+        ),
+        "hull-set": (
+            version: 1,
+            hash: "6e84594e177a857797a5f47dd48563fa57e2d97bdf421d348c7fbf6ade73008b",
+        ),
+        "ies-profile": (
+            version: 1,
+            hash: "5e1ed06d94045c958810e847bdfb6b92513818af46806a21d31043b5f59f8a0f",
+        ),
+        "impactbank": (
+            version: 1,
+            hash: "a136583ffcd18935b3c3b6efcc343d57f79d2b44e4eb2c4f856b216d1affa383",
+        ),
+        "import-rules": (
+            version: 1,
+            hash: "f1786be5595f9c1da0385bc6b4fc06104b7d0b5abfb7a8dab4ab0cde07ebc4cc",
+        ),
+        "input-overrides": (
+            version: 2,
+            hash: "8ce26d0571e00c07074f99699a4b338c16a29c7046c378562e1b6631abd0d556",
+        ),
+        "jewelry-build": (
+            version: 1,
+            hash: "0058e1be6e69f001625c3ddbb4eb6bf0a1ae86843fca8dc6ffd06f798cf5ee10",
+        ),
+        "jewelry-material-library": (
+            version: 1,
+            hash: "a5a5c52b8342ce01185214881fb96974c1f0af1d3cf008a1902117c3bbef1c2e",
+        ),
+        "jewelry-part-kit": (
+            version: 1,
+            hash: "625e6cb78bc85d99500d85ed6e1e999b6064b232a566d2c90cfb03a4adfde475",
+        ),
+        "jewelry-product-package": (
+            version: 1,
+            hash: "af302a55ddff58d259445017a541bb977a2d3f552b9570be256bee7cb18e107a",
+        ),
+        "kind": (
+            version: 1,
+            hash: "70eb22274f3c7db147ee479a7400906320ef3c18240555f7fd950a79c3b92044",
+        ),
+        "known-hosts": (
+            version: 1,
+            hash: "be07f0d26b40203d902b39d8691225952fa9e593056ae693bdbc75d460ea2a92",
+        ),
+        "layers": (
+            version: 1,
+            hash: "074405909763b677efbdbeb6c69c16f76db7e3b4f8429af19d774b6e3d31778a",
+        ),
+        "lens-effects": (
+            version: 1,
+            hash: "d0c98f564b9ba05cd21d3b91f7024cb51513c95166012dcd1dcba3c30e5eaf0e",
+        ),
+        "level-dir": (
+            version: 1,
+            hash: "8d4c8a1f7814496e34296c515496de4e12eebeea0bc0e51271dbfb7745c32f0f",
+        ),
+        "lightmap": (
+            version: 7,
+            hash: "3d57d53975f9a9b0f72d13f21be36b61bc1f0eeffa14ae1ba8bcb1503129a168",
+        ),
+        "lightmap-cells": (
+            version: 1,
+            hash: "72286edc810bb63e01cff73ea567da9625310aa5761410bec93a7aac3e147b30",
+        ),
+        "lobby-keys": (
+            version: 1,
+            hash: "f4e8ea75e16d1d59e483d41cc3c4045a8d37b6bf3875146816f9159c977722ee",
+        ),
+        "loopgen": (
+            version: 1,
+            hash: "0b976ca1a6ad33a4c16a1b76f6a4ef21196a2007a80a2c174bf01d35af8e52a7",
+        ),
+        "loudness-table": (
+            version: 1,
+            hash: "71b7f55ac18e1c3ace5c03df2aa2fa061c3e6768905c8fad5f6981bbadaa07d3",
+        ),
+        "luamod": (
+            version: 1,
+            hash: "b805c0b1511babfe7576fec3572106422e148619601a4b2e0329a8b8a44b8ed1",
+        ),
+        "luastate": (
+            version: 1,
+            hash: "251f1a431d956028bd6d5c2d752d30884df215c609801be9592ea3319fed5b33",
+        ),
+        "material": (
+            version: 7,
+            hash: "292e4fea95a862637506e2c63265583b8de6251188938a3913a1d599a356a82f",
+        ),
+        "matfunc": (
+            version: 3,
+            hash: "326af8f9619867cb7236dd41bff3008eb137b0c80fd416ba1de34215959d7cbb",
+        ),
+        "matgraph": (
+            version: 4,
+            hash: "7e36289a301edf259cba261ee2637a1a62884f9330f9c7bab3837856752f84f2",
+        ),
+        "matinst": (
+            version: 2,
+            hash: "a248fda9df6914b38af2ae6bbe2aee3badf1cce0900fb369090a50656fefb54d",
+        ),
+        "meta": (
+            version: 1,
+            hash: "ae5c32001dfe2ecc9b86c88f62f0b7c4bcb2ccf0ba929f5f883a5502bc64a6b0",
+        ),
+        "montage": (
+            version: 2,
+            hash: "10f5f28be6111a671efc4ef090481b088e78542ac44749776698429d9eb5489b",
+        ),
+        "montage-variant": (
+            version: 1,
+            hash: "f03c1a950d11b8120668d327d2992ed1e65a398a7186517e8a17b790cca802ca",
+        ),
+        "motiondb": (
+            version: 2,
+            hash: "51b7c0d23c4063fbe6c0456ffec444671acb07271a5e6a7d9eb7d11580dd6445",
+        ),
+        "motiondb-cooked": (
+            version: 2,
+            hash: "cc00a45aa258765a77439b29b54b9478148378aebf6852726ca003b97c162c21",
+        ),
+        "music": (
+            version: 2,
+            hash: "374d65f76151f51d3339677bd57e5134b8a43d8b14cfdbdb47bb24489a91566b",
+        ),
+        "nav-cell": (
+            version: 2,
+            hash: "577e1a152e00ea1d00b715abfd63c1f04d389eab8e88007c62b4eb5a407c1492",
+        ),
+        "nav-link-anchor": (
+            version: 1,
+            hash: "e132309749af2f4b8f966a6128c28472ea50b24f48ce4635757730fa93c16bf2",
+        ),
+        "navlanes": (
+            version: 2,
+            hash: "04f03ddcffa4b977818380a4ac5953639687470ab432cbecb2c540a2b4366957",
+        ),
+        "navlinks": (
+            version: 1,
+            hash: "11dda11c6b26112b6358e58ea0e33b21a4b59832cadc8509c5e68076d15fc35d",
+        ),
+        "net-manifest": (
+            version: 1,
+            hash: "2f8cac15b4e1e2757e1a8ca4180b86a300373dc4e0374328082962eca83e8fec",
+        ),
+        "net-settings": (
+            version: 2,
+            hash: "b7bf72fb372b03cb002d4546c49dd9a978e3624b8670c86d64c9afc3118cb0f6",
+        ),
+        "netdemo": (
+            version: 1,
+            hash: "7c4b0ac9c8695a1284663143ad1048c60352a28bb2fbd6d4a79383025d109db1",
+        ),
+        "netprofile": (
+            version: 1,
+            hash: "9d06795c52b83f3fe8293264f9c1bd36648ba30d81123cb071376ce1f82ec6c2",
+        ),
+        "pak": (
+            version: 1,
+            hash: "732e693f34fc1e183f07b610958c6911cbfccaf21a128b9289f14b4bc91c16f2",
+        ),
+        "perf-budgets": (
+            version: 1,
+            hash: "fcb2d58e031338e6657a7d8b34fe5ca4e6c26c2a94bb4205c87acb8f7a651802",
+        ),
+        "permutations": (
+            version: 1,
+            hash: "0a094a6637995fdc00fc8ea3afc44b2efa77bb4eee7c8a918f1f0e1ac886bd89",
+        ),
+        "pgout": (
+            version: 3,
+            hash: "2dea5b9bb3b5cbfbef353f422cf4d6ca084edbf7d4396662159de5d97ffd9c9e",
+        ),
+        "pgraph": (
+            version: 1,
+            hash: "74a2aef33dfa9f98b9bcdf16d4013feec6e400355d612bcaf2fe246371d457d6",
+        ),
+        "pgvar": (
+            version: 1,
+            hash: "2409410cbbf04badf4926156726ada231c1626f3b587039908f3f21f9e9a75a1",
+        ),
+        "physical-camera": (
+            version: 1,
+            hash: "1c50d8e2fc155b61d30e6662f302e6725b701dd466367992f1f0dedc6f9267c8",
+        ),
+        "physmat": (
+            version: 1,
+            hash: "98007c2c26718e7557d7fc237655a347a281755d667bf9121ffd46e4fb338f3e",
+        ),
+        "plants-index": (
+            version: 1,
+            hash: "e42b65251df4c4bd174c0a35548908f95c7cfa732ce70f049bbc93015c120e2b",
+        ),
+        "post-volume": (
+            version: 3,
+            hash: "edc313988bdb276f4b44984dd4f2ae29f475fb0148ef9f2cdc4601761823c41b",
+        ),
+        "prefab-instances": (
+            version: 1,
+            hash: "65d36e58d7744c6bcbb48d4cf9ee7934a77bb0acd8fd9e9bdd4e4abd4878423e",
+        ),
+        "prefab-variant": (
+            version: 1,
+            hash: "342dd9ae4c8cf954968c01fdcfed8110b45c3637460d7cf4d950a2a9b793dfc9",
+        ),
+        "primitive": (
+            version: 1,
+            hash: "e531c246fc7f2f30634ab5c9167e59b4be7c4bc7440da7780d22cd90353f68b4",
+        ),
+        "procgen-anchor": (
+            version: 1,
+            hash: "eb34c505b66edd673bace105eca539dd9f43b3fb2a3686ed7224b5b12193ec52",
+        ),
+        "procgen-generator": (
+            version: 2,
+            hash: "0f10e287456c1dd077eb46b0391d7fb81143e245c7530cda56d3cb59989062db",
+        ),
+        "procgen-instanced-set": (
+            version: 1,
+            hash: "5db56d2c3bdd506d7253b7fab5e002726b39e5a72dee67982b79595a0b942083",
+        ),
+        "procgen-painted-points": (
+            version: 1,
+            hash: "10e732bf72d5925cb2190e0a4ffd73e305739e22d0066e5f795c018ca7582df7",
+        ),
+        "profile-capture": (
+            version: 1,
+            hash: "c3c0530ebaf686c2a3bf228d69dc4e3eaca910aa96099ca79bff572603475bbc",
+        ),
+        "provenance-policy": (
+            version: 1,
+            hash: "a5fee65b973fa2b9c70624f8108e618b8bb74ee80725605d7a35978d2c873356",
+        ),
+        "ragdoll": (
+            version: 4,
+            hash: "a0f9efbd72e61a0aa18ac20e54f1056a0437d878ea7e7678c9f363d7c20c7f73",
+        ),
+        "render-job": (
+            version: 4,
+            hash: "88f64f96f936e046fae1015a72806ef7646239eed599488096f10706e4bd3a4e",
+        ),
+        "retarget": (
+            version: 1,
+            hash: "9e10d5e4b710abd20619efe320e18bee58a0fc500d3785bb2efda1f20f8d776a",
+        ),
+        "road": (
+            version: 1,
+            hash: "4009db755fa377c7aad8bf4a90f522fcbf3d451dfd27998f44af3378d85149f1",
+        ),
+        "road-of": (
+            version: 1,
+            hash: "912574d33e28730d7ae4937a9ec2cf629035dacbecc97d94c2dd3e31c68f4e27",
+        ),
+        "save": (
+            version: 2,
+            hash: "f7758612bc181656c1108a1c2c16e3fa920745906eff4f28a7696c9897cf83c6",
+        ),
+        "scatter": (
+            version: 2,
+            hash: "4e404dc883ff5ced4f59d70052f544b5445e8e480178725862d8611024437347",
+        ),
+        "scatter-paint": (
+            version: 1,
+            hash: "6bcd0c4e6373876c65e49f01898de1b58546ff11dfa011bfb8357eec1654db4b",
+        ),
+        "scene": (
+            version: 13,
+            hash: "16b1640f2af114c18bfa7c234e7b2020a1e7e4778f1b72ddd48965cfdff9034b",
+        ),
+        "sequence": (
+            version: 5,
+            hash: "cfc067be35f9a8638723bf137349229cc988495ff4e7ed2f283b4a851698c49f",
+        ),
+        "server-key": (
+            version: 1,
+            hash: "37991886f333f562de86ae4b4dda6223e786813386948ec3cb0974a5e4498f9e",
+        ),
+        "server-players": (
+            version: 1,
+            hash: "1dff36c18abd1cb506f7f7709205b4d455e007ce96c07da9641698b84bfe20e9",
+        ),
+        "server-toml": (
+            version: 3,
+            hash: "9d53970d941e3f878fb1e0d6997c77c1f90aa3b6a999e5732a2ca52f8f45b28a",
+        ),
+        "session": (
+            version: 2,
+            hash: "e1b903030028284f7dfdf94c1571ef1ea6a6d8240c1190292a1f2a1dd94c5028",
+        ),
+        "shape": (
+            version: 1,
+            hash: "ad46213f3f8e6a8e8c91a876d70a498bde43875a78d31477e99aa3d9f6c82f3a",
+        ),
+        "shot": (
+            version: 1,
+            hash: "8f6fae11e70fe582dcec72a260d9364256ecf9f1ba0f66e8becab64af3d78550",
+        ),
+        "shots": (
+            version: 2,
+            hash: "fdf25fb66f5b3176a0fb889ee60f0a7b65693ada45fe543f76ffd56265bb2f58",
+        ),
+        "siminput": (
+            version: 1,
+            hash: "a95510fe9020c946b40a02121ac228d17aa3a8a39cf511a3961480cecfca0db7",
+        ),
+        "skelprofile": (
+            version: 1,
+            hash: "47e061eb534da6065bd19821ea48f90d552ef0e7f8289ea2aa5d727f304e44bd",
+        ),
+        "slots": (
+            version: 1,
+            hash: "c6bd4bbf07e29ed4c766212af09b9daa41b716e12adaea4983deb2a693cfc696",
+        ),
+        "smartobject": (
+            version: 1,
+            hash: "bae0f0b31dd25ad75121423216b11e4294ab363c89b7f3ea58524ed4b6c0d5d9",
+        ),
+        "soft": (
+            version: 1,
+            hash: "1775f1a2f3517ca47c72b3e5649ce601a43cf0f18698c7c2476c88a8aaa81145",
+        ),
+        "spatialquery": (
+            version: 2,
+            hash: "9c09918ee518a2321aa84ef9c2bd3d9e7a834dc84a71cbd779371739d938d3fd",
+        ),
+        "spline": (
+            version: 1,
+            hash: "cd9be3e47e9d38d4b9aea7254da51c08a14831b177b3767306cb509490d102f3",
+        ),
+        "spring": (
+            version: 1,
+            hash: "a9a00c230902f82c142e900df07bcede0bbb9b9ea48d49e098e1594a93f7c0ad",
+        ),
+        "statetree": (
+            version: 2,
+            hash: "ce60e943063935b62790f03d6ed31b8a4b07eddbce69cc048059412d3ca83aa0",
+        ),
+        "subtitles": (
+            version: 1,
+            hash: "c797d0426a7bcfaf68115baa952d519f334f5edfb53eea39576f50ca46b6b9a5",
+        ),
+        "sync": (
+            version: 1,
+            hash: "0d0b8215b16b1dc75383a9f2cc5daf0fc7749e526ec49e7d75dc40188d6df774",
+        ),
+        "tags": (
+            version: 1,
+            hash: "d71c8b085582e4092acf5e42ed44cc4fce812669d93415473912f122e0819794",
+        ),
+        "terrain-holes": (
+            version: 2,
+            hash: "a36009810734cae10dea66ea7fc405574124e8e43bbb562d45045839dfa88fe4",
+        ),
+        "terrain-layers": (
+            version: 5,
+            hash: "5b6e6ef9eaf0764fcb64b8478c9d2f7e82b63f75fd1438f343cf09e0a3829bcb",
+        ),
+        "terrain-weights": (
+            version: 1,
+            hash: "b24b7596d4e8eecd24a756e1dcd3431334202d8d535019f6854642d627dc74f4",
+        ),
+        "test-report": (
+            version: 1,
+            hash: "43864671353582ec71aa566c2904712e194fe0fd5cf089fb258ffb10553de9c3",
+        ),
+        "texpack": (
+            version: 1,
+            hash: "4a01e634da5da1e4d0bf623b0451a1de6e442465370c8832eba73d147b8dce9f",
+        ),
+        "theme": (
+            version: 1,
+            hash: "16d03e5a2feffcbc77bde2650b3b8b1dbf5921f34dbf26f57212a220aeb1c229",
+        ),
+        "tilemap": (
+            version: 2,
+            hash: "0c4fdb183a4862c50ce509f8998039faa6f31b2bd85f56f6e18b270d513c1e63",
+        ),
+        "trailer": (
+            version: 2,
+            hash: "b1701875fc2e8ed0a957b046356b2d757de8ec601a4e300b277d9dea60c21bd6",
+        ),
+        "traversal-jump-point": (
+            version: 1,
+            hash: "f673d7b3c80d2b974b4c33d66ec04637d74c64a9138f6287a1175e3cd2b524b5",
+        ),
+        "traversal-ladder": (
+            version: 1,
+            hash: "952069243eb837ef6f4b6dfb1f289c512ab1cff78038a69d13ced205a5c239fa",
+        ),
+        "traversal-settings": (
+            version: 1,
+            hash: "212bb906356b9e67d9f693818e4455b37b2d9ae9b4ec5e0822546eea43fc3c58",
+        ),
+        "ui": (
+            version: 10,
+            hash: "0bc667a6563b32185d42da40736ae4039e9bf513b1b75c2dfac10a7835014486",
+        ),
+        "uianim": (
+            version: 1,
+            hash: "355fd5c6446c099533075523e5a34df23d65cdab6048497b7f83bc051f19f612",
+        ),
+        "uisettings": (
+            version: 1,
+            hash: "b311d1c4fb9106efcdd99af4ea4ec418f159ce2295b997f72559031120678f47",
+        ),
+        "utility": (
+            version: 1,
+            hash: "b3da6603b063d9be554ca353cd20ea3b3519656ae445372f8ff2eaf59f3bc919",
+        ),
+        "validation": (
+            version: 1,
+            hash: "2ef1c6de668048f8dedfd13e19b99c69ad2c7a71c3e3272a879a21ee074418b9",
+        ),
+        "vehicle": (
+            version: 4,
+            hash: "5a7003e221ca320bf5239517c322553ad8efbf4241c4889745dd454e47027266",
+        ),
+        "vehicle-audio": (
+            version: 1,
+            hash: "a320e884e72a7671c92288a2e38580c3753d67265c24153f480ced183e518d64",
+        ),
+        "vehicle-snapshot": (
+            version: 2,
+            hash: "ac3fe8dcfbf42407256ac0da7952ba1145e137099695c3106f105290aaaa8235",
+        ),
+        "vfx": (
+            version: 7,
+            hash: "3a7a5839acc70ffa8ed99143fc7a10caf5bc9cc00bfc8e285542770ed0c208e5",
+        ),
+        "video": (
+            version: 1,
+            hash: "b06ef5072b02b8e69481b830566554a2b4ef751dcb9727710150b80e5dc19702",
+        ),
+        "videolist": (
+            version: 1,
+            hash: "32897c36131ff719612902a6e27accde7ed69596496da0956d325e19a44ca1d3",
+        ),
+        "viewer-env": (
+            version: 1,
+            hash: "981291a984bcbe26a3111cff628f9726e95d507b4dc0d440b0a43acd067ca857",
+        ),
+        "viewer-package": (
+            version: 1,
+            hash: "2d463ba06def48198760ce3b9d7271367c5d8d53de42a2b18b7901b32243387d",
+        ),
+        "voice": (
+            version: 1,
+            hash: "da94ff2e8c2d8e229c49f67e82d0114af4259dcf74da50471ce60409145d5d2c",
+        ),
+        "voice-chat": (
+            version: 1,
+            hash: "36fbab4e489c71fda41379c09649b6a45fc2532c2956a7892d8a79def0023141",
+        ),
+        "voxel-far": (
+            version: 4,
+            hash: "3688e957ad4ba746560e34a804bde0ece37b633ab13cf8ccfd2b5b944e31743e",
+        ),
+        "weather": (
+            version: 1,
+            hash: "efcfcbc15631c21064c5fbcb6a03cde70a4636256e806b790710d48c2d3df3dc",
+        ),
+        "world-index": (
+            version: 2,
+            hash: "155e8b8b678f6ed3828d4b934ff2f9fa7c6cf5ac1d3b0b78bd2f2f631066703f",
+        ),
+        "xr-actions": (
+            version: 1,
+            hash: "e381dc6b84251622d666716a591578292957363a1f3671d46270a2296a0d3434",
+        ),
+        "xr-config": (
+            version: 1,
+            hash: "7d672ebe86e1466dccf8343e526179a7c0ce8e2dfe30d2446ab3f7c7e44f6f0f",
+        ),
+        "xrsim": (
+            version: 1,
+            hash: "c87f9675a2f02a274772337d5765076c22b6bcb55a026a5692501f5a7026fb2f",
+        ),
+    },
+)

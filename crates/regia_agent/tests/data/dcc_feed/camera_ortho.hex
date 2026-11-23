@@ -1,0 +1,17 @@
+# camera: orthographic, no physical block
+# Laid out by hand from docs/formats/dcc-feed-protocol-v1.md (spec 60 section 8 test 1).
+6b 00 00 00                                          # len = 107
+21 00                                                # msg_type 0x0021
+00 00                                                # flags
+01 00 00 00                                          # seq 1
+04 00 00 00                                          # handle 4
+02 00 00 00 00 00 00 00                              # frame_id 2
+14 00 00 00 00 00 00 00                              # source_time_ns 20
+00                                                   # has_timecode 0
+00 00 00 00 00 00 00 00 00 00 00 00                  # translation (0, 0, 0)
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 80 3f      # rotation (0, 0, 0, 1)
+00 00 80 3f 00 00 80 3f 00 00 80 3f                  # scale (1, 1, 1)
+00                                                   # space_flags 0
+01                                                   # mode 1 orthographic
+00 00 00 40 00 00 c0 3f 00 00 00 3f 00 00 c8 42      # xmag ymag near far
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 # physical block absent

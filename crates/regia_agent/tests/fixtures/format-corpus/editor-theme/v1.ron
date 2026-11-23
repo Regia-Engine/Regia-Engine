@@ -1,0 +1,11 @@
+(
+    format_version: 1,
+    name: "Studio Night",
+    tokens: {
+        "flat": true,
+        "colors": {
+            "ground": "#101418",
+            "signal": "#ff8800",
+        },
+    },
+)

@@ -1,0 +1,23 @@
+[package]
+name = "boot_probe"
+description = "Instant-load probe: boot splash, tiered pipeline warm-up and the boot timeline (process start → first present → menu interactive)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia = { workspace = true }
+regia_render = { workspace = true }
+regia_asset = { workspace = true }
+regia_core = { workspace = true }
+wgpu = { workspace = true }
+postcard = { workspace = true }
+serde_json = { workspace = true }
+
+[dev-dependencies]
+regia_test_utils = { workspace = true }

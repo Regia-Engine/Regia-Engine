@@ -1,0 +1,7 @@
+// `.uisettings.ron` v2 (ADR-8252): v1 plus the optional project scale rule.
+(
+    version: 2,
+    dpi_curve: [(96.0, 1.0), (144.0, 1.25), (192.0, 1.75)],
+    layer_budget_bytes: 33554432,
+    scale_mode: IntegerScale(reference: (320.0, 180.0)),
+)

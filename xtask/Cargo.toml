@@ -1,0 +1,112 @@
+[package]
+name = "xtask"
+description = "Repository automation: layer and version checks, third-party notices, build-time report, golden contact sheets."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+anyhow = { workspace = true }
+blake3 = { workspace = true }
+clap = { workspace = true }
+# Contact sheets for `golden-sheets` (PNG decode and resize). Already a workspace crate.
+image = { workspace = true }
+regia_agent = { workspace = true }
+# `agent-examples` builds the built-in extension rows in a bare World.
+bevy_ecs = { workspace = true }
+
+# `check-formats` fingerprints the product viewer package (ADR-2540).
+regia_viewer_pack = { workspace = true }
+regia_app = { workspace = true }
+regia_2d = { workspace = true }
+# The frozen content-format loaders: `book-check` parses every named RON fence through the real
+# loader, and `check-formats` hashes their serde shapes.
+regia_ai = { workspace = true }
+regia_nav = { workspace = true }
+regia_animation = { workspace = true }
+regia_asset = { workspace = true }
+# `check-formats` hashes the `.fracture.ron` shape (`regia_asset_pipeline::fracture`).
+regia_asset_pipeline = { workspace = true }
+regia_core = { workspace = true }
+regia_physics = { workspace = true }
+# The window messages the code-only UI target registers (`agent-bench`, ADR-2621).
+regia_platform = { workspace = true }
+regia_procgen = { workspace = true }
+# `check-formats` hashes the `.bake.ron` description (`regia_pt::bake_desc`).
+regia_pt = { workspace = true }
+# `check-formats` hashes the `.fluidcache` layout (`regia_fluid::cache`, ADR-2441).
+regia_fluid = { workspace = true }
+regia_audio = { workspace = true }
+regia_media = { workspace = true }
+regia_framework = { workspace = true, features = ["functional-tests", "net"] }
+regia_input = { workspace = true }
+regia_matgraph = { workspace = true }
+regia_render = { workspace = true }
+regia_scene = { workspace = true }
+# `profile-capture` in check-formats (ADR-2323).
+regia_telemetry = { workspace = true }
+regia_script_lua = { workspace = true }
+# `check-formats` records the product viewer contract schemas (ADR-2480).
+regia_configurator = { workspace = true }
+regia_world = { workspace = true }
+regia_terrain = { workspace = true }
+# check-formats: the meshlayers formats (spec 121 § 9, ADR-8112).
+regia_world_geom = { workspace = true }
+regia_ui = { workspace = true }
+regia_vfx = { workspace = true }
+# `check-formats` hashes the net, XR and CLI-owned file shapes (ADR-2316): `config/net.ron`, `server.toml`,
+# `bans.ron` and the other `regia_net` files; `config/xr.ron`, the action manifest and `.xrsim.ron`;
+# `.session.ron` and `regia-engine.release.ron`, whose types live in the `regia_cli` library (an
+# automation-layer edge: `xtask` may depend on any crate, nothing depends on `xtask`).
+regia_net = { workspace = true }
+regia_xr = { workspace = true }
+regia_cli = { workspace = true }
+# `check-formats` records `.renv` (ADR-2539).
+regia_viewer = { workspace = true }
+# The alpha smoke session drives `do27_chase`'s soak in-process. Automation may depend on samples.
+lookdev = { path = "../samples/lookdev" }
+# `showcase-table` shares the table writers with the showcase demo's benchmark (`showcase::perf_table`, ADR-3013).
+showcase = { path = "../samples/showcase" }
+png = { workspace = true }
+# `editor-icons` draws the editor's app icon set from its SVG (ADR-20000; the cook's rasterizer, no new crate).
+resvg = { workspace = true }
+# `minidump`: read native crash bundles' minidumps (dev tool only, ADR-158).
+minidump = { workspace = true }
+# `binary-size`: ELF and PE section and symbol sizes (ADR-3188).
+goblin = { workspace = true }
+minidump-processor = { workspace = true }
+minidump-unwind = { workspace = true }
+postcard = { workspace = true }
+rapier3d = { workspace = true }
+# `perf-budgets`: the metric regex of each registry entry (ADR-2704). Already in the lock file through criterion and tracing.
+regex = { workspace = true }
+ron = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+# `api-snapshot` reads the stable crates' public items from source (workspace crates, `regia_macros` uses them too).
+syn = { workspace = true }
+quote = { workspace = true }
+proc-macro2 = { workspace = true }
+# `docs/ported-sources.toml` for `notices`.
+toml = { workspace = true }
+tracing = { workspace = true }
+wgpu = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+# The template ids `templates-check` builds.
+regia_templates = { workspace = true }
+
+[dev-dependencies]
+# Unique temp dirs for the `dist` bundle and `gpu-bench` tests.
+regia_test_utils = { workspace = true }
+
+# A child process segfaults on purpose; the test reads the bundle's minidump (ADR-158). Its own
+# `main`: the crash monitor is the test binary re-launched.
+[[test]]
+name = "native_crash"
+harness = false

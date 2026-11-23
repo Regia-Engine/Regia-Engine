@@ -1,0 +1,27 @@
+// The example of docs/formats/motiondb-ron.md (v2: contact labels and the gait phase, ADR-2858).
+(
+  format_version: 2,
+  skeleton: "characters/hero.skeleton",
+  schema: (
+    root_joint: "hips",
+    forward: (0.0, 0.0, 1.0),                 // default +Z
+    feet: ["left_foot", "right_foot"],
+    trajectory_times: [0.333, 0.667, 1.0],    // default; at most 16
+    history_times: [0.25, 0.5],               // optional; at most 8
+    sample_rate: 30.0,                        // default
+    weights: ( foot_velocity: 0.5, foot_contact: 1.0, foot_phase: 0.5 ),   // 0..1000
+    normalization: group_deviation,           // or per_dimension, none
+    pose_joints: [ ( joint: "right_hand", velocity: false, weight: 0.5 ) ],
+    sample_weights: ( trajectory: [2.0, 1.0, 1.0] ),   // one per sample time, 0..100
+    contacts: Some(( height_on: 0.02, height_off: 0.05, speed_on: 0.15, speed_off: 0.35, phase: true )),
+  ),
+  tags: ["walk", "run", "stop"],              // at most 32, bit order
+  mirror_pairs: [("left_foot", "right_foot"), ("left_hand", "right_hand")],   // for mirrored entries
+  entries: [
+    ( clip: "anim/walk.clip", looping: true, tags: ["walk"],
+      spans: [ ( kind: landing_bias(-0.5), range: (0.0, 0.2) ),
+               ( kind: tag(["stop"]), range: (0.5, 0.6) ) ] ),
+    ( clip: "anim/run.clip", looping: true, tags: ["run"], trim: (0.1, 0.2) ),
+    ( clip: "anim/stop.clip", tags: ["stop"], distance_matched: true ),
+  ],
+)

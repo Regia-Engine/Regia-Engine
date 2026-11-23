@@ -1,0 +1,78 @@
+// Bore Twelve stand-in scatter (`.scatter.ron` format v2, docs/formats/terrain.md § 2).
+// Sizes are metres (meshes are ~1 m across at scale 1).
+// Mesh paths name the DO27 ice-rock set; lookdev binds procedural stand-ins to them.
+ScatterSet(
+    version: 2,
+    seed: 1212,
+    classes: [
+        // Frost-covered ice blocks broken off the ridges.
+        ScatterClass(
+            name: "ice_blocks",
+            meshes: [
+                ScatterMeshRef(mesh: "props/rocks/europa_ice_block_a.glb", weight: 3.0, min_scale: 0.7, max_scale: 5.2, scale_bias: 3.0),
+                ScatterMeshRef(mesh: "props/rocks/europa_ice_block_b.glb", weight: 2.0, min_scale: 0.7, max_scale: 4.4, scale_bias: 3.0),
+            ],
+            cell_size: 7.0,
+            density: 1.0,
+            noise_scale: 110.0,
+            noise_amount: 0.7,
+            slope_max: 0.8,
+            align_to_normal: 0.5,
+            tilt_max: 0.5,
+            tilt_jitter: 0.2,
+            sink: 0.2,
+            tint_jitter: 0.12,
+            base_tint: (0.72, 0.75, 0.80),
+            base_blend: 0.25,
+            contact_ao: 0.6,
+            contact_radius: 1.6,
+            fade_start: 260.0,
+            fade_end: 340.0,
+        ),
+        // Dark basalt chunks: rarer, read strongly against the ice.
+        ScatterClass(
+            name: "basalt",
+            meshes: [
+                ScatterMeshRef(mesh: "props/rocks/europa_basalt_a.glb", weight: 1.0, min_scale: 0.5, max_scale: 2.8, scale_bias: 2.5),
+            ],
+            cell_size: 10.0,
+            density: 0.6,
+            noise_scale: 70.0,
+            noise_amount: 0.85,
+            slope_max: 0.7,
+            align_to_normal: 0.6,
+            tilt_max: 0.5,
+            tilt_jitter: 0.2,
+            sink: 0.2,
+            tint_jitter: 0.15,
+            base_tint: (0.55, 0.58, 0.64),
+            base_blend: 0.3,
+            contact_ao: 0.5,
+            fade_start: 220.0,
+            fade_end: 300.0,
+        ),
+        // Ice rubble.
+        ScatterClass(
+            name: "rubble",
+            meshes: [
+                ScatterMeshRef(mesh: "props/rocks/europa_ice_block_b.glb", weight: 1.0, min_scale: 0.12, max_scale: 0.6, scale_bias: 1.5),
+            ],
+            cell_size: 1.8,
+            density: 1.0,
+            noise_scale: 30.0,
+            noise_amount: 0.8,
+            slope_max: 0.7,
+            align_to_normal: 0.9,
+            tilt_max: 0.8,
+            tilt_jitter: 0.3,
+            sink: 0.25,
+            tint_jitter: 0.15,
+            base_tint: (0.72, 0.75, 0.80),
+            contact_ao: 0.25,
+            fade_start: 60.0,
+            fade_end: 90.0,
+            shadow_max_lod: 1,
+            shadow_distance: 40.0,
+        ),
+    ],
+)

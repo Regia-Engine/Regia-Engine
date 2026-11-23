@@ -1,0 +1,17 @@
+(
+    format: "uisettings",
+    entries: [
+        (
+            version: 1,
+            file: "v1.ron",
+            origin: "frozen copy of the fuzz-target registry fixture",
+            exercises: "v1: the DPI curve and the layer budget, still loaded (ADR-2866)",
+        ),
+        (
+            version: 2,
+            file: "v2.ron",
+            origin: "w13 scale rule fixture (ADR-8252)",
+            exercises: "v2: optional scale_mode, the current version",
+        ),
+    ],
+)

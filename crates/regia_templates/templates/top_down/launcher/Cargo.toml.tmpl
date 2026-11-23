@@ -1,0 +1,19 @@
+[package]
+name = "{{crate_name}}_launcher"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "{{crate_name}}"
+path = "src/main.rs"
+
+[dependencies]
+regia = { path = "{{engine}}/crates/regia" }
+{{crate_name}} = { path = "../game" }
+
+# The Windows exe icon and version info (build.rs, ADR-2645).
+[build-dependencies]
+winresource = "0.1.34"
+png = "0.18"
+toml = { version = "1", default-features = false, features = ["std", "parse"] }

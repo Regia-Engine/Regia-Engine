@@ -1,0 +1,22 @@
+// Battle royale (ADR-8748): solo teams, one life, a zone that shrinks twice; the last team standing wins.
+(
+    format_version: 1,
+    id: "br_zone",
+    name_key: "mode.br_zone",
+    skeleton: "custom",
+    session: (
+        flow: (max_teams: 4, seats_per_team: 1, start_delay_ticks: 0),
+        objectives: (max_teams: 4),
+        respawn: (default: (kind: "never")),
+        zone: (
+            center: (0.0, 0.0),
+            radius: 100.0,
+            phases: [
+                (wait_ticks: 10, shrink_ticks: 100, end_radius: 10.0, damage_per_tick: 3),
+                (wait_ticks: 5, shrink_ticks: 20, end_radius: 2.0, damage_per_tick: 7),
+            ],
+            seed: 42,
+        ),
+        elimination: (last_standing: true),
+    ),
+)

@@ -1,0 +1,11 @@
+(
+    format: "viewport-snap",
+    entries: [
+        (
+            version: 1,
+            file: "v1.ron",
+            origin: "handwritten from 7a87c9394 (docs/formats/viewport-snap-ron.md's example)",
+            exercises: "the current version: what the editor writes today must stay readable",
+        ),
+    ],
+)

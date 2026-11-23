@@ -1,0 +1,11 @@
+RoadProfile(
+    format_version: 1,
+    width_m: 7.0,
+    shoulders_m: (1.0, 1.5),
+    surface_lift_m: 0.02,
+    cross_slope_pct: 2.0,
+    material: "materials/asphalt.material.ron",
+    uv_m_per_tile: 4.0,
+    samples_per_m: 1.0,
+    pieces: [(mesh: "props/rail.glb", side: Left, offset_m: 0.5)],
+)

@@ -1,0 +1,53 @@
+format_version = 1
+id = "halve-the-lamps"
+title = "Dim the three lamps to half"
+prompt = "Three point lights named 'Lamp A', 'Lamp B' and 'Lamp C' have an intensity of 800. Set every one of them to 400 and change nothing else about them."
+features = ["lighting", "scene"]
+crates = ["regia_agent", "regia_render"]
+call_budget = 8
+
+[setup]
+target = "lighting"
+
+[[setup.call]]
+method = "scene.spawn"
+params = { name = "Lamp A", components = { Transform = { translation = [0, 3, 0] }, PointLight = { position = [0, 0, 0], color = [1.0, 0.9, 0.7], intensity = 800.0, radius = 10.0, cast_shadows = false } } }
+save = { la = "/entity" }
+
+[[setup.call]]
+method = "scene.spawn"
+params = { name = "Lamp B", components = { Transform = { translation = [4, 3, 0] }, PointLight = { position = [0, 0, 0], color = [1.0, 0.9, 0.7], intensity = 800.0, radius = 10.0, cast_shadows = false } } }
+save = { lb = "/entity" }
+
+[[setup.call]]
+method = "scene.spawn"
+params = { name = "Lamp C", components = { Transform = { translation = [8, 3, 0] }, PointLight = { position = [0, 0, 0], color = [1.0, 0.9, 0.7], intensity = 800.0, radius = 10.0, cast_shadows = false } } }
+save = { lc = "/entity" }
+
+[[check]]
+name = "lamp A at 400"
+method = "scene.get_entity"
+params = { entity = "$la", components = ["PointLight"] }
+pointer = "/components/PointLight/value/intensity"
+expect = { kind = "equals", value = 400.0 }
+
+[[check]]
+name = "lamp B at 400"
+method = "scene.get_entity"
+params = { entity = "$lb", components = ["PointLight"] }
+pointer = "/components/PointLight/value/intensity"
+expect = { kind = "equals", value = 400.0 }
+
+[[check]]
+name = "lamp C at 400"
+method = "scene.get_entity"
+params = { entity = "$lc", components = ["PointLight"] }
+pointer = "/components/PointLight/value/intensity"
+expect = { kind = "equals", value = 400.0 }
+
+[[check]]
+name = "color kept"
+method = "scene.get_entity"
+params = { entity = "$la", components = ["PointLight"] }
+pointer = "/components/PointLight/value/color/2"
+expect = { kind = "number_range", min = 0.69, max = 0.71 }

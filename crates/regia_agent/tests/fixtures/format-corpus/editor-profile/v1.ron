@@ -1,0 +1,7 @@
+(
+    format_version: 1,
+    name: "Level art",
+    hidden_areas: [networking, scripting],
+    hidden_panels: ["profiler"],
+    hidden_kinds: [],
+)

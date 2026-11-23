@@ -1,0 +1,59 @@
+[package]
+name = "regia_pt"
+description = "Reference path tracer: wgpu compute ground truth for the real-time renderer (specs/27 § 1)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+# Intel Open Image Denoise previews (`regia_pt::denoise`). Off by default: it links the native
+# OIDN library (build: `OIDN_DIR` or pkg-config; run: `LD_LIBRARY_PATH=$OIDN_DIR/lib`). Tools only.
+denoise = ["dep:oidn"]
+# The GPU lightmap baker (`regia_pt::lightmap::bake_lightmap_gpu`, ADR-2024): the CPU baker's estimate as a compute
+# shader, checked against it within a tolerance. Tools only.
+lightmap-gpu = []
+
+[dependencies]
+regia_asset = { workspace = true }
+regia_core = { workspace = true }
+regia_render = { workspace = true }
+regia_terrain = { workspace = true }
+wgpu = { workspace = true }
+bytemuck = { workspace = true }
+png = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+ron = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+oidn = { workspace = true, optional = true }
+# Validates each translated material graph on its own before it joins the kernels (ADR-2725).
+naga = { workspace = true }
+
+[[example]]
+name = "pt_denoise"
+required-features = ["denoise"]
+
+[[example]]
+name = "lightmap_gpu_bench"
+required-features = ["lightmap-gpu"]
+
+[dev-dependencies]
+regia_test_utils = { workspace = true }
+# `lightmap_debug_views`: the debug views through the app's own systems.
+regia_app = { workspace = true }
+regia_scene = { workspace = true }
+naga = { workspace = true }
+# Graph parity tests compile real graphs (ADR-2725).
+regia_matgraph = { workspace = true }
+# `lightmap_pt_evidence`: the shipped UV atlas generator lays out the evidence bakes (a desktop
+# tools crate; a dev-dependency only, never linked into a game).
+regia_asset_pipeline = { workspace = true }
+# `spec27_calibration`'s decal rows draw the frame's projected decals through the VFX layer
+# (ADR-2951; a dev-dependency only).
+regia_vfx = { workspace = true }

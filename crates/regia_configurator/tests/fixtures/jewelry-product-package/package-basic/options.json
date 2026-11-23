@@ -1,0 +1,27 @@
+{
+  "axes": [
+    {
+      "group": "Material",
+      "values": [
+        {
+          "available": true,
+          "label": "Metal A"
+        }
+      ]
+    },
+    {
+      "group": "Gem",
+      "values": [
+        {
+          "available": true,
+          "label": "Clear A"
+        }
+      ]
+    }
+  ],
+  "design_key": "house-a/d0001",
+  "product_key": "house-a/p0001",
+  "schema": "jewelry.option_graph/1",
+  "snapshot_id": "2026-11-04-000000000000",
+  "status": "orderable"
+}

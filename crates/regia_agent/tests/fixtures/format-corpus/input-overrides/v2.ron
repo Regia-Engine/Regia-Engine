@@ -1,0 +1,13 @@
+(
+    format_version: 2,
+    contexts: {
+        "Gameplay": {
+            "Jump": (
+                action: "Jump",
+                input: Key("KeyJ"),
+                modifiers: [],
+                triggers: [],
+            ),
+        },
+    },
+)

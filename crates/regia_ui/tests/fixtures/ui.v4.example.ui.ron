@@ -1,0 +1,31 @@
+// `.ui.ron` v4 (ADR-2045): text-style spacing, weight, decorations, OpenType features and effect layers.
+(
+    version: 4,
+    root: (
+        name: "title_card",
+        children: [
+            (
+                name: "title",
+                text: (
+                    spans: ["Regia"],
+                    style: (
+                        font_px: 48,
+                        letter_spacing: 0.1,
+                        weight: 700,
+                        effects: [
+                            (color: "#000000", width: 2),
+                            (color: [0.0, 0.0, 0.0, 0.6], offset: (3, 3), blur: 4),
+                        ],
+                    ),
+                ),
+            ),
+            (
+                name: "subtitle",
+                text: (
+                    spans: [(text: "underlined", style: (underline: true)), " and ", (text: "struck", style: (strikethrough: true))],
+                    style: (features: ["smcp", "liga=0"]),
+                ),
+            ),
+        ],
+    ),
+)

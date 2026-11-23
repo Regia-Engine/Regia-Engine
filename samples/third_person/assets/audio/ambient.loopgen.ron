@@ -1,0 +1,20 @@
+// Ambient bed of samples/third_person (ADR-2596): soft wind over a low rumble, rendered in memory
+// by `regia_audio::LoopGenDef` (no recorded file). Plays looped on the `Ambience` bus.
+(
+    version: 1,
+    name: "tp_wind_bed",
+    sample_rate: 48000,
+    length_secs: 6.0,
+    channels: 2,
+    seed: 2522,
+    crossfade_secs: 0.5,
+    output_gain_db: -14.0,
+    nodes: [
+        (id: "air", node: Noise(color: Pink, gain: 0.6)),
+        (id: "air_lp", node: Filter(input: "air", mode: LowPass, cutoff_hz: 900.0, q: 0.6)),
+        (id: "gusts", node: Am(input: "air_lp", rate_hz: 0.17, depth: 0.6)),
+        (id: "low", node: Rumble(cutoff_hz: 70.0, q: 0.8, gain: 0.25)),
+        (id: "bed", node: Mix(inputs: [(input: "gusts"), (input: "low", gain: 0.6)])),
+    ],
+    output: "bed",
+)

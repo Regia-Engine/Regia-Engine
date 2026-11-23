@@ -1,0 +1,22 @@
+[package]
+name = "{{crate_name}}_server"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+# `regia`'s `server` build: no window, render or audio crate. Build it on its own:
+# `cargo build -p {{crate_name}}_server --release`.
+[dependencies]
+{{crate_name}} = { path = "../game", default-features = false, features = ["server"] }
+regia = { path = "{{engine}}/crates/regia", default-features = false, features = ["net", "server"] }
+
+# `regia package --server` builds `-p {{crate_name}}_server --no-default-features --features server`. This
+# crate is always the server (its game dependency turns `server` on), so the feature is a marker.
+[features]
+server = []
+
+# The Windows exe icon and version info (build.rs, ADR-2645).
+[build-dependencies]
+winresource = "0.1.34"
+png = "0.18"
+toml = { version = "1", default-features = false, features = ["std", "parse"] }

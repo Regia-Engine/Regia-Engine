@@ -1,0 +1,185 @@
+{
+  "$defs": {},
+  "$id": "https://regia.invalid/formats/jewelry-product-package.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "One product ready for a static web host or a phone: the files a viewer fetches, each with its size and BLAKE3 hash. Owner: Regia. Page: docs/formats/jewelry-product-package.md.",
+  "properties": {
+    "design_key": {
+      "description": "`<house>/<sku_base>`, else the `product_key`.",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,39}/[^\\s/][^/]{0,127}$",
+      "type": "string"
+    },
+    "files": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "blake3": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "mesh",
+              "recipe",
+              "options",
+              "materials",
+              "kit",
+              "luts",
+              "thumb",
+              "texture",
+              "data"
+            ],
+            "type": "string"
+          },
+          "name": {
+            "description": "A file directly in the package folder: one path component, no leading `.`.",
+            "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}$",
+            "type": "string"
+          },
+          "size": {
+            "maximum": 1073741824,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "blake3",
+          "kind",
+          "name",
+          "size"
+        ],
+        "type": "object"
+      },
+      "maxItems": 4096,
+      "minItems": 1,
+      "type": "array"
+    },
+    "format_version": {
+      "description": "Version of the package layout and its cooked files.",
+      "minimum": 1,
+      "type": "integer"
+    },
+    "house": {
+      "description": "Supplier slug (`interfaces.md` § 0.2), or `shared` for generic parts.",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,39}$",
+      "type": "string"
+    },
+    "package_hash": {
+      "description": "docs/formats/jewelry-product-package.md, section package_hash.",
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "package_version": {
+      "description": "Counts the rebuilds of this product's package.",
+      "minimum": 1,
+      "type": "integer"
+    },
+    "product_key": {
+      "description": "`<house>/<products.house_key>`: a natural key, never a DB row id.",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,39}/[^\\s/][^/]{0,127}$",
+      "type": "string"
+    },
+    "recipe": {
+      "additionalProperties": false,
+      "properties": {
+        "design_key": {
+          "description": "`<house>/<sku_base>`, else the `product_key`.",
+          "pattern": "^[a-z0-9][a-z0-9-]{0,39}/[^\\s/][^/]{0,127}$",
+          "type": "string"
+        },
+        "hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "hash",
+        "version"
+      ],
+      "type": "object"
+    },
+    "regia_min_version": {
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "type": "string"
+    },
+    "schema": {
+      "const": "jewelry.product_package/1"
+    },
+    "sizes": {
+      "additionalProperties": false,
+      "description": "Bytes by group, for the size report; `total` is the sum of the files.",
+      "properties": {
+        "data": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "luts": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "mesh": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "total": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "total"
+      ],
+      "type": "object"
+    },
+    "snapshot_id": {
+      "description": "`<UTC date>-<sha256[:12]>` of the catalog copy.",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9a-f]{12}$",
+      "type": "string"
+    },
+    "studio": {
+      "additionalProperties": false,
+      "description": "The shared studio package this product needs.",
+      "properties": {
+        "blake3": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "studio_id": {
+          "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "blake3",
+        "studio_id"
+      ],
+      "type": "object"
+    },
+    "tenant_id": {
+      "description": "`house:<slug>` (a supplier) or `shop:<slug>` (a business): which content it may load, never a person.",
+      "pattern": "^(house|shop):[a-z0-9][a-z0-9-]{0,39}$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "design_key",
+    "files",
+    "format_version",
+    "house",
+    "package_hash",
+    "package_version",
+    "product_key",
+    "recipe",
+    "regia_min_version",
+    "schema",
+    "sizes",
+    "snapshot_id"
+  ],
+  "title": "Product package manifest (manifest.json)",
+  "type": "object"
+}

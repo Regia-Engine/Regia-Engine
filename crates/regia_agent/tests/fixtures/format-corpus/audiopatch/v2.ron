@@ -1,0 +1,78 @@
+(
+    version: 2,
+    name: "hover_engine",
+    bus: Some("Sfx"),
+    parameters: [
+        (
+            name: "speed",
+            min: 0.0,
+            max: 100.0,
+            smoothing_secs: 0.1,
+            binding: None,
+        ),
+        (
+            name: "throttle",
+            min: 0.0,
+            max: 1.0,
+            smoothing_secs: 0.1,
+            binding: None,
+        ),
+    ],
+    layers: [
+        (
+            name: "loop_set",
+            sound: None,
+            keys: [
+                (
+                    value: 0.0,
+                    sound: "audio/engine/idle.ogg",
+                    gain_db: 0.0,
+                    pitch: 1.0,
+                ),
+                (
+                    value: 50.0,
+                    sound: "audio/engine/mid.ogg",
+                    gain_db: 0.0,
+                    pitch: 1.0,
+                ),
+                (
+                    value: 100.0,
+                    sound: "audio/engine/redline.ogg",
+                    gain_db: 0.0,
+                    pitch: 1.0,
+                ),
+            ],
+            parameter: Some("speed"),
+            volume_db: -6.0,
+            volume_curves: [
+                (
+                    parameter: "throttle",
+                    points: [
+                        (0.0, 0.0),
+                        (1.0, 6.0),
+                    ],
+                ),
+            ],
+            pitch_curves: [
+                (
+                    parameter: "speed",
+                    points: [
+                        (0.0, 0.6),
+                        (100.0, 1.4),
+                    ],
+                ),
+            ],
+            filter_curves: [
+                (
+                    parameter: "speed",
+                    points: [
+                        (0.0, 1200.0),
+                        (100.0, 20000.0),
+                    ],
+                ),
+            ],
+            one_shot: None,
+            granular: None,
+        ),
+    ],
+)

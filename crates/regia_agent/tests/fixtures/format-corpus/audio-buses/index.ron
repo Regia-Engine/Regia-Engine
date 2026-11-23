@@ -1,0 +1,23 @@
+(
+    format: "audio-buses",
+    entries: [
+        (
+            version: 0,
+            file: "v0.ron",
+            origin: "BusLayout::default_tree() in the versionless shape v0.5.0 shipped (written by hand from the v0.5.0 struct, ADR-8105 (g))",
+            exercises: "the v0 -> v1 migration: the missing version reads as 0 and the loader stamps 1",
+        ),
+        (
+            version: 1,
+            file: "v1.ron",
+            origin: "frozen copy of the fuzz-target registry fixture",
+            exercises: "the current version: a bypassed EQ, a delay send bus, two snapshots with volumes, cutoffs, mutes, sends and blend times",
+        ),
+        (
+            version: 1,
+            file: "v1-prefader.ron",
+            origin: "written by hand for the v1 send-tap fold (ADR-8590), before the v0.6.0 freeze",
+            exercises: "the per-send tap: an explicit PreFader and PostFader send on a muted bus at its fader floor, a send without the field (post-fader), a snapshot level on the pre-fader route",
+        ),
+    ],
+)

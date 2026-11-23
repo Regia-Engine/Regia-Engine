@@ -1,0 +1,26 @@
+(
+    format_version: 1,
+    id: "guide",
+    notes: "The guide NPC of the third-person sample: a greeting, a question with two answers, one reply.",
+    lines: [
+        (id: "greet", speaker: "guide", text: "npc-guide-greet", voice: None, duration: Fixed(1500)),
+        (id: "ask", speaker: "guide", text: "npc-guide-ask", voice: None, duration: Fixed(1500)),
+        (id: "yes", speaker: "guide", text: "npc-guide-yes", voice: None, duration: Fixed(1500)),
+        (id: "no", speaker: "guide", text: "npc-guide-no", voice: None, duration: Fixed(1500)),
+    ],
+    steps: [
+        Line("greet"),
+        Line("ask"),
+        Choice(options: [
+            (text: "npc-guide-opt-yes", goto: "accept"),
+            (text: "npc-guide-opt-no", goto: "decline"),
+        ]),
+        Label("accept"),
+        Line("yes"),
+        Event("quest_given"),
+        End,
+        Label("decline"),
+        Line("no"),
+        End,
+    ],
+)

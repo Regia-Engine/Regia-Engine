@@ -1,0 +1,50 @@
+[package]
+name = "regia_core"
+description = "Foundation: math (glam re-export), ids, errors, logging/profiling, task pools."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+glam = { workspace = true }
+num-traits = { workspace = true }
+bytemuck = { workspace = true }
+uuid = { workspace = true }
+smallvec = { workspace = true }
+parking_lot = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+bevy_tasks = { workspace = true }
+serde = { workspace = true }
+ron = { workspace = true }
+tracing-tracy = { workspace = true, optional = true }
+
+[target.'cfg(any(target_os = "linux", target_os = "android"))'.dependencies]
+libc = { workspace = true }
+
+[target.'cfg(target_os = "android")'.dependencies]
+android_logger = { workspace = true }
+log = { workspace = true }
+
+[dev-dependencies]
+regia_test_utils = { workspace = true }
+ron = { workspace = true }
+postcard = { workspace = true }
+serde_json = { workspace = true }
+
+[features]
+tracy = ["dep:tracing-tracy"]
+# Same bits on every CPU and OS (ADR-5176): glam's scalar path instead of SSE2/NEON (whose
+# horizontal sums group a 4-lane dot product differently and whose NEON quaternion product fuses
+# multiply-adds), with glam's transcendentals from the pure-Rust libm instead of the platform's (the
+# scalar path calls `sin`/`cos`/`atan2` where the SIMD path has its own polynomials). Off by default
+# (the SIMD path is faster); for cross-architecture lockstep and the samples' digest comparisons.
+cross-platform-determinism = ["glam/scalar-math", "glam/libm"]
+# Developer-only environment reads. Keep disabled in shipping builds, including release.
+devtools = []

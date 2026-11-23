@@ -1,0 +1,6 @@
+// `.uisettings.ron` v1 (ADR-2866): the project's UI settings, at assets/ui/project.uisettings.ron.
+(
+    version: 1,
+    dpi_curve: [(96.0, 1.0), (144.0, 1.25), (192.0, 1.75)],
+    layer_budget_bytes: 33554432,
+)

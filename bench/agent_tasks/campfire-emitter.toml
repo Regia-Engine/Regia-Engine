@@ -1,0 +1,39 @@
+format_version = 1
+id = "campfire-emitter"
+title = "Give the campfire a looping sound emitter"
+prompt = "The entity 'Campfire' stands at (5, 0, 5). Make it a sound emitter: looping, 6 dB quieter than full volume (-6 dB), audible out to 30 m."
+features = ["audio", "scene"]
+crates = ["regia_agent", "regia_audio"]
+call_budget = 6
+
+[setup]
+target = "audio"
+
+[[setup.call]]
+method = "scene.spawn"
+params = { name = "Campfire", components = { Transform = { translation = [5, 0, 5] } } }
+save = { c = "/entity" }
+
+[[check]]
+name = "one emitter"
+method = "audio.list_emitters"
+pointer = "/emitters"
+expect = { kind = "count_range", min = 1, max = 1 }
+
+[[check]]
+name = "30 m range"
+method = "audio.list_emitters"
+pointer = "/emitters/0/max_distance"
+expect = { kind = "equals", value = 30.0 }
+
+[[check]]
+name = "-6 dB"
+method = "audio.list_emitters"
+pointer = "/emitters/0/volume_db"
+expect = { kind = "equals", value = -6.0 }
+
+[[check]]
+name = "looping"
+method = "audio.list_emitters"
+pointer = "/emitters/0/looping"
+expect = { kind = "equals", value = true }

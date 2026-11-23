@@ -1,0 +1,66 @@
+// Corpus versions that cannot have a fixture (ADR-2743, `cargo xtask check-formats`): every entry names the
+// format, the version (0 = every version) and the reason. Remove an entry when its fixture lands.
+(
+    exceptions: [
+        (
+            format: "agent-task",
+            version: 0,
+            reason: "owned by xtask (bench/agent_tasks/*.toml, ADR-2621): a repository file, not project content, and no corpus loader is wired for it",
+        ),
+        (
+            format: "baked-gi",
+            version: 0,
+            reason: "the .fgiv volumes exist only as baker output and no corpus loader test is wired for them yet (regia_asset::baked_gi reads them); wire one and drop this entry",
+        ),
+        (
+            format: "gpu-mesh",
+            version: 1,
+            reason: "no v1 FGPM payload was ever committed: gpu-mesh became a registered format at v2 in e62524993 (ADR-2788), and every FGPM blob in history is the v2 corpus fixture (all .bin/.pak/.fckd/.fgpm/.fvox/.rpak blobs scanned 2026-11-09); v1 bytes exist only in the reader's test builder (v1_payload in crates/regia_asset/src/gpu_mesh.rs tests), so a v1 fixture cannot be taken from history",
+        ),
+        (
+            format: "nav-det-navmesh",
+            version: 1,
+            reason: "there is no v1: the deterministic navmesh enters Regia at v2 because DO27's cooked `NVM2` mesh is copied whole with its version (ADR-8174); no v1 bytes exist anywhere",
+        ),
+        (
+            format: "perf-budgets",
+            version: 0,
+            reason: "owned by xtask (docs/perf/budgets.ron, ADR-2704): a repository file, not project content, and no corpus loader is wired for it",
+        ),
+        (
+            format: "viewer-package",
+            version: 0,
+            reason: "a viewer package is manifest.json plus a cooked mesh and is only built by `regia viewer pack`; no standalone corpus loader test is wired for it",
+        ),
+        (
+            format: "voxel-far",
+            version: 1,
+            reason: "no real v1 .fvox file survives: v1 bytes exist only inside the v2 bump's migrator test builder (v1_bytes in crates/regia_render/src/visbuffer/voxel_far/tests.rs, ADR-2655); a v1 fixture cannot be taken from history",
+        ),
+        (
+            format: "voxel-far",
+            version: 3,
+            reason: "no v3 .fvox file was ever committed: v3 (ad50c36e6) was current only on lane branches before the v4 bump (cbee03d99), the corpus went from its v2 fixture (d98d8ff30) straight to v4 (2c47999d9), and every FVOX blob in history is a v1, v2 or v4 corpus fixture (the v1 one, on the unmerged lane/sprint-format-corpus-wave2, was today's writer with a patched version word); v3 bytes exist only in the v4 migrator test builder (v3_bytes in crates/regia_render/src/visbuffer/voxel_far/tests.rs), so a v3 fixture cannot be taken from history",
+        ),
+        (
+            format: "lightmap-cells",
+            version: 0,
+            reason: "the cell index (`<level>.cells/cells.json`, ADR-3318) is a bake cache that is never migrated (an index of another version re-bakes every cell) and regia_pt is optional in regia_agent, so no corpus loader is wired for it; its fuzz coverage is regia_pt's lightmap_cells_index_never_panics",
+        ),
+        (
+            format: "texpack",
+            version: 0,
+            reason: "a `.texpack.ron` channel-pack recipe (ADR-3090) is read only by the desktop-only regia_asset_pipeline, which regia_agent's corpus test cannot depend on; its parser is covered by the fuzz target texpack_ron_never_panics (crates/regia_asset_pipeline/tests/fuzz.rs). Wire a pipeline-side corpus loader and drop this entry",
+        ),
+        (
+            format: "version-probe",
+            version: 0,
+            reason: "a datagram layout, not a file (spec 120 § 12.2, ADR-7985): frozen forever and never migrated, and a later probe version keeps version 1's prefix, so the corpus's refuse-the-future rule does not apply; every byte is pinned by probe_bytes_are_pinned (crates/regia_net/src/version_probe.rs) and the decoders are fuzzed by the net.version_probe target",
+        ),
+        (
+            format: "regia-det-golden-1",
+            version: 1,
+            reason: "existing committed fixtures live in crates/regia_detsim/goldens/*.detgold; committed_goldens_record_the_reference_trace and golden_text_survives_mutation in tests/det_golden.rs parse and round-trip them without renderer dependencies (ADR-8231)",
+        ),
+    ],
+)

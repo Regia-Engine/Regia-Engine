@@ -1,0 +1,9 @@
+{
+  "format": 1,
+  "algorithm": "ed25519",
+  "key_id": "0871f3aabc26e458",
+  "public_key": "ed25519:ea4a6c63e29c520abef5507b132ec5f9954776aebebe7b92421eea691446d22c",
+  "date": "2026-11-18",
+  "manifest_sha256": "ea64e8da8d01443a89c41ce240e0e03fb0072b50d60b9e92fce3820507ef0aef",
+  "signature": "80d137a76ac8dbd6b3feffea20d62f5d01e4c3ccbbfde049453172b39e0adfd0f862720c11710191390978eaba2920739544ba1a540d420d787f07150c84730d"
+}

@@ -1,0 +1,6 @@
+[project]
+name = "Boot Probe"
+id = "com.regiaengine.samples.boot_probe"
+version = "0.1.0"
+build_number = 1
+engine = "0.1"

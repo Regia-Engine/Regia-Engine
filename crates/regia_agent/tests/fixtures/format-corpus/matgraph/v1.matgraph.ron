@@ -1,0 +1,126 @@
+// The painted hull panel of `ferrite_render::hard_surface::hull_closeup_scene`, rebuilt as a
+// graph: parallax-offset UV, paint × tint × vertex colour, curvature edge wear, distance-faded
+// detail grain and a whiteout detail normal. The hand-written forward path and this graph
+// render the same frame (crates/ferrite_matgraph/tests/parity.rs).
+(
+    format_version: 1,
+    name: "hull_panel",
+    params: [
+        (name: "tint", value: Color((0.07, 0.16, 0.52))),
+        (name: "roughness", value: Float(0.42)),
+        (name: "metallic", value: Float(0.0)),
+        (name: "parallax_scale", value: Float(0.08)),
+        (name: "wear_tint", value: Color((0.80, 0.81, 0.84))),
+        (name: "wear_bias", value: Float(0.55)),
+        (name: "wear_contrast", value: Float(5.0)),
+        (name: "wear_intensity", value: Float(0.9)),
+        (name: "wear_roughness", value: Float(-0.22)),
+        (name: "wear_metallic", value: Float(0.85)),
+        (name: "detail_scale", value: Vec2((8.0, 8.0))),
+        (name: "detail_albedo", value: Float(0.28)),
+        (name: "detail_normal", value: Float(0.22)),
+        (name: "detail_fade_end", value: Float(24.0)),
+        (name: "detail_fade_range", value: Float(18.0)),
+    ],
+    textures: [
+        // Panel paint: white body, dark seams and bolts (sRGB).
+        (name: "paint", path: "textures/hull_paint.png", color_space: Srgb),
+        // Grain (RGB, 0.5 neutral) packed with detail roughness (A).
+        (name: "grain", path: "textures/hull_grain.png", color_space: Linear),
+        // Flake normal (RGB) packed with the detail mask (A).
+        (name: "flake", path: "textures/hull_flake.png", color_space: Linear),
+        // Height (R, 1 = surface) packed with curvature (G, 0.5 = flat).
+        (name: "relief", path: "textures/hull_relief.png", color_space: Linear),
+    ],
+    nodes: {
+        "uv0": TexCoord,
+        "zero": Float(0.0),
+        "one3": Vec3((1.0, 1.0, 1.0)),
+        "two": Float(2.0),
+        "flat_normal": Vec3((0.0, 0.0, 1.0)),
+
+        // Parallax occlusion on the relief height.
+        "parallax_scale": Param("parallax_scale"),
+        "uv": Parallax(texture: "relief", channel: R, uv: "uv0", scale: "parallax_scale", min_steps: 4.0, max_steps: 16.0),
+
+        // Paint × tint × vertex colour.
+        "paint": Sample(texture: "paint", uv: "uv"),
+        "paint_rgb": Swizzle(input: "paint", channels: "rgb"),
+        "paint_a": Swizzle(input: "paint", channels: "a"),
+        "tint": Param("tint"),
+        "vcol": VertexColor,
+        "vcol_rgb": Swizzle(input: "vcol", channels: "rgb"),
+        "vcol_a": Swizzle(input: "vcol", channels: "a"),
+        "tinted": Mul("paint_rgb", "tint"),
+        "painted": Mul("tinted", "vcol_rgb"),
+        "alpha": Mul("paint_a", "vcol_a"),
+
+        // Edge wear from curvature: saturate((c - bias) * contrast) * intensity.
+        "relief_sample": Sample(texture: "relief", uv: "uv", lod: Some("zero")),
+        "curvature": Swizzle(input: "relief_sample", channels: "g"),
+        "wear_bias": Param("wear_bias"),
+        "wear_contrast": Param("wear_contrast"),
+        "wear_intensity": Param("wear_intensity"),
+        "wear_offset": Sub("curvature", "wear_bias"),
+        "wear_scaled": Mul("wear_offset", "wear_contrast"),
+        "wear_mask": Saturate("wear_scaled"),
+        "wear": Mul("wear_mask", "wear_intensity"),
+        "wear_tint": Param("wear_tint"),
+        "worn": Lerp(a: "painted", b: "wear_tint", t: "wear"),
+
+        "roughness_param": Param("roughness"),
+        "roughness_base": Saturate("roughness_param"),
+        "wear_roughness": Param("wear_roughness"),
+        "roughness_wear": Mul("wear_roughness", "wear"),
+        "roughness_sum": Add("roughness_base", "roughness_wear"),
+        "roughness": Saturate("roughness_sum"),
+
+        "metallic_param": Param("metallic"),
+        "metallic_base": Saturate("metallic_param"),
+        "wear_metallic": Param("wear_metallic"),
+        "metallic_wear": Mul("wear_metallic", "wear"),
+        "metallic_sum": Add("metallic_base", "metallic_wear"),
+        "metallic": Saturate("metallic_sum"),
+
+        // Detail: fade with distance, multiply the grain around mid-grey.
+        "distance": CameraDistance,
+        "fade_end": Param("detail_fade_end"),
+        "fade_range": Param("detail_fade_range"),
+        "fade_left": Sub("fade_end", "distance"),
+        "fade_ratio": Div("fade_left", "fade_range"),
+        "fade": Saturate("fade_ratio"),
+        "detail_scale": Param("detail_scale"),
+        "detail_uv": Mul("uv", "detail_scale"),
+        "flake_sample": Sample(texture: "flake", uv: "detail_uv", lod: Some("zero")),
+        "detail_mask": Swizzle(input: "flake_sample", channels: "a"),
+        "fade_mask": Mul("fade", "detail_mask"),
+        "grain_sample": Sample(texture: "grain", uv: "detail_uv", lod: Some("zero")),
+        "grain_rgb": Swizzle(input: "grain_sample", channels: "rgb"),
+        "grain_doubled": Mul("grain_rgb", "two"),
+        "detail_albedo": Param("detail_albedo"),
+        "grain_weight": Mul("fade_mask", "detail_albedo"),
+        "grain_scale": Lerp(a: "one3", b: "grain_doubled", t: "grain_weight"),
+        "base": Mul("worn", "grain_scale"),
+
+        // Detail normal: whiteout blend onto the flat panel.
+        "flake_unpacked": UnpackNormal("flake_sample"),
+        "detail_normal": Param("detail_normal"),
+        "normal_weight": Mul("fade_mask", "detail_normal"),
+        "flake_scaled": NormalStrength(normal: "flake_unpacked", strength: "normal_weight"),
+        "normal": BlendNormals(base: "flat_normal", detail: "flake_scaled", mode: Whiteout),
+    },
+    output: (
+        base_color: Some("base"),
+        alpha: Some("alpha"),
+        metallic: Some("metallic"),
+        roughness: Some("roughness"),
+        normal: Some("normal"),
+        normal_space: Tangent,
+    ),
+    shading: (
+        clearcoat: 1.0,
+        clearcoat_roughness: 0.04,
+        specular_occlusion: true,
+        multi_scatter: true,
+    ),
+)

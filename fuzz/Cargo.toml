@@ -1,0 +1,44 @@
+# Coverage-guided fuzzing of the fuzz-target registry (ADR-2723, docs/specs/97-fuzz-hardening.md § 8). Nightly and outside the
+# workspace (the empty `[workspace]` below), like crates/regia_media/fuzz. Drive it through `cargo xtask fuzz`
+# (book/agents/fuzzing.md): it copies the workspace's Cargo.lock here first, so the fuzzer links what the gate tests.
+[package]
+name = "regia_fuzz"
+version = "0.0.0"
+edition = "2024"
+publish = false
+license = "MPL-2.0"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+blake3 = "1.8"
+libfuzzer-sys = "=0.4.13"
+postcard = { version = "1.1", features = ["use-std"] }
+regia_agent = { path = "../crates/regia_agent" }
+regia_animation = { path = "../crates/regia_animation" }
+regia_app = { path = "../crates/regia_app" }
+regia_asset = { path = "../crates/regia_asset" }
+regia_asset_pipeline = { path = "../crates/regia_asset_pipeline" }
+regia_core = { path = "../crates/regia_core" }
+regia_framework = { path = "../crates/regia_framework" }
+regia_scene = { path = "../crates/regia_scene" }
+regia_script_lua = { path = "../crates/regia_script_lua" }
+
+# One binary, the target picked by name at run time (ADR-2723): one ASan build, not one link per target.
+[[bin]]
+name = "registry"
+path = "fuzz_targets/registry.rs"
+test = false
+doc = false
+bench = false
+
+# Sanitized code runs slower than plain code anyway; level 2 builds much faster than cargo-fuzz's level 3 over this crate
+# graph. Stack traces need line tables. `cargo xtask fuzz replay` and crates/regia_agent/tests/fuzz_findings.rs replay
+# findings on stable through xtask/src/fuzz/one_input.rs, so this profile never decides what a finding is.
+[profile.release]
+opt-level = 2
+debug = "line-tables-only"
+incremental = false
+
+[workspace]

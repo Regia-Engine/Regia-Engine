@@ -1,0 +1,40 @@
+[package]
+name = "regia_looks"
+description = "Cheap product looks for the light viewer: metal, anodize and gem shaders (WebGL2-safe), stand-in gem cuts, the studio environment and the material-library mapping."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+# The wgpu renderer (pipelines, studio upload, headless stills). Off for data-only users.
+gpu = ["dep:wgpu"]
+# The looks as regia_viewer shader hooks and material blocks (`regia_looks::viewer`).
+viewer = ["dep:regia_viewer", "dep:wgpu"]
+
+[dependencies]
+bytemuck = { workspace = true }
+glam = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+wgpu = { workspace = true, optional = true }
+regia_viewer = { workspace = true, optional = true }
+
+[dev-dependencies]
+png = { workspace = true }
+# PNG stills of the viewer board (`Still::encode_png`).
+regia_viewer = { workspace = true, features = ["tools"] }
+naga = { workspace = true, features = ["wgsl-in", "glsl-out"] }
+
+[[example]]
+name = "look_still"
+required-features = ["gpu"]
+
+[[example]]
+name = "look_board_viewer"
+required-features = ["viewer"]

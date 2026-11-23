@@ -1,0 +1,11 @@
+(
+    format: "asset-ids",
+    entries: [
+        (
+            version: 1,
+            file: "v1.ron",
+            origin: "regia_asset::asset_ids::fixture_manifest() written by AssetIdsManifest::to_ron at the current version",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+    ],
+)

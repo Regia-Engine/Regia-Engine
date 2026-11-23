@@ -1,0 +1,35 @@
+// Views of leak_room.gi_compare.ron. The two interior views carry the room's air as the leak
+// mask and their own exposure; the outside view checks the room's light does not leak out.
+(
+    format_version: 1,
+    size: (480, 270),
+    ev100: 15.0,
+    indirect_ev100: Some(12.5),
+    views: [
+        (
+            name: "inside_door",
+            eye: (0.0, 1.6, -2.2),
+            target: (0.0, 1.0, 2.9),
+            fov_y_deg: 75.0,
+            interior: Some((min: (-3.0, 0.0, -3.0), max: (3.0, 3.0, 3.0))),
+            ev100: Some(11.0),
+            indirect_ev100: Some(10.0),
+        ),
+        (
+            name: "inside_back",
+            eye: (2.2, 1.8, 2.4),
+            target: (-2.2, 0.6, -2.4),
+            fov_y_deg: 70.0,
+            interior: Some((min: (-3.0, 0.0, -3.0), max: (3.0, 3.0, 3.0))),
+            ev100: Some(11.0),
+            indirect_ev100: Some(10.0),
+        ),
+        (name: "outside", eye: (7.0, 2.2, 13.0), target: (0.0, 1.2, 2.0), fov_y_deg: 50.0),
+    ],
+    // The fly-through walks in from the sunlit ground through the doorway (ADR-1326).
+    flythrough: [
+        (eye: (7.0, 2.0, 13.0), target: (0.0, 1.2, 2.0), fov_y_deg: 55.0, ev100: Some(15.0)),
+        (eye: (0.0, 1.6, 6.0), target: (0.0, 1.3, -3.0), fov_y_deg: 65.0, ev100: Some(13.0)),
+        (eye: (0.0, 1.6, 0.5), target: (-2.0, 1.0, -3.0), fov_y_deg: 75.0, ev100: Some(11.0)),
+    ],
+)

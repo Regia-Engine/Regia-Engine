@@ -1,0 +1,19 @@
+// A v1 `.music.ron`: no `version` field, only name, bpm, beats_per_bar and stems
+// (docs/formats/music-ron.md's version history).
+(
+    name: "combat",
+    bpm: 132.0,
+    beats_per_bar: 4,
+    stems: [
+        (
+            name: "drums",
+            sound: "audio/music/combat_drums.ogg",
+            volume_db: 0.0,
+        ),
+        (
+            name: "strings",
+            sound: "audio/music/combat_strings.ogg",
+            volume_db: -3.0,
+        ),
+    ],
+)

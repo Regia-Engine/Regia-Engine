@@ -1,0 +1,7 @@
+# AndroidApp::poll_events holds android-activity's state lock for reading while winit runs every
+# frame inside it; these methods take the write lock and deadlock if called from engine code (ADR-013).
+disallowed-methods = [
+    { path = "android_activity::AndroidApp::set_window_flags", reason = "deadlocks inside poll_events; use RegiaActivity.regiaSetKeepScreenOn via JNI (ADR-013)" },
+    { path = "android_activity::AndroidApp::enable_motion_axis", reason = "takes android-activity's write lock; deadlocks inside poll_events (ADR-013)" },
+    { path = "android_activity::AndroidApp::disable_motion_axis", reason = "takes android-activity's write lock; deadlocks inside poll_events (ADR-013)" },
+]

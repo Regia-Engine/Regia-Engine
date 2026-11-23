@@ -1,0 +1,69 @@
+[package]
+name = "regia_media"
+description = "Video playback: WebM/Matroska demux, the decoder isolation seam, lockstep clocks, the player state machine and the CPU YUV reference (specs/50, ADR-1593, ADR-1670)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+default = []
+# Compressed codecs sit behind this feature (ADR-1593 § 4, ADR-1869): AV1, Opus and Vorbis. Off by default;
+# the `regia` umbrella forwards it as `media-codecs`. Each codec can also be enabled alone.
+video = ["av1", "opus", "vorbis"]
+# AV1 through `rav1d` (arm64 assembly on aarch64; x86 assembly only with `av1-nasm`).
+av1 = ["dep:rav1d"]
+# x86 and x86_64 assembly for `rav1d` (AVX2, AVX-512, picked at run time). Needs `nasm` 2.14 or newer on PATH,
+# which is why it stays opt-in (ADR-1593 § 5, ADR-1869 § 2); no effect on the decoded picture.
+av1-nasm = ["av1", "rav1d?/asm"]
+# Opus through `unsafe-libopus` (libopus 1.3.1 translated to unsafe Rust).
+opus = ["dep:unsafe-libopus"]
+# Vorbis through `lewton` (safe Rust).
+vorbis = ["dep:lewton"]
+# Opus for voice chat through `unsafe-libopus` (libopus 1.3.1 translated to unsafe Rust), behind the
+# `regia_audio::voice_chat::VoiceCodecProvider` seam (ADR-1593, ADR-1911).
+voice-opus = ["dep:unsafe-libopus"]
+# The offline encoders (spec 50 § 14, ADR-3369): AV1 through `rav1e` (Rust), Opus through `unsafe-libopus`,
+# muxed to WebM by `mux::WebmWriter`. For render-out and tools only, never a shipped game's runtime path
+# (ADR-1593 § 1); off by default. Desktop hosts; it compiles for Android but nothing there calls it.
+media-encode = ["dep:rav1e", "dep:unsafe-libopus"]
+
+[dependencies]
+regia_core = { workspace = true }
+regia_ecs = { workspace = true }
+regia_app = { workspace = true }
+regia_audio = { workspace = true }
+regia_render = { workspace = true }
+# The above-UI fullscreen video layer (`overlay`, a `regia_render::WindowOverlay` layer, ADR-2410).
+wgpu = { workspace = true }
+# Thermal state for decode throttling (specs/50 § 9, ADR-2410).
+regia_platform = { path = "../regia_platform", default-features = false }
+serde = { workspace = true }
+ron = { workspace = true }
+thiserror = { workspace = true }
+crossbeam-channel = { workspace = true }
+tracing = { workspace = true }
+rav1d = { workspace = true, optional = true }
+unsafe-libopus = { workspace = true, optional = true }
+lewton = { workspace = true, optional = true }
+rav1e = { workspace = true, optional = true }
+# `EncodeSettings::from_json` (render-out and `media.encode` parameters).
+serde_json = { workspace = true }
+
+# arm64 assembly (NEON, dot product, i8mm, SVE2 kernels picked at run time) is assembled by `cc` with the
+# target's clang (Android NDK, Apple clang); x86 assembly needs NASM, so it is the opt-in `av1-nasm` (ADR-1869).
+[target.'cfg(target_arch = "aarch64")'.dependencies]
+rav1d = { workspace = true, optional = true, features = ["asm", "asm_arm64_dotprod", "asm_arm64_i8mm", "asm_arm64_sve2"] }
+
+[dev-dependencies]
+regia_test_utils = { workspace = true }
+regia_net = { workspace = true, features = ["voice"] }
+regia_ui = { workspace = true }
+
+[[example]]
+name = "voice_bench"
+required-features = ["voice-opus"]

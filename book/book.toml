@@ -1,0 +1,21 @@
+[book]
+title = "Regia Engine Manual"
+description = "Regia Engine, the agent-native Rust game engine. Install, a first project, every system, tutorials, and the reference."
+language = "en"
+src = "."
+
+[build]
+# Keep the rendered output out of the content tree (src is the book root itself).
+build-dir = "build"
+
+[output.html]
+default-theme = "navy"
+preferred-dark-theme = "navy"
+additional-css = ["theme/piercing.css"]
+# Rust blocks are compiled by `cargo xtask book-check`; they are not runnable in a playground.
+[output.html.playground]
+runnable = false
+copyable = true
+
+[output.html.search]
+enable = true

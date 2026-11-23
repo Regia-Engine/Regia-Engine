@@ -1,0 +1,36 @@
+(
+    format_version: 1,
+    name: "unit_canopy_laminate",
+    glass_type: laminate,
+    page_size: 512,
+    damage_space: planar,
+    shading: (
+        crack_scatter: "#e6edf2",
+        crack_transmission: 0.1,
+        crack_roughness: 0.7,
+        crazing_haze: 0.55,
+        crazing_roughness: 0.45,
+        normal_bend: 1.0,
+        hole_cutoff: 0.5,
+        edge_jitter: 0.35,
+    ),
+    escalation: (d1: 1.0, d2: 4.0, d3: 10.0),
+    d1: [
+        (name: "bullseye_a", mask: "stamps/lam_d1_bullseye_a_mask.png", normal: Some("stamps/lam_d1_bullseye_a_n.png"), size_m: (0.12, 0.12)),
+        (name: "bullseye_b", mask: "stamps/lam_d1_bullseye_b_mask.png", normal: Some("stamps/lam_d1_bullseye_b_n.png"), size_m: (0.10, 0.10)),
+        (name: "spall_chip", mask: "stamps/lam_d1_chip_mask.png", size_m: (0.06, 0.06), weight: 0.5),
+    ],
+    d2: [
+        (name: "spiderweb_a", mask: "stamps/lam_d2_web_a_mask.png", normal: Some("stamps/lam_d2_web_a_n.png"), size_m: (0.45, 0.45)),
+        (name: "spiderweb_b", mask: "stamps/lam_d2_web_b_mask.png", normal: Some("stamps/lam_d2_web_b_n.png"), size_m: (0.40, 0.40), pivot: (0.46, 0.52)),
+    ],
+    d3: [
+        (name: "crazed_punch_a", mask: "stamps/lam_d3_punch_a_mask.png", normal: Some("stamps/lam_d3_punch_a_n.png"), size_m: (0.60, 0.60)),
+        (name: "crazed_a", mask: "stamps/lam_d3_crazed_a_mask.png", normal: Some("stamps/lam_d3_crazed_a_n.png"), size_m: (0.55, 0.55)),
+    ],
+    laminate: Some((
+        max_hole_radius_m: 0.035,
+        min_hole_energy: 3.0,
+        halo_radius_m: 0.08,
+    )),
+)

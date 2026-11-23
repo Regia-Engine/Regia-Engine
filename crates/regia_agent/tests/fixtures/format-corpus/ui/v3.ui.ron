@@ -1,0 +1,37 @@
+(
+    version: 3,
+    root: (
+        name: "settings",
+        safe_area: true,
+        style: (direction: column, padding: 16, gap: (8, 8)),
+        children: [
+            (
+                name: "hp",
+                widget: progress(1.0),
+                style: (size: (240, 12)),
+                bindings: [
+                    (source: "HudVm.health", target: progress),
+                    (source: "HudVm.dead", target: visible, invert: true),
+                ],
+            ),
+            (
+                name: "volume",
+                widget: slider(0.5, 0.0, 1.0, 0.05),
+                bindings: [(source: "SettingsVm.volume", target: value, mode: two_way)],
+            ),
+            (
+                name: "apply",
+                widget: button,
+                text: (spans: [Loc("settings-apply")]),
+                command: "settings.apply",
+                bindings: [(source: "SettingsVm.dirty", target: enabled, mode: one_time)],
+            ),
+            (
+                name: "player_name",
+                widget: text_input("Name", false),
+                command: "profile.rename",
+                bindings: [(source: "SettingsVm.name", target: input, mode: two_way)],
+            ),
+        ],
+    ),
+)

@@ -1,0 +1,2 @@
+# Oracle for golden-hour-sun: the calls a careful agent makes after the setup.
+{"method":"scene.apply_edits","params":{"edits":[{"op":"set_property","entity":"$s","component":"DirectionalLight","path":"direction","value":[-0.9,-0.15,-0.4]},{"op":"set_property","entity":"$s","component":"DirectionalLight","path":"color","value":[1.0,0.62,0.35]}]}}

@@ -1,0 +1,69 @@
+# Known lint findings of old fragments (cargo xtask release-notes --check). file<TAB>rule.
+# A finding in this list is reported as old; any other finding fails the check.
+v0.1.19-eyes-bind-poses.md	missing-heading: ## Known issues
+v0.1.19-eyes-bind-poses.md	missing-heading: ## New, ## Changed or ## Fixed
+v0.1.19-eyes-bind-poses.md	missing-heading: ## Upgrade
+v0.1.19-eyes-bind-poses.md	naming: a root fragment is named `v0.1.28-<lane>.md`; new ones go to `unreleased/<lane>.md`
+v0.1.19-hair-cards.md	missing-heading: ## Known issues
+v0.1.19-hair-cards.md	missing-heading: ## New, ## Changed or ## Fixed
+v0.1.19-hair-cards.md	missing-heading: ## Upgrade
+v0.1.19-hair-cards.md	naming: a root fragment is named `v0.1.28-<lane>.md`; new ones go to `unreleased/<lane>.md`
+v0.1.20-lod-tiers.md	missing-heading: ## Known issues
+v0.1.20-lod-tiers.md	missing-heading: ## New, ## Changed or ## Fixed
+v0.1.20-lod-tiers.md	missing-heading: ## Upgrade
+v0.1.20-lod-tiers.md	naming: a root fragment is named `v0.1.28-<lane>.md`; new ones go to `unreleased/<lane>.md`
+v0.1.20-unit-budget-bench.md	missing-heading: ## Known issues
+v0.1.20-unit-budget-bench.md	missing-heading: ## New, ## Changed or ## Fixed
+v0.1.20-unit-budget-bench.md	missing-heading: ## Upgrade
+v0.1.20-unit-budget-bench.md	naming: a root fragment is named `v0.1.28-<lane>.md`; new ones go to `unreleased/<lane>.md`
+v0.1.21-canopy-hardening.md	missing-heading: ## Known issues
+v0.1.21-canopy-hardening.md	missing-heading: ## New, ## Changed or ## Fixed
+v0.1.21-canopy-hardening.md	missing-heading: ## Upgrade
+v0.1.21-canopy-hardening.md	naming: a root fragment is named `v0.1.28-<lane>.md`; new ones go to `unreleased/<lane>.md`
+v0.1.21-oom-hardening.md	missing-heading: ## Known issues
+v0.1.21-oom-hardening.md	missing-heading: ## New, ## Changed or ## Fixed
+v0.1.21-oom-hardening.md	missing-heading: ## Upgrade
+v0.1.21-oom-hardening.md	naming: a root fragment is named `v0.1.28-<lane>.md`; new ones go to `unreleased/<lane>.md`
+v0.1.21-open-kit.md	missing-heading: ## Known issues
+v0.1.21-open-kit.md	missing-heading: ## New, ## Changed or ## Fixed
+v0.1.21-open-kit.md	missing-heading: ## Upgrade
+v0.1.21-open-kit.md	naming: a root fragment is named `v0.1.28-<lane>.md`; new ones go to `unreleased/<lane>.md`
+v0.1.28-fix-auto-ferrite_asset_pipeline-17926261737.md	missing-heading: ## Known issues
+v0.1.28-fix-auto-ferrite_audio-17926261738.md	missing-heading: ## Known issues
+v0.1.28-fix-auto-ferrite_telemetry-179262617328.md	missing-heading: ## Known issues
+v0.1.28-fix-auto-regia_2d-panics-1102.md	missing-heading: ## Known issues
+v0.1.28-fix-auto-regia_agent-panics-1102.md	missing-heading: ## Known issues
+v0.1.28-fix-auto-regia_ai-docs-1102.md	missing-heading: ## Known issues
+v0.1.28-fix-auto-regia_ai-edge-1102.md	missing-heading: ## Known issues
+v0.1.28-fix-auto-regia_ai-panics-1102.md	missing-heading: ## Known issues
+v0.1.28-fix-auto-regia_animation-panics-1102.md	missing-heading: ## Known issues
+v0.1.28-fix-auto-regia_app-panics-1102.md	missing-heading: ## Known issues
+v0.1.28-fix-auto-regia_asset-docs-1102.md	missing-heading: ## Known issues
+v0.1.28-fix-auto-regia_asset-edge-1102.md	missing-heading: ## Known issues
+v0.1.28-fix-auto-regia_asset-panics-1102.md	missing-heading: ## Known issues
+v0.1.28-fix-auto-regia_core-docs-1102.md	missing-heading: ## Known issues
+v0.1.28-fix-auto-regia_ecs-docs-1102.md	missing-heading: ## Upgrade
+v0.1.28-fix-auto-regia_ecs-panics-1102.md	missing-heading: ## Known issues
+v0.1.28-fix-auto-regia_framework-panics-1102.md	missing-heading: ## Known issues
+v0.1.28-fix-auto-regia_input-panics-1102.md	missing-heading: ## Known issues
+v0.1.28-fix-auto-regia_macros-panics-1102.md	missing-heading: ## Upgrade
+v0.1.28-fix-auto-regia_matgraph-panics-1102.md	missing-heading: ## Known issues
+v0.1.28-fix-auto-regia_pick-panics-1102.md	missing-heading: ## Known issues
+v0.1.28-fix-auto-regia_platform-edge-1102.md	missing-heading: ## Known issues
+v0.1.28-fix-auto-regia_procgen-panics-1102.md	missing-title
+v0.1.28-fix-auto-regia_render-docs-1102.md	missing-heading: ## Known issues
+v0.1.28-fix-auto-regia_steam-docs-1102.md	missing-heading: ## Known issues
+v0.1.28-fix-auto-regia_steam-edge-1102.md	missing-heading: ## Known issues
+v0.1.28-fix-auto-regia_templates-panics-1102.md	missing-heading: ## Known issues
+v0.1.28-fix-auto-regia_ui-docs-1102.md	missing-heading: ## Known issues
+v0.1.28-fix-auto-regia_ui-panics-1102.md	missing-heading: ## Known issues
+v0.1.28-fix-auto-regia_vfx-panics-1102.md	missing-heading: ## Known issues
+v0.1.28-fix-auto-regia_xr-docs-1102.md	missing-heading: ## Known issues
+v0.1.28-fix-auto-regia_xr-panics-1102.md	missing-heading: ## Known issues
+v0.1.28-lightmap-lite-fix.md	missing-title
+v0.1.28-rr-aov-export.md	missing-title
+v0.1.28-rr-render-clock-replay.md	missing-heading: ## Known issues
+v0.1.28-rr-render-clock-replay.md	missing-heading: ## New, ## Changed or ## Fixed
+v0.1.28-rr-render-clock-replay.md	missing-heading: ## Upgrade
+v0.1.28-v022c-gatefix.md	missing-heading: ## Known issues
+v0.2.3-red-rouge.md	naming: a root fragment is named `v0.1.28-<lane>.md`; new ones go to `unreleased/<lane>.md`

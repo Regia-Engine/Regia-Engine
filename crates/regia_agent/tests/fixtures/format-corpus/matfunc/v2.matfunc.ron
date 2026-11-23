@@ -1,0 +1,19 @@
+// Handwritten from 9371ad5b2 (the commit that introduced .matfunc.ron v2): a material function that reads
+// the scene wind (the Wind node, which v2 added to the node set) and returns its speed and a bend vector.
+(
+    format_version: 2,
+    name: "wind_bend",
+    inputs: [(name: "stiffness", ty: Float)],
+    nodes: {
+        "k": Input("stiffness"),
+        "w": Wind,
+        "speed": Length("w"),
+        "zero": Float(0.0),
+        "wx": Swizzle(input: "w", channels: "x"),
+        "wy": Swizzle(input: "w", channels: "y"),
+        "wxz": Append("wx", "zero"),
+        "w3": Append("wxz", "wy"),
+        "bend": Mul("w3", "k"),
+    },
+    outputs: { "speed": "speed", "bend": "bend" },
+)

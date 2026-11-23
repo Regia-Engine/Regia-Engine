@@ -1,0 +1,57 @@
+SceneFile(
+    format_version: 10,
+    entities: [
+        (
+            guid: "11111111-2222-4333-8444-555555555501",
+            name: "Lamp",
+            components: {
+                "ferrite_render::lights::PointLight": (
+    position: (0.0, 0.0, 0.0),
+    color: (1.0, 1.0, 1.0),
+    intensity: 321.0,
+    radius: 10.0,
+    cast_shadows: false,
+),
+                "ferrite_scene::transform::Transform": (
+    translation: (1.0, 3.0, 2.0),
+    rotation: (0.0, 0.0, 0.0, 1.0),
+    scale: (1.0, 1.0, 1.0),
+),
+            },
+        ),
+        (
+            guid: "11111111-2222-4333-8444-555555555502",
+            name: "Sun",
+            components: {
+                "ferrite_render::lights::DirectionalLight": (
+    direction: (-0.4, -0.8, -0.45),
+    color: (1.0, 0.97, 0.92),
+    illuminance: 100000.0,
+    cast_shadows: true,
+    static_shadow: false,
+),
+                "ferrite_scene::transform::Transform": (
+    translation: (0.0, 0.0, 0.0),
+    rotation: (0.0, 0.0, 0.0, 1.0),
+    scale: (1.0, 1.0, 1.0),
+),
+            },
+        ),
+        (
+            guid: "11111111-2222-4333-8444-555555555503",
+            name: "Crate",
+            components: {
+                "ferrite_render::runtime::MeshSource": (
+    mesh: "builtin:cube",
+    material: "",
+),
+                "ferrite_scene::transform::Transform": (
+    translation: (0.0, 0.5, 0.0),
+    rotation: (0.0, 0.0, 0.0, 1.0),
+    scale: (1.0, 1.0, 1.0),
+),
+            },
+        ),
+    ],
+    resources: {},
+)

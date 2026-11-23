@@ -1,0 +1,12 @@
+ContentManifest(
+    format_version: 1,
+    build_id: "1.2.0-7-3fa94c0d1e2b",    // <[project] version>-<build_number>-<12 hex of the cook's asset manifest hash>
+    platform: "linux",
+    compatible_with: [],                 // other base build ids this build accepts for DLC
+    chunks: [
+        (name: "base", file: "base.fpak", size: 412345678, hash: "<blake3 hex>", delivery: Install,
+         requires: [], overrides: false, mount_order: 0, assets: 9120),
+        (name: "arena", file: "arena.fpak", size: 98765432, hash: "<blake3 hex>", delivery: OnDemand,
+         requires: [], overrides: false, mount_order: 1, assets: 1410),
+    ],
+)

@@ -1,0 +1,21 @@
+// `.ui.ron` v11 (ADR-9980): text input options and image fit.
+(
+    version: 11,
+    root: (
+        name: "sign_in",
+        style: (direction: column, gap: (8, 8)),
+        children: [
+            // The old two-element form still reads: no limits.
+            (name: "user", style: (size: (240, 32)), widget: text_input("Name", false)),
+            (
+                name: "pin",
+                style: (size: (120, 32)),
+                widget: text_input("PIN", false, (max_chars: 4, secret: '*', filter: integer)),
+            ),
+            (name: "note", style: (size: (240, 96)), widget: text_input("", true, (read_only: true))),
+            (name: "banner", style: (size: (240, 80)), image: (id: 5, fit: cover)),
+            (name: "photo", style: (size: (96, 96)), image: (asset: "assets/ui/photo.png", fit: stretch)),
+            (name: "logo", style: (size: (96, 48)), image: (id: 6)),
+        ],
+    ),
+)

@@ -1,0 +1,28 @@
+format_version = 1
+id = "storm-wind"
+title = "Set a strong wind blowing along Z"
+prompt = "Set the terrain wind to a strength of 3.5 (the range is 0 to 4) blowing toward +Z only (direction x = 0, z = 1)."
+features = ["terrain"]
+crates = ["regia_agent", "regia_terrain"]
+call_budget = 5
+
+[setup]
+target = "terrain"
+
+[[check]]
+name = "strength 3.5"
+method = "terrain.wind"
+pointer = "/strength"
+expect = { kind = "equals", value = 3.5 }
+
+[[check]]
+name = "blowing along Z"
+method = "terrain.wind"
+pointer = "/unit_direction/1"
+expect = { kind = "number_range", min = 0.99, max = 1.01 }
+
+[[check]]
+name = "no X component"
+method = "terrain.wind"
+pointer = "/unit_direction/0"
+expect = { kind = "number_range", min = -0.01, max = 0.01 }

@@ -1,0 +1,22 @@
+[project]
+name = "{{name}}"
+id = "{{id}}"
+version = "0.1.0"
+build_number = 1
+engine = "{{engine_line}}"
+startup_level = "levels/main.level.ron"
+organization = "Regia Engine"
+
+[platforms.android]
+min_sdk = 29
+target_sdk = 35
+orientation = "sensor_landscape"
+abis = ["arm64-v8a"]
+cargo_package = "{{crate_name}}_android"
+
+[platforms.linux]
+formats = ["tar"]
+
+# Procedural generation (spec 64 § 7.3): let baked generators flatten the terrain under roads.
+# [procgen]
+# terrain_edits = true

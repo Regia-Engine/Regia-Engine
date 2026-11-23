@@ -1,0 +1,21 @@
+[package]
+name = "lightmap_device"
+description = "Lightmap device sample (ADR-2792): the baker's quad-and-box scene as lightmap receivers, for measuring lightmap memory and cost on real Android phones."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia = { workspace = true }
+regia_core = { workspace = true }
+regia_render = { workspace = true }
+regia_scene = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+regia_test_utils = { workspace = true }

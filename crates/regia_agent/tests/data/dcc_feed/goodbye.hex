@@ -1,0 +1,7 @@
+# goodbye
+# Laid out by hand from docs/formats/dcc-feed-protocol-v1.md (spec 60 section 8 test 1).
+0e 00 00 00                                          # len = 14
+32 00                                                # msg_type 0x0032
+00 00                                                # flags
+01 00 00 00                                          # seq 1
+04 00 64 6f 6e 65                                    # reason "done"

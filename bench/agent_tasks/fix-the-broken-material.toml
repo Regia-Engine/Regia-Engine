@@ -1,0 +1,35 @@
+format_version = 1
+id = "fix-the-broken-material"
+title = "Fix the broken reference in a material graph"
+prompt = "The material graph 'hull' does not compile: its base color output points at a node that does not exist. Find out what is wrong and fix the graph so that it compiles without errors. Keep the 'tint' parameter."
+features = ["materials"]
+crates = ["regia_agent", "regia_matgraph"]
+call_budget = 8
+
+[setup]
+target = "materials"
+
+[[setup.call]]
+method = "material.graph_set"
+params = { name = "hull", ron = "(format_version: 4, name: \"hull\", params: [(name: \"tint\", value: Color((0.5, 0.2, 0.1)))], nodes: {\"tint\": Param(\"tint\")}, output: (base_color: Some(\"tin\")))" }
+
+[[check]]
+name = "compiles"
+method = "material.compile"
+params = { name = "hull" }
+pointer = "/ok"
+expect = { kind = "equals", value = true }
+
+[[check]]
+name = "no errors"
+method = "material.compile"
+params = { name = "hull" }
+pointer = "/errors"
+expect = { kind = "count_range", min = 0, max = 0 }
+
+[[check]]
+name = "tint kept"
+method = "material.graph_get"
+params = { name = "hull" }
+pointer = "/graph/params/0/name"
+expect = { kind = "equals", value = "tint" }

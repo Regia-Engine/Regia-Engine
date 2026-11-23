@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "regia": {
+      "command": "/absolute/path/to/regia",
+      "args": ["mcp", "--project", "/absolute/path/to/your/project"]
+    }
+  }
+}

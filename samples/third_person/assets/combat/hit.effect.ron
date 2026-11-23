@@ -1,0 +1,4 @@
+(format_version: 1, name: "hit", description: "One hit: the caller passes the health change as Damage.Amount",
+ lifetime: Instant,
+ base_edits: [(attribute: "health", op: AddPre, amount: Param(key: "Damage.Amount", default: -10.0))],
+ kind_tags: ["Effect.Damage"])

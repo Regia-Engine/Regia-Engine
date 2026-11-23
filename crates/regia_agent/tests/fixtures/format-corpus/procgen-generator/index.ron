@@ -1,0 +1,17 @@
+(
+    format: "procgen-generator",
+    entries: [
+        (
+            version: 1,
+            file: "v1.procgen-generator.ron",
+            origin: "handwritten from v0.2.6 (git ec48c68efa32cd3cce4e5c676cf001316e0a9469:crates/regia_procgen/src/world.rs, ProcGenerator; level shape from regia_cli/tests/fixtures/bake_e2e courtyard.level.ron, scene format_version 10)",
+            exercises: "The ProcGenerator component entry as a level holds it, format_version 1 (no tiles).",
+        ),
+        (
+            version: 2,
+            file: "v2.ron",
+            origin: "frozen copy of the fuzz-target registry fixture",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+    ],
+)

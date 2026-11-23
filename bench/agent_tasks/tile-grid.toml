@@ -1,0 +1,31 @@
+format_version = 1
+id = "tile-grid"
+title = "Lay a 3 by 3 floor of tiles"
+prompt = "Build a 3 by 3 grid of cuboid tiles (graybox primitives) named 'Tile <row> <column>' with rows and columns numbered 1 to 3. The tiles are centered 2 m apart: the first at (0, 0, 0), the last at (4, 0, 4)."
+features = ["scene"]
+crates = ["regia_agent"]
+call_budget = 12
+
+[setup]
+target = "scene"
+
+[[check]]
+name = "nine tiles"
+method = "scene.query_entities"
+params = { name = "Tile*" }
+pointer = "/count"
+expect = { kind = "equals", value = 9 }
+
+[[check]]
+name = "tiles inside the grid"
+method = "scene.query_entities"
+params = { name = "Tile*", box = { min = [-0.5, -0.5, -0.5], max = [4.5, 0.5, 4.5] } }
+pointer = "/count"
+expect = { kind = "equals", value = 9 }
+
+[[check]]
+name = "far corner"
+method = "scene.query_entities"
+params = { component = "Transform", near = { point = [4, 0, 4], radius = 0.1 } }
+pointer = "/count"
+expect = { kind = "equals", value = 1 }

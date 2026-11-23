@@ -1,0 +1,95 @@
+(
+    format: "ui",
+    entries: [
+        (
+            version: 1,
+            file: "v1.ui.ron",
+            origin: "git de2994381548e09cf43d973a4457ab7a7b0ab9f2:crates/ferrite_ui/tests/fixtures/ui.example.ui.ron (pre-rename brand path)",
+            exercises: "the frozen first schema: root node tree with style, safe_area",
+        ),
+        (
+            version: 2,
+            file: "v2.ui.ron",
+            origin: "git 79726403144617699e6e4f5d112dd1ea666bc82f:crates/ferrite_ui/tests/fixtures/ui.v2.example.ui.ron",
+            exercises: "menu widgets (main_menu etc.) added in v2",
+        ),
+        (
+            version: 3,
+            file: "v3.ui.ron",
+            origin: "git e425c0c540f50031fdbdee0617d5157f884157e9:crates/regia_ui/tests/fixtures/ui.v3.example.ui.ron",
+            exercises: "ui designer additions: bindings, command, mode, invert, new targets",
+        ),
+        (
+            version: 4,
+            file: "v4.ui.ron",
+            origin: "git 543105ea0d3fa6dac246c01ab8682c97b866423f:crates/regia_ui/tests/fixtures/ui.v4.example.ui.ron",
+            exercises: "text-style spacing, weight, decorations, OpenType features and effect layers",
+        ),
+        (
+            version: 5,
+            file: "v5.ui.ron",
+            origin: "frozen copy of crates/regia_ui/tests/fixtures/ui.v5.example.ui.ron",
+            exercises: "what v5 froze: the pre-v6 layout",
+        ),
+        (
+            version: 6,
+            file: "v6.ui.ron",
+            origin: "git 33b05460942b7823de2acbe393dc5925cdf9fd80:crates/regia_ui/tests/fixtures/ui.v6.example.ui.ron",
+            exercises: "v6: keyed collections with item bindings and converters (ADR-2489)",
+        ),
+        (
+            version: 7,
+            file: "v7.ui.ron",
+            origin: "git b8c1ac94ab3d42bf6e42f08c961f1debeaa33c09:crates/regia_ui/tests/fixtures/ui.v7.example.ui.ron",
+            exercises: "v7: isolated group opacity, rounded clips and image masks (ADR-2866)",
+        ),
+        (
+            version: 8,
+            file: "v8.ui.ron",
+            origin: "git 708804d347260c3955ff703d5411fe31aeb692be:crates/regia_ui/tests/fixtures/ui.components.example.ui.ron",
+            exercises: "v8: component declarations with typed parameters and slot outlets (ADR-3147)",
+        ),
+        (
+            version: 9,
+            file: "v9.ui.ron",
+            origin: "git acc857c99c00d03caff3ea93a8cde26999621cd3:crates/regia_ui/tests/fixtures/ui.v9.example.ui.ron",
+            exercises: "the current version: images and masks named by asset path or icon, nine-slice insets (ADR-3148)",
+        ),
+        (
+            version: 10,
+            file: "v10.ron",
+            origin: "frozen copy of crates/regia_ui/tests/fixtures/ui.v10.example.ui.ron",
+            exercises: "v10: the game widgets (lobby list, scoreboard, radar, marker layer; ADR-2958)",
+        ),
+        (
+            version: 11,
+            file: "v11.ui.ron",
+            origin: "frozen copy of crates/regia_ui/tests/fixtures/ui.v11.example.ui.ron",
+            exercises: "the current version: text input options (max_chars, secret, read_only, filter) and image fit (ADR-9980)",
+        ),
+        (
+            version: 11,
+            file: "v11-designer.ui.ron",
+            origin: "frozen copy of crates/regia_ui/tests/fixtures/ui.v11-designer.example.ui.ron",
+            exercises: "the v11 fold (ADR-7751, ADR-7724): theme-token and animation bindings, repeat row_height template, image fit tile",
+        ),
+        (
+            version: 11,
+            file: "v11-parity.ui.ron",
+            origin: "frozen copy of crates/regia_ui/tests/fixtures/ui.v11-parity.example.ui.ron",
+            exercises: "the v11 fold (ADR-7827, ADR-7724): split, foldable and tabs containers, text markup, nav neighbors by name",
+        ),
+        (
+            version: 11,
+            file: "v11-variants.ui.ron",
+            origin: "frozen copy of crates/regia_ui/tests/fixtures/ui.v11-variants.example.ui.ron",
+            exercises: "the v11 fold (ADR-7858, ADR-7724): layout variants by orientation, width and aspect with node overrides by name and path",
+        ),
+        (
+            version: 11,
+            file: "v11-screen.ui.ron",
+            origin: "w13 screen-field fixture (ADR-8252)",
+            exercises: "the v11 fold (ADR-8252): file field back, node fields disabled_subtree and pivot",
+        ),
+    ],
+)

@@ -1,0 +1,3 @@
+# Oracle for flatten-a-building-pad: the calls a careful agent makes after the setup.
+{"method":"terrain.patch_heights","params":{"col":28,"row":28,"width":8,"height":8,"fill":6.0}}
+{"method":"play.step","params":{"frames":4}}

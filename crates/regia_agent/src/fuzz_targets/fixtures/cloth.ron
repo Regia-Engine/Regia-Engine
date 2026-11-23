@@ -1,0 +1,17 @@
+// `docs/formats/cloth-ron.md` (spec 55 § 4): every optional block filled in.
+(
+  format_version: 1,
+  name: "cape",
+  skeleton: Some("hero.glb"),
+  sim_mesh: (source: "cape_sim.glb", node: "Cape_Sim"),
+  render_mesh: Some((source: "hero.glb", node: "Hero", section: 2)),
+  params: (substeps: 8, pull_compliance: 0.001, wind_model: Aerodynamic(drag: 1.0, lift: 0.3)),
+  maps: {
+    "reach": Sparse(default: 0.0, entries: [(12, 0.25), (13, 0.30)]),
+    "standoff": Dense([0.01, 0.02, 0.03]),
+  },
+  constraint_sets: [(name: "stretch", kind: Stretch, compliance: 0.0),
+                    (name: "bend", kind: Bend, compliance: 0.01)],
+  proxies: ["spine_cap", "thigh_l_cap"],
+  lods: [(sim_mesh: Some((source: "cape_sim_lod1.glb", node: "Cape_Sim_LOD1")), overrides: (substeps: Some(4)))],
+)

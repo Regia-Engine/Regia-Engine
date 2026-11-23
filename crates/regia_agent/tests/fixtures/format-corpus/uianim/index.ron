@@ -1,0 +1,17 @@
+(
+    format: "uianim",
+    entries: [
+        (
+            version: 1,
+            file: "v1.ron",
+            origin: "frozen copy of the fuzz-target registry fixture",
+            exercises: "v1 (ADR-8900): reads as v2 with no frame events; only the number moves",
+        ),
+        (
+            version: 2,
+            file: "v2.ron",
+            origin: "v07-fmt-logic-uianim (ADR-8900), handwritten from the v1 fixture plus events; the `uianim-events` fuzz target's fixture",
+            exercises: "the current version: frame events with and without a payload, on a once and a ping-pong animation",
+        ),
+    ],
+)

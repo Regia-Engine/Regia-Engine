@@ -1,0 +1,17 @@
+(
+    format: "procgen-painted-points",
+    entries: [
+        (
+            version: 1,
+            file: "v1.ron",
+            origin: "frozen copy of the fuzz-target registry fixture (version 1, before ADR-7215)",
+            exercises: "version 1 (no yaw): loads with yaw 0 and migrates to version 2",
+        ),
+        (
+            version: 2,
+            file: "v2.ron",
+            origin: "frozen copy of the fuzz-target registry fixture (ADR-7215 adds yaw)",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+    ],
+)

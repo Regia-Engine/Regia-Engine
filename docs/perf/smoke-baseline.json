@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "recorded_on": "",
+  "entries": {
+    "blake3_1mib": null,
+    "mat4_chain_20k": null,
+    "ron_parse_2k": null,
+    "postcard_roundtrip_2k": null,
+    "sort_u64_100k": null
+  }
+}

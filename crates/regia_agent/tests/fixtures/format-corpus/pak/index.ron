@@ -1,0 +1,11 @@
+(
+    format: "pak",
+    entries: [
+        (
+            version: 1,
+            file: "v1.fpak",
+            origin: "built like crates/regia_asset/tests/fuzz.rs pak_fixture: a raw and an lz4 entry, a manifest and a dependency",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+    ],
+)

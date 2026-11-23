@@ -1,0 +1,1 @@
+(format_version: 1, rules: [(paths: ["assets/props/forest/**"], tags: {"biome": "forest"})])

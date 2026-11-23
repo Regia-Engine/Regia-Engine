@@ -1,0 +1,63 @@
+// A v6 layout: a keyed collection with item bindings and converters (ADR-2489).
+(
+    version: 6,
+    root: (
+        name: "inventory",
+        style: (direction: column, gap: (4, 4)),
+        children: [
+            // One row per item; a row keeps its entities while its `id` stays in the list.
+            (
+                name: "rows",
+                style: (direction: column),
+                repeat: (source: "InventoryVm.items", key: "id"),
+                children: [
+                    (
+                        name: "row",
+                        widget: button,
+                        command: "inventory.equip",
+                        children: [
+                            (name: "label", text: (spans: ["-"]), bindings: [(source: ".name")]),
+                            (
+                                name: "weight",
+                                text: (spans: ["0"]),
+                                bindings: [(source: ".weight", converter: number(precision: 1, group: ","))],
+                            ),
+                            (
+                                name: "fill",
+                                widget: progress(0.0),
+                                bindings: [(
+                                    source: ".durability",
+                                    target: progress,
+                                    converter: map_range(from: (0, 100), to: (0, 1), clamp: true),
+                                )],
+                            ),
+                            (
+                                name: "new",
+                                text: (spans: ["New"]),
+                                bindings: [(source: ".unseen", target: visible, converter: bool_to_visibility)],
+                            ),
+                            (
+                                name: "rarity",
+                                text: (spans: ["-"]),
+                                bindings: [(source: ".rarity", converter: loc_key(prefix: "rarity-"))],
+                            ),
+                            (
+                                name: "state",
+                                text: (spans: ["-"]),
+                                bindings: [(
+                                    source: ".state",
+                                    converter: enum_text(table: [("Idle", "Stored"), ("Equipped", "On")], default: "?"),
+                                )],
+                            ),
+                            (
+                                name: "limit",
+                                text: (spans: ["-"]),
+                                bindings: [(source: ".count", converter: clamp(min: 0, max: 99))],
+                            ),
+                        ],
+                    ),
+                ],
+            ),
+        ],
+    ),
+)

@@ -1,0 +1,33 @@
+[package]
+name = "hot_fixture"
+description = "Game plugin for the hot-reload host: reflected state, one system, a thread joined across reloads."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[lib]
+crate-type = ["rlib"]
+
+[features]
+# The editor builds this crate with `--features hot-reload` (specs/20 § 1). That links
+# `regia_dylib`, the same engine copy the editor's `hot-dylib` build uses. It also activates
+# `regia_editor` so this rebuild resolves the same features as the editor and does not relink
+# `regia_dylib` under the running process (the feature anchor). The source never names the
+# editor, so the game dylib does not link it. Without the feature the crate links `regia_app`
+# directly so `cargo test` does not need a dynamic `std`.
+hot-reload = ["dep:regia_dylib", "dep:regia_editor", "regia_editor/hot-dylib"]
+
+[dependencies]
+regia_app = { workspace = true }
+# `GamePlugin` + `export_game!` (the export table the editor loads), and the script types.
+regia_framework = { workspace = true }
+# `#[derive(Script)]` for the scripts the reload test edits and removes (specs/20 § 3.9).
+regia_macros = { workspace = true }
+regia_dylib = { workspace = true, optional = true }
+# Feature anchor only. Not referenced from Rust (specs/20 § 1).
+regia_editor = { workspace = true, optional = true }
+
+[lints]
+workspace = true

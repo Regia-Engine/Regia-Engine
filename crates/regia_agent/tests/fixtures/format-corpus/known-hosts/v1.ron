@@ -1,0 +1,13 @@
+(
+    format_version: 1,
+    hosts: {
+        "203.0.113.7:7777": (
+            key: "8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a",
+            source: FirstUse,
+        ),
+        "lobby:night-raid": (
+            key: "de9edb7d7b7dc1b4d35b61c2ece435373f8343c85b78674dadfc7e146f882b4f",
+            source: Manual,
+        ),
+    },
+)

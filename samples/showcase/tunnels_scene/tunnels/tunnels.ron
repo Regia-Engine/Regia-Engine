@@ -1,0 +1,14 @@
+(
+    version: 1,
+    document: "switchbacks.meshlayers.ron",
+    ground_offset_m: -512.0,
+    ground_step_m: 0.03125,
+    lights: (
+        spacing_m: 40.0,
+        height_m: 9.0,
+        intensity_lm: 60000.0,
+        radius_m: 36.0,
+        color: (1.0, 0.78, 0.55),
+    ),
+    rock: (0.42, 0.27, 0.17),
+)

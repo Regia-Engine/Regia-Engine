@@ -1,0 +1,29 @@
+ProcGraph(
+    format_version: 1,
+    description: "Fence tool preset: posts and panels along the Path tool's spline, ends dropped onto the ground (spec 64 § 5, spec 67 § 5.4)",
+    nodes: {
+        1: (ty: "in.self", settings: {}, at: (0.0, 0.0)),
+        2: (ty: "items.by_kind", settings: {kinds: ["Spline"]}, at: (220.0, 0.0)),
+        3: (ty: "in.ground", settings: {}, at: (220.0, 160.0)),
+        4: (ty: "spline.modules", settings: {
+            modules: {
+                "post": (mesh: "props/fence_post", length_m: 0.2),
+                "panel": (mesh: "props/fence_panel", length_m: 2.8, stretch: (0.85, 1.15)),
+            },
+            pattern: "post repeat(panel post)",
+            fit: Stretch,
+            forward_axis: X,
+        }, at: (440.0, 0.0)),
+        5: (ty: "spawn.mesh", settings: {
+            pick: ByAttr(attr: "module"),
+            entries: [(mesh: "props/fence_post", key: "post", draw_distance_m: 300.0), (mesh: "props/fence_panel", key: "panel", draw_distance_m: 300.0)],
+        }, at: (660.0, 0.0)),
+    },
+    edges: [
+        (from: (1, "out"), to: (2, "in")),
+        (from: (2, "inside"), to: (4, "in")),
+        (from: (3, "out"), to: (4, "ground")),
+        (from: (4, "out"), to: (5, "in")),
+    ],
+    flags: (starter: true, tool: Some("path")),
+)

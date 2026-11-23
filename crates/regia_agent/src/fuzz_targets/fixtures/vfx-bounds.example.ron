@@ -1,0 +1,44 @@
+// A `.vfx.ron` v8 effect with authored fixed bounds (`system.bounds`, the v8 fold of ADR-8105 row
+// (h), P-225): a smoke column whose box in the system's local space holds the drift of its curl
+// and vortex motion, and a spark burst. Seed of the `vfx-bounds` fuzz target.
+(
+    version: 8,
+    name: "bounded_smoke",
+    system: (
+        budget: 512,
+        bounds: Some((
+            min: (-2.5, -0.5, -2.5),
+            max: (2.5, 6.0, 2.5),
+        )),
+    ),
+    emitters: [
+        (
+            name: "column",
+            spawn: (mode: Rate(40.0), lifetime: (min: 2.0, max: 3.0)),
+            init: (
+                shape: Sphere(radius: (min: 0.0, max: 0.4)),
+                velocity: (mode: Directional(dir: (0.0, 1.0, 0.0), spread: 15.0, speed: (min: 0.8, max: 1.4))),
+                size: (min: 0.4, max: 0.8),
+            ),
+            update: (
+                drag: 0.4,
+                curl: Some((0.6, 0.5, 1.0)),
+                vortex: Some((axis: (0.0, 1.0, 0.0), strength: 0.8)),
+                size_over_life: [(t: 0.0, v: 1.0), (t: 1.0, v: 2.5)],
+                alpha_over_life: [(t: 0.0, v: 0.8), (t: 1.0, v: 0.0)],
+            ),
+            render: (mode: Billboard, blend: Alpha, sprite: Puff, softness: 0.4),
+        ),
+        (
+            name: "sparks",
+            spawn: (mode: Burst(24), lifetime: (min: 0.3, max: 0.6)),
+            init: (
+                shape: Point,
+                velocity: (mode: Radial(speed: (min: 3.0, max: 6.0))),
+                size: (min: 0.03, max: 0.06),
+            ),
+            update: (gravity: (0.0, -9.8, 0.0)),
+            render: (mode: Stretched, blend: Additive, sprite: Spark),
+        ),
+    ],
+)

@@ -1,0 +1,10 @@
+(
+    format_version: 2,
+    forward: (0.0, 0.0, -1.0),
+    bones: [
+        (joint: "hips", radius: 0.12, mass: 10.6, length: None, limits: None, shape: Box(width: 0.3, depth: 0.2)),
+        (joint: "head", radius: 0.1, mass: 6.1, length: None, limits: None, shape: Sphere),
+        (joint: "calf_l", radius: 0.05, mass: 4.6, length: None,
+         limits: Some((flex: Backward, bend: (0.0, 2.3), side: (-0.05, 0.05), twist: (-0.15, 0.15))), shape: Capsule),
+    ],
+)

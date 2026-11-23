@@ -1,0 +1,14 @@
+# texture_push: raw rgba8 pixels
+# Laid out by hand from docs/formats/dcc-feed-protocol-v1.md (spec 60 section 8 test 1).
+22 00 00 00                                          # len = 34
+27 00                                                # msg_type 0x0027
+00 00                                                # flags
+01 00 00 00                                          # seq 1
+05 00 77 68 69 74 65                                 # name "white"
+00                                                   # colorspace 0 srgb
+02                                                   # source 2 raw
+00                                                   # pixel_format 0 rgba8
+01 00 00 00                                          # w
+01 00 00 00                                          # h
+04 00 00 00                                          # byte_len 4
+ff ff ff ff                                          # one white texel

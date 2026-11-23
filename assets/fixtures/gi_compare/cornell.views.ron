@@ -1,0 +1,19 @@
+// Views of cornell.gi_compare.ron. Every light in the frame is indirect for the raster (the
+// emitter lights nothing directly), so both rows share one exposure.
+(
+    format_version: 1,
+    size: (480, 360),
+    ev100: 10.0,
+    indirect_ev100: Some(10.0),
+    views: [
+        (name: "front", eye: (0.0, 1.0, 3.6), target: (0.0, 1.0, 0.0), fov_y_deg: 40.0),
+        (name: "inside", eye: (0.0, 1.0, 0.9), target: (0.0, 0.9, -1.0), fov_y_deg: 65.0),
+        (name: "corner", eye: (0.7, 1.6, 0.85), target: (-0.6, 0.4, -0.5), fov_y_deg: 60.0),
+    ],
+    // A dolly from the open front into the box (ADR-1326).
+    flythrough: [
+        (eye: (0.0, 1.0, 4.0), target: (0.0, 1.0, 0.0), fov_y_deg: 40.0),
+        (eye: (0.0, 1.1, 1.6), target: (0.0, 1.0, -1.0), fov_y_deg: 55.0),
+        (eye: (0.6, 1.4, 0.8), target: (-0.6, 0.5, -0.6), fov_y_deg: 65.0),
+    ],
+)

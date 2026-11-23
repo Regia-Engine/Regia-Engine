@@ -1,0 +1,8 @@
+(
+    format_version: 1,
+    name: "combo_axe",
+    parent: "assets/anim/combo.montage.ron",   // or just the montage name "combo"
+    overrides: [
+        (track: 0, segment: 2, clip: "swing_axe", rescale: true),   // rescale defaults to false
+    ],
+)

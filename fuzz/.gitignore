@@ -1,0 +1,7 @@
+target/
+corpus/
+artifacts/
+coverage/
+logs/
+# Copied from the workspace's Cargo.lock by `cargo xtask fuzz build`, so the fuzzer links the versions the gate tests.
+Cargo.lock

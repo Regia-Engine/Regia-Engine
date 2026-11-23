@@ -1,0 +1,22 @@
+[package]
+name = "dedicated_server"
+description = "Spec 76 sample: the smallest game with a client build and a dedicated-server build of the same code."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[lints]
+workspace = true
+
+# `default-features = false` on `regia` is what lets `--no-default-features` here drop the client crates.
+[dependencies]
+regia = { path = "../../crates/regia", default-features = false }
+# Entity kinds (spec 101): the `SpawnPoint` code kind.
+regia_scene = { workspace = true }
+
+[features]
+default = ["client"]
+client = ["regia/client", "regia/agent", "regia/ui"]
+server = ["regia/server"]

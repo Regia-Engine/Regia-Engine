@@ -1,0 +1,11 @@
+(
+    format: "editor-profile",
+    entries: [
+        (
+            version: 1,
+            file: "v1.ron",
+            origin: "handwritten from 7a87c9394 (docs/formats/editor-profile-ron.md's example)",
+            exercises: "the current version: what the editor writes today must stay readable",
+        ),
+    ],
+)

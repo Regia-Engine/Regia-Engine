@@ -1,0 +1,58 @@
+[package]
+name = "regia_dylib"
+description = "The engine built as one Rust dylib (re-exports `regia`) for the hot-reload editor and game dylib; the force-link from `regia` is not wired yet."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+crate-type = ["dylib"]
+
+[lints]
+workspace = true
+
+[dependencies]
+regia = { workspace = true, default-features = false }
+
+# Forwards every optional `regia` feature so the shared copy can be built with the same feature list as the
+# launcher (a mismatch makes the hot-reload host refuse the load). `regia` is taken with its defaults off and this
+# crate's own `default` mirrors them (`client`, `agent`, `functional-tests`, `ui`, `quick`, `procgen`), so
+# `--no-default-features --features server` builds the headless server without the client stack. A shipping or
+# server dylib turns `functional-tests` off with `--no-default-features` (spec 41 § 9).
+[features]
+default = ["client", "agent", "functional-tests", "ui", "quick", "procgen"]
+agent = ["regia/agent"]
+dcc-feed = ["regia/dcc-feed"]
+functional-tests = ["regia/functional-tests"]
+ui = ["regia/ui"]
+quick = ["regia/quick"]
+procgen = ["regia/procgen"]
+steam = ["regia/steam"]
+crash = ["regia/crash"]
+dev-assets = ["regia/dev-assets"]
+static-dxc = ["regia/static-dxc"]
+physics2d = ["regia/physics2d"]
+frame-gen = ["regia/frame-gen"]
+dlss = ["regia/dlss"]
+xess = ["regia/xess"]
+net = ["regia/net"]
+voice-net = ["regia/voice-net"]
+xr = ["regia/xr"]
+fluid = ["regia/fluid"]
+media = ["regia/media"]
+content-http = ["regia/content-http"]
+content-signing = ["regia/content-signing"]
+media-codecs = ["regia/media-codecs"]
+media-codecs-asm = ["regia/media-codecs-asm"]
+media-encode = ["regia/media-encode"]
+explosion-fx = ["regia/explosion-fx"]
+destruction-fx = ["regia/destruction-fx"]
+lua = ["regia/lua"]
+client = ["regia/client"]
+server = ["regia/server"]
+voice-opus = ["regia/voice-opus"]
+accesskit = ["regia/accesskit"]
+net-quic = ["regia/net-quic"]
+logic = ["regia/logic"]

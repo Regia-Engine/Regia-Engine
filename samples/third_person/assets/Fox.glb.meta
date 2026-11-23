@@ -1,0 +1,52 @@
+(
+    format_version: 1,
+    id: "ba61eeab-7119-4ae5-a9b6-bfbadf57a912",
+    importer: "gltf",
+    sub_assets: [
+        (
+            path: "texture/0",
+            id: "0b590771-0125-8c90-cd45-0c294f4b4672",
+            type_path: "regia_asset::CookedTexture",
+        ),
+        (
+            path: "mesh/fox/primitive_0",
+            id: "94a668d8-a590-21a5-af48-8db49792687a",
+            type_path: "regia_asset::CookedMesh",
+        ),
+        (
+            path: "material/fox_material",
+            id: "ab478bb5-521b-4683-cc49-1f674727c413",
+            type_path: "regia_asset::CookedStandardMaterial",
+        ),
+        (
+            path: "model",
+            id: "96d6dc60-b26f-c5bd-ab4d-40c891ca9578",
+            type_path: "regia_asset::CookedModel",
+        ),
+        (
+            path: "prefab/sockets",
+            id: "bbfefae5-924c-1f88-cd47-0cfb1844c593",
+            type_path: "regia_asset::PrefabSocketSet",
+        ),
+        (
+            path: "skeleton/_rootJoint",
+            id: "46767607-5260-1a8e-0640-d3348ded75f0",
+            type_path: "regia_animation::Skeleton",
+        ),
+        (
+            path: "clip/Survey",
+            id: "e7b113b4-235f-7ab1-0349-dc8b6fe22267",
+            type_path: "regia_animation::AnimationClip",
+        ),
+        (
+            path: "clip/Walk",
+            id: "3ce6894d-c43b-529b-464e-e64b6c8d5a70",
+            type_path: "regia_animation::AnimationClip",
+        ),
+        (
+            path: "clip/Run",
+            id: "509145ef-64fc-4495-6641-3dea3edf12e5",
+            type_path: "regia_animation::AnimationClip",
+        ),
+    ],
+)

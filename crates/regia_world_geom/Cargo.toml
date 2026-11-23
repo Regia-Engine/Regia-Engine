@@ -1,0 +1,65 @@
+[package]
+name = "regia_world_geom"
+description = "GPU-free, ECS-free world geometry for lockstep sims: tunnel layouts, collision meshes, the floor and wall queries (spec 121, ADR-8019, ADR-8050)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+# DO27's three armed tunnel layouts and the synthetic meshes as test fixtures (plan row W-01). Off by
+# default: they are test data, not engine API.
+fixtures = []
+# Additive native query API; never changes compat arithmetic.
+stage_b = []
+# Caller-owned native query work counters.
+stats = ["stage_b"]
+# Reuse the audited allocator in CPU-only integration tests. Never enabled by runtime consumers.
+allocation-tests = []
+
+[dependencies]
+# The lockstep math kit (ADR-8012 A-4): `sqrt_f64` for the cook's strip measure (ADR-8112), tick-path trig
+# (`math::{sin, cos, atan2}`, libm 0.2.16) and the portable `det_*` min/max/clamp (ADR-8166).
+regia_detsim = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+# The meshlayers formats (spec 121 § 9, ADR-8112): the RON source, the postcard cooked file, the BLAKE3
+# content hash, and the error types.
+ron = { workspace = true }
+postcard = { workspace = true }
+blake3 = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+# The trig test (`compat::source_math`) compares `regia_detsim::math` with the libm functions the source calls
+# (ADR-8167; the workspace's pinned libm, already a regia_detsim dependency).
+libm = { workspace = true }
+# The integration tests use the fixtures.
+regia_world_geom = { path = ".", features = ["fixtures", "allocation-tests"] }
+
+[[bench]]
+name = "column"
+harness = false
+required-features = ["stage_b"]
+
+# Plan § 4.7 (row W-31): the 500-call mixed tick, the index build and the resident bytes on the
+# cooked Switchbacks map; budgets in docs/perf/budgets.ron.
+[[bench]]
+name = "mixed_calls"
+harness = false
+required-features = ["stage_b"]
+
+# Spec 121 § 11 "index build" (ADR-8816): the load of the cooked Switchbacks map alone, by part.
+[[bench]]
+name = "index_build"
+harness = false
+required-features = ["stage_b"]
+
+[[example]]
+name = "native_edge_vectors"
+required-features = ["stage_b"]

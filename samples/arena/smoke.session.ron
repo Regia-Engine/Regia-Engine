@@ -1,0 +1,16 @@
+// Spec 41 test 19: the arena's smoke session.
+//   regia test session samples/arena/smoke.session.ron
+// `render` is unset, so the harness sets REGIA_SESSION_RENDER=0. The desktop binary still opens
+// a window (spec 41 § 2.8). Linux and Windows use the same command; the device half is test 20.
+(
+    format_version: 2,
+    build: Cargo(package: "arena", profile: "dev"),
+    roles: [
+        (name: "arena", kind: Game, args: ["--smoke", "--bots", "3", "--seed", "7"]),
+    ],
+    tests: (tags: ["smoke"]),
+    limit_frames: 600,
+    max_restarts: 0,
+    allow_errors: [],
+    keep: (screenshots_on_failure: true, logs: true),
+)

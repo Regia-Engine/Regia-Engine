@@ -1,0 +1,22 @@
+(
+    format_version: 3,
+    forward: (0.0, 0.0, -1.0),
+    bones: [
+        (joint: "hips", radius: 0.12, mass: 10.6, length: None, limits: None, shape: Box(width: 0.3, depth: 0.2)),
+        (joint: "head", radius: 0.1, mass: 6.1, length: None, limits: None, shape: Sphere),
+        (joint: "calf_l", radius: 0.05, mass: 4.6, length: None,
+         limits: Some((flex: Backward, bend: (0.0, 2.3), side: (-0.05, 0.05), twist: (-0.15, 0.15))), shape: Capsule),
+        (joint: "foot_l", radius: 0.05, mass: 1.2, length: None, limits: None, shape: Box(width: 0.1, depth: 0.1)),
+    ],
+    active: Some((
+        motors: [
+            (joint: "calf_l", group: Legs, kp: 3600.0, kd: 12.0, max_torque: 600.0),
+            (joint: "foot_l", group: Legs, kp: 2700.0, kd: 9.0, max_torque: 600.0, balance: Ankle),
+        ],
+        hit: (full_impulse: 150.0, recover_time: 0.8),
+        get_up: [
+            (clip: "getup_back", facing: FaceUp),
+            (clip: "getup_front", facing: FaceDown, pose: [(joint: "calf_l", rotation: (0.0, 0.0, 0.0, 1.0))]),
+        ],
+    )),
+)

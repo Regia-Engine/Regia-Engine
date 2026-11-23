@@ -1,0 +1,8 @@
+(
+    format_version: 1,
+    description: "Ranged caster: health",
+    attributes: [
+        (name: "health_max", base: 24.0, min: 1.0, max: 9999.0),
+        (name: "health", base: 24.0, min: 0.0, max: 9999.0, max_from: Some("health_max")),
+    ],
+)

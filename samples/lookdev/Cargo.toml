@@ -1,0 +1,156 @@
+[package]
+name = "lookdev"
+description = "Photoreal look-dev harness for the DO27 Europa and Mars stand-in maps."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "lookdev"
+path = "src/main.rs"
+
+[[bin]]
+name = "perf_overlay_shot"
+path = "src/bin/perf_overlay_shot.rs"
+required-features = ["overlay"]
+
+[[bin]]
+name = "default_look"
+path = "src/bin/default_look.rs"
+
+[[bin]]
+name = "mobile_forward_bench"
+path = "src/bin/mobile_forward_bench.rs"
+
+[[bin]]
+name = "scatter_shots"
+path = "src/bin/scatter_shots.rs"
+
+[[bin]]
+name = "look_r2"
+path = "src/bin/look_r2.rs"
+
+[[bin]]
+name = "do27_chase"
+path = "src/bin/do27_chase.rs"
+
+[[bin]]
+name = "do27_bench"
+path = "src/bin/do27_bench.rs"
+
+[[bin]]
+name = "mem_report"
+path = "src/bin/mem_report.rs"
+
+[[bin]]
+name = "look_ci"
+path = "src/bin/look_ci.rs"
+
+[[bin]]
+name = "hero_r1"
+path = "src/bin/hero_r1.rs"
+
+[[bin]]
+name = "hull_terms"
+path = "src/bin/hull_terms.rs"
+
+[[bin]]
+name = "vis_stress"
+path = "src/bin/vis_stress.rs"
+
+[[bin]]
+name = "hero_ref"
+path = "src/bin/hero_ref.rs"
+
+[[bin]]
+name = "emissive_bounce"
+path = "src/bin/emissive_bounce.rs"
+
+[[bin]]
+name = "fx_shots"
+path = "src/bin/fx_shots.rs"
+
+[[bin]]
+name = "glass_sheet"
+path = "src/bin/glass_sheet.rs"
+
+[[bin]]
+name = "cooked_runtime"
+path = "src/bin/cooked_runtime.rs"
+
+[[bin]]
+name = "pak_load_bench"
+path = "src/bin/pak_load_bench.rs"
+
+[[bin]]
+name = "tsr_motion"
+path = "src/bin/tsr_motion.rs"
+
+[[bin]]
+name = "tsr_plates"
+path = "src/bin/tsr_plates.rs"
+
+[[bin]]
+name = "mobile_aa"
+path = "src/bin/mobile_aa.rs"
+
+[dependencies]
+regia_app = { workspace = true, optional = true }
+regia_framework = { workspace = true, optional = true }
+regia_platform = { workspace = true, optional = true }
+regia_ui = { workspace = true, optional = true }
+regia_asset = { workspace = true }
+regia_core = { workspace = true }
+regia_render = { workspace = true }
+# Reference path tracer ground truth for the parity plates (bin pt_plates, specs/27 § 2).
+regia_pt = { workspace = true }
+regia_scene = { workspace = true }
+regia_terrain = { workspace = true }
+# DO27 effect shots (`fx`): the showcase explosion and smoke through the frame's translucent layer.
+regia_vfx = { workspace = true }
+# do27_bench drives telemetry by hand under REGIA_TELEMETRY (its per-frame cost on a real scene).
+regia_telemetry = { workspace = true }
+glam = { workspace = true }
+png = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+wgpu = { workspace = true }
+profiling = { workspace = true, optional = true, features = ["profile-with-tracing"] }
+
+# The windowed chase host. Android lookdev stays on the headless path (`regia::run` is the shell).
+[target.'cfg(not(target_os = "android"))'.dependencies]
+winit = { workspace = true }
+
+[features]
+# wgpu-core's `profiling` scopes as tracing spans, for `do27_chase --census` / `--slow-spans`.
+# Off by default: feature unification would otherwise turn them on for every crate's build.
+wgpu-spans = ["dep:profiling"]
+# `do27_chase --memory-json` counts heap allocations per frame: the chase installs
+# `regia_core::memory::TaggingAllocator` (a header per block, so RSS numbers move; bench builds only).
+alloc-count = []
+# `perf_overlay_shot`: the runtime performance overlay over the chase (pulls in the runtime UI and
+# framework, so only that bin builds them).
+overlay = ["dep:regia_app", "dep:regia_ui", "dep:regia_framework", "dep:regia_platform"]
+
+# `do27_chase` exit timing (`CHASE_EXIT_SQUEEZE=self`): `madvise(MADV_PAGEOUT)` over the process's own mappings.
+[target.'cfg(target_os = "linux")'.dependencies]
+libc = { workspace = true }
+
+[dev-dependencies]
+# Test/example-only edges: `tests/hero_cooked.rs` maps DO27's hero glTFs through the engine's import
+# path, and the visibility-buffer examples cook meshlets. The sample's own binaries link no importer code (06 § 7).
+regia_asset_pipeline = { workspace = true }
+# `tests/warm_coverage.rs` builds extracted frames by hand (their meshes carry an `Entity`).
+regia_ecs = { workspace = true }
+regia_test_utils = { workspace = true }

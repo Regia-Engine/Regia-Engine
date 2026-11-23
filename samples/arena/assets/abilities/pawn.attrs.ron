@@ -1,0 +1,8 @@
+(
+    format_version: 1,
+    description: "Arena pawn ammunition",
+    attributes: [
+        (name: "ammo_max", base: 6.0, min: 1.0, max: 99.0),
+        (name: "ammo", base: 6.0, min: 0.0, max: 99.0, max_from: Some("ammo_max")),
+    ],
+)

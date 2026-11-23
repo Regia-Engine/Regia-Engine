@@ -1,0 +1,20 @@
+[project]
+name = "Sim Bridge"
+id = "com.regiaengine.samples.sim_bridge"
+version = "0.1.0"
+build_number = 1
+engine = "0.1"
+
+[platforms.android]
+min_sdk = 29
+target_sdk = 35
+orientation = "sensor_landscape"
+abis = ["arm64-v8a", "x86_64"]
+cargo_package = "sim_bridge_android"
+# Release signing for `--profile shipping` / `--format aab`. Set the environment variables before
+# the lead's NDK run; without them `regia package --profile shipping` errors: AGP 8 leaves release
+# builds unsigned (it does not fall back to the debug keystore).
+keystore = "env:REGIA_ANDROID_KEYSTORE"
+keystore_password = "env:REGIA_ANDROID_KEYSTORE_PASSWORD"
+key_alias = "env:REGIA_ANDROID_KEY_ALIAS"
+key_password = "env:REGIA_ANDROID_KEY_PASSWORD"

@@ -1,0 +1,30 @@
+[package]
+name = "vfx_lab"
+description = "M14 sample: exercises every VFX module, format round-trip, deterministic spawn counts and budget enforcement."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia = { workspace = true }
+regia_core = { workspace = true }
+regia_render = { workspace = true }
+regia_scene = { workspace = true }
+# The Deck performance presets `--deck-check --preset` applies and `--deck-presets` validates.
+regia_steam = { workspace = true }
+regia_vfx = { workspace = true }
+regia_physics = { workspace = true }
+glam = { workspace = true }
+png = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+[dev-dependencies]
+regia_test_utils = { workspace = true }
+wgpu = { workspace = true }

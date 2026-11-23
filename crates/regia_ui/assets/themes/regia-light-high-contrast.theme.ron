@@ -1,0 +1,24 @@
+// regia-light-high-contrast: light with stronger text, borders and focus ring (UI D15, ADR-1309).
+// The light counterpart of regia-high-contrast: it overrides the same tokens, so a player who
+// prefers the light scheme keeps it when they turn high contrast on (the resolver picks
+// `<theme>-high-contrast` first). Contrast (WCAG 2.x): text 19.7:1, text-muted 11.5:1 and
+// border 6.0:1 on surface; focus-ring 11.5:1 on bg.
+(
+    format_version: 2,
+    name: "regia-light-high-contrast",
+    extends: Some("regia-light"),
+    scheme: light,
+    tokens: {
+        "color.text": "#000000",
+        "color.text-muted": "#2e3640",
+        "color.border": "#56606c",
+        "color.focus-ring": "#002a6e",
+        "border.width.hairline": 2,
+        "border.width.focus": 3,
+        // Minus the ring width, as in regia-high-contrast: a list row's ring stays inside the row,
+        // so a scroll clip cannot cut it (ADR-372; missing until ADR-5664).
+        "border.width.focus-inset": -3,
+        // The high-contrast caption theme (ADR-7208): an opaque plate behind white text.
+        "subtitle.plate-opacity": 1,
+    },
+)

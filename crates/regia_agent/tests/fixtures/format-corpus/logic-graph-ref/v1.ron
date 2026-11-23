@@ -1,0 +1,25 @@
+{
+    "regia_ai::logic::graph_ref::LogicGraphRef": (
+        graph: "assets/prefabs/door.logic.ron",
+        enabled: true,
+        overrides: [
+            (
+                name: "open",
+                value: Bool(true),
+            ),
+            (
+                name: "count",
+                value: Int(3),
+            ),
+            (
+                name: "speed",
+                value: Float(1.5),
+            ),
+            (
+                name: "label",
+                value: String("north"),
+            ),
+        ],
+        format_version: 1,
+    ),
+}

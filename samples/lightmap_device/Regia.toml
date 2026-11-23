@@ -1,0 +1,64 @@
+[project]
+name = "Lightmap Device"
+id = "com.regiaengine.samples.lightmap_device"
+version = "0.1.0"
+build_number = 1
+engine = "0.1"
+
+[platforms.android]
+min_sdk = 29
+target_sdk = 35
+orientation = "sensor_landscape"
+abis = ["arm64-v8a"]
+cargo_package = "lightmap_device_android"
+# A shipping APK is release-signed: the tier profiles below read the key from the environment (none is
+# checked in; a test run makes a throwaway one). Dev APKs use the debug key and need none of these.
+keystore = "env:LIGHTMAP_DEVICE_KEYSTORE"
+keystore_password = "env:LIGHTMAP_DEVICE_KEYSTORE_PASSWORD"
+key_alias = "env:LIGHTMAP_DEVICE_KEY_ALIAS"
+
+# Lightmap tier packages for the phone (ADR-5382). One quad-box bake, packages derived from it by
+# `regia package --profile <name>`. Bake first (not checked in):
+#   regia bake-lightmaps quad-box --density 256 --samples 16 --out assets/maps/quad_box.flmap
+# The scene is 22 m2, so the tiers are factors of that bake, not the default table's 4 and 8 texels a metre:
+# HIGH keeps the bake's density (a 2048 x 1032 atlas, about the spec's whole 2 Mi-texel Android level), LOW halves it.
+# Both are block encoded (`auto`: ASTC HDR on Android, BC6H on a desktop) and pad two texels, as a block tier needs.
+[lightmaps.tiers.high]
+density_factor = 1
+encoding = "auto"
+padding = 2
+budget_mib = 208
+
+[lightmaps.tiers.low]
+density_factor = 2
+encoding = "auto"
+padding = 2
+budget_mib = 96
+
+# Shipping code with the agent server kept (a playtest build), so the package runs the shipping checks.
+[profiles.lm_low]
+base = "shipping"
+allow_agent = true
+entry_levels = ["levels/tiers.level.ron"]
+include = ["maps/quad_box.flmap"]
+lightmap_tier = "low"
+
+[profiles.lm_high]
+base = "shipping"
+allow_agent = true
+entry_levels = ["levels/tiers.level.ron"]
+include = ["maps/quad_box.flmap"]
+lightmap_tier = "high"
+
+# The same packages as debuggable dev APKs: the agent attaches through `run-as`, which a release APK refuses.
+[profiles.lm_low_dev]
+base = "dev"
+entry_levels = ["levels/tiers.level.ron"]
+include = ["maps/quad_box.flmap"]
+lightmap_tier = "low"
+
+[profiles.lm_high_dev]
+base = "dev"
+entry_levels = ["levels/tiers.level.ron"]
+include = ["maps/quad_box.flmap"]
+lightmap_tier = "high"

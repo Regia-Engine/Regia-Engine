@@ -1,0 +1,16 @@
+// Ecology profile of `birch_woodland.biome.ron` (ADR-2456, book agents/biomes.md "Ecology").
+EcologyProfile(
+    format_version: 1,
+    site: (moisture: (7.5, 9.5), reaction: (1.5, 4.0), altitude_m: (0.0, 1200.0), slope_deg: (0.0, 12.0), soil: "peaty gley at a bog margin"),
+    species: [
+        (entry: "canopy/downy_birch", species: "betula_pubescens", role: Dominant, share: Some(0.75)),
+        (entry: "canopy/scots_pine", species: "pinus_sylvestris", role: Associated, share: Some(0.25)),
+        (entry: "shrubs/rowan", species: "sorbus_aucuparia", role: Associated, share: Some(0.3)),
+        (entry: "shrubs/alder_buckthorn", species: "frangula_alnus", role: Understory, share: Some(0.4)),
+        (entry: "shrubs/eared_willow", species: "salix_aurita", role: Understory, share: Some(0.3)),
+        (entry: "field/moor_grass", species: "molinia_caerulea", role: Understory, share: Some(0.6)),
+        (entry: "field/bilberry", species: "vaccinium_myrtillus", role: Understory, share: Some(0.4)),
+        (entry: "ground/peat_moss", species: "sphagnum_palustre", role: Understory, share: Some(1.0)),
+    ],
+    competition: (shade_rules: true, self_thinning: Some((cell_m: 25.0, max_stems_per_ha: 200.0, exponent: 1.605))),
+)

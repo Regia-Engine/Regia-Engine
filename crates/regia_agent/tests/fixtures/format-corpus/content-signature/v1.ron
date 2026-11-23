@@ -1,0 +1,6 @@
+(
+    format_version: 1,
+    algorithm: "ed25519",
+    key_id: "0123456789abcdef",
+    signature: "5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a",
+)

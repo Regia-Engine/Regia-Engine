@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://regiaengine.com/schemas/scene-files-v1.json",
+  "title": "SceneFile (.level.ron / .prefab.ron) v1",
+  "description": "Regia Engine scene files, format version 1 (docs/formats/scene-files.md, specs/14 A2). RON maps to JSON loosely: an entity's component/resource values are opaque RON and appear as opaque strings here.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format_version", "entities"],
+  "properties": {
+    "format_version": {
+      "enum": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+      "description": "11 (current), 10, 9, 8, 7, 6, 5, 4, 3, 2 or 1 (migrated on load: v2 added LevelSettings.atmosphere, v3 LevelSettings.look and the atmosphere's moons and haze, v4 LevelLook.lut, v5 SkyBody.fill_lux, v6 LevelSettings.audio_medium, v7 LevelMeter.bright_threshold_cd_m2 and bright_bias_ev, v8 LevelAtmosphere.aerosol_turbidity, v9 LevelLook.local_exposure, v10 LevelLook.baked_gi, v11 LevelLook.lightmap and the saved LightmapReceiver component). Loaders reject newer versions (specs/12 4a)."
+    },
+    "entities": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/entity" },
+      "description": "Entity records. Order is irrelevant; parents may be declared after children."
+    },
+    "resources": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/opaqueRon" },
+      "description": "Resource values by full type path (e.g. regia_scene::level::LevelSettings)."
+    }
+  },
+  "$defs": {
+    "guid": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{12}$",
+      "description": "A GUID: 32 hex digits, dashes optional."
+    },
+    "assetRef": {
+      "type": "string",
+      "pattern": "^(asset:)?[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{12}$",
+      "description": "An asset reference: 'asset:<guid>' (the prefix is optional when reading)."
+    },
+    "opaqueRon": {
+      "description": "One RON value, written in canonical form (specs/23 1). Decoded through reflection against the registered type.",
+      "type": "string"
+    },
+    "typePath": {
+      "type": "string",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_]*(::[A-Za-z_][A-Za-z0-9_]*)+$",
+      "description": "A full Rust type path, e.g. regia_scene::transform::Transform."
+    },
+    "entity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["guid"],
+      "properties": {
+        "guid": { "$ref": "#/$defs/guid" },
+        "name": {
+          "type": "string",
+          "description": "Human-readable name (outliner, find-by-name). Never an addressing key."
+        },
+        "parent": {
+          "$ref": "#/$defs/guid",
+          "description": "Parent entity guid; omit for a root. May reference an entity of the file or a prefab-internal local id."
+        },
+        "components": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/opaqueRon" },
+          "description": "Component values by full type path, one RON value each."
+        },
+        "prefab_instance": { "$ref": "#/$defs/prefabInstance" }
+      }
+    },
+    "prefabInstance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["prefab"],
+      "properties": {
+        "prefab": { "$ref": "#/$defs/assetRef" },
+        "overrides": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/override" },
+          "description": "Per-field overrides on prefab-internal entities (outer wins over nested prefab values)."
+        },
+        "added_components": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/componentAdd" }
+        },
+        "removed_components": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/componentRemove" }
+        },
+        "added_children": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/entity" },
+          "description": "Entity subtrees created for this instance; parent may point at a prefab-internal guid or another added child."
+        },
+        "removed_children": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/guid" },
+          "description": "Prefab-internal local ids (with subtrees) not to instantiate."
+        }
+      }
+    },
+    "override": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target", "component", "path", "value"],
+      "properties": {
+        "target": { "$ref": "#/$defs/guid" },
+        "component": { "$ref": "#/$defs/typePath" },
+        "path": {
+          "type": "string",
+          "pattern": "^\\.[A-Za-z0-9_]+(\\.[A-Za-z0-9_]+)*$|^\\.?$",
+          "description": "Reflection field path with leading dot (.intensity, .color.x); empty or '.' replaces the whole component."
+        },
+        "value": { "$ref": "#/$defs/opaqueRon" }
+      }
+    },
+    "componentAdd": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target", "component", "value"],
+      "properties": {
+        "target": { "$ref": "#/$defs/guid" },
+        "component": { "$ref": "#/$defs/typePath" },
+        "value": { "$ref": "#/$defs/opaqueRon" }
+      }
+    },
+    "componentRemove": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target", "component"],
+      "properties": {
+        "target": { "$ref": "#/$defs/guid" },
+        "component": { "$ref": "#/$defs/typePath" }
+      }
+    }
+  }
+}

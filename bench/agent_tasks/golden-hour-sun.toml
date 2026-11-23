@@ -1,0 +1,36 @@
+format_version = 1
+id = "golden-hour-sun"
+title = "Make the sun lower and warmer"
+prompt = "The entity 'Sun' has a directional light pointing steeply down and a white color. Make the sun lower in the sky (the vertical component of its direction between -0.35 and -0.02) and warmer: red at least 0.9, blue at most 0.5."
+features = ["lighting", "scene"]
+crates = ["regia_agent", "regia_render"]
+call_budget = 6
+
+[setup]
+target = "lighting"
+
+[[setup.call]]
+method = "scene.spawn"
+params = { name = "Sun", components = { Transform = {}, DirectionalLight = { direction = [-0.5, -0.8, -0.3], color = [1.0, 1.0, 1.0], illuminance = 100000.0, cast_shadows = true, static_shadow = false } } }
+save = { s = "/entity" }
+
+[[check]]
+name = "lower"
+method = "scene.get_entity"
+params = { entity = "$s", components = ["DirectionalLight"] }
+pointer = "/components/DirectionalLight/value/direction/1"
+expect = { kind = "number_range", min = -0.35, max = -0.02 }
+
+[[check]]
+name = "warmer: red stays high"
+method = "scene.get_entity"
+params = { entity = "$s", components = ["DirectionalLight"] }
+pointer = "/components/DirectionalLight/value/color/0"
+expect = { kind = "number_range", min = 0.9, max = 1.0 }
+
+[[check]]
+name = "warmer: blue drops"
+method = "scene.get_entity"
+params = { entity = "$s", components = ["DirectionalLight"] }
+pointer = "/components/DirectionalLight/value/color/2"
+expect = { kind = "number_range", min = 0.0, max = 0.5 }

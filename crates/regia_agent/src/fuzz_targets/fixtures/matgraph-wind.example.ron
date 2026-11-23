@@ -1,0 +1,57 @@
+// A v3 foliage graph: the scene wind (`Wind`, m/s on world X and Z) bends a two-meter plant along
+// the wind, more toward the top (height above the object's origin, squared), with a gust that
+// varies over time and per instance (phase from the object's position). Seed of the
+// `matgraph-wind` fuzz target.
+(
+    format_version: 3,
+    name: "reed_sway",
+    nodes: {
+        "wind": Wind,
+        "t": Time,
+        "op": ObjectPosition,
+        "wp": WorldPosition,
+
+        // Gust: 0.8 + 0.2 sin(pi t + phase), a 2 s period that divides the clock's lap.
+        "opx": Swizzle(input: "op", channels: "x"),
+        "opz": Swizzle(input: "op", channels: "z"),
+        "phase": Add("opx", "opz"),
+        "freq": Float(3.1415927),
+        "tw": Mul("t", "freq"),
+        "arg": Add("tw", "phase"),
+        "s": Sin("arg"),
+        "gust_amp": Float(0.2),
+        "gust_var": Mul("s", "gust_amp"),
+        "gust_base": Float(0.8),
+        "gust": Add("gust_base", "gust_var"),
+
+        // Height above the origin over the plant's height, clamped, squared.
+        "wpy": Swizzle(input: "wp", channels: "y"),
+        "opy": Swizzle(input: "op", channels: "y"),
+        "rel": Sub("wpy", "opy"),
+        "inv_height": Float(0.5),
+        "h_lin": Mul("rel", "inv_height"),
+        "h": Saturate("h_lin"),
+        "h2": Mul("h", "h"),
+
+        // The wind on world X and Z as a Vec3, times the stiffness, the gust and the height.
+        "wx": Swizzle(input: "wind", channels: "x"),
+        "wz": Swizzle(input: "wind", channels: "y"),
+        "zero": Float(0.0),
+        "wxy": Append("wx", "zero"),
+        "w3": Append("wxy", "wz"),
+        "stiffness": Float(0.02),
+        "bend": Mul("w3", "stiffness"),
+        "gusty": Mul("bend", "gust"),
+        "offset": Mul("gusty", "h2"),
+
+        "leaf": Vec3((0.18, 0.32, 0.08)),
+        "rough": Float(0.6),
+    },
+    output: (
+        base_color: Some("leaf"),
+        roughness: Some("rough"),
+        world_position_offset: Some("offset"),
+    ),
+    // 0.02 m per m/s at the 40 m/s wind limit with a full gust.
+    shading: (max_vertex_offset: 0.8),
+)

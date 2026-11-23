@@ -1,0 +1,217 @@
+{
+  "addons": [
+    {
+      "group": "Thread",
+      "kind": "thread",
+      "multi": false,
+      "required": true,
+      "values": [
+        {
+          "available": true,
+          "code": "5",
+          "label": "16g",
+          "value_key": "Thread=16g"
+        },
+        {
+          "available": true,
+          "code": "6",
+          "label": "14g",
+          "value_key": "Thread=14g"
+        }
+      ]
+    },
+    {
+      "group": "Jump Rings to Fit",
+      "kind": "chain_fit",
+      "multi": false,
+      "required": false,
+      "values": [
+        {
+          "available": true,
+          "code": "48",
+          "label": "Small",
+          "value_key": "Jump Rings to Fit=Small"
+        },
+        {
+          "available": true,
+          "label": "Large",
+          "value_key": "Jump Rings to Fit=Large"
+        }
+      ]
+    }
+  ],
+  "axes": [
+    {
+      "group": "Style",
+      "kind": "style",
+      "values": [
+        {
+          "available": true,
+          "code": "2001",
+          "label": "S1",
+          "value_key": "Style=S1"
+        },
+        {
+          "available": true,
+          "code": "2002",
+          "label": "S2",
+          "value_key": "Style=S2"
+        },
+        {
+          "available": true,
+          "code": "2003",
+          "label": "S3",
+          "value_key": "Style=S3"
+        },
+        {
+          "available": true,
+          "code": "2004",
+          "label": "S4",
+          "value_key": "Style=S4"
+        },
+        {
+          "available": true,
+          "code": "2005",
+          "label": "S5",
+          "value_key": "Style=S5"
+        },
+        {
+          "available": true,
+          "code": "2006",
+          "label": "S6",
+          "value_key": "Style=S6"
+        },
+        {
+          "available": true,
+          "code": "2007",
+          "label": "S7",
+          "value_key": "Style=S7"
+        },
+        {
+          "available": true,
+          "code": "2008",
+          "label": "S8",
+          "value_key": "Style=S8"
+        }
+      ]
+    },
+    {
+      "group": "Metal",
+      "kind": "metal",
+      "values": [
+        {
+          "available": true,
+          "code": "1",
+          "label": "Metal A",
+          "value_key": "Metal=Metal A"
+        },
+        {
+          "available": true,
+          "code": "2",
+          "label": "Metal B",
+          "value_key": "Metal=Metal B"
+        }
+      ]
+    }
+  ],
+  "cart": {
+    "mode": "manual_line",
+    "platform": "custom"
+  },
+  "design_key": "house-b/d0002",
+  "gaps": [
+    {
+      "code": "TRUNCATED_VARIATIONS",
+      "detail": "the Style list stops at 8",
+      "product_key": "house-b/p0002"
+    }
+  ],
+  "house": "house-b",
+  "product_key": "house-b/p0002",
+  "schema": "jewelry.option_graph/1",
+  "snapshot_id": "2026-11-04-000000000000",
+  "status": "incomplete",
+  "title": "Round Setting",
+  "variants": [
+    {
+      "picks": {
+        "Metal": "Metal A",
+        "Style": "S1"
+      },
+      "sku": "HB-S1",
+      "variant_key": "2001:1"
+    },
+    {
+      "picks": {
+        "Metal": "Metal A",
+        "Style": "S2"
+      },
+      "sku": "HB-S2",
+      "variant_key": "2002:1"
+    },
+    {
+      "picks": {
+        "Metal": "Metal A",
+        "Style": "S3"
+      },
+      "sku": "HB-S3",
+      "variant_key": "2003:1"
+    },
+    {
+      "picks": {
+        "Metal": "Metal A",
+        "Style": "S4"
+      },
+      "sku": "HB-S4",
+      "variant_key": "2004:1"
+    },
+    {
+      "picks": {
+        "Metal": "Metal A",
+        "Style": "S5"
+      },
+      "sku": "HB-S5",
+      "variant_key": "2005:1"
+    },
+    {
+      "picks": {
+        "Metal": "Metal A",
+        "Style": "S6"
+      },
+      "sku": "HB-S6",
+      "variant_key": "2006:1"
+    },
+    {
+      "picks": {
+        "Metal": "Metal A",
+        "Style": "S7"
+      },
+      "sku": "HB-S7",
+      "variant_key": "2007:1"
+    },
+    {
+      "picks": {
+        "Metal": "Metal A",
+        "Style": "S8"
+      },
+      "sku": "HB-S8",
+      "variant_key": "2008:1"
+    },
+    {
+      "picks": {
+        "Metal": "Metal B",
+        "Style": "S1"
+      },
+      "sku": "HB-S1",
+      "variant_key": "2001:2"
+    },
+    {
+      "picks": {
+        "Metal": "Metal B",
+        "Style": "S2"
+      },
+      "sku": "HB-S2",
+      "variant_key": "2002:2"
+    }
+  ]
+}

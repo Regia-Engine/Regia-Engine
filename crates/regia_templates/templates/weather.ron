@@ -1,0 +1,6 @@
+// The project's weather: which effects run and the numbers of the model
+// (docs/formats/weather-ron.md, spec 99). Every field has a default; name only what you change.
+(
+    format_version: 1,
+    effects: (precipitation: true, surface: true, scene_wind: true),
+)

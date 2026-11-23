@@ -1,0 +1,65 @@
+// Example `.prefab.ron` (format version 8, `docs/formats/scene-files.md`).
+//!
+//! A lamp prefab: a pole with a light on top and a knob beneath the light (an extra grouping
+//! node to show nesting). Exactly one root entity, no resources. Instances address `Light` and
+//! `Knob` by their guids (the *local ids*); the same guids act as override targets.
+//!
+//! Run `cargo test -p regia_scene --test formats` to parse this file against the schema rules.
+
+SceneFile(
+    format_version: 8,
+    entities: [
+        (
+            guid: "44fe6f0a-1e42-4c11-8d5a-9b3c2f7e10d0",
+            name: "Lamp",
+            components: {
+                "regia_scene::transform::Transform": (
+                    translation: (0.0, 0.0, 0.0),
+                    rotation: (0.0, 0.0, 0.0, 1.0),
+                    scale: (1.0, 1.0, 1.0),
+                ),
+                "regia_scene::components::Static": (),
+            },
+        ),
+        (
+            guid: "1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
+            name: "Pole",
+            parent: Some("44fe6f0a-1e42-4c11-8d5a-9b3c2f7e10d0"),
+            components: {
+                "regia_scene::transform::Transform": (
+                    translation: (0.0, 1.5, 0.0),
+                    rotation: (0.0, 0.0, 0.0, 1.0),
+                    scale: (0.15, 3.0, 0.15),
+                ),
+            },
+        ),
+        (
+            guid: "0f1e8a44-90d3-4f2e-b7c5-6a2d0e4f8b11",
+            name: "Light",
+            parent: Some("44fe6f0a-1e42-4c11-8d5a-9b3c2f7e10d0"),
+            components: {
+                "regia_scene::transform::Transform": (
+                    translation: (0.0, 3.2, 0.0),
+                    rotation: (0.0, 0.0, 0.0, 1.0),
+                    scale: (1.0, 1.0, 1.0),
+                ),
+                "regia_render::PointLight": (
+                    intensity: 100.0,
+                    color: (1.0, 0.95, 0.9),
+                ),
+            },
+        ),
+        (
+            guid: "6a5b4c3d-2e1f-4a0b-9c8d-7e6f5a4b3c2d",
+            name: "Knob",
+            parent: Some("0f1e8a44-90d3-4f2e-b7c5-6a2d0e4f8b11"),
+            components: {
+                "regia_scene::transform::Transform": (
+                    translation: (0.0, -0.2, 0.0),
+                    rotation: (0.0, 0.0, 0.0, 1.0),
+                    scale: (1.0, 1.0, 1.0),
+                ),
+            },
+        ),
+    ],
+)

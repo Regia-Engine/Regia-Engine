@@ -1,0 +1,132 @@
+# cargo-deny configuration. Policy: docs/03-workspace-and-dependencies.md § 4.
+# Coupling-group duplicates are checked per runtime crate by `cargo xtask check-versions`, because
+# cargo-deny can only check duplicates across the whole workspace (the editor legitimately carries a
+# second glam through transform-gizmo-egui, 03 § 1).
+
+[graph]
+# Every platform Regia Engine ships on (macOS deferred, ADR-009).
+targets = [
+    "x86_64-unknown-linux-gnu",
+    "x86_64-pc-windows-msvc",
+    "aarch64-linux-android",
+    "x86_64-linux-android",
+]
+# Dev-dependencies never ship.
+exclude-dev = true
+# Every optional feature is in the graph: off-by-default features ship too when a game enables them
+# (`regia_crash/tls`, `regia_steam/steamworks`, `regia_pt/denoise`). Before ADR-1378 the gate never
+# saw the TLS stack behind `regia_crash/tls`.
+all-features = true
+
+[advisories]
+version = 2
+yanked = "deny"
+# Each ignore names the crate, how it reaches Regia Engine and when it is reviewed. Vulnerabilities are never
+# ignored without an ADR.
+ignore = [
+    # paste (unmaintained, no successor release): proc-macro only, via egui_dock (editor) and
+    # pulp -> exr -> image (importers). No runtime code. Review on each GPU/UI group bump.
+    { id = "RUSTSEC-2024-0436", reason = "transitive proc-macro via egui_dock and exr; no maintained release; reviewed on GPU/UI group bumps" },
+    # ttf-parser (unmaintained): via cosmic-text/fontdb (runtime UI) and ab_glyph (winit's Wayland
+    # decorations). Parses fonts the engine and the game ship. Reviewed 2026-10-22 (ADR-1378): 0.25.1 is
+    # the latest release and cosmic-text 0.19 / fontdb 0.23 still use it. Review on each UI group bump.
+    { id = "RUSTSEC-2026-0192", reason = "transitive via cosmic-text and sctk-adwaita; parses only fonts the project ships; reviewed 2026-10-22 (ADR-1378)" },
+    # quick-xml 0.31 via tiled 0.16 (desktop Tiled importer only; no newer tiled). Mitigated by the
+    # importer's GuardedReader (size and attributes-per-tag limits); tiled never uses NsReader.
+    # ADR "Accept quick-xml 0.31 advisories under the Tiled importer". Drop when tiled moves to >= 0.41.
+    { id = "RUSTSEC-2026-0194", reason = "quick-xml 0.31 via tiled (pipeline only); input limits in regia_asset_pipeline::tiled_import bound the quadratic check (ADR)" },
+    { id = "RUSTSEC-2026-0195", reason = "quick-xml 0.31 via tiled (pipeline only); tiled never uses NsReader (ADR)" },
+    # zvariant, zbus_names, zvariant_derive (informational "unmaintained": merged into zbus 6.0 as modules): via zbus 5 ->
+    # atspi -> accesskit_unix, the Linux screen-reader adapter behind the off-by-default `accesskit` feature. No
+    # accesskit_unix of the accesskit 0.24 line (the core egui 0.36 locks) uses zbus 6. Drop with the GPU/UI group
+    # bump that moves AccessKit (ADR-1998).
+    { id = "RUSTSEC-2026-0370", reason = "zvariant merged into zbus 6; via accesskit_unix (accesskit feature, off by default); no adapter on zbus 6 for accesskit 0.24 (ADR-1998)" },
+    { id = "RUSTSEC-2026-0371", reason = "zbus_names merged into zbus 6; via accesskit_unix (accesskit feature, off by default) (ADR-1998)" },
+    { id = "RUSTSEC-2026-0372", reason = "zvariant_derive merged into zbus 6; via accesskit_unix (accesskit feature, off by default) (ADR-1998)" },
+    # zip 8.6 via openusd 0.8 (desktop USD importer only; openusd pins zip ^8.2, no openusd release on zip 9 yet). All
+    # four are in `ZipArchive::extract` / `ZipStreamReader::extract` (unpacking an archive to disk: setuid bits,
+    # symlink targets, symlink-size allocation). openusd never extracts: it reads stored `.usdz` entries by index
+    # into memory, and the importer reads every package itself first (ADR-3235). Drop when openusd moves to zip >= 9.
+    { id = "RUSTSEC-2026-0367", reason = "zip 8 via openusd (pipeline only); ZipArchive::extract is never called (ADR-3235)" },
+    { id = "RUSTSEC-2026-0368", reason = "zip 8 via openusd (pipeline only); ZipArchive::extract is never called (ADR-3235)" },
+    { id = "RUSTSEC-2026-0369", reason = "zip 8 via openusd (pipeline only); the extract APIs are never called (ADR-3235)" },
+    { id = "RUSTSEC-2026-0429", reason = "zip 8 via openusd (pipeline only); ZipArchive::extract is never called (ADR-3235)" },
+]
+
+[licenses]
+version = 2
+confidence-threshold = 0.93
+allow = [
+    "MIT",
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "Zlib",
+    "ISC",
+    "Unicode-3.0",
+    "CC0-1.0",
+    "BSL-1.0",
+    "MPL-2.0",
+    # Samples and starter-template code are MIT-0 (ADR-10225); permissive, no attribution needed.
+    "MIT-0",
+]
+exceptions = [
+    # egui's bundled default fonts (editor only). 03 § 4.
+    { crate = "epaint_default_fonts", allow = ["OFL-1.1", "Ubuntu-font-1.0"] },
+    # Mozilla's CA root list as Rust data (0.26.11 is a shim over 1.x), behind `regia_crash/tls` only.
+    # A permissive data licence, no copyleft. ADR-1378 (proposed), 03 § 4.
+    { crate = "webpki-roots", allow = ["CDLA-Permissive-2.0"] },
+]
+
+[licenses.private]
+# Regia Engine's own crates are checked too (ADR-10225): engine crates declare MPL-2.0 (the workspace
+# `license`), samples MIT-0. A crate without a licence, or with one outside the list above, fails.
+ignore = false
+
+[bans]
+multiple-versions = "allow"
+wildcards = "deny"
+allow-wildcard-paths = true
+# Reviewed duplicate versions (multiple-versions is "allow"; each new duplicate gets a line here).
+skip = [
+    # tiled 0.16 (desktop pipeline only, the Tiled importer) pins quick-xml 0.31; the workspace uses 0.41.
+    { crate = "quick-xml@0.31.0", reason = "tiled 0.16 (pipeline-only Tiled importer) pins quick-xml 0.31" },
+    # minidump-writer 0.13 (runtime, Linux, native crash monitor) is on the older rust-minidump line; xtask's reader is on 0.27.
+    { crate = "minidump-common@0.26.1", reason = "minidump-writer 0.13 pins minidump-common 0.26; xtask's minidump reader uses 0.27 (ADR-158)" },
+    { crate = "scroll@0.12.0", reason = "goblin 0.9 (via minidump-writer) uses scroll 0.12; rust-minidump 0.27 uses 0.13 (ADR-158)" },
+    # rav1d 1.1 (regia_media `av1`, off by default) pins zerocopy 0.7; the rest of the tree is on 0.8.
+    { crate = "zerocopy@0.7.35", reason = "rav1d 1.1 (regia_media av1 feature) uses zerocopy 0.7; the tree is on 0.8 (ADR-1869)" },
+    { crate = "zerocopy-derive@0.7.35", reason = "rav1d 1.1 (regia_media av1 feature) uses zerocopy-derive 0.7 (ADR-1869)" },
+    # snow 0.10 (regia_net transport encryption) is on the older RustCrypto line (ADR-1901).
+    { crate = "chacha20@0.9.1", reason = "chacha20poly1305 0.10 via snow 0.10 uses chacha20 0.9; rand 0.10 uses 0.10 (ADR-1901)" },
+    { crate = "cpufeatures@0.2.17", reason = "the RustCrypto crates under snow 0.10 use cpufeatures 0.2 (ADR-1901)" },
+    { crate = "digest@0.10.7", reason = "blake2 0.10 via snow 0.10 uses digest 0.10 (ADR-1901)" },
+    { crate = "block-buffer@0.10.4", reason = "digest 0.10 under snow 0.10 uses block-buffer 0.10 (ADR-1901)" },
+    { crate = "crypto-common@0.1.7", reason = "aead 0.5 and digest 0.10 under snow 0.10 use crypto-common 0.1 (ADR-1901)" },
+    # resvg/usvg 0.45 (pipeline-only SVG import, ADR-3350): svgtypes 0.15 pins kurbo 0.11 (the tree
+    # has 0.13 via cosmic-text); strict-num 0.1.1 pulls float-cmp 0.9 (the tree has 0.10); tiny-skia's
+    # png-format feature (enabled by resvg) pulls png 0.17 (the workspace uses 0.18).
+    { crate = "kurbo@0.11.3", reason = "svgtypes 0.15 via resvg/usvg 0.45 pins kurbo 0.11; the tree is on 0.13 (ADR-3350)" },
+    { crate = "float-cmp@0.9.0", reason = "strict-num 0.1.1 via tiny-skia-path 0.11 (resvg) uses float-cmp 0.9; the tree is on 0.10 (ADR-3350)" },
+    { crate = "png@0.17.16", reason = "tiny-skia 0.11 png-format (enabled by resvg 0.45) uses png 0.17; the workspace is on 0.18 (ADR-3350)" },
+    { crate = "bitflags@1.3.2", reason = "png 0.17 via tiny-skia (resvg) uses bitflags 1.3; the tree is on 2.x (ADR-3350)" },
+    # rav1e 0.8 (regia_media `media-encode`, off by default; on in regia_cli) pulls nom 8 next to the tree's nom 7.
+    # rav1e also lists rand 0.9 under cfg(fuzzing) only: it is in Cargo.lock but never in the graph above (the
+    # target list prunes cfg(fuzzing)), so it needs no skip line (cargo-deny warned `unmatched-skip`, ADR-5556).
+    { crate = "nom@7.1.3", reason = "av1-grain 0.2 under rav1e 0.8 (media-encode) uses nom 8; the tree's other users are on 7 (ADR-3369)" },
+    # accesskit_android 0.7.5 (TalkBack, ADR-3454) pins jni 0.21; the workspace activity glue is jni 0.22.
+    { crate = "jni@0.21.1", reason = "accesskit_android 0.7.5 uses jni 0.21; android-activity uses jni 0.22 (ADR-3454)" },
+    { crate = "windows-sys@0.45.0", reason = "jni 0.21 (via accesskit_android) uses windows-sys 0.45; the workspace is on 0.61 (ADR-3454)" },
+    { crate = "windows-targets@0.42.2", reason = "windows-sys 0.45 (jni 0.21, accesskit_android) uses windows-targets 0.42 (ADR-3454)" },
+    # openusd 0.8 (desktop pipeline only, the USD importer) uses strum 0.28; the rest of the tree is on 0.27.
+    { crate = "strum@0.28.0", reason = "openusd 0.8 (pipeline-only USD importer) uses strum 0.28; the tree is on 0.27 (ADR-3235)" },
+    { crate = "strum_macros@0.28.0", reason = "openusd 0.8 (pipeline-only USD importer) uses strum_macros 0.28 (ADR-3235)" },
+]
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+# rav1d pinned to an upstream revision until 1.1.1 reaches crates.io (ADR-1869 § 1); nothing else may use git.
+allow-git = ["https://github.com/memorysafety/rav1d"]

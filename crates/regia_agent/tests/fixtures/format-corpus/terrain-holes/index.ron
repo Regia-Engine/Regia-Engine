@@ -1,0 +1,17 @@
+(
+    format: "terrain-holes",
+    entries: [
+        (
+            version: 1,
+            file: "v1.holes.ron",
+            origin: "git 781ed9c65dcb63d39f2d3ea99be022e56abafb43:docs/formats/terrain.md (the ron block of section 5, lines 194-205; the parent of the v2 bump 95f108e33)",
+            exercises: "The first shape: legacy ellipses plus polygon, rect and ellipse shapes (doc example, not a file from disk; a file without version is also v1).",
+        ),
+        (
+            version: 2,
+            file: "v2.ron",
+            origin: "frozen copy of the fuzz-target registry fixture",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+    ],
+)

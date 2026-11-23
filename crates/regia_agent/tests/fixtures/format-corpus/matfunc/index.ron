@@ -1,0 +1,29 @@
+(
+    format: "matfunc",
+    entries: [
+        (
+            version: 1,
+            file: "v1.matfunc.ron",
+            origin: "handwritten from 56252c2eb3b9f9abe198fa77665d5e025caa583a",
+            exercises: "baseline: a material function in its own file with inputs, Input nodes and named outputs",
+        ),
+        (
+            version: 2,
+            file: "v2.matfunc.ron",
+            origin: "handwritten from 9371ad5b237eac0611038266323c45417f1c643e",
+            exercises: "adds the Wind node to the function node set (v3 is the Noise bump)",
+        ),
+        (
+            version: 3,
+            file: "v3.ron",
+            origin: "frozen copy of the fuzz-target registry fixture",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+        (
+            version: 4,
+            file: "v4.ron",
+            origin: "frozen copy of the fuzz-target registry fixture",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+    ],
+)

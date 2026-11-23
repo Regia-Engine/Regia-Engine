@@ -1,0 +1,104 @@
+# The lockstep closure (ADR-8012 A-4, ADR-8013): every crate whose `src/` runs on a lockstep sim tick.
+# `cargo xtask det-scan` scans each listed crate's `src/` (test items excluded) and fails on:
+#   std_float_fn    a std float method whose bits depend on the platform (sin, cos, ..., powi, hypot,
+#                   tanh, cbrt, mul_add; min, max, clamp for their zero/NaN sign), in method,
+#                   `f32::`/`f64::` or `Float::` form, also used as a value (`.map(f32::sin)`)
+#   direct_libm     a `libm::` call outside the math module named below
+#   fast_math       `*_fast` float intrinsics and `algebraic_*` methods (reassociation)
+#   f64_parse       text parsed as f64 (narrowed to f32 later it is rounded twice)
+#   hash_iteration  a HashMap/HashSet (iteration order differs per process)
+#   rayon           rayon or parallel iterators in step code
+#   simd_type       SIMD vector types (glam Vec3A/Vec4/Quat/Mat2/Mat3A/Mat4/Affine*, std::simd, intrinsics)
+#   glam_trig       glam scalar-type functions that call std trig inside glam (Mat3::from_rotation_y,
+#                   Vec2::from_angle, v.slerp(..), ...; ADR-8085)
+#   wall_clock      Instant/SystemTime now, UNIX_EPOCH, chrono and OffsetDateTime clocks
+#   os_random       RandomState, thread_rng, rand::random/rng, getrandom, OsRng, fastrand
+#   env_read        runtime env/argument reads; option_env! and env! are compile-time and allowed
+#   address_order   visible pointer-to-usize casts, ptr::addr/.addr(), Arc::as_ptr (review non-ordering uses)
+#   thread_spawn    thread::spawn, thread::Builder, tokio::spawn
+#   arch_cfg        cfg/cfg_attr/cfg! target_arch/target_feature and CPU feature detection macros
+#   float_sort      sort_by/sort_unstable_by containing partial_cmp; use total_cmp or integer keys
+# New rules share token matching across lines; waive on the expression's starting line (the cast
+# line for pointer-to-usize) or immediately above. Clippy also denies host methods and types.
+# A finding is waived on its line or the line above with `// det-scan: allow(<rule>): <reason>`.
+# An as-is copy whose bytes must not change lists its known sites under [[pin]] instead (each must match
+# exactly one live line). It also checks that every workspace crate a listed crate depends on is listed
+# or exempted, and that each listed crate's clippy.toml denies the lockstep methods.
+#
+# Add a crate here in the same change that makes it lockstep code; copy crates/regia_detsim/clippy.toml.
+# A `[[module]]` row (ADR-8049, ADR-8102) lists one module directory or file of a crate that is not lockstep as a
+# whole: the line rules apply to its sources; the crate's dependencies and clippy.toml are not checked.
+#
+# ADR-8146: a file that a `#[cfg(test)] mod name;` line of a listed directory declares is left out.
+
+# The one module allowed to call `libm` directly.
+math_module = "crates/regia_detsim/src/math.rs"
+
+[[crate]]
+path = "crates/regia_detsim"
+why = "the lockstep kit itself: math, tick constants, the FTZ/DAZ guard"
+
+
+# S-04, ADR-8150: the as-is helper's scalar u128 binding was named `v128`, which det-scan reads as a WebAssembly
+# SIMD type; integ-v06n renamed the local to `v_wide` (no bit change), so regia_detsim needs no pin (det_scan's
+# `non_test_sources_use_math_module_for_transcendentals` requires none).
+
+[[crate]]
+path = "crates/regia_world_geom"
+why = "the world-geometry query DO27's lockstep sim calls every tick: floor, ceiling, wall push, segments (spec 121 § 2 item 3; Stage A compat from W-01, ADR-8050)"
+
+# Plan row W-01 (ADR-8050): the one HashMap of DO27's as-is tunnel code. ADR-8166 (review rev-b L1, L2) moved
+# its std trig, sqrt and float min/max/clamp onto `regia_detsim::math` and `regia_detsim::float::det_*`, so those
+# pins are gone.
+
+[[pin]]
+path = "crates/regia_world_geom/src/compat/pack.rs"
+text = "use std::collections::HashMap;"
+rule = "hash_iteration"
+why = "as-is DO27 copy (ADR-8050): `tunnel_mouth_issues` duplicate-id count; validation only, never sim state, but the issue order varies per process. Stage B issue: the bake checks of lane W-09 replace it"
+
+[[pin]]
+path = "crates/regia_world_geom/src/compat/pack.rs"
+text = "let mut seen: HashMap<&str, usize> = HashMap::new();"
+rule = "hash_iteration"
+why = "as-is DO27 copy (ADR-8050): `tunnel_mouth_issues` duplicate-id count; validation only, never sim state, but the issue order varies per process. Stage B issue: the bake checks of lane W-09 replace it"
+
+# ADR-8877 (review sprint-v06-absorb-rev-b R3): the deterministic navigation left `regia_nav` (it was the
+# `[[module]]` row `crates/regia_nav/src/det`) for its own crate, so it now gets the crate checks too: its
+# clippy.toml (typed float min/max/clamp and trig guards) and its workspace dependencies (regia_detsim and
+# regia_world_geom, both listed). `regia_nav` re-exports it as `regia_nav::det`.
+[[crate]]
+path = "crates/regia_nav_det"
+why = "the deterministic navigation: grid, two-level search, flow fields, navmesh, layered tunnels, agents and crowds (plan rows S-01..S-06, W-20, ADR-8049, ADR-8174, ADR-8877); regia_nav's ECS navigation is not lockstep code"
+
+# ADR-8246: regia_world_geom's existing crate entry also covers query.rs, query_index.rs,
+# query_walls.rs and query_segment.rs (native Stage B). No query-path trig or libm.
+# ADR-8246 also covers query_pyramid.rs: conservative load-time extrema and fixed-order traversal.
+# ADR-8246 also covers query_ground.rs: cached axis coordinates, unchanged lattice arithmetic.
+# ADR-8323 (W-30): the crate entry also covers query_capsule.rs (the capsule's vertical rule) and mover.rs (the
+# disc and capsule mover): f32 + - * / in source order, regia_detsim::math::sqrt, det_* extrema, no allocation.
+
+# W-30's [[pin]] for query_index.rs's IEEE sqrt is dropped at integ-v06r-det: the line carries the base's inline
+# `det-scan: allow(std_float_fn)` waiver (ADR-8246 R7), so a pin there matches no live line.
+# ADR-8313 (lane W-12): regia_world_geom's crate entry also covers edit.rs (D1 ground edits, the state hash and
+# the snapshot): integer profile, m_to_mm/mm_to_m only, sorted Vec blocks, no hash containers, no float min/max.
+# Lane W-13 (spec 121 § 5.7): regia_world_geom's crate entry also covers blockers.rs (blocker flips, the closed set,
+# the section route): bit tests, integer mm distances (i64 isqrt), an insertion sort and a BinaryHeap with total
+# integer keys; no float, no hash containers.
+
+# Plan row W-20 (ADR-8486): `det::layers` (the layered runtime) is under the `crates/regia_nav_det` row above. The
+# glue that feeds it from a world-geometry map at run time (blockers, ground edits) is its own row.
+[[module]]
+path = "crates/regia_nav/src/layered/geom.rs"
+why = "the layered bake's blocker and ground-edit feed (`sync_layers`, every generation of a lockstep match) and its load-time cook (plan row W-20, ADR-8486)"
+
+[[module]]
+path = "crates/regia_net/src/lockstep"
+why = "the lockstep frame authority and seats: what every participant decodes, in which order, and the delay and quorum decisions the frames carry (ADR-8146)"
+
+[[module]]
+path = "crates/regia_net_soak/src/lockstep.rs"
+why = "the lockstep sample simulation the cross-architecture golden steps (ADR-8146)"
+[[crate]]
+path = "crates/regia_rules"
+why = "the match rules core (objectives, CTF, KOTH, pause, ready-up, playlist; ADR-8102): extracted as a closure crate by ADR-8239; plain data a lockstep sim steps on every peer; imports only serde, thiserror, tracing and regia_detsim"

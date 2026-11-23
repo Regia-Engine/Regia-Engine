@@ -1,0 +1,22 @@
+(
+    format_version: 1,
+    id: "1a6af12a-b104-4b40-91e6-f8d64cab1e09",
+    importer: "gltf",
+    sub_assets: [
+        (
+            path: "mesh/Unnamed/primitive_0",
+            id: "9363f4ca-edf7-1bbf-ea41-78e7ae9335af",
+            type_path: "regia_asset::CookedMesh",
+        ),
+        (
+            path: "model",
+            id: "1e927293-c265-2e9d-f347-da061b5d2335",
+            type_path: "regia_asset::CookedModel",
+        ),
+        (
+            path: "prefab/sockets",
+            id: "b5a2d35a-c317-f393-a948-b43dd4521a86",
+            type_path: "regia_asset::PrefabSocketSet",
+        ),
+    ],
+)

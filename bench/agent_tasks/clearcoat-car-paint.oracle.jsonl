@@ -1,0 +1,3 @@
+# Oracle for clearcoat-car-paint: the calls a careful agent makes after the setup.
+{"method":"material.graph_set","params":{"name":"car_paint","ron":"(format_version: 4, name: \"car_paint\", params: [(name: \"tint\", value: Color((0.8, 0.05, 0.05))), (name: \"gloss\", value: Float(0.25))], nodes: {\"tint\": Param(\"tint\"), \"gloss\": Param(\"gloss\")}, output: (base_color: Some(\"tint\"), roughness: Some(\"gloss\")), shading: (clearcoat: 1.0, clearcoat_roughness: 0.05))"}}
+{"method":"material.compile","params":{"name":"car_paint"}}

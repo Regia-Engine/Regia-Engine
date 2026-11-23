@@ -1,0 +1,3 @@
+gen,variant,build_ms,unload_ms,snapshot_ms,teardown_ms,load_ms,register_ms,restore_ms,onload_ms,swap_ms,first_frame_ms,rss_mb,snapshot_kb,sim_tick_at_unload,sim_tick_after,note
+1,A,3512.8,0.00,0.00,0.00,18.13,0.29,0.00,0.08,18.50,3.78,16.1,0.0,0,1,
+2,C,3261.8,7.39,6.21,1.15,16.80,0.20,0.00,0.00,0.00,0.00,0.0,342.0,288,0,refused: layout clash

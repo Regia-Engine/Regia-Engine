@@ -1,0 +1,8 @@
+// The parked car's tuning (`docs/formats/vehicle.md`): the engine's default four-wheel car,
+// front steer, rear drive. Edit a field here to retune it; `physics.vehicle_config_check`
+// checks a change without running the game.
+(
+    format_version: 1,
+    name: "third-person car",
+    config: (),
+)

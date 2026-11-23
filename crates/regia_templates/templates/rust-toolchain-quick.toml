@@ -1,0 +1,6 @@
+# The compiler this project builds with: the one the engine checkout it depends on is tested with.
+# Bump it with the engine, never alone.
+[toolchain]
+channel = "1.99.0"
+components = ["rustfmt", "clippy"]
+profile = "minimal"

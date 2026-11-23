@@ -1,0 +1,21 @@
+[package]
+name = "{{crate_name}}"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+# The shared simulation needs only `net`, but `regia` itself needs `client` or `server`, so this crate
+# always builds with one of them: `client` by default (`cargo build`, `cargo check -p {{crate_name}}`,
+# `cargo test`), `server` from the server crate, which turns the default off (no window, render or
+# audio crate). There is no `server` dev-dependency: in one `cargo test` it would join the client's
+# build and make the client's `regia::run_with` the dedicated-server host.
+[dependencies]
+regia = { path = "{{engine}}/crates/regia", default-features = false, features = ["net"] }
+regia_scene = { path = "{{engine}}/crates/regia_scene" }
+regia_render = { path = "{{engine}}/crates/regia_render", optional = true }
+regia_input = { path = "{{engine}}/crates/regia_input", optional = true }
+
+[features]
+default = ["client"]
+client = ["regia/client", "regia/agent", "regia/ui", "dep:regia_render", "dep:regia_input"]
+server = ["regia/server"]

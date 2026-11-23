@@ -1,0 +1,9 @@
+// The starter utility panel (ADR-8189, docs/formats/editor-panel-ron.md): Window > Utility Panels >
+// Rename selection with prefix. The starter content installs this folder as assets/starter/utility_panels/.
+(
+    format_version: 1,
+    title: "Rename selection with prefix",
+    layout: "rename_with_prefix.ui.ron",
+    driver: Lua("rename_with_prefix.lua"),
+    size: (360, 168),
+)

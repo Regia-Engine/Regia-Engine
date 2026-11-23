@@ -1,0 +1,22 @@
+# Lobby hub (hub.toml v1). The key file is created on first run outside any project.
+format_version = 1
+bind = "0.0.0.0"
+port = 7810
+key_path = ""
+
+[caps]
+session_cap = 1024
+lobby_cap = 256
+max_members = 64
+chat_per_sec = 4
+handle_max_bytes = 24
+idle_ms = 30000
+
+[limits]
+per_address_per_sec = 30
+per_identity_per_sec = 20
+
+[status]
+enabled = true
+bind = "127.0.0.1"
+port = 7811

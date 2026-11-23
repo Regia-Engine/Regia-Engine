@@ -1,0 +1,38 @@
+(
+    format_version: 2,
+    name: "attack",                       // library key
+    rate: 1.0,                            // multiplied by the play call's rate
+    tracks: [                             // one per slot; track 0 = main (root motion, slot group)
+        (slot: "full_body", segments: [
+            (clip: "Windup"),                                   // start 0, end = clip end, rate 1, loops 1
+            (clip: "Swing", start: 0.1, end: Some(0.9), rate: 1.2, loops: 1),
+        ]),
+        (slot: "face", segments: [(clip: "Shout")]),
+    ],
+    sections: [                           // strictly increasing, first at 0; none = one section "main"
+        (name: "windup", start: 0.0),                       // next: Continue (default)
+        (name: "loop", start: 0.5, next: Jump("loop")),     // loops until relinked
+        (name: "finish", start: 1.0, next: Stop),
+    ],
+    notifies: [
+        (name: "swoosh", time: 0.55),                           // instant
+        (name: "hitbox", time: 0.6, duration: 0.25, payload: Some("(damage: 20)")),  // window
+        (name: "combo_input", time: 0.9, branch: true),         // branching point (no duration)
+    ],
+    blend_in: (time: 0.2, curve: Smooth),     // Linear | Smooth
+    blend_out: (time: 0.2, curve: Smooth),
+    blend_out_lead: None,                 // seconds before the end the auto blend-out starts (None = blend_out.time)
+    auto_blend_out: true,                 // false: hold the last pose until stopped
+    root_motion: true,                    // the main track's root motion drives the rig
+    root_motion_off: [(start: 1.2, end: 1.4)],
+    warps: [(target: "enemy", start: 0.2, end: 0.6, translation: true, vertical: false, rotation: true,
+             // v2 (all optional; the defaults reproduce v1 behavior):
+             mode: Similarity,               // Similarity | PathScale (scale the path without turning it)
+             rotation_kind: Auto,            // Auto | MatchTarget | FaceTarget
+             rotation_fraction: 1.0,         // (0, 1]: the turn completes after this fraction of the window
+             anchor: Root,                   // Root | Bone("hand") | Offset((0.0, 0.0, -0.8)) (rig space)
+             tint: None)],                   // editor timeline color, [r, g, b]; ignored at runtime
+    rate_curve: None,                     // v2 data; playback applies it in a later step (spec 34 M7):
+                                          // Some((keys: [(0.0, 1.0), (0.5, 2.0)], interpolation: Linear | Step))
+    sync_group: Some("gait"),             // while blending out, the main track leads this .sync.ron group
+)

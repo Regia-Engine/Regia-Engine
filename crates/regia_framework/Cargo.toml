@@ -1,0 +1,210 @@
+[package]
+name = "regia_framework"
+description = "Gameplay framework: scripts, game rules, players/controllers, characters, cameras, save games."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+# `client` owns everything a player's machine needs (rendering, audio, UI, VFX, 2D and input devices) and the
+# modules that use them: HUD, feedback, cameras, shot and sequence players, settings. The simulation modules
+# (character, rules, player, save, input recording, the sequencer model) build without it: the `server` build
+# (spec 76 § 2.1, ADR-1886).
+[features]
+default = ["client"]
+client = [
+    "dep:regia_render",
+    "dep:regia_terrain",
+    "dep:regia_audio",
+    "dep:regia_ui",
+    "dep:regia_vfx",
+    "dep:regia_2d",
+    "dep:png",
+    "dep:minidumper",
+    "regia_platform/window",
+    "regia_input/devices",
+]
+# `explosion-fx`: the crash layers and the ground-shock camera shake of `explosion` (ADR-2430).
+explosion-fx = ["client"]
+# `destruction-fx`: play the sound cues, VFX systems and decals of `destruction_fx` tables (ADR-2734).
+destruction-fx = ["client"]
+# `net_character`: characters in the predicted schedule (spec 73 § 9, ADR-1905).
+net = ["dep:regia_net"]
+# In-level functional tests (`functional`, specs/41 § 9): the runner the agent's `functest.*` and
+# `regia test` drive. On in dev and test builds through `regia`'s defaults; a shipping profile
+# without default features compiles it out (a `panic = "abort"` build cannot catch a body's panic).
+functional-tests = []
+# Development-only per-entity shapes and messages; omit in shipping builds.
+visual-log = []
+# Boot movies from `Regia.toml` and the `skip_video` action (`boot_movies`, specs/50 § 2.7, ADR-2410), and
+# the video sections of the sequencer (`sequencer::video`, ADR-2862).
+media = ["dep:regia_media"]
+
+[dependencies]
+regia_core = { workspace = true }
+# Hover hull files (`.hoverhull.ron`, ADR-8512) parse on the host. The lockstep crate stays free of RON.
+# The per-system lockstep desync hash (`desync_hash`, ADR-8080): `Mix`, `Systems`, `SystemRing`.
+# Lockstep hover hulls in the ECS (`det_hover`, plan row mp-hover-ecs-agent): the pure hover step and its host kit.
+regia_detsim = { workspace = true, features = ["serde"] }
+regia_ecs = { workspace = true }
+regia_app = { workspace = true }
+regia_platform = { path = "../regia_platform", default-features = false }
+regia_input = { path = "../regia_input", default-features = false }
+regia_asset = { workspace = true }
+regia_scene = { workspace = true }
+regia_render = { workspace = true, optional = true }
+regia_physics = { workspace = true }
+regia_audio = { workspace = true, optional = true }
+regia_nav = { workspace = true }
+# The nav bridge reads terrain height patches and the terrain surface (`nav_world`, ADR-1934).
+regia_terrain = { workspace = true, optional = true }
+regia_animation = { workspace = true }
+regia_ui = { workspace = true, optional = true }
+regia_vfx = { workspace = true, optional = true }
+regia_2d = { workspace = true, optional = true }
+regia_macros = { workspace = true }
+# Fog of war (`fog_view`, plan row S-16, ADR-8154): the pure team-visibility functions the per-viewer snapshot
+# filter runs.
+# ECS-free match core, re-exported by `rules` (ADR-8239).
+regia_rules = { workspace = true }
+# Networked characters (`net_character`, spec 73 § 9) and destruction over the network
+# (`destruction_net`, ADR-1967): the `net` feature, on through `regia/net` and the agent server.
+regia_net = { workspace = true, optional = true }
+# Boot movies (`boot_movies`, the `media` feature).
+regia_media = { workspace = true, optional = true }
+serde = { workspace = true }
+postcard = { workspace = true }
+tracing = { workspace = true }
+ron = { workspace = true }
+smallvec = { workspace = true }
+thiserror = { workspace = true }
+# Feedback bundles (`feedback`): the screenshot PNG and `feedback.json`.
+png = { workspace = true, optional = true }
+serde_json = { workspace = true }
+# Extension manifests and resolver (`extension`, specs/57, ADR-1669).
+toml = { workspace = true }
+semver = { workspace = true }
+blake3 = { workspace = true }
+
+[target.'cfg(any(target_os = "linux", windows))'.dependencies]
+# Native crash capture (`feedback::native`, ADR-158): the client and the out-of-process monitor that
+# writes the minidump.
+minidumper = { workspace = true, optional = true }
+
+[build-dependencies]
+# The extension ABI stamp's toolchain hashes (`build.rs`, specs/57 § 2.8, ADR-1885).
+blake3 = { workspace = true }
+
+[[test]]
+name = "destruction_net"
+required-features = ["net"]
+
+[[test]]
+name = "destruction_net_apps"
+required-features = ["net"]
+
+[[test]]
+name = "destruction_load_net"
+required-features = ["net"]
+
+# Net cutscenes end to end (ADR-2948).
+[[test]]
+name = "cutscene_net_apps"
+required-features = ["net"]
+
+# Presentation physics beside the sim bridge (ADR-8356). `client` links regia_terrain.
+[[test]]
+name = "presentation_physics"
+required-features = ["client"]
+
+[[example]]
+name = "destruction_net_perf"
+required-features = ["net"]
+
+[dev-dependencies]
+regia_framework = { path = ".", features = ["functional-tests", "media"] }
+regia_test_utils = { workspace = true }
+# The sim host's FP-environment tests plant FTZ on a thread (ADR-8526).
+regia_detsim = { workspace = true, features = ["fp-test-hooks"] }
+wgpu = { workspace = true }
+tracing-subscriber = { workspace = true }
+# The spec 51 § 10 table-load bench (ADR-2132): `cargo bench -p regia_framework --bench tables_load`.
+criterion = { workspace = true }
+
+[[bench]]
+name = "tables_load"
+harness = false
+
+[[test]]
+name = "net_character"
+required-features = ["net"]
+
+[[test]]
+name = "net_body"
+required-features = ["net"]
+
+[[test]]
+name = "net_replay"
+required-features = ["net"]
+
+[[example]]
+name = "net_character_bench"
+required-features = ["net"]
+
+[[test]]
+name = "net_vehicle"
+required-features = ["net"]
+
+# Hover hulls in the predicted schedule (spec 73 § 9.2, ADR-8819).
+[[test]]
+name = "net_hover"
+required-features = ["net"]
+
+[[example]]
+name = "net_vehicle_bench"
+required-features = ["net"]
+
+[[test]]
+name = "net_session_rules"
+required-features = ["net"]
+
+[[test]]
+name = "net_session_players"
+required-features = ["net"]
+
+[[test]]
+name = "server_persistence"
+required-features = ["net"]
+
+[[test]]
+name = "traversal_net"
+required-features = ["net"]
+
+[[test]]
+name = "net_host_rotation"
+required-features = ["net"]
+
+[[test]]
+name = "fog_relevance"
+required-features = ["net"]
+
+[[test]]
+name = "match_state_replication"
+required-features = ["net"]
+
+[[example]]
+name = "fog_relevance_cost"
+required-features = ["net"]
+
+[[example]]
+name = "match_state_bandwidth"
+required-features = ["net"]
+
+# The `locomotion` gizmo overlay (ADR-8729). `client` links regia_render and regia_ui.
+[[test]]
+name = "locomotion_gizmos"
+required-features = ["client"]

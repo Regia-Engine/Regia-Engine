@@ -1,0 +1,15 @@
+(
+    format_version: 2,
+    build: Cargo(package: "arena", profile: "dev"),
+    roles: [
+        (name: "server", kind: Server, args: ["--port", "{port}"]),
+        (name: "client", kind: Client, count: 2, args: ["--connect", "{server}"], render: true),
+        (name: "phone", kind: Client, remote: Some("attached")),
+    ],
+    tests: (filter: ["net_*"], tags: ["smoke"]),
+    script: [(role: "client[0]", call: "functest.run", params: Some({"name": "join"}))],
+    limit_frames: 600,
+    max_restarts: 1,
+    allow_errors: ["audio device"],
+    keep: (screenshots_on_failure: true, logs: false),
+)

@@ -1,0 +1,30 @@
+{
+  "format_version": 1,
+  "level": "assets/levels/world.level.ron",
+  "cell_size_m": 128.0,
+  "ring": 1,
+  "exposure": 0.125,
+  "primary_hash": "5b8f0e3c1d2a4b6c7d8e9f00112233445566778899aabbccddeeff0011223344",
+  "cells": [
+    {
+      "key": "0_0",
+      "x": 0,
+      "z": 0,
+      "file": "0_0.flmap",
+      "input_hash": "0f1e2d3c4b5a69788796a5b4c3d2e1f00f1e2d3c4b5a69788796a5b4c3d2e1f0",
+      "entries": 41,
+      "width": 512,
+      "height": 384
+    },
+    {
+      "key": "-1_0",
+      "x": -1,
+      "z": 0,
+      "file": "-1_0.flmap",
+      "input_hash": "aa1e2d3c4b5a69788796a5b4c3d2e1f00f1e2d3c4b5a69788796a5b4c3d2e1f0",
+      "entries": 7,
+      "width": 128,
+      "height": 128
+    }
+  ]
+}

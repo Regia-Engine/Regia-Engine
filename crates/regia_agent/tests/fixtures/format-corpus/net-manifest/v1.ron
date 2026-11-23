@@ -1,0 +1,9 @@
+NetManifest(
+    format_version: 1,
+    engine_version: "0.5.0",
+    game_version: "1.2.0",
+    protocol_version: 1,
+    protocol_hash: 0x8f3a51c2d9e04b17,
+    content_hash: 0x0123456789abcdef,
+    packs: [("base", 0x1111111111111111), ("dlc_harbor", 0x2222222222222222)],
+)

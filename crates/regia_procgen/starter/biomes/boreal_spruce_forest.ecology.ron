@@ -1,0 +1,17 @@
+// Ecology profile of `boreal_spruce_forest.biome.ron` (ADR-2456, book agents/biomes.md "Ecology").
+EcologyProfile(
+    format_version: 1,
+    site: (moisture: (5.0, 7.0), reaction: (1.5, 3.5), altitude_m: (0.0, 900.0), slope_deg: (0.0, 35.0), soil: "iron-humus podzol (mor humus)"),
+    species: [
+        (entry: "canopy/norway_spruce", species: "picea_abies", role: Dominant, share: Some(0.75)),
+        (entry: "canopy/downy_birch", species: "betula_pubescens", role: Associated, share: Some(0.15)),
+        (entry: "canopy/scots_pine", species: "pinus_sylvestris", role: Associated, share: Some(0.1)),
+        (entry: "subcanopy/rowan", species: "sorbus_aucuparia", role: Associated, share: Some(1.0)),
+        (entry: "field/bilberry", species: "vaccinium_myrtillus", role: Understory, share: Some(0.6)),
+        (entry: "field/lingonberry", species: "vaccinium_vitis_idaea", role: Understory, share: Some(0.2)),
+        (entry: "field/hair_grass", species: "deschampsia_flexuosa", role: Understory, share: Some(0.1)),
+        (entry: "field/wood_sorrel", species: "oxalis_acetosella", role: Understory, share: Some(0.1)),
+        (entry: "ground/feather_moss", species: "hylocomium_splendens", role: Understory, share: Some(1.0)),
+    ],
+    competition: (shade_rules: true, self_thinning: Some((cell_m: 25.0, max_stems_per_ha: 350.0, exponent: 1.605))),
+)

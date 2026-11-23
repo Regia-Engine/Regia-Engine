@@ -1,0 +1,11 @@
+EntityFile(
+    format_version: 1,
+    scene_format_version: 10,
+    entity: (
+        guid: "8f1c3a00-0000-0000-0000-000000000001",
+        name: "Crate",
+        components: {
+            "regia_scene::transform::Transform": (translation: (1.0, 0.0, 0.0), rotation: (0.0, 0.0, 0.0, 1.0), scale: (1.0, 1.0, 1.0)),
+        },
+    ),
+)

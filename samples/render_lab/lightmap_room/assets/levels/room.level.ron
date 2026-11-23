@@ -1,0 +1,23 @@
+SceneFile(
+    format_version: 11,
+    entities: [
+        (guid: "00000000-0000-0000-0000-00000000a001", name: "Room", components: {
+            "regia_scene::transform::Transform": (translation: (0.0, 0.0, 0.0)),
+            "regia_scene::components::GiMobility": Static,
+            "regia_render::runtime::MeshSource": (mesh: "assets/meshes/room.gltf", material: ""),
+        }),
+        (guid: "00000000-0000-0000-0000-00000000a002", name: "Plinth", components: {
+            "regia_scene::transform::Transform": (translation: (3.0, 0.0, 3.0), scale: (0.15, 0.15, 0.15)),
+            "regia_scene::components::GiMobility": Static,
+            "regia_render::runtime::MeshSource": (mesh: "assets/meshes/room.gltf", material: ""),
+        }),
+        (guid: "00000000-0000-0000-0000-00000000a003", name: "Visitor", components: {
+            "regia_scene::transform::Transform": (translation: (5.0, 0.0, 4.0), scale: (0.1, 0.1, 0.1)),
+            "regia_scene::components::GiMobility": Dynamic,
+            "regia_render::runtime::MeshSource": (mesh: "assets/meshes/room.gltf", material: ""),
+        }),
+    ],
+    resources: {
+        "regia_scene::level::LevelSettings": (atmosphere: (preset: Earth, time_of_day: Some((hour: 12.0, day_of_year: 172, latitude_deg: 40.0))), look: (lightmap: Some((file: "maps/room.flmap")))),
+    },
+)

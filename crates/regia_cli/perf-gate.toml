@@ -1,0 +1,124 @@
+# Session-summary performance gate (ADR-8429).
+#
+# One default row per resolution class and tier. A map name that has no row of its own
+# uses that default. Operator files may add map rows; this shipped file has none.
+# Frame-time numbers are the class/tier defaults the gate was specified with.
+# Hitch, RSS and VRAM caps are settings (the brief requires them). They are loose
+# enough that a quiet 16.6 ms window is not a hitch and a missing memory sample is skipped.
+
+[classes."1080p".LOW.default]
+fps_min = 90.0
+frame_ms_p50_max = 11.1
+frame_ms_p95_max = 16.7
+frame_ms_p99_max = 25.0
+update_ms_p50_max = 5.0
+render_ms_p50_max = 5.0
+outside_update_ms_p50_max = 2.0
+gpu_ms_p50_max = 8.0
+hitches_per_minute_max = 30.0
+rss_peak_mb_max = 16384.0
+vram_peak_mb_max = 12288.0
+
+[classes."1080p".HIGH.default]
+fps_min = 60.0
+frame_ms_p50_max = 16.7
+frame_ms_p95_max = 25.0
+frame_ms_p99_max = 33.0
+update_ms_p50_max = 8.0
+render_ms_p50_max = 8.0
+outside_update_ms_p50_max = 2.0
+gpu_ms_p50_max = 12.0
+hitches_per_minute_max = 30.0
+rss_peak_mb_max = 16384.0
+vram_peak_mb_max = 12288.0
+
+[classes."1080p".ULTRA.default]
+fps_min = 40.0
+frame_ms_p50_max = 25.0
+frame_ms_p95_max = 33.0
+frame_ms_p99_max = 50.0
+update_ms_p50_max = 12.0
+render_ms_p50_max = 12.0
+outside_update_ms_p50_max = 2.0
+gpu_ms_p50_max = 20.0
+hitches_per_minute_max = 30.0
+rss_peak_mb_max = 16384.0
+vram_peak_mb_max = 12288.0
+
+[classes."1440p".LOW.default]
+fps_min = 72.0
+frame_ms_p50_max = 13.9
+frame_ms_p95_max = 20.0
+frame_ms_p99_max = 28.0
+update_ms_p50_max = 6.0
+render_ms_p50_max = 6.0
+outside_update_ms_p50_max = 2.0
+gpu_ms_p50_max = 10.0
+hitches_per_minute_max = 30.0
+rss_peak_mb_max = 16384.0
+vram_peak_mb_max = 12288.0
+
+[classes."1440p".HIGH.default]
+fps_min = 60.0
+frame_ms_p50_max = 16.7
+frame_ms_p95_max = 25.0
+frame_ms_p99_max = 33.0
+update_ms_p50_max = 8.0
+render_ms_p50_max = 8.0
+outside_update_ms_p50_max = 2.0
+gpu_ms_p50_max = 12.0
+hitches_per_minute_max = 30.0
+rss_peak_mb_max = 16384.0
+vram_peak_mb_max = 12288.0
+
+[classes."1440p".ULTRA.default]
+fps_min = 40.0
+frame_ms_p50_max = 25.0
+frame_ms_p95_max = 33.0
+frame_ms_p99_max = 50.0
+update_ms_p50_max = 12.0
+render_ms_p50_max = 12.0
+outside_update_ms_p50_max = 2.0
+gpu_ms_p50_max = 20.0
+hitches_per_minute_max = 30.0
+rss_peak_mb_max = 16384.0
+vram_peak_mb_max = 12288.0
+
+[classes.ultrawide.LOW.default]
+fps_min = 60.0
+frame_ms_p50_max = 16.7
+frame_ms_p95_max = 25.0
+frame_ms_p99_max = 33.0
+update_ms_p50_max = 8.0
+render_ms_p50_max = 8.0
+outside_update_ms_p50_max = 2.0
+gpu_ms_p50_max = 12.0
+hitches_per_minute_max = 30.0
+rss_peak_mb_max = 16384.0
+vram_peak_mb_max = 12288.0
+
+[classes.ultrawide.HIGH.default]
+fps_min = 40.0
+frame_ms_p50_max = 25.0
+frame_ms_p95_max = 33.0
+frame_ms_p99_max = 50.0
+update_ms_p50_max = 12.0
+render_ms_p50_max = 12.0
+outside_update_ms_p50_max = 2.0
+gpu_ms_p50_max = 20.0
+hitches_per_minute_max = 30.0
+rss_peak_mb_max = 16384.0
+vram_peak_mb_max = 12288.0
+
+[classes.ultrawide.ULTRA.default]
+fps_min = 30.0
+frame_ms_p50_max = 33.3
+frame_ms_p95_max = 50.0
+frame_ms_p99_max = 66.0
+update_ms_p50_max = 16.0
+render_ms_p50_max = 16.0
+outside_update_ms_p50_max = 2.0
+gpu_ms_p50_max = 28.0
+hitches_per_minute_max = 30.0
+rss_peak_mb_max = 16384.0
+vram_peak_mb_max = 12288.0

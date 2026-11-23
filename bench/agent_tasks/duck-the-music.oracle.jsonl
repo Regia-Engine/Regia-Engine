@@ -1,0 +1,3 @@
+# Oracle for duck-the-music: the calls a careful agent makes after the setup.
+{"method":"audio.set_bus","params":{"bus":"Music","volume_db":-12.0}}
+{"method":"audio.set_bus","params":{"bus":"Ambience","mute":true}}

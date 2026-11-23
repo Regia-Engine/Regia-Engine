@@ -1,0 +1,8 @@
+(
+    format_version: 1,
+    entries: [
+        (path: "models/crate.glb", id: "5d0c8a3e-4b1f-4c62-9e07-3a41c2d87f10", importer: "gltf"),
+        (path: "textures/rock_albedo.jpg", id: "2b6e91f4-07ad-4e35-8c19-d4a26b03e85f", importer: "jpg"),
+        (path: "textures/rock_albedo.png", id: "2b6e91f4-07ad-4e35-8c19-d4a26b03e85f", importer: "png"),
+    ],
+)

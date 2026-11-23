@@ -1,0 +1,107 @@
+// Fuzz fixture for `.aircraft.ron` v1 (ADR-3374): the flight lab's trainer.
+(
+    format_version: 1,
+    name: "trainer",
+    config: (
+        mass: 1000.0,
+        center_of_mass: (0.0, 0.0, 0.0),
+        // Pitch (X), yaw (Y) and roll (Z) moments of inertia, kg m^2.
+        inertia: (1800.0, 2700.0, 1300.0),
+        fuselage_half_extents: (0.6, 0.6, 2.5),
+        parasite_drag_area: 0.45,
+        surfaces: [
+            // An 11 m wing in two panels with 3 degrees of dihedral and ailerons; each panel uses the
+            // whole wing's aspect ratio.
+            (
+                name: "left wing",
+                kind: Wing,
+                position: (-2.75, 0.8, 0.15),
+                normal: (0.052335956, 0.9986295, 0.0),
+                incidence_deg: 1.0,
+                span: 5.5,
+                chord: 1.5,
+                aspect_ratio: Some(7.3333335),
+                cl0: 0.25,
+                cd0: 0.008,
+                cm0: -0.05,
+                oswald: 0.8,
+                stall_angle_deg: 15.0,
+                stall_blend_deg: 4.0,
+                flat_plate_cn: 1.2,
+                control_chord_fraction: 0.25,
+                controls: [
+                    (channel: Roll, max_deflection_deg: 15.0),
+                    (channel: Flaps, max_deflection_deg: 10.0),
+                ],
+            ),
+            (
+                name: "right wing",
+                kind: Wing,
+                position: (2.75, 0.8, 0.15),
+                normal: (-0.052335956, 0.9986295, 0.0),
+                incidence_deg: 1.0,
+                span: 5.5,
+                chord: 1.5,
+                aspect_ratio: Some(7.3333335),
+                cl0: 0.25,
+                cd0: 0.008,
+                cm0: -0.05,
+                oswald: 0.8,
+                stall_angle_deg: 15.0,
+                stall_blend_deg: 4.0,
+                flat_plate_cn: 1.2,
+                control_chord_fraction: 0.25,
+                controls: [
+                    (channel: Roll, max_deflection_deg: -15.0),
+                    (channel: Flaps, max_deflection_deg: 10.0),
+                ],
+            ),
+            // Pitch +1 raises the elevator's trailing edge 20 degrees: tail down, nose up.
+            (
+                name: "tailplane",
+                kind: Tailplane,
+                position: (0.0, 0.6, 4.6),
+                incidence_deg: -1.0,
+                span: 3.4,
+                chord: 0.9,
+                control_chord_fraction: 0.35,
+                controls: [(channel: Pitch, max_deflection_deg: -20.0)],
+            ),
+            // Yaw +1 swings the rudder's trailing edge right (force on the fin to the left): nose right.
+            (
+                name: "fin",
+                kind: Fin,
+                position: (0.0, 1.2, 4.7),
+                normal: (1.0, 0.0, 0.0),
+                span: 1.5,
+                chord: 1.1,
+                control_chord_fraction: 0.4,
+                controls: [(channel: Yaw, max_deflection_deg: -25.0)],
+            ),
+        ],
+        engines: [
+            (
+                name: "propeller",
+                position: (0.0, 0.0, -2.6),
+                direction: (0.0, 0.0, -1.0),
+                static_thrust: 2600.0,
+                model: Propeller(power: 120000.0, efficiency: 0.8),
+            ),
+        ],
+        gear: [
+            (
+                name: "nose",
+                position: (0.0, -0.5, -1.8),
+                stiffness: 20000.0,
+                damping: 3000.0,
+                steerable: true,
+                max_steer_deg: 25.0,
+                brakes: false,
+            ),
+            (name: "left main", position: (-1.2, -0.5, 0.3)),
+            (name: "right main", position: (1.2, -0.5, 0.3)),
+        ],
+        ground_layers: None,
+        query_layer: None,
+    ),
+)

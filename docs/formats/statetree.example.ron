@@ -1,0 +1,24 @@
+// A guard that idles, investigates noises and fights when it sees the player.
+(
+    format_version: 1,
+    description: "guard",
+    root: "Guard",
+    seed: 7,
+    state_key: "guard_mode",
+    states: [
+        (name: "Guard", children: ["Idle", "Alert", "Fight"]),
+        (name: "Idle", transitions: [
+            (trigger: Event("heard"), target: State("Alert")),
+            (trigger: Tick, condition: Key("sees_player"), priority: 10, target: State("Fight")),
+        ]),
+        (name: "Alert", tasks: ["game::Investigate"], transitions: [
+            (trigger: Tick, condition: Key("sees_player"), priority: 10, target: State("Fight")),
+            (trigger: Completed, target: State("Idle")),
+        ]),
+        (name: "Fight", selection: Utility, children: ["Shoot", "Melee"], transitions: [
+            (trigger: Tick, condition: Not(Key("sees_player")), target: State("Alert")),
+        ]),
+        (name: "Shoot", utility: Some((key: "distance", scale: 0.1)), tasks: ["game::Shoot"]),
+        (name: "Melee", utility: Some((key: "distance", scale: -0.1, bias: 2.0)), tasks: ["game::Melee"]),
+    ],
+)

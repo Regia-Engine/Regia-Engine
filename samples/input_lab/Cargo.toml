@@ -1,0 +1,17 @@
+[package]
+name = "input_lab"
+description = "M7 input lab: exercises the action-mapping layer with simulated devices and logs live action values."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[dependencies]
+regia_input = { workspace = true }
+regia_platform = { workspace = true }
+regia_app = { workspace = true }
+regia_core = { workspace = true }
+
+[lints]
+workspace = true

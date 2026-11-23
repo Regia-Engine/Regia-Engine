@@ -1,0 +1,13 @@
+Windows VM, rustc 1.99.0 x86_64-pc-windows-msvc, linker rust-lld (repo .cargo/config.toml), debug profile.
+Counted with `dumpbin /exports` (MSVC 14.44.35207), line "number of functions".
+
+spike_engine_dylib.dll   47,147,520 bytes   34,479 exports   (limit 65,535 -> 52.6 %)
+spike_engine_dylib.pdb  148,529,152 bytes
+spike_engine_dylib.dll.lib 26,398,956 bytes
+game.dll                    883,712 bytes      804 exports   (one reload generation)
+sim_dylib.dll                83,968 bytes       98 exports
+host.exe                    257,024 bytes
+editor_host.exe           5,694,976 bytes   (engine dylib dynamic, egui stack static)
+
+Clean build of engine dylib + host: 7 min 07 s (6 vCPU). editor_host afterwards: 3.9 s and the engine
+dylib was NOT relinked (feature anchor works on Windows too).

@@ -1,0 +1,22 @@
+[package]
+name = "regia_gen"
+description = "Procedural mesh helpers (extrude with bevel, lathe, boolean-lite plane clipping, planar and box UV projection over regia_asset::CpuMesh), texture synthesis (seeded tileable noise, masks, mesh edge/cavity and wear masks) and heightfield tools (terrace, pad, thermal erosion, terrain export); deterministic bits on every platform."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia_core = { workspace = true }
+regia_asset = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+blake3 = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

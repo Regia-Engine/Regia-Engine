@@ -1,0 +1,19 @@
+(
+    format_version: 1,
+    rules: [
+        (
+            glob: "assets/ui/**",
+            importer: "png",
+            settings: "(compress: Some(false), max_size: Some(512))",
+        ),
+        (
+            glob: "assets/**",
+            settings: "(quality: Some(Low))",
+        ),
+        (
+            glob: "assets/props/*",
+            importer: "gltf",
+            settings: "(meshlets: true, collision: ConvexDecomposition)",
+        ),
+    ],
+)

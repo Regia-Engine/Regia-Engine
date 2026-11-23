@@ -1,0 +1,51 @@
+[package]
+name = "product_viewer"
+description = "The product viewer app: one configurable piece, tap to switch options, drag to turn the view (specs/42 § 9). Desktop window for development, Android for the phone."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+default = []
+# The agent protocol (`viewer.*`) over the existing transport: a dev build, which links the whole engine
+# through `regia_agent`. The app itself never needs it.
+# `viewer_app.step`'s PNG comes through `regia_viewer/tools`.
+agent = ["dep:regia_agent", "regia_viewer/tools"]
+
+[dependencies]
+regia_core = { workspace = true }
+regia_app = { workspace = true }
+regia_platform = { workspace = true }
+regia_crash = { workspace = true, features = ["tls"] }
+regia_agent = { workspace = true, optional = true }
+regia_viewer = { workspace = true }
+regia_viewer_pack = { workspace = true }
+regia_web = { workspace = true }
+blake3 = { workspace = true }
+# Without `default_fonts`: the app ships one font (`panel::configure`).
+egui = { version = "0.36.2", default-features = false }
+egui-wgpu = { workspace = true }
+glam = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+ureq = { workspace = true }
+# The public root list for `https://` packages without a pin; same line ureq and `regia_crash` use.
+webpki-roots = { version = "0.26" }
+wgpu = { workspace = true }
+
+[target.'cfg(target_os = "android")'.dependencies]
+jni = { workspace = true }
+
+[dev-dependencies]
+regia_test_utils = { workspace = true }
+regia_viewer_pack = { workspace = true, features = ["cook"] }
+# The real TLS server of tests/https_install.rs; dev-only, as in `regia_crash`.
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
+rcgen = "0.14"

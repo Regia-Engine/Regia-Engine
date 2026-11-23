@@ -1,0 +1,29 @@
+(
+    format: "render-job",
+    entries: [
+        (
+            version: 1,
+            file: "v1.render_job.ron",
+            origin: "git c7253feba1d7019a83a97ee4672f901a5263b0d7:docs/formats/render-job.example.ron (parent of the v2 bump 6a582874e)",
+            exercises: "The first shape: takes, cuts, output settings; no bindings table.",
+        ),
+        (
+            version: 2,
+            file: "v2.render_job.ron",
+            origin: "frozen copy of the fuzz-target registry fixture (v2 was current at the corpus branch base)",
+            exercises: "v2: the bindings table",
+        ),
+        (
+            version: 3,
+            file: "v3.render_job.ron",
+            origin: "git ad2ad70ff:crates/regia_agent/src/fuzz_targets/fixtures/render-job.example.ron (the v3 fuzz fixture with burn-ins and slate, ADR-3393)",
+            exercises: "v3: burn-ins, guides and slate blocks",
+        ),
+        (
+            version: 4,
+            file: "v4.ron",
+            origin: "registry fixture (version 3) loaded and re-encoded by the loader at version 4",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+    ],
+)

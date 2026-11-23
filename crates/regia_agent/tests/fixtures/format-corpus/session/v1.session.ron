@@ -1,0 +1,14 @@
+Session(
+    format_version: 1,
+    build: Cargo(package: "my_game", profile: "dev"),
+    roles: [
+        (name: "server", kind: Server, count: 1, args: ["--level", "arena"], driver: None),
+        (name: "client", kind: Client, count: 4, args: ["--connect", "{server}"], driver: Some("bot_walker")),
+    ],
+    tests: (filter: ["smoke*"], tags: []),
+    script: [ (role: "client[0]", call: "play.wait_until", params: Some((condition: (a: 1)))) ],
+    limit_frames: 36000,
+    max_restarts: 2,
+    allow_errors: [],
+    keep: (screenshots_on_failure: true, logs: true),
+)

@@ -1,0 +1,5 @@
+(format_version: 1, name: "slash", description: "One swing of the player's three-hit combo",
+ kind_tags: ["Ability.Melee.Slash"], run_tags: ["State.Attacking"],
+ owner_forbids: Some(Has("Status.Staggered")),
+ cooldown: Some("combat/slash_cooldown.effect.ron"),
+ charge: OnStart, max_run_ticks: Some(1))

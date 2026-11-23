@@ -1,0 +1,8 @@
+// Gameplay data: ships in both packages and is part of the content hash.
+(
+    format_version: 1,
+    row_type: "dedicated_server::WeaponRow",
+    rows: {
+        "rifle": (damage: 30),
+    },
+)

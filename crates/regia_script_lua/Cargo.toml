@@ -1,0 +1,37 @@
+[package]
+name = "regia_script_lua"
+description = "Embedded Lua 5.1 for mods (docs/specs/84-lua-mods.md, ADR-1751): sandboxed states, instruction and memory budgets, error isolation, agent surface. Optional, behind regia's `lua` feature."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia_agent = { workspace = true }
+regia_app = { workspace = true }
+regia_core = { workspace = true }
+# Component reflection added after the dependency audit base.
+regia_ecs = { workspace = true }
+regia_framework = { workspace = true }
+# `ModFiles::from_mods_vfs`: Lua mods read from `mods://` (ADR-2418); already linked through regia_framework.
+regia_asset = { workspace = true }
+regia_scene = { workspace = true }
+# The Lua 5.1.5 C runtime, compiled from source by lua-src (no system Lua), bound by mlua (ADR-1751).
+mlua = { workspace = true }
+postcard = { workspace = true }
+ron = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+
+[target.'cfg(unix)'.dependencies]
+# O_NOFOLLOW / O_NONBLOCK when a mod file is opened (the opened file is the one checked).
+libc = { workspace = true }
+
+[dev-dependencies]
+regia_test_utils = { workspace = true }

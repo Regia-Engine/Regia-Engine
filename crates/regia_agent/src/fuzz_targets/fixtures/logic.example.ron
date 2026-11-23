@@ -1,0 +1,50 @@
+// A phase-1 logic graph (spec 102 § 3): the gatehouse door. `game::OpenDoor` is a task the game
+// registers; the `logic::*` tasks are built in.
+LogicGraphDef(
+    format_version: 1,
+    description: "Gatehouse door logic",
+    seed: 7,
+    locals: [
+        (name: "opened_count", default: Int(0)),
+        (name: "door_speed", default: Float(1.5)),
+    ],
+    rules: [
+        (
+            name: "open_door",
+            event: EntityEvent("trigger_enter"),
+            priority: 10,
+            condition: All([Has("door_ref"), Not(Key("locked"))]),
+            actions: [
+                (task: "logic::SetBlackboard", set: {
+                    "key": Literal(String("local/opened_count")),
+                    "op": Literal(String("increment")),
+                }),
+                (task: "game::OpenDoor", set: { "speed": BbRef("local/door_speed") }),
+            ],
+        ),
+        (
+            name: "raise_alarm",
+            event: EntityEvent("trigger_enter"),
+            priority: 20,
+            condition: Key("locked"),
+            actions: [
+                (task: "logic::EmitEvent", set: {
+                    "event": Literal(String("alarm")),
+                    "target": BbRef("entity/door_ref"),
+                }),
+            ],
+        ),
+        (
+            name: "patrol_ping",
+            event: Timer(every_ticks: 600, jitter_ticks: 60),
+            cooldown_ticks: 0,
+            actions: [(task: "logic::EmitEvent", set: { "event": Literal(String("ping")) })],
+        ),
+        (
+            name: "on_unlock",
+            event: BlackboardChanged(key: "locked"),
+            condition: Not(Key("locked")),
+            actions: [(task: "logic::EnableEntity", set: { "target": BbRef("door_ref") })],
+        ),
+    ],
+)

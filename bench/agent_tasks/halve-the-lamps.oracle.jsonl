@@ -1,0 +1,2 @@
+# Oracle for halve-the-lamps: the calls a careful agent makes after the setup.
+{"method":"scene.apply_edits","params":{"edits":[{"op":"set_property","entity":"$la","component":"PointLight","path":"intensity","value":400.0},{"op":"set_property","entity":"$lb","component":"PointLight","path":"intensity","value":400.0},{"op":"set_property","entity":"$lc","component":"PointLight","path":"intensity","value":400.0}]}}

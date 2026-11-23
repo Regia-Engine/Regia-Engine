@@ -1,0 +1,14 @@
+// Failure screenshots on a real game (ADR-2755): the test fails on purpose, so the session fails (exit 1)
+// and, with a display, saves failure-1.png next to the logs and names it in session-failure.json.
+//   regia test session samples/arena/smoke-fail.session.ron
+(
+    format_version: 2,
+    build: Cargo(package: "arena", profile: "dev"),
+    roles: [
+        (name: "arena", kind: Game, args: ["--smoke-fail", "--bots", "3", "--seed", "7"], render: true),
+    ],
+    tests: (tags: ["smoke_fail"]),
+    limit_frames: 600,
+    max_restarts: 0,
+    keep: (screenshots_on_failure: true, logs: true),
+)

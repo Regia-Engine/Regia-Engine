@@ -1,0 +1,11 @@
+(
+    format: "regiatrace",
+    entries: [
+        (
+            version: 1,
+            file: "v1.regiatrace",
+            origin: "frozen copy of crates/regia_telemetry/tests/data/v1.regiatrace (the checked-in v1 fixture spec 54 § 4.4 requires to always open)",
+            exercises: "the current version: every chunk kind of a v1 recording must stay readable",
+        ),
+    ],
+)

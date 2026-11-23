@@ -1,0 +1,65 @@
+// The car's chase camera (spec 35): a driver asset the player camera runs while the player
+// drives (ADR-2134). The on-foot camera stays the legacy boom rig.
+(
+    format_version: 1,
+    name: "vehicle_chase",
+    params: { "boom_length": Float(7.5) },
+    variables: [],
+    inputs: [
+        (
+            name: "look",
+            kind: Axis2,
+            speed: (120.0, 90.0),
+            pitch_clamp: (-50.0, 20.0),
+            invert_pitch: false,
+            normalize: false,
+            pull_toward_var: None,
+            pull_weight: 0.1,
+        ),
+    ],
+    rigs: [
+        (
+            name: "chase",
+            tags: ["vehicle"],
+            root: [
+                Pivot(
+                    target: DriveTarget,
+                    offset: (0.0, 1.4, 0.0),
+                    space: Target,
+                    aim_offset: (0.0, 0.0, 0.0),
+                    inherit_rotation: true,
+                ),
+                LookInput(
+                    slot: "look",
+                    additive: true,
+                ),
+                Boom(
+                    length: Param("boom_length"),
+                    side_offset: Literal(0.0),
+                    up_offset: Literal(0.6),
+                    length_speed: Literal(0.0),
+                ),
+                Collision(
+                    radius: 0.25,
+                    layers: [],
+                    close_speed: 100000000.0,
+                    open_speed: 0.0,
+                    open_rate: 4.0,
+                    anchor: Pivot,
+                    reuse_last_frame: false,
+                ),
+                Fov(degrees: Literal(70.0)),
+                SmoothPosition(
+                    depth: 6.0,
+                    side: 6.0,
+                    height: 4.0,
+                    space: World,
+                ),
+            ],
+            transitions: [],
+            blend_out: None,
+        ),
+    ],
+    transitions: [],
+    director: Fixed("chase"),
+)

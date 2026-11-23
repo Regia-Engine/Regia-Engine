@@ -1,0 +1,20 @@
+(
+    format_version: 3,
+    name: "fuzz",
+    inputs: [
+        (
+            name: "p",
+            ty: Vec3,
+        ),
+    ],
+    nodes: {
+        "in": Input("p"),
+        "n": Noise(
+            input: "in",
+            octaves: 3,
+        ),
+    },
+    outputs: {
+        "out": "n",
+    },
+)

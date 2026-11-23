@@ -1,0 +1,11 @@
+(
+    format: "ai-formation",
+    entries: [
+        (
+            version: 1,
+            file: "v1.ron",
+            origin: "handwritten for format version 1",
+            exercises: "the current version: named slots, a role tag, a fill order and a spacing scale",
+        ),
+    ],
+)

@@ -1,0 +1,267 @@
+[package]
+name = "regia"
+description = "Umbrella crate: re-exports, prelude, DefaultPlugins and regia::run()."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia_core = { workspace = true }
+regia_ecs = { workspace = true }
+regia_app = { workspace = true }
+# `window`, `devices` and the framework's `client` come with the feature `client` below: a server build
+# links none of them (spec 76 § 2.1, ADR-1886).
+regia_platform = { path = "../regia_platform", default-features = false }
+regia_input = { path = "../regia_input", default-features = false }
+regia_asset = { workspace = true }
+regia_scene = { workspace = true }
+regia_world = { workspace = true }
+regia_render = { workspace = true, optional = true }
+regia_physics = { workspace = true }
+regia_2d = { workspace = true, optional = true }
+regia_audio = { workspace = true, optional = true }
+regia_animation = { workspace = true }
+regia_ui = { workspace = true, optional = true }
+# The quick layer: `regia::quick::{sketch, app}`, `Quick`, immediate `Draw` (survey catalogue #1-#6).
+regia_quick = { workspace = true, optional = true }
+regia_framework = { path = "../regia_framework", default-features = false }
+# The packaged-media index (`media_index.ron`, ADR-5441): serde/ron are workspace-core already.
+serde = { workspace = true }
+ron = { workspace = true }
+regia_telemetry = { workspace = true, optional = true }
+tracing = { workspace = true }
+regia_agent = { workspace = true, optional = true }
+# Steamworks integration (specs/24); desktop-only, off by default.
+regia_steam = { workspace = true, optional = true }
+# Opt-in crash + match-log upload (specs/21 § 5); off by default, `tls` feature enables https.
+regia_crash = { workspace = true, optional = true }
+regia_net = { workspace = true, optional = true }
+# Procedural content graphs and generators (specs/62, 63); `procgen` feature, default on.
+regia_procgen = { workspace = true, optional = true }
+# OpenXR head-mounted displays (specs/58); off by default.
+regia_xr = { workspace = true, optional = true }
+# Particle liquid (PIC/FLIP, whitewater, `.fluidcache`, ADR-2441); off by default.
+regia_fluid = { workspace = true, optional = true }
+# Video playback (specs/50, ADR-1670); off by default.
+regia_media = { workspace = true, optional = true }
+# Embedded Lua 5.1 for mods (specs/84, ADR-1751); off by default. The only crate with the Lua C runtime.
+regia_script_lua = { workspace = true, optional = true }
+# Simulation plugins of the `server` build (spec 76 § 2).
+regia_ai = { path = "../regia_ai", default-features = false, optional = true }
+regia_nav = { workspace = true, optional = true }
+
+[features]
+# Live asset reload in dev runs (`regia run --dev`, specs/12 § 8): the asset plugin watches the
+# cooked cache and the sources the runtime reads. Never in shipping builds (`regia package`).
+dev-assets = ["regia_asset/dev-assets", "regia_render?/dev-assets"]
+# Windows DX12 fallback backend: shaders compile with the statically linked DXC (Shader Model 6).
+static-dxc = ["client", "regia_render/static-dxc"]
+# The agent protocol server (specs/23 § 2). On for dev builds; shipping builds turn default features off
+# (packaging, M16) unless the game opts in. `regia_agent` needs the client crates, so a server built
+# with it (`regia server --agent`, a playtest profile) links them too (ADR-1886).
+# `ui` installs `regia_ui::UiPlugin` into [`DefaultPlugins`] (runtime game UI, specs/18).
+default = ["client", "agent", "functional-tests", "ui", "quick", "procgen"]
+# Everything a player's machine needs: the window, rendering, audio, 2D, telemetry, input devices and the
+# framework's client modules. Off only in a dedicated-server build (`server`, spec 76 § 2).
+client = [
+    "dep:regia_render",
+    "dep:regia_2d",
+    "dep:regia_audio",
+    "dep:regia_telemetry",
+    "regia_platform/window",
+    "regia_input/devices",
+    "regia_framework/client",
+    "regia_ai?/debug_draw",
+]
+# The dedicated-server build (spec 76 § 2): `regia::run` hosts the game headless under
+# `regia_net::server_host`. Build it with `--no-default-features --features server`.
+server = ["net", "dep:regia_ai", "regia_ai/net", "dep:regia_nav"]
+agent = ["client", "dep:regia_agent", "functional-tests"]
+# In-level functional tests (`regia::framework::functional`, specs/41 § 9); dev and test only. The agent
+# protocol's `functest.*` needs it, so a shipping profile turns both off.
+functional-tests = ["regia_framework/functional-tests"]
+# The DCC scene feed (specs/60 § 3): dev builds only, never default and never in a shipping profile.
+dcc-feed = ["agent", "regia_agent/dcc-feed"]
+ui = ["client", "dep:regia_ui"]
+# `quick` re-exports `regia_quick` as `regia::quick` with a `run()` for quick apps (needs `ui` for text).
+quick = ["ui", "dep:regia_quick"]
+# `steam` re-exports `regia_steam` as `regia::steam` (specs/24, docs/03 § 5).
+steam = ["client", "dep:regia_steam"]
+# `lua` re-exports `regia_script_lua` as `regia::lua`: sandboxed Lua 5.1 mods (specs/84, ADR-1751).
+lua = ["dep:regia_script_lua"]
+# `logic` re-exports `regia_ai` as `regia::ai` and adds `regia::logic_bridge` (spec 102 § 13 P3, ADR-7268): the
+# logic-graph tasks and routes for the sequencer and cues (`client`), Lua mods (`lua`) and the net layer (`net`).
+logic = ["dep:regia_ai"]
+# `crash` re-exports `regia_crash` as `regia::crash` (specs/21 § 5); enable `regia_crash/tls`
+# for https:// endpoints.
+crash = ["dep:regia_crash"]
+# `procgen` re-exports `regia_procgen` as `regia::procgen` and adds `ProcGenPlugin` to
+# [`DefaultPlugins`] (specs/62 § 13). Its `pipeline` feature (file writing) stays off in games.
+procgen = ["dep:regia_procgen"]
+# `physics2d` enables rapier2d bodies in `regia::physics::physics2d` (specs/22 § T2.10); off by default.
+physics2d = ["regia_physics/physics2d"]
+# `frame-gen`: FSR 3 frame generation in the renderer (ADR-514, ADR-2067); off by default.
+frame-gen = ["client", "regia_render/frame-gen"]
+# `dlss`: DLSS Super Resolution through NGX (ADR-2002); links the NGX SDK when DLSS_SDK is set at
+# build time, otherwise a stub that reports `not_bundled`. Off by default.
+dlss = ["client", "regia_render/dlss"]
+xess = ["client", "regia_render/xess"]
+# `net` re-exports `regia_net` as `regia::net` (specs 70-71, ADR-1643): client-server replication.
+net = ["dep:regia_net", "regia_framework/net"]
+# `voice-net` carries voice chat over the net runtime (`regia::net::voice`, specs/59, ADR-1911); off by default.
+voice-net = ["net", "regia_net/voice"]
+# `xr` re-exports `regia_xr` as `regia::xr` (OpenXR, specs/58, ADR-1676); off by default. Add
+# `regia::xr::XrPlugin` to the app yourself; nothing installs it.
+xr = ["dep:regia_xr"]
+# `fluid` re-exports `regia_fluid` as `regia::fluid` with its `draw` feature (the surface and whitewater as
+# `MeshRenderer`s, ADR-2441) and its `physics` feature (rigid-body coupling, ADR-2577); off by default. Add
+# `regia::fluid::FluidPlugin` (and `regia::fluid::coupling::FluidPhysicsPlugin`) to the app yourself.
+fluid = ["client", "dep:regia_fluid", "regia_fluid/draw", "regia_fluid/physics"]
+# `media` re-exports `regia_media` as `regia::media` (video playback, specs/50, ADR-1670); off by default.
+media = ["dep:regia_media", "regia_framework/media"]
+# `media-codecs` adds the AV1, Opus and Vorbis decoders to `regia::media` (regia_media `video`, ADR-1593,
+# ADR-1869); off by default (compile time, and the AV1 patent-grant counsel question of ADR-1593 § 3).
+media-codecs = ["media", "regia_media/video"]
+# `media-codecs-asm` adds the x86 AV1 assembly (3.7 to 5.3 times faster, ADR-1869 § 2). Needs `nasm` on PATH, so
+# plain builds stay without it; release builds of a game that plays AV1 turn it on.
+media-codecs-asm = ["media-codecs", "regia_media/av1-nasm"]
+# `media-encode` adds the offline AV1/Opus WebM encoder (`regia::media::encode`, render-out format `webm`,
+# `regia media encode`; ADR-3369). For render-out and tools only, never a shipped game's runtime path; off by default.
+media-encode = ["media", "regia_media/media-encode", "regia_agent?/media-encode"]
+# `content-http`: `https://` content-chunk sources (ureq + rustls, specs/40 § 2.6, ADR-1876); off by
+# default. `http://` sources need no feature.
+content-http = ["regia_asset/content-http"]
+# `content-signing`: Ed25519 checks of fetched content manifests (ring, ADR-2710); `content-http`
+# turns it on. Without it a game that trusts signing keys refuses every fetched manifest.
+content-signing = ["regia_asset/content-signing"]
+# `voice-opus` makes voice chat speak Opus (`regia::media::voice_opus`, specs/59, ADR-1593, ADR-1911); off by default.
+voice-opus = ["media", "regia_media/voice-opus"]
+# `explosion-fx`: the crash effect layers and the ground-shock camera shake of `regia::framework::explosion` (ADR-2430); off by default.
+explosion-fx = ["client", "regia_framework/explosion-fx"]
+# `destruction-fx`: sound cues, VFX systems and decals of `regia::framework::destruction_fx` tables (ADR-2734); off by default.
+destruction-fx = ["client", "regia_framework/destruction-fx"]
+# `accesskit`: the screen-reader OS bridge (AccessKit adapters for AT-SPI, UI Automation and
+# NSAccessibility, ADR-1998); off by default. Needs `ui`.
+accesskit = ["ui", "regia_ui/accesskit"]
+# `net-quic`: QUIC datagrams (RFC 9221) as a regia_net socket (ADR-3970). Off by default.
+net-quic = ["net", "regia_net/net-quic"]
+
+[dev-dependencies]
+# `tests/startup_idle_ratchet.rs` (ADR-2987): the tagging-allocator helper and the child process
+# bound, the committed RON table, the child's JSON result line. All already in the workspace graph.
+regia_test_utils = { workspace = true }
+serde = { workspace = true }
+ron = { workspace = true }
+serde_json = { workspace = true }
+# `tests/logic_integrations.rs`: the in-process agent client (already in the workspace graph).
+crossbeam-channel = { workspace = true }
+
+# Logic-graph integrations (spec 102 § 13 P3, ADR-7268).
+[[test]]
+name = "logic_integrations"
+required-features = ["logic"]
+
+# Logic-graph match-rules tasks and match events (spec 102 § 15, audit gap GR-7.6).
+[[test]]
+name = "logic_rules_nodes"
+required-features = ["logic", "net"]
+
+# The lag-compensation bridge: physics occlusion, animator joints, gizmo group (ADR-1752).
+[[test]]
+name = "lagcomp_bridge"
+required-features = ["net"]
+
+# Stack walk of `rig_entity`: a rig on the root allocates nothing (perf audit, finding 2).
+[[test]]
+name = "lagcomp_rig_alloc"
+required-features = ["net"]
+
+# Second read of one exact-tick record allocates less than the first (perf audit, finding 3).
+[[test]]
+name = "lagcomp_pose_alloc"
+required-features = ["net"]
+
+[[test]]
+name = "net_relevance_bridge"
+required-features = ["net", "client"]
+
+# Montage commands over the network: a two-app loopback (spec 34 § 9, ADR-9370).
+[[test]]
+name = "montage_net"
+required-features = ["net"]
+
+# A normal quit exits 0 with no crash bundle (v0.1.0 NVIDIA quit crash). No libtest harness: the
+# native crash monitor re-launches the executable, and the child must return from `main` as a game does.
+[[test]]
+name = "clean_exit"
+harness = false
+required-features = ["client"]
+
+# A lost GPU device exits with code 3 and a crash bundle (ADR-171); same child-process shape.
+[[test]]
+name = "device_lost_exit"
+harness = false
+required-features = ["client"]
+
+[[test]]
+name = "audio_occlusion"
+required-features = ["client"]
+
+# Loaded-cell relevance (spec 78 § 21). The module is behind the `net` feature.
+[[test]]
+name = "stream_cell_relevance"
+required-features = ["net"]
+
+# The quick-layer example ladder (ported from macroquad's examples, docs/ported-sources.toml):
+# `cargo run -p regia --example snake`.
+[[example]]
+name = "snake"
+path = "../../examples/quick/snake.rs"
+required-features = ["quick"]
+
+[[example]]
+name = "asteroids"
+path = "../../examples/quick/asteroids.rs"
+required-features = ["quick"]
+
+[[example]]
+name = "arkanoid"
+path = "../../examples/quick/arkanoid.rs"
+required-features = ["quick"]
+
+[[example]]
+name = "life"
+path = "../../examples/quick/life.rs"
+required-features = ["quick"]
+
+[[example]]
+name = "platformer"
+path = "../../examples/quick/platformer.rs"
+required-features = ["quick"]
+
+[[example]]
+name = "first_person"
+path = "../../examples/quick/first_person.rs"
+required-features = ["quick"]
+
+[[example]]
+name = "basic_shapes"
+path = "../../examples/quick/basic_shapes.rs"
+required-features = ["quick"]
+
+[[example]]
+name = "input_touch"
+path = "../../examples/quick/input_touch.rs"
+required-features = ["quick"]
+
+# Destruction level 2 sample: a brick wall and a plank bridge broken by a hit script (ADR-1597).
+# `REGIA_DESTRUCTION_CAPTURE=out.png` saves a frame, prints the hashes and quits.
+[[example]]
+name = "destruction"
+path = "../../examples/quick/destruction.rs"
+required-features = ["quick"]

@@ -1,0 +1,2 @@
+# Oracle for campfire-emitter: the calls a careful agent makes after the setup.
+{"method":"audio.set_emitter","params":{"entity":"$c","volume_db":-6.0,"max_distance":30.0,"looping":true}}

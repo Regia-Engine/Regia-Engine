@@ -1,0 +1,7 @@
+(
+    format_version: 1,
+    slots: [
+        (name: "upper_body", group: "upper", mask: Some((joints: ["spine"], include_children: true))),
+        (name: "full", group: "default", mask: None),
+    ],
+)

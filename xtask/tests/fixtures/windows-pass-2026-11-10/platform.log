@@ -1,0 +1,623 @@
+   Compiling quote v1.0.47
+   Compiling lock_api v0.4.14
+   Compiling windows-sys v0.52.0
+   Compiling futures-core v0.3.34
+   Compiling futures-lite v2.6.1
+   Compiling syn v3.0.6
+   Compiling syn v2.0.119
+   Compiling cc v1.6.0
+   Compiling serde_json v1.0.151
+   Compiling async-executor v1.14.1
+   Compiling bevy_macro_utils v0.20.0
+   Compiling blake3 v1.8.7
+   Compiling async-channel v2.5.0
+   Compiling bevy_ecs_macro_logic v0.20.0
+   Compiling variadics_please v2.0.0
+   Compiling spin v0.9.9
+   Compiling winapi-util v0.1.11
+   Compiling windows-sys v0.61.2
+   Compiling serde_derive v1.0.229
+   Compiling bytemuck_derive v1.12.1
+   Compiling thiserror-impl v2.0.21
+   Compiling bytemuck v1.25.2
+   Compiling glam v0.33.12
+   Compiling tracing-attributes v0.1.31
+   Compiling serde v1.0.229
+   Compiling smallvec v1.16.2
+   Compiling arrayvec v0.7.8
+   Compiling parking_lot_core v0.9.12
+   Compiling parking_lot v0.12.5
+   Compiling thiserror v2.0.21
+   Compiling windows-implement v0.60.2
+   Compiling windows-interface v0.59.3
+   Compiling bevy_platform v0.20.0
+   Compiling derive_more-impl v2.1.1
+   Compiling num-complex v0.4.6
+   Compiling zerocopy-derive v0.8.59
+   Compiling windows-core v0.62.2
+   Compiling windows-collections v0.3.2
+   Compiling windows-future v0.3.2
+   Compiling windows-numerics v0.3.1
+   Compiling windows v0.62.2
+   Compiling tracing v0.1.44
+   Compiling bevy_utils v0.20.0
+   Compiling assert_type_match v0.1.1
+   Compiling bevy_reflect_derive v0.20.0
+   Compiling derive_more v2.1.1
+   Compiling bevy_tasks v0.20.0
+   Compiling zerocopy v0.8.59
+   Compiling bevy_ecs_macros v0.20.0
+   Compiling half v2.7.1
+   Compiling tracing-subscriber v0.3.23
+   Compiling cobs v0.3.0
+   Compiling ron v0.12.2
+   Compiling bevy_reflect v0.20.0
+   Compiling heapless v0.7.17
+   Compiling bevy_state_macros v0.20.0
+   Compiling postcard v1.1.3
+   Compiling regia_core v0.2.23 (<build-dir>)
+   Compiling bevy_ecs v0.20.0
+   Compiling termcolor v1.4.1
+   Compiling naga-types v30.0.1
+   Compiling profiling-procmacros v1.0.18
+   Compiling profiling v1.0.18
+   Compiling codespan-reporting v0.13.1
+   Compiling naga v30.0.1
+   Compiling bevy_state v0.20.0
+   Compiling regia_ecs v0.2.23 (<build-dir>)
+   Compiling regia_app v0.2.23 (<build-dir>)
+   Compiling windows-sys v0.60.2
+   Compiling winit v0.30.13
+   Compiling arboard v3.6.1
+   Compiling crash-handler v0.8.1
+   Compiling wgpu-types v30.0.1
+   Compiling synstructure v0.14.0
+   Compiling gpu-allocator v0.28.0
+   Compiling wgpu-naga-bridge v30.0.1
+   Compiling regia_platform v0.2.23 (<build-dir>)
+   Compiling wgpu-hal v30.0.1
+   Compiling zerofrom-derive v0.1.8
+   Compiling regia_scene v0.2.23 (<build-dir>)
+   Compiling regia_asset v0.2.23 (<build-dir>)
+   Compiling zerofrom v0.1.8
+   Compiling wgpu-core-deps-windows-linux-android v30.0.1
+   Compiling yoke-derive v0.8.4
+   Compiling yoke v0.8.3
+   Compiling wgpu-core v30.0.1
+   Compiling zerovec-derive v0.11.6
+   Compiling zerovec v0.11.8
+   Compiling wgpu v30.0.1
+   Compiling displaydoc v0.2.7
+   Compiling symphonia-core v0.6.1
+   Compiling tinystr v0.8.4
+   Compiling regia_render v0.2.23 (<build-dir>)
+   Compiling codespan-reporting v0.12.0
+   Compiling naga_oil v0.23.0
+   Compiling symphonia-metadata v0.6.1
+   Compiling safe_arch v1.2.0
+   Compiling wide v1.7.1
+   Compiling symphonia-common v0.6.1
+   Compiling gilrs-core v0.6.8
+   Compiling either v1.18.0
+   Compiling gilrs v0.11.2
+   Compiling simba v0.10.2
+   Compiling unic-langid-impl v0.9.6
+   Compiling num-rational v0.4.2
+   Compiling nalgebra-macros v0.3.0
+   Compiling unic-langid v0.9.6
+   Compiling regia_input v0.2.23 (<build-dir>)
+   Compiling nalgebra v0.35.0
+   Compiling font-types v0.12.6
+   Compiling font-types v0.11.3
+   Compiling icu_locale_core v2.3.0
+   Compiling symphonia-format-riff v0.6.1
+   Compiling read-fonts v0.37.0
+   Compiling read-fonts v0.41.0
+   Compiling glamx v0.3.1
+   Compiling rstar v0.13.0
+   Compiling potential_utf v0.1.6
+   Compiling symphonia-codec-vorbis v0.6.1
+   Compiling symphonia-bundle-flac v0.6.1
+   Compiling symphonia-format-ogg v0.6.1
+   Compiling symphonia-bundle-mp3 v0.6.1
+   Compiling symphonia-codec-pcm v0.6.1
+   Compiling zerotrie v0.2.5
+   Compiling serde_arrays v0.2.0
+   Compiling scroll_derive v0.12.1
+   Compiling audio_thread_priority v0.35.1
+   Compiling num-derive v0.5.1
+   Compiling zeroize v1.9.1
+   Compiling cipher v0.4.4
+   Compiling cpal v0.18.2
+   Compiling parry3d v0.31.1
+   Compiling icu_provider v2.3.1
+   Compiling scroll v0.12.0
+   Compiling symphonia v0.6.1
+   Compiling skrifa v0.44.0
+   Compiling tinyvec v1.13.3
+   Compiling icu_collections v2.3.0
+   Compiling kira v0.12.5
+   Compiling rapier3d v0.36.0
+   Compiling swash v0.2.10
+   Compiling fontdb v0.23.0
+   Compiling intl-memoizer v0.5.3
+   Compiling rustfft v6.4.1
+   Compiling icu_locale_fallback v2.3.0
+   Compiling chacha20 v0.9.1
+   Compiling harfrust v0.5.2
+   Compiling skrifa v0.40.0
+   Compiling fluent-langneg v0.13.1
+   Compiling intl_pluralrules v7.0.2
+   Compiling fluent-syntax v0.12.0
+   Compiling num-derive v0.4.2
+   Compiling smart-default v0.7.1
+   Compiling curve25519-dalek-derive v0.1.1
+   Compiling cosmic-text v0.19.0
+   Compiling curve25519-dalek v4.1.3
+   Compiling goblin v0.9.3
+   Compiling lyon_geom v1.0.19
+   Compiling minidump-common v0.26.1
+   Compiling fluent-bundle v0.16.0
+   Compiling chacha20poly1305 v0.10.1
+   Compiling regia_audio v0.2.23 (<build-dir>)
+   Compiling icu_segmenter v2.3.0
+   Compiling regia_physics v0.2.23 (<build-dir>)
+   Compiling regia_terrain v0.2.23 (<build-dir>)
+   Compiling taffy v0.14.0
+   Compiling error-graph v0.1.1
+   Compiling minidump-writer v0.13.0
+   Compiling pulp v0.22.3
+   Compiling regia_ui v0.2.23 (<build-dir>)
+   Compiling snow v0.10.0
+   Compiling lyon_path v1.0.19
+   Compiling regia_framework v0.2.23 (<build-dir>)
+   Compiling regia_macros v0.2.23 (<build-dir>)
+   Compiling polling v3.11.0
+   Compiling exr v1.74.2
+   Compiling minidumper v0.11.0
+   Compiling regia_net v0.2.23 (<build-dir>)
+   Compiling regia_vfx v0.2.23 (<build-dir>)
+   Compiling regia_2d v0.2.23 (<build-dir>)
+   Compiling regia_viewer v0.2.23 (<build-dir>)
+   Compiling regia_animation v0.2.23 (<build-dir>)
+   Compiling regia_nav v0.2.23 (<build-dir>)
+   Compiling lyon_tessellation v1.0.22
+   Compiling regia_looks v0.2.23 (<build-dir>)
+   Compiling lyon_algorithms v1.0.21
+   Compiling regia_viewer_view v0.2.23 (<build-dir>)
+   Compiling regia_viewer_pack v0.2.23 (<build-dir>)
+   Compiling lyon v1.0.19
+   Compiling regia_configurator v0.2.23 (<build-dir>)
+   Compiling gltf-derive v1.4.1
+   Compiling image v0.25.10
+   Compiling regia_web v0.2.23 (<build-dir>)
+   Compiling tungstenite v0.30.0
+   Compiling regia_quick v0.2.23 (<build-dir>)
+   Compiling regia_ai v0.2.23 (<build-dir>)
+   Compiling regia_telemetry v0.2.23 (<build-dir>)
+   Compiling regia_procgen v0.2.23 (<build-dir>)
+   Compiling regia_pick v0.2.23 (<build-dir>)
+   Compiling regia_fluid v0.2.23 (<build-dir>)
+   Compiling regia_media v0.2.23 (<build-dir>)
+   Compiling regia_world v0.2.23 (<build-dir>)
+   Compiling regia_xr v0.2.23 (<build-dir>)
+   Compiling regia_matgraph v0.2.23 (<build-dir>)
+   Compiling regia_agent v0.2.23 (<build-dir>)
+   Compiling rayon v1.12.0
+   Compiling gltf-json v1.4.1
+   Compiling itertools v0.14.0
+   Compiling gltf v1.4.1
+   Compiling image-compare v0.5.0
+   Compiling regia v0.2.23 (<build-dir>)
+   Compiling regia_test_utils v0.2.23 (<build-dir>)
+    Finished `test` profile [optimized + debuginfo] target(s) in 43m 16s
+  Executable unittests src\lib.rs (C:/work/regia/v05-windows-final-a/t\debug\deps\regia_platform-da2aac0a93fb41e6.exe)
+  Executable tests\crash_report.rs (C:/work/regia/v05-windows-final-a/t\debug\deps\crash_report-70f48d7656ee412d.exe)
+  Executable tests\crash_sections.rs (C:/work/regia/v05-windows-final-a/t\debug\deps\crash_sections-89bc90b0f31db0f3.exe)
+  Executable tests\events_api.rs (C:/work/regia/v05-windows-final-a/t\debug\deps\events_api-8d738ec433a359bc.exe)
+  Executable tests\exit_workers.rs (C:/work/regia/v05-windows-final-a/t\debug\deps\exit_workers-082aff30ba5eeee1.exe)
+  Executable tests\frame_pacing.rs (C:/work/regia/v05-windows-final-a/t\debug\deps\frame_pacing-6ec09d81688f6420.exe)
+  Executable tests\pacing_trace.rs (C:/work/regia/v05-windows-final-a/t\debug\deps\pacing_trace-f6288b7713ab21e4.exe)
+  Executable tests\threat_model.rs (C:/work/regia/v05-windows-final-a/t\debug\deps\threat_model-d4f3e4218499f7ec.exe)
+  Executable tests\vfs_api.rs (C:/work/regia/v05-windows-final-a/t\debug\deps\vfs_api-e4860a62c3f6ce19.exe)
+    Finished `test` profile [optimized + debuginfo] target(s) in 2.02s
+     Running unittests src\lib.rs (C:/work/regia/v05-windows-final-a/t\debug\deps\regia_platform-da2aac0a93fb41e6.exe)
+
+running 240 tests
+test asset_packs::tests::desktop_is_unsupported ... ok
+test asset_packs::tests::rows_parse_and_short_rows_do_not ... ok
+test console_ctrl::tests::a_host_that_never_stops_does_not_hold_the_handler ... ok
+test console_ctrl::tests::a_logoff_does_not_stop_the_server ... ok
+test console_ctrl::tests::control_types_map_to_events ... ok
+test console_ctrl::tests::close_waits_for_the_host_even_while_draining ... ok
+test console_ctrl::tests::first_ctrl_c_requests_shutdown_and_the_second_exits ... ok
+test crash::tests::build_info_detects_without_env ... ok
+test crash::tests::collision_suffixes_sort_numerically ... ok
+test crash::tests::crash_file_name_predicate ... ok
+test crash::tests::gpu_info_round_trips_and_is_not_a_placeholder ... ok
+test crash::tests::every_report_field_is_scrubbed_of_a_home_a_token_and_an_email ... ok
+test crash::tests::list_dir_hides_names_remove_would_refuse ... ok
+test crash::tests::list_read_remove_round_trip ... ok
+test crash::tests::report_body_has_every_section ... ok
+test crash::tests::prune_dir_drops_the_oldest_by_count_and_bytes ... ok
+test crash::tests::prune_dir_orders_collision_suffixes_numerically ... ok
+test crash::tests::write_to_dir_uniquifies_names ... ok
+test deliberate_exit::tests::a_deliberate_exit_already_begun_does_not_wait_for_workers ... ok
+test deliberate_exit::tests::a_quit_waits_for_its_workers_then_returns_normally ... ok
+test crash::tests::write_to_dir_never_overwrites_an_existing_report ... ok
+test deliberate_exit::tests::crash_hook_returns_the_code_when_the_exit_begins_during_the_dump ... ok
+test deliberate_exit::tests::a_worker_left_at_the_end_of_the_budget_makes_the_exit_deliberate ... ok
+test deliberate_exit::tests::crash_hook_runs_both_steps_when_no_exit_began ... ok
+test deliberate_exit::tests::crash_hook_skips_everything_when_the_exit_began_first ... ok
+test deliberate_exit::tests::crash_hook_skips_the_dump_when_the_exit_begins_while_arming ... ok
+test deliberate_exit::tests::first_code_wins_and_exit_runs_once_after_the_flush ... ok
+test deliberate_exit::tests::nothing_happens_without_a_begin ... ok
+test exit::tests::a_disarm_in_the_grace_still_wins ... ok
+test exit::tests::an_unrepresentable_watchdog_deadline_does_not_overflow ... ok
+test exit::tests::fullscreen_is_left_before_the_surfaces_drop_and_steps_run_in_order ... ok
+test exit::tests::leave_fullscreen_touches_only_fullscreen_windows ... ok
+test exit::tests::request_clean_exit_writes_app_exit ... ok
+test exit::tests::the_exit_event_data_is_json_with_every_step ... ok
+test gpu_worker_registry::tests::a_marked_worker_counts_only_inside_its_driver_calls ... ok
+test gpu_worker_registry::tests::a_running_worker_is_outstanding_until_it_ends ... ok
+test gpu_worker_registry::tests::a_stopped_marked_worker_opens_no_driver_call ... ok
+test gpu_worker_registry::tests::a_worker_registered_after_the_stop_starts_stopped ... ok
+test gpu_worker_registry::tests::left_workers_name_their_driver_call ... ok
+test gpu_worker_registry::tests::the_stop_signal_ends_a_worker_and_the_wait_returns_after_it ... ok
+test gpu_worker_registry::tests::the_wait_override_reads_milliseconds ... ok
+test gpu_worker_registry::tests::what_the_body_captured_drops_before_the_registration_ends ... ok
+test hid::tests::a_path_with_no_nul_stops_at_the_buffer ... ok
+test hid::tests::an_offset_past_the_buffer_is_empty ... ok
+test hid::tests::the_path_starts_at_the_offset_and_ends_at_its_nul ... ok
+test lifecycle::tests::first_resume_emits_started_and_resumed ... ok
+test lifecycle::tests::low_memory_keeps_the_state_it_found ... ok
+test lifecycle::tests::low_memory_never_changes_the_state ... ok
+test lifecycle::tests::memory_warning_and_exit ... ok
+test lifecycle::tests::suspend_resume_cycles_and_ignores_repeats ... ok
+test lifecycle::tests::transitions_run_lifecycle_schedule_and_pause_time ... ok
+test lifecycle_drill::tests::audit_accepts_a_clean_cycle ... ok
+test lifecycle_drill::tests::audit_flags_each_broken_rule ... ok
+test lifecycle_drill::tests::audit_keeps_a_bounded_list_and_counts_the_rest ... ok
+test lifecycle_drill::tests::drill_events_only_while_running ... ok
+test lifecycle_drill::tests::drill_requests_cap_and_cancel ... ok
+test lifecycle_drill::tests::headless_drill_reports_a_surface_kept_through_a_suspend ... ok
+test lifecycle_drill::tests::headless_drill_runs_every_cycle_through_the_lifecycle_schedule ... ok
+test locale_hints::tests::a_valueless_flag_does_not_swallow_the_next_flag ... ok
+test locale_hints::tests::flag_forms_and_last_wins ... ok
+test locale_hints::tests::generated_flag_sequences_match_argument_grammar ... ok
+test locale_hints::tests::isolated_getters_never_fall_through_for_empty_or_whitespace_fields ... ok
+test locale_hints::tests::isolated_hints_read_only_their_fields ... ok
+test native_crash::record::tests::addresses_are_named_by_their_mapping ... ok
+test native_crash::record::tests::an_abort_right_after_a_panic_is_recognized ... ok
+test native_crash::record::tests::bad_files_are_rejected_with_a_typed_error ... ok
+test native_crash::record::tests::encode_then_decode_round_trips ... ok
+test native_crash::record::tests::file_offsets_map_to_virtual_addresses ... ok
+test native_crash::record::tests::frame_walk_ends_at_a_null_frame_and_strips_pointer_auth_bits ... ok
+test native_crash::record::tests::frame_walk_stops_at_a_bad_address ... ok
+test native_crash::record::tests::frame_walk_stops_at_the_bound ... ok
+test native_crash::record::tests::long_text_fields_are_cut_at_a_char_boundary ... ok
+test native_crash::record::tests::maps_filter_keeps_executable_lines_across_chunks ... ok
+test native_crash::record::tests::the_report_names_signal_thread_build_and_stack ... ok
+test native_crash::windows::tests::crash_info_ignores_the_record_of_a_context_no_filter_is_handling ... ok
+test native_crash::windows::tests::crash_info_reads_the_access_violation_of_the_live_context ... ok
+test native_crash::windows::tests::crash_info_uses_the_instruction_address_for_other_exceptions ... ok
+test paths::tests::free_space_asks_the_nearest_existing_ancestor ... ok
+test paths::tests::saved_games_exists_only_on_windows ... ok
+test paths::tests::std_fs_handles_paths_over_260_characters ... ok
+test paths::tests::the_feedback_folder_follows_the_mounted_user_dir ... ok
+test paths::tests::user_and_cache_dirs_are_per_app_under_regia ... ok
+test paths::tests::windows_crash_data_goes_to_local_app_data_only_for_the_standard_user_dir ... ok
+test process_memory::tests::the_os_reports_resident_memory_and_the_peak_is_never_below_it ... ok
+test runner::tests::a_destroyed_window_gives_up_the_focus_only_if_it_held_it ... ok
+test runner::tests::a_focused_window_needs_two_seconds_and_the_switch_turns_it_off ... ok
+test runner::tests::a_resize_does_not_clear_the_occlusion_of_a_window ... ok
+test runner::tests::a_slow_frame_is_not_a_stall ... ok
+test runner::tests::an_undelivered_redraw_stalls_an_unfocused_window_after_250_ms ... ok
+test runner::tests::bench_mode_ignores_input_but_not_window_events ... ok
+test runner::tests::focused_or_fullscreen_window_is_presented_after_the_hidden_grace ... ok
+test runner::tests::focused_window_follows_gains_and_ignores_a_late_loss ... ok
+test runner::tests::hidden_wakeups_step_once_per_throttle_period ... ok
+test runner::tests::only_a_lazy_loop_goes_without_the_vsync_thread ... ok
+test runner::tests::the_android_back_key_has_a_name_a_binding_can_use ... ok
+test runner::tests::visibility_log_is_rate_limited ... ok
+test services::parse::tests::apple_languages_first_entry ... ok
+test services::parse::tests::env_priority ... ok
+test services::parse::tests::exit_reasons_are_named_and_classified ... ok
+test services::parse::tests::haptics_mapping ... ok
+test services::parse::tests::meminfo ... ok
+test services::parse::tests::os_release ... ok
+test services::parse::tests::os_tags ... ok
+test services::parse::tests::posix_locales ... ok
+test services::parse::tests::urls ... ok
+test services::power::tests::a_class_directory_prefers_a_battery ... ok
+test services::power::tests::a_file_is_not_a_supply_directory ... ok
+test services::power::tests::android_extras_map_without_jni ... ok
+test services::power::tests::bad_capacity_is_none_and_does_not_panic ... ok
+test services::power::tests::battery_at_15_discharging_is_low_power ... ok
+test services::power::tests::capacity_150_is_not_a_percent ... ok
+test services::power::tests::charging_does_not_clear_low_power ... ok
+test services::power::tests::empty_directory_is_unknown ... ok
+test exit::tests::a_slow_step_is_logged_and_the_sequence_goes_on ... ok
+test services::power::tests::low_power_threshold_is_below_20 ... ok
+test services::power::tests::mains_is_ac_and_not_low_power ... ok
+test services::power::tests::missing_directory_is_an_error ... ok
+test services::power::tests::other_hosts_report_unknown ... ok
+test services::power::tests::mains_with_a_low_capacity_stays_not_low_power ... ok
+test services::power::tests::the_lowest_battery_name_wins ... ok
+test services::tests::a_window_that_starts_with_ime_on_asks_for_the_keyboard ... ok
+test services::tests::cpuinfo_model_reads_x86_and_arm_forms ... ok
+test services::tests::desktop_defaults_are_inert ... ok
+test services::tests::desktop_has_no_prompt ... ok
+test services::tests::file_manager_program_is_a_bare_name_or_absolute_tool ... ok
+test services::tests::microphone_permission_follows_the_activity_state ... ok
+test services::tests::open_path_rejects_a_missing_path_before_spawning ... ok
+test services::tests::open_url_rejects_before_touching_the_os ... ok
+test services::tests::os_info_detects_something ... ok
+test services::tests::safe_area_maths ... ok
+test services::tests::system_locale_is_bcp47_shaped ... ok
+test services::tests::the_generated_activity_has_the_microphone_helpers ... ok
+test services::thermal::tests::an_override_wins_at_once_and_clearing_it_returns_to_the_os ... ok
+test services::thermal::tests::headroom_rejects_nan_and_negative ... ok
+test services::thermal::tests::status_maps_android_constants ... ok
+test sleep::tests::a_wake_is_a_suspend_resume_pair_and_only_while_running ... ok
+test sleep::tests::boottime_ahead_of_monotonic_is_a_sleep ... ok
+test sleep::tests::short_gaps_are_ignored ... ok
+test sleep::tests::steady_clocks_report_nothing ... ok
+test services::power::tests::type_strings_follow_the_sysfs_abi ... ok
+test sleep::tests::the_pair_pauses_gameplay_time_and_survives_repeats ... ok
+test tests::plugin_keeps_a_preinserted_vfs ... ok
+test tests::plugin_registers_vfs_and_services ... ok
+test vfs::dir::tests::an_entry_that_vanished_mid_listing_is_skipped_not_an_error ... ok
+test vfs::dir::tests::list_dir_hides_write_atomic_temp_files ... ok
+test vfs::dir::tests::read_only_mount_refuses_writes ... ok
+test vfs::dir::tests::rename_replace_overwrites_an_existing_file ... ok
+test vfs::dir::tests::resolve_stays_under_root ... ok
+test vfs::dir::tests::sharing_violations_are_transient_and_other_errors_are_not ... ok
+test vfs::dir::tests::concurrent_atomic_writes_leave_one_whole_file ... ok
+test vfs::dir::tests::writable_mount_creates_root_lazily ... ok
+test vfs::path::tests::join_parent_file_name ... ok
+test vfs::path::tests::parses_every_mount ... ok
+test vfs::path::tests::property_escapes_are_always_rejected ... ok
+test vfs::path::tests::rejects_bad_paths ... ok
+test vfs::path::tests::property_parsed_paths_are_normalised_and_round_trip ... ok
+test vfs::path::tests::rejects_names_windows_cannot_store ... ok
+test vfs::path::tests::rejects_windows_device_names_and_trailing_dots ... ok
+test vfs::path::tests::root_and_dot_segments ... ok
+test vfs::stats::tests::since_subtracts_per_counter_and_saturates ... ok
+test vfs::tests::apk_names ... ok
+test vfs::tests::assets_root_resolution ... ok
+test vfs::stats::tests::reads_streams_misses_and_writes_are_counted ... ok
+test vfs::tests::list_dir_sorted_with_kinds ... ok
+test vfs::tests::missing_and_unmounted ... ok
+test vfs::tests::write_atomic_only_on_user_and_cache ... ok
+test vfs::tests::read_sync_async_and_stream ... ok
+test window_os::tests::apply_window_changes_is_pinned_to_the_main_thread ... ok
+test window_os::tests::closed_windows_leave_the_applied_state_map ... ok
+test window_os::tests::classify_grab_backend_prefers_the_compile_target ... ok
+test window_os::tests::creation_baseline_differs_in_cursor_grab_and_ime_only ... ok
+test window_os::tests::cursor_grab_mode_maps_locked_per_platform ... ok
+test window_os::tests::failed_cursor_grab_does_not_advance_and_is_retried ... ok
+test xr::layers::tests::a_malformed_runtime_mask_is_detected ... ok
+test xr::layers::tests::a_valid_list_passes_and_an_empty_list_is_a_cleared_display ... ok
+test xr::layers::tests::each_bad_layer_is_named ... ok
+test xr::layers::tests::the_budget_keeps_the_top_panels_as_layers ... ok
+test xr::layers::tests::quads_order_by_priority_then_id_whatever_the_input_order ... ok
+test xr::tests::a_host_that_composes_submits_the_pose_it_rendered_with ... ok
+test xr::layers::tests::the_lens_mask_covers_the_corners_and_leaves_the_center ... ok
+test xr::tests::a_negative_haptic_duration_is_refused ... ok
+test xr::tests::a_non_finite_simulated_head_pose_is_ignored ... ok
+test xr::tests::a_refused_begin_keeps_the_frame_counter ... ok
+test xr::tests::a_refused_layer_list_still_ends_the_frame ... ok
+test xr::tests::a_second_wait_replaces_a_dropped_frame ... ok
+test xr::tests::an_inactive_controller_reports_released_inputs ... ok
+test xr::tests::controller_inputs_stay_in_range_on_every_path ... ok
+test xr::tests::error_codes_are_lowercase_ascii ... ok
+test xr::tests::error_codes_are_unique_lowercase_xr_codes ... ok
+test xr::tests::every_other_transition_is_rejected_and_leaves_the_state ... ok
+test xr::tests::extrapolation_clamps_future_and_never_runs_backwards ... ok
+test xr::tests::extrapolation_ignores_non_finite_velocity ... ok
+test xr::tests::extrapolation_is_linear_and_deterministic ... ok
+test xr::tests::fov_extents ... ok
+test xr::tests::frame_calls_must_follow_wait_begin_end ... ok
+test xr::tests::frames_flow_in_every_begun_state_and_a_loss_drops_the_frame ... ok
+test xr::tests::frustum_edges_map_to_ndc_extremes ... ok
+test xr::tests::haptics_validate_amplitude ... ok
+test xr::tests::infinite_far_reversed_z_approaches_zero ... ok
+test xr::tests::infinite_far_standard_z_approaches_one ... ok
+test xr::tests::kept_events_are_capped ... ok
+test xr::tests::late_latch_counts_clamped_predictions ... ok
+test xr::tests::late_latch_moves_both_eyes_by_the_head_change ... ok
+test xr::tests::late_latch_with_an_unchanged_head_is_the_identity_correction ... ok
+test xr::tests::mono_eyes_sit_at_the_head_and_a_real_ipd_stays_in_range ... ok
+test xr::tests::null_backend_reports_focus_and_hides_synchronized_frames ... ok
+test xr::tests::null_backend_session_events_follow_the_transitions ... ok
+test xr::tests::null_controllers_update_on_sync_only ... ok
+test xr::tests::null_end_frame_rejects_a_bad_fov_and_a_wrong_time ... ok
+test xr::tests::null_frame_times_are_whole_periods ... ok
+test xr::tests::null_frame_times_move_forward_for_a_zero_or_negative_period ... ok
+test xr::tests::null_locate_and_sync_need_a_running_session ... ok
+test xr::tests::null_view_config_is_validated_and_moves_the_eyes ... ok
+test xr::tests::pose_inverse_and_compose_round_trip ... ok
+test xr::tests::pose_new_keeps_a_bad_position_out_of_view_matrices ... ok
+test xr::tests::pose_new_repairs_bad_orientation ... ok
+test xr::tests::projection_rejects_bad_fov_and_depth ... ok
+test xr::tests::reversed_z_puts_near_at_one_and_far_at_zero ... ok
+test xr::tests::run_frame_ends_a_begun_frame_when_locating_fails ... ok
+test xr::tests::run_frame_late_latch_follows_a_head_that_moves_during_render ... ok
+test xr::tests::run_frame_on_an_idle_session_fails_cleanly ... ok
+test xr::tests::run_frame_renders_late_latches_and_submits ... ok
+test xr::tests::run_frame_submits_no_layers_and_a_bad_layer_is_refused_with_its_name ... ok
+test xr::tests::run_frame_skips_render_when_asked_not_to_but_still_submits ... ok
+test xr::tests::runtime_resource_counts_frames_and_keeps_events ... ok
+test xr::tests::runtime_stop_ends_ready_and_running_sessions ... ok
+test xr::tests::session_walks_the_whole_cycle ... ok
+test xr::tests::simulate_head_pose_moves_the_views ... ok
+test xr::tests::standard_z_puts_near_at_zero_and_far_at_one ... ok
+test xr::tests::state_names_are_stable ... ok
+test xr::tests::state_names_round_trip_and_classify ... ok
+test xr::tests::stereo_views_reject_bad_ipd_and_fov ... ok
+test xr::tests::stereo_views_split_the_eyes_along_head_x ... ok
+test xr::tests::symmetric_fov_matches_the_standard_perspective_matrix ... ok
+test xr::tests::the_last_frame_can_end_while_stopping_and_idle_drops_it ... ok
+test xr::tests::the_layer_budget_is_the_runtimes ... ok
+test xr::tests::the_scripted_lens_raises_an_event_and_follows_the_field_of_view ... ok
+test xr::tests::view_projection_puts_a_point_ahead_of_the_eye_in_front ... ok
+test exit::tests::a_disarmed_watchdog_never_fires ... ok
+test background::tests::lowering_a_scratch_thread_does_not_fail ... ok
+
+test result: ok. 240 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.47s
+
+     Running tests\crash_report.rs (C:/work/regia/v05-windows-final-a/t\debug\deps\crash_report-70f48d7656ee412d.exe)
+
+running 2 tests
+test no_crash_dir_means_no_file_but_no_panic ... ok
+test panic_writes_a_report_and_chains_the_previous_hook ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+     Running tests\crash_sections.rs (C:/work/regia/v05-windows-final-a/t\debug\deps\crash_sections-89bc90b0f31db0f3.exe)
+
+running 1 test
+test device_lost_report_is_pending_and_carries_the_sections ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests\events_api.rs (C:/work/regia/v05-windows-final-a/t\debug\deps\events_api-8d738ec433a359bc.exe)
+
+running 18 tests
+test back_button_asks_but_does_not_exit_when_exit_on_close_is_off ... ok
+test back_button_without_a_primary_window_does_nothing ... ok
+test back_button_is_ignored_when_the_policy_turns_it_off ... ok
+test back_button_closes_the_primary_window_by_default ... ok
+test close_policy_defaults_exit_and_back_closes ... ok
+test max_latency_is_oldest_event_to_frame_start ... ok
+test closing_a_secondary_window_does_not_exit ... ok
+test platform_plugin_includes_input_timing ... ok
+test request_quit_headless_exits_when_the_policy_allows ... ok
+test request_quit_headless_stays_running_when_the_game_decides ... ok
+test request_quit_with_a_non_primary_window_asks_it_and_does_not_exit ... ok
+test request_quit_with_a_window_and_exit_policy_off_only_reports_the_close ... ok
+test request_quit_without_a_policy_resource_uses_the_default ... ok
+test timestamp_conversions_and_clamping ... ok
+test request_quit_with_a_window_sends_a_close_request_and_exits_on_the_frame ... ok
+test timing_collects_sorted_nonzero_stamps_from_every_input_kind ... ok
+test timing_forgets_events_each_frame_but_keeps_the_newest_stamp ... ok
+test timing_without_any_input_leaves_latest_empty ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests\exit_workers.rs (C:/work/regia/v05-windows-final-a/t\debug\deps\exit_workers-082aff30ba5eeee1.exe)
+
+running 3 tests
+test child_end_of_process ... ok
+test a_worker_that_stops_lets_the_process_end_normally ... ok
+test a_worker_still_in_the_driver_ends_the_process_with_the_app_code ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests\frame_pacing.rs (C:/work/regia/v05-windows-final-a/t\debug\deps\frame_pacing-6ec09d81688f6420.exe)
+
+running 40 tests
+test a_cap_below_the_lowest_rate_runs_at_the_lowest_rate ... ok
+test a_cap_holds_the_hint_however_cheap_the_frames ... ok
+test a_cap_is_a_whole_number_of_vsyncs_and_never_exceeded ... ok
+test a_bounce_doubles_the_wait_so_the_interval_does_not_flap ... ok
+test a_fast_panel_holds_a_40_ms_frame_inside_the_20_fps_slot ... ok
+test a_faster_panel_gets_a_closer_interval ... ok
+test a_forced_interval_counts_panel_vsyncs_on_a_following_panel ... ok
+test a_capped_app_on_a_panel_that_follows_the_hint_stays_there ... ok
+test a_forced_interval_wins_and_is_clamped ... ok
+test a_frame_over_the_slot_settles_on_even_frames ... ok
+test a_frame_that_ends_just_after_a_tick_takes_that_tick ... ok
+test a_frame_the_pacer_skipped_makes_nothing_late ... ok
+test a_late_frame_is_counted_and_starts_a_new_timeline ... ok
+test a_much_slower_frame_jumps_to_where_it_fits ... ok
+test a_panel_change_that_is_not_ours_is_the_new_panel ... ok
+test a_hint_the_panel_ignores_changes_nothing ... ok
+test a_rare_spike_leaves_the_interval_alone ... ok
+test a_panel_that_follows_the_hint_stays_there ... ok
+test a_refresh_switch_to_a_slower_panel_right_after_warmup_terminates ... ok
+test an_unbounded_wait_returns_the_tick ... ok
+test a_refresh_change_keeps_the_slot ... ok
+test cheap_frames_bring_the_panel_back ... ok
+test light_frames_run_at_the_panel_rate ... ok
+test a_suspend_keeps_the_period_and_drops_the_timeline ... ok
+test no_ticks_means_the_software_cap_runs_the_frame ... ok
+test off_leaves_the_frame_to_the_software_cap_and_keeps_learning ... ok
+test rates_no_display_has_are_refused_before_they_overflow_the_clock ... ok
+test repeated_and_older_ticks_teach_nothing_and_gaps_do_not_count ... ok
+test the_compositor_hint_follows_the_interval ... ok
+test the_hint_is_worked_out_again_after_a_pause ... ok
+test nonsense_runs_are_refused ... ok
+test the_interval_drops_only_after_the_frames_have_fit_for_a_while ... ok
+test the_interval_stops_at_twenty_fps ... ok
+test the_period_comes_from_the_ticks ... ok
+test the_period_survives_jitter_and_skipped_ticks ... ok
+test the_slot_ceiling_follows_twenty_fps_on_any_panel ... ok
+test the_wait_for_a_tick_always_covers_the_slot ... ok
+test the_pacer_releases_on_live_ticks ... ok
+test every_rate_and_cost_settles_with_a_following_panel ... ok
+test stalled_ticks_stop_blocking_and_a_new_tick_brings_pacing_back ... ok
+
+test result: ok. 40 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+
+     Running tests\pacing_trace.rs (C:/work/regia/v05-windows-final-a/t\debug\deps\pacing_trace-f6288b7713ab21e4.exe)
+
+running 25 tests
+test a_frame_started_on_its_missed_tick_still_counts_as_late ... ok
+test a_boot_stall_comes_back_in_one_hold ... ok
+test a_cost_that_does_not_grow_is_probed_once_after_a_stall_and_never_without_one ... ok
+test a_frame_that_overran_its_slot_starts_on_the_missed_tick ... ok
+test a_held_frame_that_missed_its_tick_starts_at_once ... ok
+test a_cost_that_grows_with_the_slot_is_probed_down_to_where_it_fits ... ok
+test a_probe_waits_for_the_panel_and_starts_late_frames_at_once ... ok
+test a_skipped_vsync_shows_in_the_row_whatever_the_frame_did ... ok
+test a_run_without_a_swapchain_is_the_old_run ... ok
+test a_swapchain_outside_its_ranges_is_refused ... ok
+test a_stretch_outside_its_range_is_refused ... ok
+test swapchain_waits_add_up_until_taken ... ok
+test real_work_still_picks_the_interval_behind_a_swapchain ... ok
+test the_breakdown_names_what_held_the_frames_back ... ok
+test the_cap_wait_lands_on_the_newest_row ... ok
+test a_trace_row_describes_the_frame ... ok
+test the_double_hint_keeps_two_vsyncs_per_frame_on_the_panel_grid ... ok
+test the_frame_cost_collapses_on_a_full_swapchain_and_a_following_panel ... ok
+test the_double_hint_keeps_the_phone_out_of_the_collapse ... ok
+test the_gap_of_a_suspend_is_no_skipped_vsync ... ok
+test the_trace_keeps_the_newest_rows ... ok
+test work_is_the_default_cost ... ok
+test the_work_cost_runs_at_the_rate_the_swapchain_allows ... ok
+test real_work_over_the_slot_still_raises_the_interval ... ok
+test the_work_cost_leaves_swapchain_blocking_out ... ok
+
+test result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests\threat_model.rs (C:/work/regia/v05-windows-final-a/t\debug\deps\threat_model-d4f3e4218499f7ec.exe)
+
+running 1 test
+test a_crash_report_scrubs_the_log_lines_it_carries ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+     Running tests\vfs_api.rs (C:/work/regia/v05-windows-final-a/t\debug\deps\vfs_api-e4860a62c3f6ce19.exe)
+
+running 10 tests
+test clones_share_mounts_and_debug_lists_only_mounted_points ... ok
+test custom_mount_defaults_are_read_only_without_a_host_path ... ok
+test errors_name_the_path_and_the_reason ... ok
+test mount_point_text_round_trips_and_only_user_and_cache_are_writable ... ok
+test mount_replace_unmount_and_describe ... ok
+test open_stream_seeks_on_any_backend ... ok
+test vfs_path_conversions_and_ordering ... ok
+test write_atomic_to_the_root_and_unmounted_writable_points ... ok
+test exists_and_list_dir_distinguish_files_from_directories ... ok
+test write_atomic_overwrites_with_shorter_data_and_creates_nested_parents ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+   Doc-tests regia_platform
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

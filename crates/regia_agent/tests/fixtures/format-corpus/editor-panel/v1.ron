@@ -1,0 +1,7 @@
+(
+    format_version: 1,
+    title: "Rename selection with prefix",
+    layout: "rename_with_prefix.ui.ron",
+    driver: Lua("rename_with_prefix.lua"),
+    size: (360.0, 168.0),
+)

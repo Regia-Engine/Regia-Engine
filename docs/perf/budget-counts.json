@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "recorded_on": "the build server 526b05fdf",
+  "entries": {
+    "assetdb_graph_query_allocs": 1199.0,
+    "assetdb_graph_query_bytes": 207064.0,
+    "assetdb_project_validation_allocs": 4135532.0,
+    "assetdb_project_validation_bytes": 292283253.0,
+    "assetdb_save_time_run_allocs": 2577342.0,
+    "assetdb_save_time_run_bytes": 150131128.0,
+    "assetdb_size_map_allocs": 106975.0,
+    "assetdb_size_map_bytes": 6822179.0,
+    "level_10k_cooked_load_allocs": 524076.0,
+    "level_10k_cooked_load_bytes": 40042179.0,
+    "level_10k_save_text_allocs": 659287.0,
+    "level_10k_save_text_bytes": 43094926.0,
+    "level_10k_text_load_allocs": 646450.0,
+    "level_10k_text_load_bytes": 44215876.0,
+    "query_bench_1000_mixed_calls_allocs": 0.0,
+    "schedule_tick_200_empty_systems_allocs": 1.0041666666666667,
+    "schedule_tick_200_empty_systems_bytes": 4728.666666666667,
+    "schedule_tick_template_shape_allocs": 1.0041666666666667,
+    "schedule_tick_template_shape_bytes": 4728.666666666667
+  }
+}

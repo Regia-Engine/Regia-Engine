@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://regiaengine.com/schemas/meta-v2.json",
+  "title": "Regia Engine .meta sidecar v2",
+  "description": "Sidecar metadata for a source asset under assets/ (specs/12, specs/23 §5).",
+  "type": "object",
+  "required": ["format_version", "id", "importer"],
+  "properties": {
+    "format_version": { "enum": [1, 2], "description": "2 is current; a v1 file migrates on load and in regia upgrade-project (ADR-7819)" },
+    "id": { "type": "string", "description": "AssetId (UUID string)" },
+    "importer": { "type": "string" },
+    "settings": { "type": "string", "description": "Importer settings, a RON object. Since v2 the clip importers (gltf, fbx, usd, bvh) read lossless_clips: true|false (default false): cook every clip of the source lossless instead of compressed (ADR-7819)." },
+    "sub_assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "id", "type_path"],
+        "properties": {
+          "path": { "type": "string" },
+          "id": { "type": "string" },
+          "type_path": { "type": "string" }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "properties": {
+        "origin": { "type": "string" },
+        "tool": { "enum": ["hand", "agent", "generator", "import", "unknown"] },
+        "generator": { "type": "string" },
+        "seed": { "type": "integer" },
+        "client": { "type": "string" },
+        "session": { "type": "string" },
+        "model": { "type": "string" },
+        "created_utc": { "type": "string" },
+        "reviewer": { "oneOf": [{ "enum": ["pending", "owner"] }, { "type": "string" }] },
+        "extensions": { "type": "object", "additionalProperties": { "type": "string" } }
+      }
+    }
+  }
+}

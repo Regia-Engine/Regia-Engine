@@ -1,0 +1,9 @@
+// A material instance: the scatter rock graph with the Mars basalt style's colour and roughness.
+(
+    format_version: 1,
+    parent: "materials/scatter_rock.matgraph.ron",
+    params: {
+        "tint": Color((0.035, 0.032, 0.03)),
+        "roughness": Float(0.95),
+    },
+)

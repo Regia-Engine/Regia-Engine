@@ -1,0 +1,28 @@
+(
+    format_version: 1,
+    name: "concrete_site",
+    max_per_step: 24,
+    fallback: Some("default"),
+    rows: [
+        (
+            tag: "concrete",
+            kinds: [BondBreak, ChunkDetach, Collapse],
+            sound: Some("concrete_crack"),
+            vfx: Some("dust_puff"),
+            decal: Some((half_size: (0.35, 0.35, 0.25), color: (0.1, 0.09, 0.08, 0.8), lifetime_secs: 30.0)),
+            max_per_step: 8,
+            min_magnitude: 5.0,
+            scale_jitter: 0.25,
+        ),
+        (
+            tag: "default",
+            kinds: [Collapse],
+            sound: Some("rumble"),
+            vfx: None,
+            decal: None,
+            max_per_step: 4,
+            min_magnitude: 0.0,
+            scale_jitter: 0.0,
+        ),
+    ],
+)

@@ -1,0 +1,29 @@
+ProcGraph(
+    format_version: 1,
+    description: "Starter: a broadleaf tree grown in light (spec 68). Bark and leaf placeholders from the default content.",
+    params: [
+        (name: "growth_steps", ty: Int, default: 12, min: Some(1.0), max: Some(64.0), doc: "Growth steps"),
+    ],
+    inputs: [],
+    outputs: [ (name: "skeleton", kinds: ["PlantSkeleton"]), (name: "mesh", kinds: ["PlantMesh"]) ],
+    nodes: {
+        1: (ty: "plant.seed", settings: { "tilt_deg": [0.0, 4.0] }, at: (0.0, 0.0)),
+        2: (ty: "plant.grow", settings: { "growth_steps": Bind("growth_steps") }, at: (220.0, 0.0)),
+        3: (ty: "plant.radius", settings: {}, at: (440.0, 0.0)),
+        4: (ty: "plant.mesh", settings: { "materials": by_order(["materials/default_bark.material.ron"]) }, at: (660.0, 0.0)),
+        5: (ty: "plant.leaves", settings: { "choices": [(card: true, material: "materials/default_leaf.material.ron", weight: 1.0, size_m: [0.08, 0.14], rules: [])], "orders": [2.0, 16.0] }, at: (880.0, 0.0)),
+        6: (ty: "plant.export", settings: { "name": "plant_broadleaf" }, at: (1100.0, 0.0)),
+        7: (ty: "graph.output", settings: { "pin": "skeleton" }, at: (660.0, 200.0)),
+        8: (ty: "graph.output", settings: { "pin": "mesh" }, at: (1320.0, 0.0)),
+    },
+    edges: [
+        (from: (1, "out"), to: (2, "in")),
+        (from: (2, "out"), to: (3, "in")),
+        (from: (3, "out"), to: (4, "in")),
+        (from: (4, "out"), to: (5, "in")),
+        (from: (5, "out"), to: (6, "in")),
+        (from: (3, "out"), to: (7, "in")),
+        (from: (6, "out"), to: (8, "in")),
+    ],
+    flags: (starter: true, tool: None, domain: Plant),
+)

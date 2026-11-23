@@ -1,0 +1,47 @@
+// Rolling terrain (three plane waves) with three half-buried rocks and one dynamic unit, a
+// vertical capsule left out of the bake. The unit is a capsule occluder over the baked volume
+// (ADR-282, lane gi-near-field): the ground under and beside it should darken as it does in the
+// reference, where the unit is real geometry. Rock centres sit 0.3 to 0.5 m above the terrain
+// height at their x, z (height_at in fixture.rs).
+(
+    format_version: 1,
+    name: "rocks_capsule",
+    purpose: "rocks in the bake and a dynamic capsule occluder over it (ADR-282)",
+    sun: Some((toward: (-0.55, 0.45, 0.35), color: (1.0, 0.95, 0.88), lux: 100000.0)),
+    sky_lux: 20000.0,
+    materials: [
+        (name: "ground", albedo: (0.25, 0.22, 0.18)),
+        (name: "rock", albedo: (0.42, 0.4, 0.37)),
+        (name: "unit", albedo: (0.5, 0.5, 0.48), roughness: 0.6),
+    ],
+    terrain: Some((
+        size: (128.0, 128.0),
+        spacing: 1.0,
+        material: "ground",
+        waves: [
+            (amplitude: 1.5, wavelength: (40.0, 0.0)),
+            (amplitude: 1.0, wavelength: (0.0, 28.0), phase: 1.0),
+            (amplitude: 0.4, wavelength: (11.0, 9.0), phase: 0.5),
+        ],
+    )),
+    shapes: [
+        (name: "rock_a", kind: Ellipsoid(radii: (1.6, 1.0, 1.3)), material: "rock", at: (4.0, 2.54, -2.0), yaw_deg: 20.0),
+        (name: "rock_b", kind: Ellipsoid(radii: (1.0, 0.8, 1.2)), material: "rock", at: (-3.0, 2.37, -4.0), yaw_deg: -35.0),
+        (name: "rock_c", kind: Ellipsoid(radii: (2.2, 1.4, 1.6)), material: "rock", at: (1.0, 1.4, 3.5), yaw_deg: 60.0),
+        (
+            name: "unit",
+            kind: Capsule(half_height: 0.5, radius: 0.5),
+            material: "unit",
+            at: (-1.5, 3.25, 0.5),
+            baked: false,
+            occluder: true,
+        ),
+    ],
+    layout: (
+        terrain: Some((spacing: (4.0, 4.0), levels: [0.5, 1.5, 3.0, 6.0, 12.0])),
+        bricks: [(min: (-6.0, 0.0, -7.0), max: (7.0, 5.5, 6.0), spacing: 0.75)],
+        moment_resolution: 8,
+        max_distance: 32.0,
+    ),
+    bake: (rays_per_probe: 256, samples: 16, max_bounces: 4, seed: 7),
+)

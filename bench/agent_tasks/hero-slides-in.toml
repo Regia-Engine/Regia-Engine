@@ -1,0 +1,36 @@
+format_version = 1
+id = "hero-slides-in"
+title = "Slide the hero in with a sequence"
+prompt = "The entity 'Hero' stands at the origin. Author and play a two-second sequence that moves it in a straight line to (10, 0, 0), bound to Hero, and play it to its end. The sequence should hold its last frame."
+features = ["sequencer", "scene"]
+crates = ["regia_agent", "regia_framework"]
+call_budget = 8
+
+[setup]
+target = "sequencer"
+
+[[setup.call]]
+method = "scene.spawn"
+params = { name = "Hero", components = { Transform = { translation = [0, 0, 0] } } }
+save = { h = "/entity" }
+
+[[check]]
+name = "hero arrived"
+method = "scene.query_entities"
+params = { name = "Hero" }
+pointer = "/entities/0/translation"
+expect = { kind = "within_distance", point = [10, 0, 0], max = 0.05 }
+
+[[check]]
+name = "sequence finished"
+method = "sequence.player"
+params = { action = "query" }
+pointer = "/players/0/status"
+expect = { kind = "equals", value = "finished" }
+
+[[check]]
+name = "the marker fired"
+method = "sequence.player"
+params = { action = "query" }
+pointer = "/players/0/markers_fired"
+expect = { kind = "equals", value = 1 }

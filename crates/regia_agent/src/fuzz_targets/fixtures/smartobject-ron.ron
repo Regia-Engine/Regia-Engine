@@ -1,0 +1,10 @@
+SmartObjectDef(
+    format_version: 1,
+    activity: ["Activity.Sit"],
+    behaviors: [(family: "sit", data: "(pose: \"default\")")],
+    slots: [
+        (name: "left", offset: (translation: (-0.4, 0.0, 0.0)),
+         entrances: [(offset: (translation: (-0.4, 0.0, 1.0)), kind: Both, rank: 0)]),
+        (name: "right", offset: (translation: (0.4, 0.0, 0.0))),
+    ],
+)

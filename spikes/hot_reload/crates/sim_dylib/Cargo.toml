@@ -1,0 +1,15 @@
+[package]
+name = "sim_dylib"
+description = "The simulation as a dylib that is loaded once and never reloaded (option (b), specs/25 § 3)."
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[lib]
+crate-type = ["dylib"]
+
+[dependencies]
+sim = { workspace = true }
+# Shared crates (serde, postcard...) must come from the one engine dylib: two dylibs that both
+# statically contain `serde` cannot be linked into the same game library.
+spike_engine_dylib = { workspace = true }

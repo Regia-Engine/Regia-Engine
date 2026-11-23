@@ -1,0 +1,17 @@
+(
+    format: "music",
+    entries: [
+        (
+            version: 1,
+            file: "v1.music.ron",
+            origin: "handwritten from 3874f69cc (docs/formats/music-ron.md\'s version history: v1 has no version field, only name, bpm, beats_per_bar and stems)",
+            exercises: "v1: the pre-v2 layout without version, segment_bars, stingers and transitions",
+        ),
+        (
+            version: 2,
+            file: "v2.ron",
+            origin: "frozen copy of the fuzz-target registry fixture",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+    ],
+)

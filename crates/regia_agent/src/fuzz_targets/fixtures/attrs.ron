@@ -1,0 +1,11 @@
+(
+    format_version: 1,              // must be 1; a newer version is refused (`format_too_new`)
+    description: "Hero stats",      // optional
+    attributes: [                   // declaration order is kept
+        (name: "health_max", base: 100.0, min: 1.0, max: 9999.0),
+        (name: "health", base: 100.0, min: 0.0, max: 9999.0, max_from: Some("health_max")),
+        (name: "strength", base: 10.0, min: 0.0, max: 100.0),
+        (name: "armor", base: 0.0, min: 0.0, max: 1000.0,
+         derived: Some((inputs: [("strength", 2.0)], offset: 0.0))),
+    ],
+)

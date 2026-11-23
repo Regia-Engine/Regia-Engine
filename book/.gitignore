@@ -1,0 +1,2 @@
+# mdBook render output (build-dir in book.toml)
+build/

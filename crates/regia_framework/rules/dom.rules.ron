@@ -1,0 +1,61 @@
+// Domination: a shipped default rule set (`.rules.ron` v1, ADR-8694).
+// Every value below is the engine's Rust default, written out so a designer sees it; the test
+// `default_rule_sets_resolve_to_the_rust_defaults_bit_for_bit` holds the two equal. A project
+// changes a mode by extending this one (`extends: Some("dom")`) or by shipping its own
+// `assets/rules/dom.rules.ron`, which replaces this file.
+// Not set here (no limit, no phase, the engine keeps them off): seat_slot_limit,
+// max_pauses_per_seat, max_pause_ticks_per_seat, warmup_ticks, warmup_min_seats, time_limit_ticks,
+// rounds, post_match_ticks, forfeit_after_ticks, touch_height, flag_return_ticks, zone score_limit.
+(
+    format_version: 1,
+    id: "dom",
+    name_key: "mode.dom",
+    skeleton: "dom",
+    teams: [
+        (id: 1, name_key: "", color: (196, 64, 64, 255), max_seats: 16),
+        (id: 2, name_key: "", color: (64, 112, 196, 255), max_seats: 16),
+        (id: 3, name_key: "", color: (64, 168, 96, 255), max_seats: 16),
+        (id: 4, name_key: "", color: (196, 168, 64, 255), max_seats: 16),
+    ],
+    session: (
+        flow: (
+            max_teams: 4,
+            seats_per_team: 16,
+            friendly_unpause_ticks: 3600,
+            start_delay_ticks: 180,
+            pause_name_max: 24,
+            max_join_asks: 8,
+            match_clock: session,
+        ),
+        phases: (
+            countdown_ticks: 0,
+            on_time_up: (kind: "end"),
+        ),
+        objectives: (
+            max_teams: 4,
+            max_objectives: 8,
+            flag_touch_radius: 3.0,
+            capture_needs_home_flag: true,
+            capture_limit: 3,
+            hill_score_limit: 180,
+            hill_accrual_ticks: 60,
+            max_pending_events: 4096,
+        ),
+        teams: (
+            switch: (policy: never),
+            rebalance_between_rounds: false,
+            assist_window_ticks: 300,
+        ),
+        respawn: (
+            default: (kind: "instant"),
+            teams: [],
+            spawn: First,
+            seed: 0,
+        ),
+        zones: (
+            mode: (kind: "domination"),
+        ),
+    ),
+    win_conditions: [],
+    options: [],
+)

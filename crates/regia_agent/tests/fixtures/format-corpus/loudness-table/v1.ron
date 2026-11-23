@@ -1,0 +1,35 @@
+(
+    format_version: 1,
+    policy: (
+        target_lufs: -23.0,
+        true_peak_ceiling_db: -1.0,
+    ),
+    entries: {
+        "assets/sfx/door.wav": (
+            integrated_lufs: Some(-17.42),
+            loudness_range_lu: 0.0,
+            true_peak_db: Some(-3.1),
+            short_clip: true,
+            dual_mono: true,
+            sample_rate: 48000,
+            frames: 9600,
+            normalize: true,
+            target_lufs: -23.0,
+            gain_db: -5.58,
+            peak_limited: false,
+        ),
+        "assets/sfx/silence.wav": (
+            integrated_lufs: None,
+            loudness_range_lu: 0.0,
+            true_peak_db: None,
+            short_clip: false,
+            dual_mono: false,
+            sample_rate: 48000,
+            frames: 96000,
+            normalize: false,
+            target_lufs: -23.0,
+            gain_db: 0.0,
+            peak_limited: false,
+        ),
+    },
+)

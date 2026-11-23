@@ -1,0 +1,3 @@
+# Oracle for accessible-ui-profile: the calls a careful agent makes after the setup.
+{"method":"ui.theme_select","params":{"theme":"regia-dark","density":"compact","high_contrast":true,"reduced_motion":true}}
+{"method":"play.step","params":{"frames":5}}

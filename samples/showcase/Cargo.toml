@@ -1,0 +1,63 @@
+[package]
+name = "showcase"
+description = "Showcase host: a scene directory (heightfield, splat layers, scatter, sky, a scripted track and a VFX/decal schedule) rendered through the agent protocol (agent guide: agents/showcase)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[[bin]]
+name = "showcase"
+path = "src/main.rs"
+
+[dependencies]
+# `default-features = false`: the feature set is chosen per build profile below. The dev/filming
+# default keeps the engine facade's ui/quick/procgen extras; the v0.5 demo packaging build resolves
+# `--no-default-features --features demo` (offline: no agent protocol, no network crates), which
+# `cargo xtask demo-notices` renders and checks (docs/demo, ADR-4847).
+regia = { workspace = true, default-features = false }
+regia_agent = { workspace = true, optional = true }
+regia_app = { workspace = true }
+regia_asset = { workspace = true }
+regia_core = { workspace = true }
+regia_framework = { workspace = true }
+regia_render = { workspace = true }
+regia_scene = { workspace = true }
+regia_terrain = { workspace = true }
+regia_vfx = { workspace = true }
+regia_xr = { workspace = true }
+# Armed tunnels (ADR-8825): the scene's mesh layers are cooked at load (`src/tunnels.rs`).
+regia_world_geom = { workspace = true }
+regia_input = { workspace = true }
+regia_platform = { workspace = true }
+# The interactive demo's panel (ADR-3013).
+regia_ui = { workspace = true }
+image = { workspace = true }
+png = { workspace = true }
+ron = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+
+[features]
+# What `cargo run -p showcase` resolved before this split: the agent protocol endpoint (specs/23)
+# plus the engine facade's ui/quick/procgen extras. Filming, tests and agent automation stay here.
+default = ["agent", "regia/ui", "regia/quick", "regia/procgen"]
+# The agent protocol server (binds a UDP socket for automation). Never in the demo build: the demo
+# is offline (docs/showcase-plan.md, docs/demo/THIRD_PARTY_NOTICES-demo.md).
+agent = ["dep:regia_agent", "regia/agent"]
+# The v0.5 demo packaging feature set (the future `cargo xtask demo-package`): the showcase scene
+# with `regia`'s client features and runtime UI, agent protocol compiled out.
+demo = ["regia/client", "regia/ui"]
+
+[dev-dependencies]
+regia_test_utils = { workspace = true }
+# tests/tunnels_scene.rs: the Switchbacks passages fixture the tunnels scene is generated from (ADR-8825).
+regia_world_geom = { workspace = true, features = ["fixtures"] }
+# tests/late_pipelines.rs names the window's target format (ADR-8122; already in the graph via regia_render).
+wgpu = { workspace = true }

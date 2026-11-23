@@ -1,0 +1,11 @@
+(
+    format_version: 1,
+    values: {
+        "appearance.theme": Text("regia-light"),
+        "appearance.ui_scale": Float(1.25),
+        "autosave.interval_minutes": Int(10),
+        "camera.fly_speed": Float(12.5),
+        "layout.save_on_exit": Bool(false),
+        "future.setting": Bool(true),
+    },
+)

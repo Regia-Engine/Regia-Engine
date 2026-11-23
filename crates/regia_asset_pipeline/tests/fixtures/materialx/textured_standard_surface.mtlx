@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!-- Hand-written fixture (ADR-3341): a textured Standard Surface with its images in a node graph,
+     a tiled normal map and a constant clearcoat. Image paths are relative to this file. -->
+<materialx version="1.38" colorspace="lin_rec709" fileprefix="textures/">
+  <nodegraph name="NG_wood">
+    <image name="base_tex" type="color3">
+      <input name="file" type="filename" value="wood_albedo.png" colorspace="srgb_texture" />
+    </image>
+    <image name="rough_tex" type="float">
+      <input name="file" type="filename" value="wood_roughness.png" />
+    </image>
+    <tiledimage name="normal_tex" type="vector3">
+      <input name="file" type="filename" value="wood_normal.png" />
+      <input name="uvtiling" type="vector2" value="2.0, 2.0" />
+    </tiledimage>
+    <normalmap name="nmap" type="vector3">
+      <input name="in" type="vector3" nodename="normal_tex" />
+      <input name="scale" type="float" value="0.8" />
+    </normalmap>
+    <output name="base_color_out" type="color3" nodename="base_tex" />
+    <output name="roughness_out" type="float" nodename="rough_tex" />
+    <output name="normal_out" type="vector3" nodename="nmap" />
+  </nodegraph>
+  <standard_surface name="SR_wood" type="surfaceshader">
+    <input name="base" type="float" value="1.0" />
+    <input name="base_color" type="color3" nodegraph="NG_wood" output="base_color_out" />
+    <input name="specular_roughness" type="float" nodegraph="NG_wood" output="roughness_out" />
+    <input name="metalness" type="float" value="0.0" />
+    <input name="coat" type="float" value="0.3" />
+    <input name="coat_roughness" type="float" value="0.05" />
+    <input name="normal" type="vector3" nodegraph="NG_wood" output="normal_out" />
+  </standard_surface>
+  <surfacematerial name="M_wood" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="SR_wood" />
+  </surfacematerial>
+</materialx>

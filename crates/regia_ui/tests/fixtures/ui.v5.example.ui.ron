@@ -1,0 +1,17 @@
+// Frozen fixture: `.ui.ron` v5 (ADR-2129; its lane wrote it as v4, renumbered at the v0.2.13 integration, ADR-2219): `backdrop_blur` on a panel node.
+UiFile(
+    version: 5,
+    root: (
+        name: "root",
+        children: [
+            (
+                name: "glass",
+                backdrop_blur: 12.0,
+                background: "#10182080",
+            ),
+            (
+                name: "plain",
+            ),
+        ],
+    ),
+)

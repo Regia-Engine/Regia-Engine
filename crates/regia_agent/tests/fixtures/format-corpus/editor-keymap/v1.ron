@@ -1,0 +1,9 @@
+(
+    format_version: 1,
+    bindings: {
+        "view.toggle_grid": "Ctrl+G",
+        "view.frame_selection": "Alt+F",
+        "layout.reset": "Ctrl+Alt+Shift+R",
+        "future.command": "F9",
+    },
+)

@@ -1,0 +1,8 @@
+BanList(
+    format_version: 1,
+    entries: [
+        (id: 1, kind: PlatformId, value: "steam:76561190000000000", until: None, reason: "cheating", added: 1793000000),
+        (id: 2, kind: Address, value: "203.0.113.7", until: Some(1793600000), reason: "spam", added: 1793000000),
+        (id: 3, kind: Address, value: "198.51.100.0/24", until: None, reason: "botnet", added: 1793000000),
+    ],
+)

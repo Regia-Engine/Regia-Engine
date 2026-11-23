@@ -1,0 +1,19 @@
+[package]
+name = "vfx_lab_android"
+description = "Android entry point of vfx_lab: regia::android_main! generates android_main."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[lib]
+crate-type = ["cdylib"]
+path = "src/lib.rs"
+
+[dependencies]
+regia = { workspace = true }
+vfx_lab = { path = ".." }

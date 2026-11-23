@@ -1,0 +1,22 @@
+(
+    format_version: 1,
+    name: "alpha-review",
+    shots: [
+        (
+            name: "wide_noon",
+            camera: Some(Pose(eye: (0.0, 2.0, 8.0), target: (0.0, 1.0, 0.0), fov_y_deg: Some(50.0))),
+            time_of_day: Some((hour: 12.0)),
+            profile: Some("desktop_high"),
+            width: Some(1280),
+            height: Some(720),
+            warmup_frames: Some(8),
+            aovs: ["depth"],
+        ),
+        (
+            name: "gate_dusk",
+            camera: Some(Named("gate_camera")),
+            time_of_day: Some((hour: 17.6, day_of_year: Some(172))),
+            format: Some("exr"),
+        ),
+    ],
+)

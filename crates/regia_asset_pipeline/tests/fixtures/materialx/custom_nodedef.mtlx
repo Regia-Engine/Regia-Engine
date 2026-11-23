@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!-- Hand-written fixture (ADR-3341): a custom node (nodedef + node graph implementation) used once;
+     its inputs become material parameters with the document's values and the nodedef defaults. -->
+<materialx version="1.38">
+  <nodedef name="ND_rust_color3" node="rust">
+    <input name="base" type="color3" value="0.5, 0.5, 0.5" />
+    <input name="amount" type="float" value="0.5" />
+    <output name="out" type="color3" />
+  </nodedef>
+  <nodegraph name="NG_rust_color3" nodedef="ND_rust_color3">
+    <constant name="rust_color" type="color3">
+      <input name="value" type="color3" value="0.45, 0.2, 0.08" />
+    </constant>
+    <mix name="blend" type="color3">
+      <input name="fg" type="color3" nodename="rust_color" />
+      <input name="bg" type="color3" interfacename="base" />
+      <input name="mix" type="float" interfacename="amount" />
+    </mix>
+    <output name="out" type="color3" nodename="blend" />
+  </nodegraph>
+  <rust name="rusty" type="color3">
+    <input name="base" type="color3" value="0.7, 0.7, 0.75" />
+  </rust>
+  <standard_surface name="SR_rust" type="surfaceshader">
+    <input name="base_color" type="color3" nodename="rusty" />
+    <input name="metalness" type="float" value="0.6" />
+  </standard_surface>
+  <surfacematerial name="M_rust" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="SR_rust" />
+  </surfacematerial>
+</materialx>

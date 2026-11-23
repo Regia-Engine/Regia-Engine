@@ -1,0 +1,29 @@
+// `.ui.ron` v8 components (ADR-3147, spec 111): a component declaration with typed parameters and a
+// slot outlet, and component instances with parameters, a bind root and slot content.
+(
+    version: 8,
+    component: (
+        params: [
+            (name: "label", type: string, default: "HP", targets: [(node: "Label", property: text)]),
+            (name: "fill", type: color, default: "#30C060", targets: [(node: "Fill", property: background)]),
+            (name: "value", type: number, default: 1.0, targets: [(node: "Fill", property: progress)]),
+            (name: "shown", type: bool, default: true, targets: [(property: visible)]),
+        ],
+        slots: ["badge"],
+    ),
+    root: (
+        name: "HealthBar",
+        children: [
+            (name: "Label", text: (spans: ["HP"]), bind: (source: "$.name", target: text)),
+            (name: "Fill", widget: progress(1.0)),
+            (name: "Badge", slot: "badge"),
+            (
+                use: "ui/icon.ui.ron",
+                name: "Icon",
+                bind_root: "$.icon",
+                params: {"tint": "#FFFFFF", "size": 16.0},
+                slots: {"default": [(name: "IconText", text: (spans: ["!"]))]},
+            ),
+        ],
+    ),
+)

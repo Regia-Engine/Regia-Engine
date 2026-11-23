@@ -1,0 +1,17 @@
+(
+    format: "test-report",
+    entries: [
+        (
+            version: 1,
+            file: "v1.json",
+            origin: "frozen copy of the fuzz-target registry fixture",
+            exercises: "a v1 report (no `notes`) migrates to v2 with empty notes (ADR-7980)",
+        ),
+        (
+            version: 2,
+            file: "v2.json",
+            origin: "frozen copy of the fuzz-target registry fixture at v2 (ADR-7980: the v1 body plus one `notes` entry)",
+            exercises: "the current version: per-test `notes`; what the loader writes today must stay readable",
+        ),
+    ],
+)

@@ -1,0 +1,32 @@
+[package]
+name = "regia_xess"
+description = "Intel XeSS Super Resolution on wgpu Vulkan; external SDK, optional Windows runtime (ADR-4656)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+wgpu.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+
+[target.'cfg(target_os = "windows")'.dependencies]
+ash.workspace = true
+libloading.workspace = true
+
+[build-dependencies]
+bindgen = { workspace = true, optional = true }
+
+[dev-dependencies]
+regia_core.workspace = true
+# The heap-zeroing tests record raw Vulkan commands on lavapipe (ADR-7820); wgpu-hal already
+# builds ash on every Vulkan target, so this adds no crate to the workspace.
+ash.workspace = true
+
+[features]
+sdk = ["dep:bindgen"]

@@ -1,0 +1,22 @@
+format_version = 1
+id = "exposure-and-saturation"
+title = "Brighten the level look and mute its colors"
+prompt = "Change the level's look: raise the exposure bias by one stop (+1 EV) and lower the saturation to 0.8."
+features = ["lighting"]
+crates = ["regia_agent", "regia_scene"]
+call_budget = 5
+
+[setup]
+target = "lighting"
+
+[[check]]
+name = "exposure +1 EV"
+method = "level.get_look"
+pointer = "/look/exposure_bias_ev"
+expect = { kind = "equals", value = 1.0 }
+
+[[check]]
+name = "saturation 0.8"
+method = "level.get_look"
+pointer = "/look/saturation"
+expect = { kind = "number_range", min = 0.79, max = 0.81 }

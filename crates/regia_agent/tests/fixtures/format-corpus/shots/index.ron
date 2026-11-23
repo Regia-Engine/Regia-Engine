@@ -1,0 +1,23 @@
+(
+    format: "shots",
+    entries: [
+        (
+            version: 1,
+            file: "v1.shots.ron",
+            origin: "git 037d4f8ca47ec5ceeaec2e6669ab5c9fb8043556:docs/formats/shots.example.ron (parent of the v2 bump 9a209ab23)",
+            exercises: "v1 shot sequence: camera path position keys only (v2 adds rotation keys)",
+        ),
+        (
+            version: 2,
+            file: "v2.ron",
+            origin: "frozen copy of the fuzz-target registry fixture",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+        (
+            version: 3,
+            file: "v3.shots.ron",
+            origin: "hand-written for the v0.6 format bump (w11-seq-preview-fixes, ADR-8640)",
+            exercises: "the current version: a Catmull-Rom path key and a look-at key past the shot's end (tail control keys)",
+        ),
+    ],
+)

@@ -1,0 +1,5 @@
+# Oracle for door-functional-test: the calls a careful agent makes after the setup.
+{"method":"scene.set_property","params":{"entity":"$d","component":"Transform","path":"translation","value":[0,3,0]}}
+{"method":"functest.create","params":{"name":"door_is_open","body":"script:tests/door_is_open.functest.ron","script":"(format_version: 1, steps: [(name: \"door is up\", expect: [(name: \"door height\", condition: (entity: (name: \"Door\"), component: \"Transform\", path: \"translation.y\", op: \"gte\", value: 2.5))])])"}}
+{"method":"functest.run","params":{"filter":"door_is_open"}}
+{"method":"play.step","params":{"frames":10}}

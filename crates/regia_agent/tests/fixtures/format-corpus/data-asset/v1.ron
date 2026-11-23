@@ -1,0 +1,10 @@
+DataAsset(
+    format_version: 1,
+    type: "regia_agent::fuzz_targets::sweep::data_asset_type::FuzzDataAsset",
+    value: (
+        name: "rifle",
+        count: 3,
+        weights: [0.5, 1.0, 2.25],
+        tag: Some("long"),
+    ),
+)

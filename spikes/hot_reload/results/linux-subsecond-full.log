@@ -1,0 +1,46 @@
+  0.62s  INFO -----------------------------------------------------------------
+                Serving your app: patch_host! 🚀
+                • Press `ctrl+c` to exit the server
+                • Press `r` to rebuild the app
+                • Press `p` to toggle automatic rebuilds
+                • Press `v` to toggle verbose logging
+                • Press `/` for more commands and shortcuts
+               ----------------------------------------------------------------
+ 41.54s  INFO Build completed successfully in 40.92s, launching app! 💫
+ 41.88s  INFO PATCHPROBE linked full engine: 0
+ 41.88s  INFO PATCHPROBE 1791129726062 start pid=2243721
+ 42.56s  INFO PATCHPROBE 1791129727027 frame=60 value=60 marker=v1
+ 43.55s  INFO PATCHPROBE 1791129728017 frame=120 value=120 marker=v1
+ 44.53s  INFO PATCHPROBE 1791129728999 frame=180 value=180 marker=v1
+ 45.50s  INFO PATCHPROBE 1791129729966 frame=240 value=240 marker=v1
+ 46.47s  INFO PATCHPROBE 1791129730943 frame=300 value=300 marker=v1
+ 47.44s  INFO PATCHPROBE 1791129731911 frame=360 value=360 marker=v1
+ 48.41s  INFO PATCHPROBE 1791129732880 frame=420 value=420 marker=v1
+ 48.94s  INFO Hot-patching: patch_host/src/sedYYbOZs took 510ms
+ 48.94s  INFO PATCHPROBE 1791129733414 patch-applied
+ 49.38s  INFO PATCHPROBE 1791129733849 frame=480 value=508 marker=r2
+ 50.35s  INFO PATCHPROBE 1791129734822 frame=540 value=628 marker=r2
+ 51.32s  INFO PATCHPROBE 1791129735792 frame=600 value=748 marker=r2
+ 51.44s  INFO Hot-patching: patch_host/src/sedC0kKMo took 413ms
+ 51.45s  INFO PATCHPROBE 1791129735921 patch-applied
+ 52.30s  INFO PATCHPROBE 1791129736772 frame=660 value=921 marker=r3
+ 53.27s  INFO PATCHPROBE 1791129737738 frame=720 value=1101 marker=r3
+ 53.92s  INFO Hot-patching: patch_host/src/sedwy716p took 352ms
+ 53.93s  INFO PATCHPROBE 1791129738399 patch-applied
+ 54.23s  INFO PATCHPROBE 1791129738705 frame=780 value=1301 marker=r4
+ 55.20s  INFO PATCHPROBE 1791129739672 frame=840 value=1541 marker=r4
+ 56.17s  INFO PATCHPROBE 1791129740640 frame=900 value=1781 marker=r4
+ 56.38s  INFO Hot-patching: patch_host/src/sedSyUXZ9 took 385ms
+ 56.39s  INFO PATCHPROBE 1791129740866 patch-applied
+ 57.14s  INFO PATCHPROBE 1791129741607 frame=960 value=2068 marker=r5
+ 58.10s  INFO PATCHPROBE 1791129742574 frame=1020 value=2368 marker=r5
+ 58.86s  INFO Hot-patching: patch_host/src/sedZ3waxw took 379ms
+ 58.86s  INFO PATCHPROBE 1791129743332 patch-applied
+ 59.07s  INFO PATCHPROBE 1791129743541 frame=1080 value=2682 marker=r6
+ 60.05s  INFO PATCHPROBE 1791129744516 frame=1140 value=3042 marker=r6
+ 61.01s  INFO PATCHPROBE 1791129745483 frame=1200 value=3402 marker=r6
+ 61.36s  INFO Hot-patching: patch_host/src/main.rs took 456ms
+ 61.37s  INFO PATCHPROBE 1791129745842 patch-applied
+ 61.99s  INFO PATCHPROBE 1791129746456 frame=1260 value=3567 marker=v1
+ 62.96s  INFO PATCHPROBE 1791129747426 frame=1320 value=3627 marker=v1
+ 63.92s  INFO PATCHPROBE 1791129748393 frame=1380 value=3687 marker=v1

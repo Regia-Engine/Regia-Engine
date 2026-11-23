@@ -1,0 +1,29 @@
+[package]
+name = "ext_fixture"
+description = "A dynamic extension for the extension host tests: one agent method, state kept across reloads, a build that can be told to fail."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[lib]
+crate-type = ["rlib"]
+
+[features]
+# `regia plugin build` and the host test turn this on: the stamp and entry symbols (specs/57 § 2.8).
+# It links `regia_dylib`, the engine copy the editor's `hot-dylib` build uses, and activates
+# `regia_editor` so this build resolves the editor's features and does not relink `regia_dylib`
+# (the feature anchor of specs/20 § 1). The source never names the editor.
+dynamic-extension = ["dep:regia_dylib", "dep:regia_editor", "regia_editor/hot-dylib"]
+
+[dependencies]
+regia_app = { workspace = true }
+regia_framework = { workspace = true }
+serde_json = { workspace = true }
+regia_dylib = { workspace = true, optional = true }
+# Feature anchor only. Not referenced from Rust (specs/20 § 1).
+regia_editor = { workspace = true, optional = true }
+
+[lints]
+workspace = true

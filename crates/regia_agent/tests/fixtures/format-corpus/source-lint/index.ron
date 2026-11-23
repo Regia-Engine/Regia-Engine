@@ -1,0 +1,4 @@
+(format: "source-lint", entries: [
+    (version: 1, file: "v1.ron", origin: "hand-written from the v1 contract, ADR-8248",
+     exercises: "project material default overlay on the engine defaults"),
+])

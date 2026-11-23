@@ -1,0 +1,14 @@
+// Team elimination with an alliance (ADR-8748): teams 1 and 2 win together; a fallen ally shares the win.
+(
+    format_version: 1,
+    id: "allied_elimination",
+    name_key: "mode.allied_elimination",
+    skeleton: "custom",
+    session: (
+        flow: (max_teams: 3, seats_per_team: 1, start_delay_ticks: 0),
+        objectives: (max_teams: 3),
+        respawn: (default: (kind: "never")),
+        elimination: (last_standing: false, alliances: [(teams: [1, 2])]),
+        victory: (conditions: [(kind: "team_elimination")]),
+    ),
+)

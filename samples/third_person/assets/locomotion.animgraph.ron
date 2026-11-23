@@ -1,0 +1,150 @@
+(
+    format_version: 4,
+    parameters: [
+        ("Speed", Float(0.0)),
+        ("Grounded", Bool(true)),
+        ("Foot0Target", Vec3((0.0, 0.0, 0.0))),
+        ("Foot0Pole", Vec3((0.0, 0.0, 0.0))),
+        ("Foot0Weight", Float(0.0)),
+        ("Foot1Target", Vec3((0.0, 0.0, 0.0))),
+        ("Foot1Pole", Vec3((0.0, 0.0, 0.0))),
+        ("Foot1Weight", Float(0.0)),
+        ("Foot2Target", Vec3((0.0, 0.0, 0.0))),
+        ("Foot2Pole", Vec3((0.0, 0.0, 0.0))),
+        ("Foot2Weight", Float(0.0)),
+        ("Foot3Target", Vec3((0.0, 0.0, 0.0))),
+        ("Foot3Pole", Vec3((0.0, 0.0, 0.0))),
+        ("Foot3Weight", Float(0.0)),
+    ],
+    root: TwoBoneIK((
+        inner: TwoBoneIK((
+            inner: TwoBoneIK((
+                inner: TwoBoneIK((
+                    inner: StateMachine((
+                        initial: "Locomote",
+                        states: [
+                            ("Idle", Clip((
+                                clip: "Survey",
+                                looping: true,
+                                speed: 1.0,
+                                sync_group: Some("gait"),
+                            ))),
+                            ("Locomote", BlendSpace1D((
+                                space: (
+                                    param: "Speed",
+                                    samples: [
+                                        (
+                                            value: 0.0,
+                                            clip: "Walk",
+                                        ),
+                                        (
+                                            value: 8.0,
+                                            clip: "Run",
+                                        ),
+                                    ],
+                                ),
+                                sync_group: Some("gait"),
+                            ))),
+                            ("Air", Clip((
+                                clip: "Run",
+                                looping: true,
+                                speed: 0.6,
+                                sync_group: Some("gait"),
+                            ))),
+                        ],
+                        transitions: [
+                            (
+                                from: Some("Idle"),
+                                to: "Locomote",
+                                conditions: [
+                                    Float(
+                                        param: "Speed",
+                                        op: Gt,
+                                        value: 0.5,
+                                    ),
+                                ],
+                                duration: 0.25,
+                                curve: Smooth,
+                                interruptible: true,
+                            ),
+                            (
+                                from: Some("Locomote"),
+                                to: "Idle",
+                                conditions: [
+                                    Float(
+                                        param: "Speed",
+                                        op: Lt,
+                                        value: 0.2,
+                                    ),
+                                ],
+                                duration: 0.3,
+                                curve: Smooth,
+                                interruptible: true,
+                            ),
+                            (
+                                from: None,
+                                to: "Air",
+                                conditions: [
+                                    Bool(
+                                        param: "Grounded",
+                                        value: false,
+                                    ),
+                                ],
+                                duration: 0.15,
+                                curve: Smooth,
+                                interruptible: true,
+                            ),
+                            (
+                                from: Some("Air"),
+                                to: "Locomote",
+                                conditions: [
+                                    Bool(
+                                        param: "Grounded",
+                                        value: true,
+                                    ),
+                                    Float(
+                                        param: "Speed",
+                                        op: Gt,
+                                        value: 0.5,
+                                    ),
+                                ],
+                                duration: 0.2,
+                                curve: Smooth,
+                                interruptible: true,
+                            ),
+                            (
+                                from: Some("Air"),
+                                to: "Idle",
+                                conditions: [
+                                    Bool(
+                                        param: "Grounded",
+                                        value: true,
+                                    ),
+                                ],
+                                duration: 0.2,
+                                curve: Smooth,
+                                interruptible: true,
+                            ),
+                        ],
+                    )),
+                    chain: ("b_LeftLeg01_015", "b_LeftLeg02_016", "b_LeftFoot01_017"),
+                    target: Param("Foot0Target"),
+                    pole: Some("Foot0Pole"),
+                    weight_param: Some("Foot0Weight"),
+                )),
+                chain: ("b_RightLeg01_019", "b_RightLeg02_020", "b_RightFoot01_021"),
+                target: Param("Foot1Target"),
+                pole: Some("Foot1Pole"),
+                weight_param: Some("Foot1Weight"),
+            )),
+            chain: ("b_LeftUpperArm_09", "b_LeftForeArm_010", "b_LeftHand_011"),
+            target: Param("Foot2Target"),
+            pole: Some("Foot2Pole"),
+            weight_param: Some("Foot2Weight"),
+        )),
+        chain: ("b_RightUpperArm_06", "b_RightForeArm_07", "b_RightHand_08"),
+        target: Param("Foot3Target"),
+        pole: Some("Foot3Pole"),
+        weight_param: Some("Foot3Weight"),
+    )),
+)

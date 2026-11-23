@@ -1,0 +1,31 @@
+[package]
+name = "regia_ecs"
+description = "ECS + reflection facade over bevy_ecs/bevy_reflect, plus reflected (de)serialization."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia_core = { workspace = true }
+bevy_ecs = { workspace = true }
+bevy_reflect = { workspace = true }
+bevy_state = { workspace = true }
+serde = { workspace = true }
+ron = { workspace = true }
+postcard = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+glam = { workspace = true }
+
+[features]
+default = ["debug_names"]
+# Keep system/component names at runtime (ownership records, agent protocol, profiler). Costs the
+# type-name strings in the binary; a shipping build may turn it off.
+debug_names = ["bevy_ecs/debug"]

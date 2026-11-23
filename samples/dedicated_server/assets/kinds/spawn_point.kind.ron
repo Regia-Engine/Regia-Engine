@@ -1,0 +1,10 @@
+(
+    format_version: 1,
+    name: "SpawnPoint",
+    icon: "spawn",
+    color: "#3cb44b",
+    description: "Where a player spawns",
+    category: Some("Gameplay"),
+    required: ["regia_scene::transform::Transform"],
+    marker: Some("dedicated_server::SpawnPoint"),
+)

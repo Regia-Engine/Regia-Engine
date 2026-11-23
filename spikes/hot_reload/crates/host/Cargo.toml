@@ -1,0 +1,11 @@
+[package]
+name = "host"
+description = "Headless stand-in for the editor host: runs the app, rebuilds and reloads the game library, measures."
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+# Only the engine facade: every other dependency the host needs lives in the engine, so the host and
+# game builds resolve identical features for shared crates (README, "feature unification").
+spike_regia = { workspace = true, features = ["dynamic"] }

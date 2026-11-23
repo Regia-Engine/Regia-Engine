@@ -1,0 +1,7 @@
+{
+    "regia_procgen::tiles::ProcGenAnchor": (
+        reach_scale: 1.0,
+        use_view_direction: true,
+        format_version: 1,
+    ),
+}

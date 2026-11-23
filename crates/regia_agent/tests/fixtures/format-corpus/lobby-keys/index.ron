@@ -1,0 +1,17 @@
+(
+    format: "lobby-keys",
+    entries: [
+        (
+            version: 1,
+            file: "v1.ron",
+            origin: "frozen copy of the fuzz-target registry fixture",
+            exercises: "layout v1 (no regia.mode or regia.playlist): an older build's lobby must stay readable",
+        ),
+        (
+            version: 2,
+            file: "v2.ron",
+            origin: "frozen copy of the fuzz-target registry fixture at layout v2 (ADR-8897)",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+    ],
+)

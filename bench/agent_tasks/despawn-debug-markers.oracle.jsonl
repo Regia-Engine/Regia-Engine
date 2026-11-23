@@ -1,0 +1,2 @@
+# Oracle for despawn-debug-markers: the calls a careful agent makes after the setup.
+{"method":"scene.apply_edits","params":{"edits":[{"op":"despawn","entity":"$d0"},{"op":"despawn","entity":"$d1"},{"op":"despawn","entity":"$d2"},{"op":"despawn","entity":"$d3"},{"op":"despawn","entity":"$d4"},{"op":"despawn","entity":"$d5"},{"op":"despawn","entity":"$d6"},{"op":"despawn","entity":"$d7"}]}}

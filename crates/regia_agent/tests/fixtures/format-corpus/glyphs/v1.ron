@@ -1,0 +1,8 @@
+// `.glyphs.ron` v1 (ADR-7070): the project's button-prompt glyphs, at assets/input/project.glyphs.ron.
+(
+    version: 1,
+    glyphs: {
+        "activate": { "xbox": "Ⓐ", "playstation": "<icon=ps_cross>" },
+        "Fire": { "keyboard_mouse": "LMB", "gamepad": "RT" },
+    },
+)

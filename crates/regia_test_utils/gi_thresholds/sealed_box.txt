@@ -1,0 +1,14 @@
+# GI validation record (ADR-423): scene technique rel_rmse shadow_bias energy_ratio
+# measured on: llvmpipe (LLVM 23.1.4, 256 bits) (llvmpipe; Mesa 26.2.6-arch1.1 (LLVM 23.1.4))
+# Re-record with REGIA_GI_RECORD=1 on lavapipe; say why in the commit message.
+# 2026-11-07 (lane sprint-gi-leak-plates-p95): the probe rows re-recorded after
+# lane/sprint-dyn-gi-remainder's plate layouts (probes and probes_ssgi 0.062 -> 0.0007 rel.
+# RMSE; the leak rows are 10x inside the old records). The flat-sky rows (direct/ambient/
+# ssgi/baked) keep their old records: the layout change moved their baselines and a record
+# never loosens.
+sealed_box direct 0.00005 0.00003 -
+sealed_box ambient 0.17654 0.16533 -
+sealed_box ssgi 0.17740 0.16628 -
+sealed_box probes 0.00073 0.00022 -
+sealed_box probes_ssgi 0.00074 0.00023 -
+sealed_box baked 0.17654 0.16533 -

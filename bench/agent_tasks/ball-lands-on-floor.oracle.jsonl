@@ -1,0 +1,4 @@
+# Oracle for ball-lands-on-floor: the calls a careful agent makes after the setup.
+{"method":"play.pause"}
+{"method":"scene.spawn","params":{"name":"Ball","components":{"Transform":{"translation":[0,5,0]},"RigidBody":{"kind":"Dynamic"},"Collider":{"shape":{"Sphere":{"radius":0.5}}}}}}
+{"method":"play.step","params":{"frames":300}}

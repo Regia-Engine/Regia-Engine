@@ -1,0 +1,74 @@
+{
+  "format": "match-result",
+  "version": 1,
+  "match_id": "6d617463-682d-7265-7375-6c7400000001",
+  "ruleset": {
+    "id": "ctf",
+    "hash": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "map_id": "harbor",
+  "start": {
+    "step": 90,
+    "tick": 0
+  },
+  "end": {
+    "step": 1290,
+    "tick": 1200
+  },
+  "end_reason": "capture_limit_reached",
+  "winner": 1,
+  "draw": false,
+  "teams": [
+    {
+      "team": 1,
+      "score": 3,
+      "round_wins": 0
+    },
+    {
+      "team": 2,
+      "score": 1,
+      "round_wins": 0
+    }
+  ],
+  "players": [
+    {
+      "key": "steam:76561190000000001",
+      "team": 1,
+      "slot": 0,
+      "kills": 4,
+      "deaths": 1,
+      "assists": 2,
+      "objective_points": 3,
+      "score": 7,
+      "counters": {
+        "revives": 2
+      }
+    },
+    {
+      "key": "seat:2.0",
+      "team": 2,
+      "slot": 0,
+      "kills": 1,
+      "deaths": 4,
+      "assists": 0,
+      "objective_points": 1,
+      "score": 2,
+      "counters": {}
+    }
+  ],
+  "ledger": {
+    "start_tick": 0,
+    "over_tick": 1200,
+    "tick_hz": 60,
+    "timeline": [
+      {
+        "tick": 300,
+        "kind": "FirstKill",
+        "team": 1,
+        "foe_team": 2,
+        "stem": ""
+      }
+    ]
+  },
+  "replay": "harbor-1.regiareplay"
+}

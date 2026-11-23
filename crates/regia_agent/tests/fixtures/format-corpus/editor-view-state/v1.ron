@@ -1,0 +1,14 @@
+(
+    format_version: 1,
+    recent_levels: ["assets/maps/arena.level.ron"],
+    levels: {
+        "assets/maps/arena.level.ron": (
+            camera: Some((target: (0.0, 1.0, 0.0), distance: 12.0, yaw: 0.6, pitch: -0.4, speed: 8.0, fov_deg: 60.0)),
+            bookmarks: {
+                1: (target: (4.0, 0.0, -2.0), distance: 6.0, yaw: 1.2, pitch: -0.3, speed: 8.0, fov_deg: 60.0),
+            },
+            locked: [],
+        ),
+    },
+    ui_designer: Some((size: (1920.0, 1080.0), safe_area: (0.0, 0.0, 0.0, 0.0), theme: None)),
+)

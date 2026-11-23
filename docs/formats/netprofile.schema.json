@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://regiaengine.com/schemas/netprofile-ron-v2.json",
+  "title": "Regia Engine .netprofile.ron v2",
+  "description": "Net profile (docs/formats/netprofile-ron.md). RON structs map to objects, Some(x) to x, None to null, enum variants to strings or single-key objects. Every field is optional (serde defaults).",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "format_version": {
+      "enum": [1, 2]
+    },
+    "priority": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "relevance": {
+      "oneOf": [
+        {
+          "const": "World"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "Spatial"
+          ],
+          "properties": {
+            "Spatial": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "radius",
+                "hysteresis"
+              ],
+              "properties": {
+                "radius": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "hysteresis": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "sent_to_all": {
+      "type": "boolean"
+    },
+    "owner_only": {
+      "type": "boolean"
+    },
+    "group_required": {
+      "type": "boolean"
+    },
+    "follow_parent": {
+      "type": "boolean"
+    },
+    "custom_filter": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "min_interval_ticks": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "max_interval_ticks": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "linger_ticks": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "owner_boost": {
+      "type": "number",
+      "minimum": 1
+    },
+    "view_falloff": {
+      "type": "boolean"
+    },
+    "position_step_m": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 1e-05,
+      "maximum": 1.0
+    },
+    "interpolation": {
+      "enum": [
+        "Linear",
+        "Hermite",
+        "None"
+      ]
+    },
+    "snap_distance_m": {
+      "type": "number",
+      "minimum": 0
+    },
+    "max_extrapolate_ms": {
+      "type": "number",
+      "minimum": 0
+    },
+    "appear_immediately": {
+      "type": "boolean"
+    },
+    "rate_tiers": {
+      "description": "Distance send-rate tiers (spec 120 § 8.3, v2); null for none.",
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "near_m": { "type": "number", "minimum": 0 },
+        "mid_m": { "type": "number", "minimum": 0 },
+        "mid_every": { "type": "integer", "minimum": 1 },
+        "far_hz": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+    "extrapolation_gate_m": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "exclusiveMinimum": 0,
+      "maximum": 10.0
+    }
+  }
+}

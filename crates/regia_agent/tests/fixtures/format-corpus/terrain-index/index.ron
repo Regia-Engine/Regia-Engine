@@ -1,0 +1,23 @@
+(
+    format: "terrain-index",
+    entries: [
+        (
+            version: 1,
+            file: "v1.bin",
+            origin: "hand-written from the v1 field list (fb51d0e59:crates/regia_terrain/src/stream.rs TerrainIndex, the v0.5.0 shape) by a throwaway serde writer of that list, not today's writer",
+            exercises: "The v0.5.0 index a standard cook wrote: a slot, a heightfield entry, layers and world extents; it loads as v2 with no heights, holes or material (ADR-8024).",
+        ),
+        (
+            version: 2,
+            file: "v2.bin",
+            origin: "frozen copy of the fuzz-target registry fixture; re-recorded at integ-v06s-final with the trailing source_mapping None byte when the unreleased v2s of ADR-8024 and ADR-8471 became one (ADR-8619)",
+            exercises: "the current version: what the loader writes today must stay readable (heights, holes, material, then source_mapping)",
+        ),
+        (
+            version: 3,
+            file: "v3.bin",
+            origin: "frozen copy of the fuzz-target registry fixture (bless_missing_current_fixtures at lane v07-fmt-terrain-index-v3, ADR-8871)",
+            exercises: "the current version: heights, holes, material, the count mapping, then a Z spacing other than X (1.5 m against 2 m) and a valid-data mask with the center sample missing (ADR-8871)",
+        ),
+    ],
+)

@@ -1,0 +1,26 @@
+(
+    version: 4,
+    wetness_default: 0.0,
+    layers: [
+        (
+            name: "ground",
+            albedo: (0.18, 0.28, 0.1),
+            roughness: 0.95,
+            tiling: 8.0,
+            slope_min: 0.0,
+            slope_max: 0.6,
+            altitude_min: -1000.0,
+            altitude_max: 1000.0,
+            blend_sharpness: 0.15,
+            triplanar: false,
+            albedo_texture: None,
+            normal_texture: None,
+            height_texture: None,
+            orm_texture: None,
+            detail_normal_strength: 0.0,
+            height_blend: 0.0,
+            weather: None,
+        ),
+    ],
+    puddles: true,
+)

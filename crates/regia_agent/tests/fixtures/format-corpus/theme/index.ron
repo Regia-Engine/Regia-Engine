@@ -1,0 +1,17 @@
+(
+    format: "theme",
+    entries: [
+        (
+            version: 1,
+            file: "v1.ron",
+            origin: "frozen copy of the fuzz-target registry fixture",
+            exercises: "v1 (ADR-8105 (e)): reads as v2 with no rules and no focus_visible layers",
+        ),
+        (
+            version: 2,
+            file: "v2.ron",
+            origin: "w13-ui-theme-v2-styles (ADR-8105 (e), ADR-8303)",
+            exercises: "the current version: a focus_visible layer on Button and three style rules (inside + widget, classes + hover state, widget + variation + focus_visible state)",
+        ),
+    ],
+)

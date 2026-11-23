@@ -1,0 +1,65 @@
+{
+  "format_version": 2,
+  "frames": 8,
+  "frame_ms": 4.5,
+  "cpu": [
+    {
+      "name": "frame",
+      "inclusive_ms": 4.0,
+      "self_ms": 1.0,
+      "calls": 1.0,
+      "children": [
+        {
+          "name": "extract",
+          "inclusive_ms": 1.25,
+          "self_ms": 1.25,
+          "calls": 1.0,
+          "children": []
+        },
+        {
+          "name": "render",
+          "inclusive_ms": 1.75,
+          "self_ms": 1.75,
+          "calls": 1.0,
+          "children": []
+        }
+      ]
+    }
+  ],
+  "truncated": 0,
+  "gpu": [
+    {
+      "pass": "shadow",
+      "ms": 0.5
+    }
+  ],
+  "folded": "frame 1000\nframe;extract 1250\nframe;render 1750\n",
+  "timeline": [
+    {
+      "number": 41,
+      "frame_ns": 4500000,
+      "dropped": 0,
+      "threads": [
+        {
+          "index": 0,
+          "name": "main",
+          "spans": [
+            {
+              "name": "frame",
+              "start_ns": 0,
+              "end_ns": 4000000,
+              "depth": 0
+            },
+            {
+              "name": "extract",
+              "start_ns": 1000000,
+              "end_ns": 2250000,
+              "depth": 1
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "timeline_truncated": 0
+}

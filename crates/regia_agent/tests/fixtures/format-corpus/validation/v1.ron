@@ -1,0 +1,12 @@
+(
+    format_version: 1,
+    validate_on_save: true,
+    cook: Warn,
+    exclude: ["assets/dev/**"],
+    roots: ["assets/levels/**"],
+    limits: (max_texture_dimension: 4096, texture_power_of_two: false, mesh_triangle_budget: 200000, max_path_len: 200),
+    rules: [
+        PathStyle(id: "lowercase", glob: "assets/**", style: SnakeCase, severity: Error),
+        SizeBudget(id: "texture-cap", kind: Texture, max_bytes: 16777216, severity: Warning),
+    ],
+)

@@ -1,0 +1,5 @@
+# Commands the user onboarding files (dist/public-root/, dist/public-skills/, book/start/assistant-setup.md,
+# book/agents/onboarding.md) name before they exist in `regia_cli` (ADR-10135, ADR-10230).
+# One command path per line: `setup` covers every `regia setup ...`; `setup connect` only that one.
+# `cargo xtask onboarding-lint` fails when a listed command exists: remove it as it lands.
+# Empty on the v0.6 line: the files name only commands v0.6 has (no `regia setup`, no `regia licence`).

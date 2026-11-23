@@ -1,0 +1,21 @@
+# The engine's example editor extension (ADR-9850 (5)): one panel, one menu and toolbar action,
+# one asset-type tool. A project enables it in Regia.toml and grants `editor_panel`:
+#
+#   [extensions]
+#   enabled = ["hello_panel"]
+#   [extensions.grants]
+#   hello_panel = ["editor_panel"]
+#
+# A project copy at <project>/extensions/hello_panel/ with this id overrides this one.
+format_version = 1
+id = "hello_panel"
+name = "Hello panel (engine example)"
+version = "0.1.0"
+publisher = "Regia Engine"
+licence = "LicenseRef-Regia-Engine"
+description = "Example editor extension: a panel, a menu and toolbar action, and a tool for .ron assets."
+capabilities = ["editor_panel"]
+
+[[code]]
+crate = "regia_ext_hello_panel"
+audience = ["editor"]

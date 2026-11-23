@@ -1,0 +1,28 @@
+format_version = 1
+id = "duck-the-music"
+title = "Duck the music bus and mute the ambience"
+prompt = "Lower the Music bus to -12 dB and mute the Ambience bus. Leave the other buses as they are."
+features = ["audio"]
+crates = ["regia_agent", "regia_audio"]
+call_budget = 6
+
+[setup]
+target = "audio"
+
+[[check]]
+name = "music at -12 dB"
+method = "audio.mix"
+pointer = "/buses/1/base_db"
+expect = { kind = "equals", value = -12.0 }
+
+[[check]]
+name = "ambience muted"
+method = "audio.mix"
+pointer = "/buses/6/muted"
+expect = { kind = "equals", value = true }
+
+[[check]]
+name = "sfx untouched"
+method = "audio.mix"
+pointer = "/buses/2/muted"
+expect = { kind = "equals", value = false }

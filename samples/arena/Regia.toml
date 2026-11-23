@@ -1,0 +1,28 @@
+[project]
+name = "Arena"
+id = "com.regiaengine.samples.arena"
+version = "0.1.0"
+build_number = 1
+engine = "0.1"
+
+[platforms.android]
+min_sdk = 29
+target_sdk = 35
+orientation = "sensor_landscape"
+abis = ["arm64-v8a", "x86_64"]
+cargo_package = "arena_android"
+
+# The shipping binary is ~140 MB stripped. Secret scanning stays on, and its default signatures
+# are unbounded patterns that only run on a whole file that fits in `max_memory_bytes`
+# (ADR-8244; 32 MiB by default refuses the binary with `unbounded_regex`). Raise the audit's
+# memory ceiling instead of turning the scan off (ADR-8786).
+[package_hygiene]
+max_memory_bytes = 536870912
+
+# The engine pause (ADR-10104): Escape and the gamepad Start button are the TogglePause bindings; gameplay
+# freezes, physics included, and the arena's own menu is the pause screen (it follows GamePause).
+[game]
+pause = true
+pause_key = "Escape"
+pause_gamepad = "Start"
+pause_screen = "none"

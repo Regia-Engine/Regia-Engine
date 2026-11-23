@@ -1,0 +1,27 @@
+// Handwritten from b76cf8b93 (the commit that introduced .animgraph.ron v2), composed from the graphs in
+// that commit's crates/ferrite_animation/tests/inertialize.rs: per-transition `blend` (Inertialize,
+// InertializeSpring) and per-layer `weight_inertialize`.
+(
+    format_version: 2,
+    parameters: [("Go", Bool(false)), ("Aim", Float(0.0))],
+    root: Layer((
+        base: StateMachine((
+            initial: "A",
+            states: [
+                ("A", Clip((clip: "A", looping: true, speed: 1.0, sync_group: None))),
+                ("B", Clip((clip: "B", looping: true, speed: 1.0, sync_group: None))),
+            ],
+            transitions: [
+                (from: Some("A"), to: "B", conditions: [Bool(param: "Go", value: true)],
+                 duration: 0.3, curve: Linear, interruptible: true, blend: Inertialize),
+                (from: Some("B"), to: "A", conditions: [Bool(param: "Go", value: false)],
+                 duration: 0.3, curve: Linear, interruptible: true, blend: InertializeSpring),
+            ],
+        )),
+        layers: [
+            (graph: Clip((clip: "Aim", looping: true, speed: 1.0, sync_group: None)),
+             mask: (joints: ["arm"], include_children: true), mode: Override,
+             weight_param: "Aim", weight_inertialize: 0.15),
+        ],
+    )),
+)

@@ -1,0 +1,27 @@
+ProcGraph(
+    format_version: 1,
+    description: "Open world: the biome pipeline on a 256 m tier, ground clutter on a 32 m tier (spec 66 § 8)",
+    nodes: {
+        1: (ty: "in.self", settings: {}, at: (0.0, 0.0)),
+        2: (ty: "tiles.tier", settings: {cell_m: Meters(256.0)}, at: (220.0, 0.0)),
+        3: (ty: "biome.areas", settings: {}, at: (440.0, 0.0)),
+        4: (ty: "in.ground", settings: {}, at: (440.0, 160.0)),
+        5: (ty: "biome.layer", settings: {}, at: (660.0, 0.0)),
+        6: (ty: "biome.resolve", settings: {}, at: (880.0, 0.0)),
+        7: (ty: "biome.spawn", settings: {}, at: (1100.0, 0.0)),
+        8: (ty: "tiles.tier", settings: {cell_m: Meters(32.0)}, at: (220.0, 320.0)),
+        9: (ty: "sample.ground", settings: {spacing_m: 3.0, jitter: 0.9, align: "normal"}, at: (440.0, 320.0)),
+        10: (ty: "spawn.mesh", settings: {entries: [(mesh: "plants/tuft", weight: 3.0, draw_distance_m: 160.0, fade_m: 30.0), (mesh: "rocks/pebble", weight: 1.0, draw_distance_m: 160.0, fade_m: 30.0)]}, at: (660.0, 320.0)),
+    },
+    edges: [
+        (from: (1, "out"), to: (2, "in")),
+        (from: (2, "out"), to: (3, "bounds")),
+        (from: (3, "out"), to: (5, "claims")),
+        (from: (4, "out"), to: (5, "ground")),
+        (from: (5, "out"), to: (6, "in")),
+        (from: (6, "out"), to: (7, "in")),
+        (from: (1, "out"), to: (8, "in")),
+        (from: (8, "out"), to: (9, "region")),
+        (from: (9, "out"), to: (10, "in")),
+    ],
+)

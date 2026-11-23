@@ -1,0 +1,14 @@
+// Which resupply slot should a dry bot walk to? Every slot tagged `resupply_slot`, nearest first
+// (planar distance to the asking bot; ties go to the lower entity id). `arena::brain::Restock`
+// runs it with `pick: All` and claims the first free slot of the ranking (ADR-2134).
+(
+    format_version: 1,
+    name: "resupply_stations",
+    item_type: Entity,
+    default_pick: All,
+    generator: NearbyEntities(tag: "resupply_slot"),
+    tests: [
+        Distance(id: "near", purpose: Score, to: Asker, mode: Planar,
+                 score: (shape: Linear, weight: -1.0, clamp_min: Seen, clamp_max: Seen)),
+    ],
+)

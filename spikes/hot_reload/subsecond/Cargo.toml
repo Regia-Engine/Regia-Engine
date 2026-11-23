@@ -1,0 +1,17 @@
+# subsecond hot-patching half of the M2 spike (specs/20 § 1a). Separate workspace: it enables
+# bevy_ecs' `hotpatching` feature, which would otherwise rebuild the engine for the dylib half.
+[workspace]
+resolver = "3"
+members = ["patch_host", "patch_game"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[profile.dev]
+opt-level = 1
+debug = "line-tables-only"
+
+[profile.dev.package."*"]
+opt-level = 3

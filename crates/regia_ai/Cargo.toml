@@ -1,0 +1,45 @@
+[package]
+name = "regia_ai"
+description = "Game AI: behaviour trees (selector/sequence/parallel/decorators/services/leaf tasks), a reflected blackboard, and perception helpers."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+# `debug_draw`: the perception and smart-object overlays, the only `regia_render` use. Off in the `server` build.
+[features]
+default = ["debug_draw"]
+debug_draw = ["dep:regia_render", "regia_framework/client"]
+# Runs `SpatialQueryProbe` previews (docs/specs/33 § 4.2). `regia_agent` turns it on, so dev builds
+# with the agent have it and shipping builds without the agent compile the probe system out.
+spatial-query-probe = []
+# Connectionless server bots: the behaviour-tree adapter for `regia_framework::net_bots`.
+net = ["regia_framework/net", "dep:regia_net"]
+
+[dependencies]
+regia_core = { workspace = true }
+regia_ecs = { workspace = true }
+regia_app = { workspace = true }
+regia_scene = { workspace = true }
+# `SmartObject::definition`: the id and the server that resolves it (spec 39 § 2).
+regia_asset = { workspace = true }
+regia_nav = { workspace = true }
+regia_framework = { path = "../regia_framework", default-features = false }
+regia_net = { workspace = true, optional = true }
+regia_physics = { workspace = true }
+# Only the debug overlays (spec 76 § 2.1, ADR-1886).
+regia_render = { workspace = true, optional = true }
+regia_macros = { workspace = true }
+# `regia_ai::det`: the deterministic AI core (ADR-8152), re-exported.
+regia_detsim = { workspace = true }
+serde = { workspace = true }
+ron = { workspace = true }
+tracing = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+regia_test_utils = { workspace = true }

@@ -1,0 +1,12 @@
+# One pinned stable compiler for the owner's machine, CI and Android builds (05-milestones M0).
+# Bump deliberately, in its own commit, after all tests pass (03 § 3).
+[toolchain]
+channel = "1.99.0"
+components = ["rustfmt", "clippy", "rust-src"]
+targets = [
+    "x86_64-unknown-linux-gnu",
+    "x86_64-pc-windows-msvc",
+    "aarch64-linux-android",
+    "x86_64-linux-android",
+]
+profile = "minimal"

@@ -1,0 +1,26 @@
+// A shared sparkle (`.seq.ron` v2): the `lamp` target's light flares (lumens) and settles, and a twinkle plays on it
+// halfway through. Played by `cinematics/intro.seq.ron` as a sub-sequence.
+(
+    version: 2,
+    name: "sparkle",
+    fps: 30.0,
+    tracks: [
+        (
+            name: "flare",
+            target: "lamp",
+            property: "light.intensity",
+            keys: Float([
+                (time: 0.0, value: 0.0, ease: Bezier, tangent: Aligned(12000.0), weights: Some((0.25, 0.25))),
+                (time: 0.4, value: 4000.0, ease: Bezier, tangent: Flat),
+                (time: 1.5, value: 0.0),
+            ]),
+        ),
+        (
+            name: "twinkle",
+            keys: Sub([(sequence: "cinematics/fx/twinkle.seq.ron", start: 0.5, end: 1.2, speed: 2.0)]),
+        ),
+    ],
+    markers: [
+        (name: "flash", time: 0.4, payload: "cue:chime"),
+    ],
+)

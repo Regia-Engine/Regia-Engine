@@ -1,0 +1,17 @@
+(
+    format: "statetree",
+    entries: [
+        (
+            version: 1,
+            file: "v1.statetree.ron",
+            origin: "git 031fde679493d0e75dc4c710313092e5e66a4a34:docs/formats/statetree.example.ron (parent of v2 commit d89ce9ce8)",
+            exercises: "v1 definition: states, transitions, Event/Tick triggers (v2 adds hold, ambient, enter_set, includes, fallback)",
+        ),
+        (
+            version: 2,
+            file: "v2.ron",
+            origin: "registry fixture (version 1) loaded and re-encoded by the loader at version 2",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+    ],
+)

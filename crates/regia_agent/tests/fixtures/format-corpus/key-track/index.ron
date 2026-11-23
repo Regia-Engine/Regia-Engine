@@ -1,0 +1,11 @@
+(
+    format: "key-track",
+    entries: [
+        (
+            version: 1,
+            file: "v1.ron",
+            origin: "the example on docs/formats/key-track-ron.md extended with one of each v1 step (ADR-8403)",
+            exercises: "the current version: a section, a tap, an expect, a press and release, a hold, two taps, a pointer move and a wheel notch",
+        ),
+    ],
+)

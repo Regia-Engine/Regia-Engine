@@ -1,0 +1,15 @@
+[package]
+name = "{{crate_name}}_editor"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "{{crate_name}}_editor"
+path = "src/main.rs"
+
+[dependencies]
+# Feature anchor (docs/specs/20 § 1): this bin depends on the game crate so a hot-reload
+# build of `game` resolves the same features as the editor.
+regia_editor = { path = "{{engine}}/crates/regia_editor" }
+{{crate_name}} = { path = "../game" }

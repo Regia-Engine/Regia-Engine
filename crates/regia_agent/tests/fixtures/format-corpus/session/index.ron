@@ -1,0 +1,17 @@
+(
+    format: "session",
+    entries: [
+        (
+            version: 1,
+            file: "v1.session.ron",
+            origin: "git bf4833a0a02f2666368c5b528a6abe61833efd0a:crates/regia_cli/src/session.rs (the SESSION test constant, parent of the v2 bump e7db04def)",
+            exercises: "The first shape: session-wide build, roles without a role-level build.",
+        ),
+        (
+            version: 2,
+            file: "v2.session.ron",
+            origin: "frozen copy of the fixture text of crates/regia_cli/tests/fuzz.rs (the example on the format page)",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+    ],
+)

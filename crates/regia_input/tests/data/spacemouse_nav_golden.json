@@ -1,0 +1,2965 @@
+{
+  "format": 1,
+  "spec": "docs/specs/29-spacemouse.md",
+  "comparison": "delta == nav::step(state, dt, context); f32 fields within 1e-6 relative (1e-12 absolute), step exact",
+  "cases": [
+    {
+      "name": "orbit_idle",
+      "state": {
+        "translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.016666668,
+      "context": {
+        "mode": "Orbit",
+        "distance": 5.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          0.0
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "orbit_pan_right_full",
+      "state": {
+        "translation": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.016666668,
+      "context": {
+        "mode": "Orbit",
+        "distance": 10.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.16666667,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          0.0
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "orbit_pan_up_half",
+      "state": {
+        "translation": [
+          0.0,
+          0.52,
+          0.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.1,
+      "context": {
+        "mode": "Orbit",
+        "distance": 4.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.1,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          0.0
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "orbit_zoom_in_push_away",
+      "state": {
+        "translation": [
+          0.0,
+          0.0,
+          -1.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.1,
+      "context": {
+        "mode": "Orbit",
+        "distance": 10.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          0.0
+        ],
+        "roll": 0.0,
+        "zoom": 0.860708,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "orbit_zoom_out_pull",
+      "state": {
+        "translation": [
+          0.0,
+          0.0,
+          0.6
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.016666668,
+      "context": {
+        "mode": "Orbit",
+        "distance": 10.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          0.0
+        ],
+        "roll": 0.0,
+        "zoom": 1.0085433,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "orbit_yaw_ccw_full",
+      "state": {
+        "translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.1,
+      "context": {
+        "mode": "Orbit",
+        "distance": 10.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.15,
+          0.0
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "orbit_pitch_half",
+      "state": {
+        "translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          0.52,
+          0.0,
+          0.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.1,
+      "context": {
+        "mode": "Orbit",
+        "distance": 10.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          0.0375
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "orbit_mixed",
+      "state": {
+        "translation": [
+          0.7,
+          -0.4,
+          0.6
+        ],
+        "rotation": [
+          0.5,
+          -0.8,
+          0.3
+        ],
+        "buttons": 0
+      },
+      "dt": 0.016666668,
+      "context": {
+        "mode": "Orbit",
+        "distance": 7.5,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.3,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.05908203,
+          -0.017578129,
+          0.0
+        ],
+        "orbit": [
+          -0.015668405,
+          0.0057400186
+        ],
+        "roll": 0.0,
+        "zoom": 1.0085433,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "orbit_roll_ignored_horizon_lock_on",
+      "state": {
+        "translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.1,
+      "context": {
+        "mode": "Orbit",
+        "distance": 10.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          0.0
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "orbit_roll_horizon_lock_off",
+      "state": {
+        "translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.1,
+      "context": {
+        "mode": "Orbit",
+        "distance": 10.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": false,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          0.0
+        ],
+        "roll": 0.15,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "orbit_mixed_horizon_lock_off",
+      "state": {
+        "translation": [
+          0.7,
+          -0.4,
+          0.6
+        ],
+        "rotation": [
+          0.5,
+          -0.8,
+          0.3
+        ],
+        "buttons": 0
+      },
+      "dt": 0.016666668,
+      "context": {
+        "mode": "Orbit",
+        "distance": 7.5,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": false,
+        "pitch": 0.3,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.05908203,
+          -0.017578129,
+          0.0
+        ],
+        "orbit": [
+          -0.015668405,
+          0.0057400186
+        ],
+        "roll": 0.001833768,
+        "zoom": 1.0085433,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "orbit_pitch_clamp_up_near_limit",
+      "state": {
+        "translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.1,
+      "context": {
+        "mode": "Orbit",
+        "distance": 5.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 1.5433431,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          0.00999999
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "orbit_pitch_clamp_up_at_limit",
+      "state": {
+        "translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.1,
+      "context": {
+        "mode": "Orbit",
+        "distance": 5.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 1.553343,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          0.0
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "orbit_pitch_back_inside_from_limit",
+      "state": {
+        "translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          -1.0,
+          0.0,
+          0.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.1,
+      "context": {
+        "mode": "Orbit",
+        "distance": 5.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 1.553343,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          -0.15
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "orbit_pitch_clamp_down_near_limit",
+      "state": {
+        "translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          -1.0,
+          0.0,
+          0.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.1,
+      "context": {
+        "mode": "Orbit",
+        "distance": 5.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": -1.5333431,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          -0.01999998
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "orbit_pitch_no_clamp_horizon_lock_off",
+      "state": {
+        "translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.1,
+      "context": {
+        "mode": "Orbit",
+        "distance": 5.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": false,
+        "pitch": 1.553343,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          0.15
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "orbit_dominant_on",
+      "state": {
+        "translation": [
+          0.7,
+          -0.4,
+          0.6
+        ],
+        "rotation": [
+          0.5,
+          -0.8,
+          0.3
+        ],
+        "buttons": 0
+      },
+      "dt": 0.016666668,
+      "context": {
+        "mode": "Orbit",
+        "distance": 7.5,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": true,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          -0.015668405,
+          0.0
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "orbit_dominant_on_translation_wins",
+      "state": {
+        "translation": [
+          0.9,
+          0.2,
+          -0.3
+        ],
+        "rotation": [
+          0.1,
+          0.5,
+          0.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.016666668,
+      "context": {
+        "mode": "Orbit",
+        "distance": 3.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": true,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.040125873,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          0.0
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "orbit_invert_x_and_ry",
+      "state": {
+        "translation": [
+          0.7,
+          -0.4,
+          0.6
+        ],
+        "rotation": [
+          0.5,
+          -0.8,
+          0.3
+        ],
+        "buttons": 0
+      },
+      "dt": 0.016666668,
+      "context": {
+        "mode": "Orbit",
+        "distance": 7.5,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          true,
+          false,
+          false,
+          false,
+          true,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          -0.05908203,
+          -0.017578129,
+          0.0
+        ],
+        "orbit": [
+          0.015668405,
+          0.0057400186
+        ],
+        "roll": 0.0,
+        "zoom": 1.0085433,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "orbit_invert_all",
+      "state": {
+        "translation": [
+          0.7,
+          -0.4,
+          0.6
+        ],
+        "rotation": [
+          0.5,
+          -0.8,
+          0.3
+        ],
+        "buttons": 0
+      },
+      "dt": 0.016666668,
+      "context": {
+        "mode": "Orbit",
+        "distance": 7.5,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      "delta": {
+        "pan": [
+          -0.05908203,
+          0.017578129,
+          0.0
+        ],
+        "orbit": [
+          0.015668405,
+          -0.0057400186
+        ],
+        "roll": 0.0,
+        "zoom": 0.9915291,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "orbit_sensitivity_min_0_1",
+      "state": {
+        "translation": [
+          0.7,
+          -0.4,
+          0.6
+        ],
+        "rotation": [
+          0.5,
+          -0.8,
+          0.3
+        ],
+        "buttons": 0
+      },
+      "dt": 0.016666668,
+      "context": {
+        "mode": "Orbit",
+        "distance": 7.5,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 0.1,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.005908204,
+          -0.001757813,
+          0.0
+        ],
+        "orbit": [
+          -0.0015668406,
+          0.0005740018
+        ],
+        "roll": 0.0,
+        "zoom": 1.000851,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "orbit_sensitivity_max_4_0",
+      "state": {
+        "translation": [
+          0.7,
+          -0.4,
+          0.6
+        ],
+        "rotation": [
+          0.5,
+          -0.8,
+          0.3
+        ],
+        "buttons": 0
+      },
+      "dt": 0.016666668,
+      "context": {
+        "mode": "Orbit",
+        "distance": 7.5,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 4.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.23632812,
+          -0.070312515,
+          0.0
+        ],
+        "orbit": [
+          -0.06267362,
+          0.022960074
+        ],
+        "roll": 0.0,
+        "zoom": 1.0346134,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "orbit_sensitivity_above_max_clamped",
+      "state": {
+        "translation": [
+          0.7,
+          -0.4,
+          0.6
+        ],
+        "rotation": [
+          0.5,
+          -0.8,
+          0.3
+        ],
+        "buttons": 0
+      },
+      "dt": 0.016666668,
+      "context": {
+        "mode": "Orbit",
+        "distance": 7.5,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 10.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.23632812,
+          -0.070312515,
+          0.0
+        ],
+        "orbit": [
+          -0.06267362,
+          0.022960074
+        ],
+        "roll": 0.0,
+        "zoom": 1.0346134,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "orbit_dt_above_clamp_0_25",
+      "state": {
+        "translation": [
+          0.7,
+          -0.4,
+          0.6
+        ],
+        "rotation": [
+          0.5,
+          -0.8,
+          0.3
+        ],
+        "buttons": 0
+      },
+      "dt": 0.25,
+      "context": {
+        "mode": "Orbit",
+        "distance": 7.5,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.3544922,
+          -0.10546877,
+          0.0
+        ],
+        "orbit": [
+          -0.09401043,
+          0.034440108
+        ],
+        "roll": 0.0,
+        "zoom": 1.0523667,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "orbit_dt_144_fps",
+      "state": {
+        "translation": [
+          0.7,
+          -0.4,
+          0.6
+        ],
+        "rotation": [
+          0.5,
+          -0.8,
+          0.3
+        ],
+        "buttons": 0
+      },
+      "dt": 0.0069444445,
+      "context": {
+        "mode": "Orbit",
+        "distance": 7.5,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.024617512,
+          -0.00732422,
+          0.0
+        ],
+        "orbit": [
+          -0.006528502,
+          0.002391674
+        ],
+        "roll": 0.0,
+        "zoom": 1.0035509,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "dead_zone_just_below_0_0399",
+      "state": {
+        "translation": [
+          0.0399,
+          -0.0399,
+          0.0399
+        ],
+        "rotation": [
+          0.0399,
+          -0.0399,
+          0.0399
+        ],
+        "buttons": 0
+      },
+      "dt": 0.1,
+      "context": {
+        "mode": "Orbit",
+        "distance": 100.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          -0.0,
+          0.0
+        ],
+        "orbit": [
+          -0.0,
+          0.0
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "dead_zone_at_edge_0_04",
+      "state": {
+        "translation": [
+          0.04,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          0.0,
+          -0.04,
+          0.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.1,
+      "context": {
+        "mode": "Orbit",
+        "distance": 100.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          -0.0,
+          0.0
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "dead_zone_just_above_0_0401",
+      "state": {
+        "translation": [
+          0.0401,
+          -0.0401,
+          0.0401
+        ],
+        "rotation": [
+          0.0401,
+          -0.0401,
+          0.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.1,
+      "context": {
+        "mode": "Orbit",
+        "distance": 100.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          1.0851061e-7,
+          -1.0851061e-7,
+          0.0
+        ],
+        "orbit": [
+          -1.6276592e-9,
+          1.6276592e-9
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "dead_zone_above_0_05",
+      "state": {
+        "translation": [
+          0.05,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          0.0,
+          0.05,
+          0.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.1,
+      "context": {
+        "mode": "Orbit",
+        "distance": 100.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0010850698,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.00001627605,
+          0.0
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "fly_translate_all",
+      "state": {
+        "translation": [
+          1.0,
+          0.52,
+          -1.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.1,
+      "context": {
+        "mode": "Fly",
+        "distance": 1.0,
+        "scene_scale": 20.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          0.0
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          2.0,
+          0.5,
+          -2.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "fly_turn_horizon_lock_on",
+      "state": {
+        "translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          0.6,
+          -1.0,
+          1.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.016666668,
+      "context": {
+        "mode": "Fly",
+        "distance": 1.0,
+        "scene_scale": 20.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.2,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          -0.025000002,
+          0.008506946
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "fly_roll_horizon_lock_off",
+      "state": {
+        "translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          0.6,
+          -1.0,
+          1.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.016666668,
+      "context": {
+        "mode": "Fly",
+        "distance": 1.0,
+        "scene_scale": 20.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": false,
+        "pitch": 0.2,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          -0.025000002,
+          0.008506946
+        ],
+        "roll": 0.025000002,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "fly_pitch_clamp",
+      "state": {
+        "translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.1,
+      "context": {
+        "mode": "Fly",
+        "distance": 1.0,
+        "scene_scale": 20.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 1.5033431,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          0.049999952
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "fly_mixed_sensitivity_2",
+      "state": {
+        "translation": [
+          0.7,
+          -0.4,
+          0.6
+        ],
+        "rotation": [
+          0.5,
+          -0.8,
+          0.3
+        ],
+        "buttons": 0
+      },
+      "dt": 0.016666668,
+      "context": {
+        "mode": "Fly",
+        "distance": 1.0,
+        "scene_scale": 3.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 2.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          -0.03133681,
+          0.011480037
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.04726563,
+          -0.014062504,
+          0.034027785
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "turntable_mixed",
+      "state": {
+        "translation": [
+          0.7,
+          -0.4,
+          0.6
+        ],
+        "rotation": [
+          0.5,
+          -0.8,
+          0.3
+        ],
+        "buttons": 0
+      },
+      "dt": 0.016666668,
+      "context": {
+        "mode": "Turntable",
+        "distance": 7.5,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.3,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.05908203,
+          -0.017578129,
+          0.0
+        ],
+        "orbit": [
+          -0.015668405,
+          0.0057400186
+        ],
+        "roll": 0.0,
+        "zoom": 1.0085433,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "turntable_pitch_clamp",
+      "state": {
+        "translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          1.0,
+          0.5,
+          0.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.1,
+      "context": {
+        "mode": "Turntable",
+        "distance": 2.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 1.5433431,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.034440108,
+          0.00999999
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "view2d_pan_and_zoom_in",
+      "state": {
+        "translation": [
+          1.0,
+          0.52,
+          -1.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.1,
+      "context": {
+        "mode": "View2D",
+        "distance": 1.0,
+        "scene_scale": 1.0,
+        "visible_extent": 200.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          20.0,
+          5.0,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          0.0
+        ],
+        "roll": 0.0,
+        "zoom": 0.860708,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "view2d_rotation_unused",
+      "state": {
+        "translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.1,
+      "context": {
+        "mode": "View2D",
+        "distance": 1.0,
+        "scene_scale": 1.0,
+        "visible_extent": 200.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          0.0
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "view2d_mixed",
+      "state": {
+        "translation": [
+          0.7,
+          -0.4,
+          0.6
+        ],
+        "rotation": [
+          0.5,
+          -0.8,
+          0.3
+        ],
+        "buttons": 0
+      },
+      "dt": 0.016666668,
+      "context": {
+        "mode": "View2D",
+        "distance": 1.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1080.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          8.5078125,
+          -2.5312505,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          0.0
+        ],
+        "roll": 0.0,
+        "zoom": 1.0085433,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "timeline_scrub_forward_full",
+      "state": {
+        "translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.1,
+      "context": {
+        "mode": "Timeline",
+        "distance": 1.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 30.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          0.0
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 3.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "timeline_scrub_back_half_zoom_out",
+      "state": {
+        "translation": [
+          0.0,
+          0.0,
+          0.6
+        ],
+        "rotation": [
+          0.0,
+          -0.52,
+          0.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.1,
+      "context": {
+        "mode": "Timeline",
+        "distance": 1.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 30.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          0.0
+        ],
+        "roll": 0.0,
+        "zoom": 1.0523667,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": -0.75,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "timeline_unit_span_fraction",
+      "state": {
+        "translation": [
+          0.7,
+          -0.4,
+          0.6
+        ],
+        "rotation": [
+          0.5,
+          -0.8,
+          0.3
+        ],
+        "buttons": 0
+      },
+      "dt": 0.016666668,
+      "context": {
+        "mode": "Timeline",
+        "distance": 1.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          0.0
+        ],
+        "roll": 0.0,
+        "zoom": 1.0085433,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": -0.010445603,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "step_below_threshold_0_7",
+      "state": {
+        "translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          -0.7
+        ],
+        "buttons": 0
+      },
+      "dt": 0.016666668,
+      "context": {
+        "mode": "Step",
+        "distance": 1.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          0.0
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "step_crossing_right_0_72",
+      "state": {
+        "translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          -0.72
+        ],
+        "buttons": 0
+      },
+      "dt": 0.016666668,
+      "context": {
+        "mode": "Step",
+        "distance": 1.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          0.0
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 1,
+        "step_held": 1.1754944e-38
+      }
+    },
+    {
+      "name": "step_crossing_left_full",
+      "state": {
+        "translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.016666668,
+      "context": {
+        "mode": "Step",
+        "distance": 1.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          0.0
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": -1,
+        "step_held": 1.1754944e-38
+      }
+    },
+    {
+      "name": "step_held_after_crossing",
+      "state": {
+        "translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          -1.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.016666668,
+      "context": {
+        "mode": "Step",
+        "distance": 1.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 1.1754944e-38,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          0.0
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.016666668
+      }
+    },
+    {
+      "name": "step_held_between_repeats",
+      "state": {
+        "translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          -1.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.016666668,
+      "context": {
+        "mode": "Step",
+        "distance": 1.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.2,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          0.0
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.21666667
+      }
+    },
+    {
+      "name": "step_repeat_at_0_35",
+      "state": {
+        "translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          -1.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.016666668,
+      "context": {
+        "mode": "Step",
+        "distance": 1.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.34,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          0.0
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 1,
+        "step_held": 0.35666668
+      }
+    },
+    {
+      "name": "step_second_repeat_at_0_70",
+      "state": {
+        "translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.016666668,
+      "context": {
+        "mode": "Step",
+        "distance": 1.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.69,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          0.0
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": -1,
+        "step_held": 0.70666665
+      }
+    },
+    {
+      "name": "step_released",
+      "state": {
+        "translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.016666668,
+      "context": {
+        "mode": "Step",
+        "distance": 1.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.5,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          0.0
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    },
+    {
+      "name": "step_ignores_other_axes",
+      "state": {
+        "translation": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "rotation": [
+          1.0,
+          1.0,
+          0.0
+        ],
+        "buttons": 0
+      },
+      "dt": 0.016666668,
+      "context": {
+        "mode": "Step",
+        "distance": 1.0,
+        "scene_scale": 1.0,
+        "visible_extent": 1.0,
+        "visible_span": 1.0,
+        "horizon_lock": true,
+        "pitch": 0.0,
+        "step_held": 0.0,
+        "dominant": false,
+        "sensitivity": 1.0,
+        "invert": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "delta": {
+        "pan": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "orbit": [
+          0.0,
+          0.0
+        ],
+        "roll": 0.0,
+        "zoom": 1.0,
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scrub": 0.0,
+        "step": 0,
+        "step_held": 0.0
+      }
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+# Oracle for wall-blocks-the-ray: the calls a careful agent makes after the setup.
+{"method":"scene.spawn","params":{"name":"Wall","components":{"Transform":{"translation":[5,1.5,0]},"RigidBody":{"kind":"Static"},"Collider":{"shape":{"Box":{"half_extents":[0.5,1.5,2]}}}}}}
+{"method":"play.pause"}
+{"method":"play.step","params":{"frames":10}}

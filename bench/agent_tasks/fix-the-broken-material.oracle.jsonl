@@ -1,0 +1,3 @@
+# Oracle for fix-the-broken-material: the calls a careful agent makes after the setup.
+{"method":"material.compile","params":{"name":"hull"}}
+{"method":"material.graph_set","params":{"name":"hull","output":{"base_color":"tint"}}}

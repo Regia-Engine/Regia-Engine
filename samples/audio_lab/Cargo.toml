@@ -1,0 +1,19 @@
+[package]
+name = "audio_lab"
+description = "M8 sample: orbiting emitters, music crossfade, snapshots, cues, 200-voice bursts, an engine patch and announcer ducking, driven live."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT-0"
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+regia = { workspace = true }
+regia_audio = { workspace = true }
+regia_asset = { workspace = true }
+regia_scene = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }

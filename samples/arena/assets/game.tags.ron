@@ -1,0 +1,19 @@
+// Gameplay tags of samples/arena (ADR-1463). A typo in any asset below is a load error.
+(
+    version: 1,
+    description: "samples/arena tags",
+    tags: [
+        (name: "Team.Bot", description: "A bot-driven pawn"),
+        (name: "Team.Player", description: "The local player's pawn"),
+        (name: "Weapon.Rifle", description: "The hitscan rifle ability"),
+        (name: "Weapon.Rocket", description: "The pooled rocket ability"),
+        (name: "Cooldown.Rifle", description: "The rifle (and every shot) is cooling down"),
+        (name: "Cooldown.Rocket", description: "The rocket launcher is cooling down"),
+        (name: "State.Firing", description: "A weapon ability is running"),
+        (name: "State.Resupplying", description: "The pawn is using a resupply station"),
+        (name: "Effect.Ammo.Cost", description: "Ammunition spent by a shot"),
+        (name: "Effect.Ammo.Refill", description: "Ammunition restored at a station or on respawn"),
+        (name: "Activity.Resupply", description: "A smart-object slot that restocks ammunition"),
+        (name: "Cue.Resupply", description: "Presentation cue: a pawn restocked"),
+    ],
+)

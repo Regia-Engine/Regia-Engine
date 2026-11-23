@@ -1,0 +1,221 @@
+{
+  "bake": {
+    "front_still": false,
+    "probes": true,
+    "transport_tables": false
+  },
+  "camera_default": {
+    "distance_mm": 60,
+    "f_stop": 11,
+    "focal_length_mm": 100
+  },
+  "checks": {},
+  "design_key": "house-a/d0001",
+  "dims_mm": [
+    {
+      "confidence": 0.5,
+      "name": "width",
+      "source": "rule",
+      "value": 4.1
+    }
+  ],
+  "drives": [
+    {
+      "group": "Material",
+      "to": {
+        "material_zone": "body"
+      }
+    },
+    {
+      "group": "Anodization",
+      "to": {
+        "material_zone": "body"
+      }
+    },
+    {
+      "group": "Extras",
+      "to": {
+        "material_zone": "body"
+      }
+    },
+    {
+      "group": "Gem",
+      "to": {
+        "material_zone": "gem:s1"
+      }
+    },
+    {
+      "group": "Gem Size",
+      "to": {
+        "map": {
+          "3x1.5mm": 3.0,
+          "4x2mm": 4.0
+        },
+        "value": "mq_l"
+      }
+    },
+    {
+      "group": "Gem Size",
+      "to": {
+        "map": {
+          "3x1.5mm": 1.5,
+          "4x2mm": 2.0
+        },
+        "value": "mq_w"
+      }
+    },
+    {
+      "group": "Threading",
+      "to": {
+        "map": {
+          "Threaded": "shared/prong-head-4@1",
+          "Threadless": "shared/threadless-end-base@1"
+        },
+        "part_swap": "base"
+      }
+    }
+  ],
+  "fidelity": {
+    "back_sides": "plausible",
+    "front": "photo",
+    "height_source": "rule"
+  },
+  "gem_slots": [
+    {
+      "at": {
+        "origin_mm": [
+          0,
+          0,
+          0.6
+        ],
+        "up": [
+          0,
+          1,
+          0
+        ],
+        "z_axis": [
+          0,
+          0,
+          1
+        ]
+      },
+      "count": 1,
+      "cut": "marquise",
+      "material_slot": "gem:s1",
+      "pattern": null,
+      "role": "center",
+      "setting": {
+        "kind": "bezel",
+        "variant": "closed"
+      },
+      "size_mm": [
+        "$mq_l",
+        "$mq_w"
+      ],
+      "slot_id": "s1"
+    }
+  ],
+  "house": "house-a",
+  "material_zones": [
+    {
+      "kind": "metal",
+      "zone": "body"
+    },
+    {
+      "kind": "gem",
+      "zone": "gem:s1"
+    }
+  ],
+  "modelling_class": "end-single-gem",
+  "no_visual": [
+    "Gauge",
+    "Engraving"
+  ],
+  "option_graph": {
+    "content_hashes": {
+      "house-a/p0001": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "snapshot_id": "2026-11-04-000000000000"
+  },
+  "parts": [
+    {
+      "at": {
+        "socket": null
+      },
+      "instance_id": "base",
+      "params": {},
+      "part_ref": "shared/threadless-end-base@1"
+    },
+    {
+      "at": {
+        "socket": "base.top"
+      },
+      "instance_id": "cup",
+      "params": {},
+      "part_ref": "shared/bezel-cup-marquise@1"
+    }
+  ],
+  "product_keys": [
+    "house-a/p0001"
+  ],
+  "provenance": {
+    "by": "synthetic",
+    "numbers": {}
+  },
+  "recipe_version": 2,
+  "schema": "jewelry.piece_recipe/1",
+  "shop_photos": [],
+  "units": "mm",
+  "values": {
+    "mq_l": 3.0,
+    "mq_w": 1.5
+  },
+  "view_range": {
+    "back": "plausible",
+    "front_axis": [
+      0,
+      0,
+      1
+    ],
+    "max_px_per_mm": 400,
+    "pan_bounds_mm": [
+      [
+        -3,
+        3
+      ],
+      [
+        -3,
+        3
+      ]
+    ],
+    "rock_max_deg": null,
+    "spin": "none",
+    "tilt_max_deg": 30
+  },
+  "wear": {
+    "handed": "none",
+    "mirror_pair": null,
+    "presets": [
+      {
+        "label": "Default",
+        "mirror": false,
+        "preset_id": "default",
+        "rotation_deg": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "label": "Flipped",
+        "mirror": true,
+        "preset_id": "flipped",
+        "rotation_deg": [
+          0,
+          0,
+          180
+        ]
+      }
+    ]
+  }
+}

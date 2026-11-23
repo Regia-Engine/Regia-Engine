@@ -1,0 +1,4 @@
+(format_version: 1, name: "heal_full", description: "Respawn: health back to its maximum",
+ lifetime: Instant,
+ base_edits: [(attribute: "health", op: AddPre, amount: Stat(side: Target, attribute: "health_max", read: AtApply, weight: 1.0, offset: 0.0))],
+ kind_tags: ["Effect.Heal"])

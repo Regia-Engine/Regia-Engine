@@ -1,0 +1,58 @@
+{
+  "design_key": "house-a/d0001",
+  "files": [
+    {
+      "blake3": "4eed7141ea4a5cd4b788606bd23f46e212af9cacebacdc7d1f4c6dc7f2511b98",
+      "kind": "mesh",
+      "name": "mesh.rvm",
+      "size": 64
+    },
+    {
+      "blake3": "e7eb1dc9470e825e3e7c254eeb70ba6db337d1b2c64b4af6731ef31a99adc042",
+      "kind": "luts",
+      "name": "luts.bin",
+      "size": 32
+    },
+    {
+      "blake3": "8ed9ceb82a1fa8fb03d05f827da64365e63bbc46a261a53f658a7ceb7805dc0f",
+      "kind": "recipe",
+      "name": "recipe.json",
+      "size": 561
+    },
+    {
+      "blake3": "a38a8049f27bc89711624ba09deb53b252096fa1c6e61f1f14b29fff5ff771d6",
+      "kind": "options",
+      "name": "options.json",
+      "size": 476
+    },
+    {
+      "blake3": "651d7185b2068c911b7003e030ede8ca5c4c1be66771aef92ab970005e566db7",
+      "kind": "materials",
+      "name": "materials.json",
+      "size": 1221
+    }
+  ],
+  "format_version": 1,
+  "house": "house-a",
+  "package_hash": "703330ca9dca7a1f7f5062d808394e8a81c60cf114cb95e00304921a7dc5f563",
+  "package_version": 1,
+  "product_key": "house-a/p0001",
+  "recipe": {
+    "design_key": "house-a/d0001",
+    "hash": "sha256:bed3e080e71fb52e74fd3cf3563bb0958a7d6d5958f2c75b1000cdb5ca98caf0",
+    "version": 1
+  },
+  "regia_min_version": "0.2.14",
+  "schema": "jewelry.product_package/1",
+  "sizes": {
+    "data": 2258,
+    "luts": 32,
+    "mesh": 64,
+    "total": 2354
+  },
+  "snapshot_id": "2026-11-04-000000000000",
+  "studio": {
+    "blake3": "f0acf9741d7f1ea7bd9e63f963ba61ee5ddac3af8acbb22373fef2104031ea1e",
+    "studio_id": "studio-soft-1"
+  }
+}

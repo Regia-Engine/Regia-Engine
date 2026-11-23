@@ -1,0 +1,16 @@
+// A packed ORM map from three grayscale maps (docs/formats/texpack-ron.md).
+(
+    format_version: 1,
+    sources: {
+        "ao": "rock_ao.png",
+        "rough": "rock_rough.png",
+        "metal": "rock_metal.png",
+    },
+    r: Source(source: "ao", channel: "r"),
+    g: Source(source: "rough", channel: "r"),
+    b: Source(source: "metal", channel: "r"),
+    a: Constant(1.0),
+    size_mismatch: resize_to_largest,
+    size: None,
+    usage: Some(linear),
+)

@@ -1,0 +1,21 @@
+// A race (ADR-8748): one lap of a four-gate square; ten ticks after the winner, the rest are DNF.
+(
+    format_version: 1,
+    id: "race_sprint",
+    name_key: "mode.race_sprint",
+    skeleton: "custom",
+    session: (
+        flow: (start_delay_ticks: 0),
+        race: (
+            checkpoints: [
+                (id: 10, volume: (min: (-3.0, -1.0, -3.0), max: (3.0, 3.0, 3.0)), next: [20]),
+                (id: 20, volume: (min: (97.0, -1.0, -3.0), max: (103.0, 3.0, 3.0)), next: [30]),
+                (id: 30, volume: (min: (97.0, -1.0, 97.0), max: (103.0, 3.0, 103.0)), next: [40]),
+                (id: 40, volume: (min: (-3.0, -1.0, 97.0), max: (3.0, 3.0, 103.0)), next: [10]),
+            ],
+            laps: 1,
+            finish_window_ticks: 10,
+            wrong_way_ticks: 30,
+        ),
+    ),
+)

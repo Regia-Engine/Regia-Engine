@@ -1,0 +1,21 @@
+{
+    "regia_framework::functional::FunctionalTest": (
+        format_version: 1,
+        enabled: true,
+        description: "door opens",
+        owner: "gameplay",
+        tags: [
+            "doors",
+            "smoke",
+        ],
+        frame_limit: 1800,
+        ready_limit: 600,
+        on_limit: Failed,
+        viewpoint: None,
+        settings: [
+            ("render.quality", "low"),
+        ],
+        body: Script("tests/door_opens.functest.ron"),
+        reset_expected: false,
+    ),
+}

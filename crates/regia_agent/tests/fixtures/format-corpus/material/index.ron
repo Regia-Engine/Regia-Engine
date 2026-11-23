@@ -1,0 +1,47 @@
+(
+    format: "material",
+    entries: [
+        (
+            version: 1,
+            file: "v1.material.ron",
+            origin: "git 5be03c6a81a9de5d7b6fdb6c199b97078ce4585c:docs/formats/material.example.ron",
+            exercises: "baseline: layers, clearcoat, base maps, render_state without alpha_cutoff",
+        ),
+        (
+            version: 2,
+            file: "v2.material.ron",
+            origin: "git b1f42db0cd78087932387bfcd730b18787c71ffc:docs/formats/material-v2.example.ron",
+            exercises: "adds anisotropy and the hard_surface block (detail, parallax, edge_wear, multi_scatter, specular_occlusion)",
+        ),
+        (
+            version: 3,
+            file: "v3.material.ron",
+            origin: "git 5db5b0d4ea81efb09c04551814c6ab3d5249fe89:docs/formats/material-v3.example.ron",
+            exercises: "adds base emissive_strength, orm_packed, ior and the transmission block; render_state alpha_cutoff",
+        ),
+        (
+            version: 4,
+            file: "v4.material.ron",
+            origin: "git ecfc13c38cc7ea28265f727990fb54efd5bb1a7d:docs/formats/material-v4.example.ron",
+            exercises: "adds the thin_film block",
+        ),
+        (
+            version: 5,
+            file: "v5.material.ron",
+            origin: "git 244d7cf62829c5a7d8237bd7ccd593cc673d4ff7:docs/formats/material-v5.example.ron",
+            exercises: "adds the optional weather block (porosity, wet, snow, puddles)",
+        ),
+        (
+            version: 6,
+            file: "v6.material.ron",
+            origin: "git fad13b750a6ad7d898098985e107d87faa55d82a:docs/formats/material-v6.example.ron",
+            exercises: "adds the subsurface block (profile, radius, tint)",
+        ),
+        (
+            version: 7,
+            file: "v7.ron",
+            origin: "registry fixture (version 3) loaded and re-encoded by the loader at version 7",
+            exercises: "the current version: what the loader writes today must stay readable",
+        ),
+    ],
+)

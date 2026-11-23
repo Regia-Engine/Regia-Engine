@@ -1,0 +1,11 @@
+host: mode=Unsalted edit=layout sim=inproc gens=20 os=windows abi=57d5783c076051c4
+gen  1 A build    3513 ms | swap   18.5 ms (unload 0.0, snap 0.0, teardown 0.0, load 18.1, register 0.3, restore 0.0, on_load 0.1) | 1st frame 3.8 ms | rss 16.1 MB | restored 0 comps/0 res, defaulted 0, dropped 0 | sim tick 0ΓåÆ1 | Mover TypeId(0xeab2bddc708f89a2255f32f43fe0f980) | 
+SUMMARY reloads=1 median: build 3262 ms, swap 0.0 ms (unload 7.4, snapshot 6.2, teardown 1.2, load 16.8, register 0.2, restore 0.0, on_load 0.0), first frame 0.0 ms; max build 3262 ms; rss start 12.7 MB, after gen1 16.1 MB, end 0.0 MB (-16.11 MB/reload)
+host.exe : FAILED: gen 2: UNSOUND ΓÇö TypeId reused with a different layout: game::generated::Mover (registered 16 B, 
+new 24 B). bevy_ecs would store the new type in the old column layout. Reload refused.
+At C:\spike\matrix.ps1:17 char:3
++   & .\target\debug\host.exe --mode $r[0] --edit $r[1] --sim $r[2] --g ...
++   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (FAILED: gen 2: ...Reload refused.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 

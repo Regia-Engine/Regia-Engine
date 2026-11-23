@@ -1,0 +1,5260 @@
+{
+  "format": "regia-net-soak",
+  "version": 1,
+  "plan": "gate",
+  "label": "v0.5.0-59ff4b61d",
+  "passed": false,
+  "known_blocker_failures": 10,
+  "new_failures": 6,
+  "results": [
+    {
+      "label": "clean/8/dedicated",
+      "scenario": {
+        "profile": {
+          "name": "clean",
+          "summary": "1 ms one way, nothing else",
+          "up": {
+            "latency_ms": 1,
+            "jitter_ms": 0,
+            "loss": 0.0,
+            "burst": null,
+            "reorder": 0.0,
+            "reorder_ms": 0,
+            "duplicate": 0.0,
+            "bandwidth_bps": 0,
+            "queue_bytes": 0,
+            "mtu": 0
+          },
+          "down": {
+            "latency_ms": 1,
+            "jitter_ms": 0,
+            "loss": 0.0,
+            "burst": null,
+            "reorder": 0.0,
+            "reorder_ms": 0,
+            "duplicate": 0.0,
+            "bandwidth_bps": 0,
+            "queue_bytes": 0,
+            "mtu": 0
+          },
+          "flaps": null,
+          "long_outage_ms": null,
+          "rebind_at": null,
+          "hostile": false
+        },
+        "clients": 8,
+        "mode": "dedicated",
+        "seed": 1592590337,
+        "duration_ms": 60000
+      },
+      "passed": false,
+      "bars": [
+        {
+          "id": "involuntary_disconnects",
+          "passed": true,
+          "detail": "0 involuntary ends (0 excused by outages beyond the timeout)",
+          "known_blockers": []
+        },
+        {
+          "id": "reconnect_within_grace",
+          "passed": true,
+          "detail": "1 rejoins, longest 112 ms after the link was up (grace 3000 ms)",
+          "known_blockers": []
+        },
+        {
+          "id": "no_wedged_client",
+          "passed": false,
+          "detail": "client 2 input_send_failing for 6400 ms from 12036 ms (input send errors {\"too_large\": 192}) [known blocker v051-net-input-mtu]; client 2 server_no_input for 6366 ms from 12100 ms (input send errors {\"too_large\": 289}) [known blocker v051-net-input-mtu]",
+          "known_blockers": [
+            "v051-net-input-mtu"
+          ]
+        }
+      ],
+      "metrics": {
+        "joined": 8,
+        "ends_by_cause": {},
+        "server_ends_by_cause": {},
+        "ends_excused": 0,
+        "connect_refusals": {},
+        "connect_timeouts": 0,
+        "reconnects": 1,
+        "reconnects_ok": 1,
+        "reconnect_max_ms": 112,
+        "inputs_sent": 12633,
+        "input_send_errors": {
+          "too_large": 1426
+        },
+        "inputs_stamped_behind": 0,
+        "server_ticks_with_input": 12902,
+        "server_ticks_missed": 1128,
+        "worst_missed_fraction": 0.15002820078962212,
+        "corrections": 971,
+        "correction_rate": 0.06920390563751692,
+        "correction_steps_p50": 2,
+        "correction_steps_max": 2,
+        "rollback_ticks_p50": 2,
+        "rollback_ticks_p99": 3,
+        "staleness_ticks_p50": 1,
+        "staleness_ticks_p99": 2,
+        "staleness_ticks_max": 2,
+        "worst_client_staleness_p99": 2,
+        "staleness_max_by_10s": [
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2
+        ],
+        "staleness_max_by_client_10s": [
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ]
+        ],
+        "commands_sent": 153,
+        "commands_acked": 153,
+        "command_rtt_p99_ms": 48,
+        "down_bps_mean": 428638,
+        "down_bps_max": 435925,
+        "down_bps_second_half_max": 437018,
+        "up_bps_mean": 99066,
+        "up_bps_max": 110526,
+        "down_budget_bps": 1000000,
+        "up_budget_bps": 256000,
+        "min_entity_budget": 139,
+        "server_tick_us_p50": 193,
+        "server_tick_us_p99": 28366,
+        "server_tick_us_max": 136420,
+        "peak_heap_bytes": 0,
+        "drops": {},
+        "largest_client_datagram": 1200,
+        "largest_server_datagram": 1200
+      },
+      "ends": [],
+      "reconnects": [
+        {
+          "client": 5,
+          "kind": "scripted",
+          "start_ms": 20002,
+          "link_up_ms": 20002,
+          "connected_ms": 20114
+        }
+      ],
+      "wedges": [
+        {
+          "client": 2,
+          "kind": "input_send_failing",
+          "start_ms": 12036,
+          "length_ms": 6400,
+          "send_errors": {
+            "too_large": 192
+          }
+        },
+        {
+          "client": 2,
+          "kind": "server_no_input",
+          "start_ms": 12100,
+          "length_ms": 6366,
+          "send_errors": {
+            "too_large": 289
+          }
+        }
+      ],
+      "hostile": null,
+      "server_totals": {
+        "datagrams_in": 18704,
+        "datagrams_out": 28830,
+        "foreign": 0,
+        "malformed": 0,
+        "accepted": 9,
+        "denied": 0,
+        "socket_errors": 0,
+        "rate_limited": 0,
+        "inbound_dropped": 0,
+        "sealed_out": 28812,
+        "opened_in": 18684,
+        "auth_failed": 2,
+        "replayed": 0,
+        "handshakes": 9,
+        "handshakes_refused": 0,
+        "pre_proof_shed": 0,
+        "rebinds": 0,
+        "rebinds_refused": 0
+      },
+      "wall_ms": 5144,
+      "reproduce": "cargo xtask net-soak --profiles clean --clients 8 --modes dedicated --seed 1592590337 --seconds 60"
+    },
+    {
+      "label": "good-wifi/8/dedicated",
+      "scenario": {
+        "profile": {
+          "name": "good-wifi",
+          "summary": "4 ms + 0-4 ms jitter, 0.2 % loss, 0.1 % reorder, 0.05 % dup, 20/50 Mbit/s",
+          "up": {
+            "latency_ms": 4,
+            "jitter_ms": 4,
+            "loss": 0.002,
+            "burst": null,
+            "reorder": 0.001,
+            "reorder_ms": 10,
+            "duplicate": 0.0005,
+            "bandwidth_bps": 20000000,
+            "queue_bytes": 65536,
+            "mtu": 0
+          },
+          "down": {
+            "latency_ms": 4,
+            "jitter_ms": 4,
+            "loss": 0.002,
+            "burst": null,
+            "reorder": 0.001,
+            "reorder_ms": 10,
+            "duplicate": 0.0005,
+            "bandwidth_bps": 50000000,
+            "queue_bytes": 65536,
+            "mtu": 0
+          },
+          "flaps": null,
+          "long_outage_ms": null,
+          "rebind_at": null,
+          "hostile": false
+        },
+        "clients": 8,
+        "mode": "dedicated",
+        "seed": 1592590337,
+        "duration_ms": 60000
+      },
+      "passed": false,
+      "bars": [
+        {
+          "id": "involuntary_disconnects",
+          "passed": true,
+          "detail": "0 involuntary ends (0 excused by outages beyond the timeout)",
+          "known_blockers": []
+        },
+        {
+          "id": "reconnect_within_grace",
+          "passed": true,
+          "detail": "1 rejoins, longest 112 ms after the link was up (grace 3000 ms)",
+          "known_blockers": []
+        },
+        {
+          "id": "no_wedged_client",
+          "passed": false,
+          "detail": "client 2 input_send_failing for 6448 ms from 12036 ms (input send errors {\"too_large\": 193}) [known blocker v051-net-input-mtu]; client 2 server_no_input for 6400 ms from 12100 ms (input send errors {\"too_large\": 304}) [known blocker v051-net-input-mtu]",
+          "known_blockers": [
+            "v051-net-input-mtu"
+          ]
+        }
+      ],
+      "metrics": {
+        "joined": 8,
+        "ends_by_cause": {},
+        "server_ends_by_cause": {},
+        "ends_excused": 0,
+        "connect_refusals": {},
+        "connect_timeouts": 0,
+        "reconnects": 1,
+        "reconnects_ok": 1,
+        "reconnect_max_ms": 112,
+        "inputs_sent": 12529,
+        "input_send_errors": {
+          "too_large": 1532
+        },
+        "inputs_stamped_behind": 0,
+        "server_ticks_with_input": 12776,
+        "server_ticks_missed": 1254,
+        "worst_missed_fraction": 0.15736040609137056,
+        "corrections": 1084,
+        "correction_rate": 0.07726300784034212,
+        "correction_steps_p50": 2,
+        "correction_steps_max": 2,
+        "rollback_ticks_p50": 2,
+        "rollback_ticks_p99": 3,
+        "staleness_ticks_p50": 1,
+        "staleness_ticks_p99": 2,
+        "staleness_ticks_max": 2,
+        "worst_client_staleness_p99": 2,
+        "staleness_max_by_10s": [
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2
+        ],
+        "staleness_max_by_client_10s": [
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ]
+        ],
+        "commands_sent": 154,
+        "commands_acked": 154,
+        "command_rtt_p99_ms": 64,
+        "down_bps_mean": 427558,
+        "down_bps_max": 435719,
+        "down_bps_second_half_max": 436396,
+        "up_bps_mean": 101978,
+        "up_bps_max": 108892,
+        "down_budget_bps": 1000000,
+        "up_budget_bps": 256000,
+        "min_entity_budget": 139,
+        "server_tick_us_p50": 197,
+        "server_tick_us_p99": 26479,
+        "server_tick_us_max": 120430,
+        "peak_heap_bytes": 0,
+        "drops": {
+          "random": 111
+        },
+        "largest_client_datagram": 1200,
+        "largest_server_datagram": 1200
+      },
+      "ends": [],
+      "reconnects": [
+        {
+          "client": 5,
+          "kind": "scripted",
+          "start_ms": 20002,
+          "link_up_ms": 20002,
+          "connected_ms": 20114
+        }
+      ],
+      "wedges": [
+        {
+          "client": 2,
+          "kind": "input_send_failing",
+          "start_ms": 12036,
+          "length_ms": 6448,
+          "send_errors": {
+            "too_large": 193
+          }
+        },
+        {
+          "client": 2,
+          "kind": "server_no_input",
+          "start_ms": 12100,
+          "length_ms": 6400,
+          "send_errors": {
+            "too_large": 304
+          }
+        }
+      ],
+      "hostile": null,
+      "server_totals": {
+        "datagrams_in": 21485,
+        "datagrams_out": 28361,
+        "foreign": 0,
+        "malformed": 0,
+        "accepted": 9,
+        "denied": 0,
+        "socket_errors": 0,
+        "rate_limited": 0,
+        "inbound_dropped": 0,
+        "sealed_out": 28343,
+        "opened_in": 21458,
+        "auth_failed": 2,
+        "replayed": 7,
+        "handshakes": 9,
+        "handshakes_refused": 0,
+        "pre_proof_shed": 0,
+        "rebinds": 0,
+        "rebinds_refused": 0
+      },
+      "wall_ms": 3940,
+      "reproduce": "cargo xtask net-soak --profiles good-wifi --clients 8 --modes dedicated --seed 1592590337 --seconds 60"
+    },
+    {
+      "label": "bad-wifi/8/dedicated",
+      "scenario": {
+        "profile": {
+          "name": "bad-wifi",
+          "summary": "8 ms + 0-30 ms jitter, 1 % random + Gilbert-Elliott bursts (~3 % total), 1 % reorder, 2/6 Mbit/s",
+          "up": {
+            "latency_ms": 8,
+            "jitter_ms": 30,
+            "loss": 0.01,
+            "burst": {
+              "p_good_to_bad": 0.01,
+              "p_bad_to_good": 0.3,
+              "loss_good": 0.0,
+              "loss_bad": 0.6
+            },
+            "reorder": 0.01,
+            "reorder_ms": 30,
+            "duplicate": 0.005,
+            "bandwidth_bps": 2000000,
+            "queue_bytes": 65536,
+            "mtu": 0
+          },
+          "down": {
+            "latency_ms": 8,
+            "jitter_ms": 30,
+            "loss": 0.01,
+            "burst": {
+              "p_good_to_bad": 0.01,
+              "p_bad_to_good": 0.3,
+              "loss_good": 0.0,
+              "loss_bad": 0.6
+            },
+            "reorder": 0.01,
+            "reorder_ms": 30,
+            "duplicate": 0.005,
+            "bandwidth_bps": 6000000,
+            "queue_bytes": 65536,
+            "mtu": 0
+          },
+          "flaps": null,
+          "long_outage_ms": null,
+          "rebind_at": null,
+          "hostile": false
+        },
+        "clients": 8,
+        "mode": "dedicated",
+        "seed": 1592590337,
+        "duration_ms": 60000
+      },
+      "passed": false,
+      "bars": [
+        {
+          "id": "involuntary_disconnects",
+          "passed": true,
+          "detail": "0 involuntary ends (0 excused by outages beyond the timeout)",
+          "known_blockers": []
+        },
+        {
+          "id": "reconnect_within_grace",
+          "passed": true,
+          "detail": "1 rejoins, longest 272 ms after the link was up (grace 3000 ms)",
+          "known_blockers": []
+        },
+        {
+          "id": "no_wedged_client",
+          "passed": false,
+          "detail": "client 2 input_send_failing for 6432 ms from 12052 ms (input send errors {\"too_large\": 193}) [known blocker v051-net-input-mtu]; client 2 server_no_input for 6434 ms from 12100 ms (input send errors {\"too_large\": 288}) [known blocker v051-net-input-mtu]",
+          "known_blockers": [
+            "v051-net-input-mtu"
+          ]
+        }
+      ],
+      "metrics": {
+        "joined": 8,
+        "ends_by_cause": {},
+        "server_ends_by_cause": {},
+        "ends_excused": 0,
+        "connect_refusals": {},
+        "connect_timeouts": 0,
+        "reconnects": 1,
+        "reconnects_ok": 1,
+        "reconnect_max_ms": 272,
+        "inputs_sent": 12618,
+        "input_send_errors": {
+          "too_large": 1417
+        },
+        "inputs_stamped_behind": 0,
+        "server_ticks_with_input": 12715,
+        "server_ticks_missed": 1288,
+        "worst_missed_fraction": 0.15979672501411632,
+        "corrections": 1107,
+        "correction_rate": 0.08069689459104826,
+        "correction_steps_p50": 2,
+        "correction_steps_max": 6,
+        "rollback_ticks_p50": 3,
+        "rollback_ticks_p99": 4,
+        "staleness_ticks_p50": 2,
+        "staleness_ticks_p99": 3,
+        "staleness_ticks_max": 8,
+        "worst_client_staleness_p99": 4,
+        "staleness_max_by_10s": [
+          5,
+          5,
+          8,
+          7,
+          8,
+          5,
+          1
+        ],
+        "staleness_max_by_client_10s": [
+          [
+            3,
+            3,
+            3,
+            4,
+            3,
+            4,
+            1
+          ],
+          [
+            3,
+            5,
+            3,
+            7,
+            8,
+            4
+          ],
+          [
+            4,
+            3,
+            4,
+            3,
+            4,
+            5
+          ],
+          [
+            3,
+            4,
+            8,
+            5,
+            6,
+            4
+          ],
+          [
+            4,
+            3,
+            6,
+            5,
+            5,
+            4
+          ],
+          [
+            5,
+            4,
+            3,
+            3,
+            4,
+            4
+          ],
+          [
+            3,
+            4,
+            3,
+            3,
+            3,
+            4
+          ],
+          [
+            4,
+            4,
+            7,
+            5,
+            5,
+            3
+          ]
+        ],
+        "commands_sent": 160,
+        "commands_acked": 159,
+        "command_rtt_p99_ms": 352,
+        "down_bps_mean": 311321,
+        "down_bps_max": 419518,
+        "down_bps_second_half_max": 435234,
+        "up_bps_mean": 103229,
+        "up_bps_max": 117696,
+        "down_budget_bps": 1000000,
+        "up_budget_bps": 256000,
+        "min_entity_budget": 8,
+        "server_tick_us_p50": 170,
+        "server_tick_us_p99": 32355,
+        "server_tick_us_max": 316407,
+        "peak_heap_bytes": 0,
+        "drops": {
+          "burst": 879,
+          "random": 470
+        },
+        "largest_client_datagram": 1200,
+        "largest_server_datagram": 1200
+      },
+      "ends": [],
+      "reconnects": [
+        {
+          "client": 5,
+          "kind": "scripted",
+          "start_ms": 20002,
+          "link_up_ms": 20002,
+          "connected_ms": 20274
+        }
+      ],
+      "wedges": [
+        {
+          "client": 2,
+          "kind": "input_send_failing",
+          "start_ms": 12052,
+          "length_ms": 6432,
+          "send_errors": {
+            "too_large": 193
+          }
+        },
+        {
+          "client": 2,
+          "kind": "server_no_input",
+          "start_ms": 12100,
+          "length_ms": 6434,
+          "send_errors": {
+            "too_large": 288
+          }
+        }
+      ],
+      "hostile": null,
+      "server_totals": {
+        "datagrams_in": 20988,
+        "datagrams_out": 23379,
+        "foreign": 0,
+        "malformed": 0,
+        "accepted": 9,
+        "denied": 0,
+        "socket_errors": 0,
+        "rate_limited": 0,
+        "inbound_dropped": 0,
+        "sealed_out": 23361,
+        "opened_in": 20864,
+        "auth_failed": 2,
+        "replayed": 104,
+        "handshakes": 9,
+        "handshakes_refused": 0,
+        "pre_proof_shed": 0,
+        "rebinds": 0,
+        "rebinds_refused": 0
+      },
+      "wall_ms": 4503,
+      "reproduce": "cargo xtask net-soak --profiles bad-wifi --clients 8 --modes dedicated --seed 1592590337 --seconds 60"
+    },
+    {
+      "label": "mobile-4g/8/dedicated",
+      "scenario": {
+        "profile": {
+          "name": "mobile-4g",
+          "summary": "35 ms + 0-25 ms jitter, 0.5 % + bursts, MTU 1232, 2/8 Mbit/s with a 128 KiB queue, one NAT rebinding",
+          "up": {
+            "latency_ms": 35,
+            "jitter_ms": 25,
+            "loss": 0.005,
+            "burst": {
+              "p_good_to_bad": 0.005,
+              "p_bad_to_good": 0.2,
+              "loss_good": 0.0,
+              "loss_bad": 0.5
+            },
+            "reorder": 0.005,
+            "reorder_ms": 40,
+            "duplicate": 0.001,
+            "bandwidth_bps": 2000000,
+            "queue_bytes": 131072,
+            "mtu": 1232
+          },
+          "down": {
+            "latency_ms": 35,
+            "jitter_ms": 25,
+            "loss": 0.005,
+            "burst": {
+              "p_good_to_bad": 0.005,
+              "p_bad_to_good": 0.2,
+              "loss_good": 0.0,
+              "loss_bad": 0.5
+            },
+            "reorder": 0.005,
+            "reorder_ms": 40,
+            "duplicate": 0.001,
+            "bandwidth_bps": 8000000,
+            "queue_bytes": 131072,
+            "mtu": 1232
+          },
+          "flaps": null,
+          "long_outage_ms": null,
+          "rebind_at": 0.4,
+          "hostile": false
+        },
+        "clients": 8,
+        "mode": "dedicated",
+        "seed": 1592590337,
+        "duration_ms": 60000
+      },
+      "passed": false,
+      "bars": [
+        {
+          "id": "involuntary_disconnects",
+          "passed": true,
+          "detail": "0 involuntary ends (0 excused by outages beyond the timeout)",
+          "known_blockers": []
+        },
+        {
+          "id": "reconnect_within_grace",
+          "passed": true,
+          "detail": "1 rejoins, longest 384 ms after the link was up (grace 3000 ms)",
+          "known_blockers": []
+        },
+        {
+          "id": "no_wedged_client",
+          "passed": false,
+          "detail": "client 2 input_send_failing for 6432 ms from 12020 ms (input send errors {\"too_large\": 193}) [known blocker v051-net-input-mtu]; client 2 server_no_input for 6468 ms from 12066 ms (input send errors {\"too_large\": 310}) [known blocker v051-net-input-mtu]",
+          "known_blockers": [
+            "v051-net-input-mtu"
+          ]
+        }
+      ],
+      "metrics": {
+        "joined": 8,
+        "ends_by_cause": {},
+        "server_ends_by_cause": {},
+        "ends_excused": 0,
+        "connect_refusals": {},
+        "connect_timeouts": 0,
+        "reconnects": 1,
+        "reconnects_ok": 1,
+        "reconnect_max_ms": 384,
+        "inputs_sent": 12547,
+        "input_send_errors": {
+          "too_large": 1459
+        },
+        "inputs_stamped_behind": 0,
+        "server_ticks_with_input": 12491,
+        "server_ticks_missed": 1436,
+        "worst_missed_fraction": 0.17253121452894438,
+        "corrections": 1325,
+        "correction_rate": 0.0954679731969162,
+        "correction_steps_p50": 1,
+        "correction_steps_max": 4,
+        "rollback_ticks_p50": 4,
+        "rollback_ticks_p99": 5,
+        "staleness_ticks_p50": 3,
+        "staleness_ticks_p99": 4,
+        "staleness_ticks_max": 6,
+        "worst_client_staleness_p99": 4,
+        "staleness_max_by_10s": [
+          4,
+          5,
+          6,
+          6,
+          5,
+          4,
+          3
+        ],
+        "staleness_max_by_client_10s": [
+          [
+            4,
+            4,
+            6,
+            4,
+            4,
+            4,
+            3
+          ],
+          [
+            4,
+            5,
+            6,
+            4,
+            4,
+            4
+          ],
+          [
+            4,
+            4,
+            5,
+            6,
+            4,
+            4
+          ],
+          [
+            4,
+            4,
+            6,
+            4,
+            4,
+            4
+          ],
+          [
+            4,
+            5,
+            6,
+            4,
+            4,
+            4
+          ],
+          [
+            4,
+            4,
+            6,
+            4,
+            4,
+            4
+          ],
+          [
+            4,
+            4,
+            5,
+            4,
+            4,
+            4
+          ],
+          [
+            4,
+            4,
+            6,
+            4,
+            5,
+            4
+          ]
+        ],
+        "commands_sent": 155,
+        "commands_acked": 154,
+        "command_rtt_p99_ms": 320,
+        "down_bps_mean": 406199,
+        "down_bps_max": 422425,
+        "down_bps_second_half_max": 436506,
+        "up_bps_mean": 101940,
+        "up_bps_max": 115587,
+        "down_budget_bps": 1000000,
+        "up_budget_bps": 256000,
+        "min_entity_budget": 60,
+        "server_tick_us_p50": 210,
+        "server_tick_us_p99": 476,
+        "server_tick_us_max": 48300,
+        "peak_heap_bytes": 0,
+        "drops": {
+          "burst": 574,
+          "no_route": 49,
+          "random": 256
+        },
+        "largest_client_datagram": 1200,
+        "largest_server_datagram": 1200
+      },
+      "ends": [],
+      "reconnects": [
+        {
+          "client": 5,
+          "kind": "scripted",
+          "start_ms": 20002,
+          "link_up_ms": 20002,
+          "connected_ms": 20386
+        }
+      ],
+      "wedges": [
+        {
+          "client": 2,
+          "kind": "input_send_failing",
+          "start_ms": 12020,
+          "length_ms": 6432,
+          "send_errors": {
+            "too_large": 193
+          }
+        },
+        {
+          "client": 2,
+          "kind": "server_no_input",
+          "start_ms": 12066,
+          "length_ms": 6468,
+          "send_errors": {
+            "too_large": 310
+          }
+        }
+      ],
+      "hostile": null,
+      "server_totals": {
+        "datagrams_in": 22993,
+        "datagrams_out": 28157,
+        "foreign": 0,
+        "malformed": 0,
+        "accepted": 9,
+        "denied": 0,
+        "socket_errors": 0,
+        "rate_limited": 0,
+        "inbound_dropped": 0,
+        "sealed_out": 28139,
+        "opened_in": 22942,
+        "auth_failed": 2,
+        "replayed": 31,
+        "handshakes": 9,
+        "handshakes_refused": 0,
+        "pre_proof_shed": 0,
+        "rebinds": 8,
+        "rebinds_refused": 0
+      },
+      "wall_ms": 1247,
+      "reproduce": "cargo xtask net-soak --profiles mobile-4g --clients 8 --modes dedicated --seed 1592590337 --seconds 60"
+    },
+    {
+      "label": "transatlantic/8/dedicated",
+      "scenario": {
+        "profile": {
+          "name": "transatlantic",
+          "summary": "45 ms + 0-6 ms jitter one way (~100 ms RTT), 0.3 % loss, 20/50 Mbit/s",
+          "up": {
+            "latency_ms": 45,
+            "jitter_ms": 6,
+            "loss": 0.003,
+            "burst": null,
+            "reorder": 0.002,
+            "reorder_ms": 15,
+            "duplicate": 0.0,
+            "bandwidth_bps": 20000000,
+            "queue_bytes": 65536,
+            "mtu": 0
+          },
+          "down": {
+            "latency_ms": 45,
+            "jitter_ms": 6,
+            "loss": 0.003,
+            "burst": null,
+            "reorder": 0.002,
+            "reorder_ms": 15,
+            "duplicate": 0.0,
+            "bandwidth_bps": 50000000,
+            "queue_bytes": 65536,
+            "mtu": 0
+          },
+          "flaps": null,
+          "long_outage_ms": null,
+          "rebind_at": null,
+          "hostile": false
+        },
+        "clients": 8,
+        "mode": "dedicated",
+        "seed": 1592590337,
+        "duration_ms": 60000
+      },
+      "passed": false,
+      "bars": [
+        {
+          "id": "involuntary_disconnects",
+          "passed": true,
+          "detail": "0 involuntary ends (0 excused by outages beyond the timeout)",
+          "known_blockers": []
+        },
+        {
+          "id": "reconnect_within_grace",
+          "passed": true,
+          "detail": "1 rejoins, longest 384 ms after the link was up (grace 3000 ms)",
+          "known_blockers": []
+        },
+        {
+          "id": "no_wedged_client",
+          "passed": false,
+          "detail": "client 2 input_send_failing for 6432 ms from 12004 ms (input send errors {\"too_large\": 193}) [known blocker v051-net-input-mtu]; client 2 server_no_input for 6434 ms from 12066 ms (input send errors {\"too_large\": 308}) [known blocker v051-net-input-mtu]",
+          "known_blockers": [
+            "v051-net-input-mtu"
+          ]
+        }
+      ],
+      "metrics": {
+        "joined": 8,
+        "ends_by_cause": {},
+        "server_ends_by_cause": {},
+        "ends_excused": 0,
+        "connect_refusals": {},
+        "connect_timeouts": 0,
+        "reconnects": 1,
+        "reconnects_ok": 1,
+        "reconnect_max_ms": 384,
+        "inputs_sent": 12495,
+        "input_send_errors": {
+          "too_large": 1505
+        },
+        "inputs_stamped_behind": 0,
+        "server_ticks_with_input": 12566,
+        "server_ticks_missed": 1364,
+        "worst_missed_fraction": 0.16685584562996594,
+        "corrections": 1206,
+        "correction_rate": 0.08637112368402206,
+        "correction_steps_p50": 2,
+        "correction_steps_max": 2,
+        "rollback_ticks_p50": 4,
+        "rollback_ticks_p99": 4,
+        "staleness_ticks_p50": 3,
+        "staleness_ticks_p99": 3,
+        "staleness_ticks_max": 4,
+        "worst_client_staleness_p99": 3,
+        "staleness_max_by_10s": [
+          3,
+          3,
+          4,
+          3,
+          3,
+          3,
+          2
+        ],
+        "staleness_max_by_client_10s": [
+          [
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            2
+          ],
+          [
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ],
+          [
+            3,
+            3,
+            4,
+            3,
+            3,
+            3
+          ],
+          [
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ],
+          [
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ],
+          [
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ],
+          [
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ],
+          [
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ]
+        ],
+        "commands_sent": 157,
+        "commands_acked": 157,
+        "command_rtt_p99_ms": 160,
+        "down_bps_mean": 427561,
+        "down_bps_max": 435565,
+        "down_bps_second_half_max": 436701,
+        "up_bps_mean": 102283,
+        "up_bps_max": 116070,
+        "down_budget_bps": 1000000,
+        "up_budget_bps": 256000,
+        "min_entity_budget": 139,
+        "server_tick_us_p50": 202,
+        "server_tick_us_p99": 24285,
+        "server_tick_us_max": 108305,
+        "peak_heap_bytes": 0,
+        "drops": {
+          "random": 166
+        },
+        "largest_client_datagram": 1200,
+        "largest_server_datagram": 1200
+      },
+      "ends": [],
+      "reconnects": [
+        {
+          "client": 5,
+          "kind": "scripted",
+          "start_ms": 20002,
+          "link_up_ms": 20002,
+          "connected_ms": 20386
+        }
+      ],
+      "wedges": [
+        {
+          "client": 2,
+          "kind": "input_send_failing",
+          "start_ms": 12004,
+          "length_ms": 6432,
+          "send_errors": {
+            "too_large": 193
+          }
+        },
+        {
+          "client": 2,
+          "kind": "server_no_input",
+          "start_ms": 12066,
+          "length_ms": 6434,
+          "send_errors": {
+            "too_large": 308
+          }
+        }
+      ],
+      "hostile": null,
+      "server_totals": {
+        "datagrams_in": 24183,
+        "datagrams_out": 28834,
+        "foreign": 0,
+        "malformed": 0,
+        "accepted": 9,
+        "denied": 0,
+        "socket_errors": 0,
+        "rate_limited": 0,
+        "inbound_dropped": 0,
+        "sealed_out": 28816,
+        "opened_in": 24163,
+        "auth_failed": 2,
+        "replayed": 0,
+        "handshakes": 9,
+        "handshakes_refused": 0,
+        "pre_proof_shed": 0,
+        "rebinds": 0,
+        "rebinds_refused": 0
+      },
+      "wall_ms": 3330,
+      "reproduce": "cargo xtask net-soak --profiles transatlantic --clients 8 --modes dedicated --seed 1592590337 --seconds 60"
+    },
+    {
+      "label": "congested/8/dedicated",
+      "scenario": {
+        "profile": {
+          "name": "congested",
+          "summary": "15 ms + 0-10 ms jitter, downstream capped at 256 kbit/s (below the game's ~450 kbit/s) behind a 16 KiB drop-tail queue, 1 Mbit/s up",
+          "up": {
+            "latency_ms": 15,
+            "jitter_ms": 10,
+            "loss": 0.0,
+            "burst": null,
+            "reorder": 0.0,
+            "reorder_ms": 0,
+            "duplicate": 0.0,
+            "bandwidth_bps": 1000000,
+            "queue_bytes": 16384,
+            "mtu": 0
+          },
+          "down": {
+            "latency_ms": 15,
+            "jitter_ms": 10,
+            "loss": 0.0,
+            "burst": null,
+            "reorder": 0.0,
+            "reorder_ms": 0,
+            "duplicate": 0.0,
+            "bandwidth_bps": 256000,
+            "queue_bytes": 16384,
+            "mtu": 0
+          },
+          "flaps": null,
+          "long_outage_ms": null,
+          "rebind_at": null,
+          "hostile": false
+        },
+        "clients": 8,
+        "mode": "dedicated",
+        "seed": 1592590337,
+        "duration_ms": 60000
+      },
+      "passed": false,
+      "bars": [
+        {
+          "id": "involuntary_disconnects",
+          "passed": true,
+          "detail": "0 involuntary ends (0 excused by outages beyond the timeout)",
+          "known_blockers": []
+        },
+        {
+          "id": "reconnect_within_grace",
+          "passed": true,
+          "detail": "1 rejoins, longest 192 ms after the link was up (grace 3000 ms)",
+          "known_blockers": []
+        },
+        {
+          "id": "no_wedged_client",
+          "passed": false,
+          "detail": "client 0 server_no_input for 2034 ms from 5466 ms (input send errors {\"too_large\": 179}); client 0 server_no_input for 7966 ms from 16634 ms (input send errors {\"too_large\": 179}); client 0 server_no_input for 8268 ms from 33966 ms (input send errors {\"too_large\": 179}); client 0 server_no_input for 7966 ms from 51300 ms (input send errors {\"too_large\": 179}); client 1 server_no_input for 2100 ms from 5700 ms (input send errors {\"too_large\": 103}); client 1 server_no_input for 7966 ms from 16900 ms (input send errors {\"too_large\": 103}); client 1 server_no_input for 8666 ms from 34200 ms (input send errors {\"too_large\": 103}); client 1 server_no_input for 8134 ms from 51566 ms (input send errors {\"too_large\": 103}); client 2 server_no_input for 2068 ms from 5966 ms (input send errors {\"too_large\": 306}); client 2 input_send_failing for 6528 ms from 12004 ms (input send errors {\"too_large\": 188}) [known blocker v051-net-input-mtu]; client 2 server_no_input for 13568 ms from 12066 ms (input send errors {\"too_large\": 306}) [known blocker v051-net-input-mtu]; client 2 server_no_input for 8000 ms from 34700 ms (input send errors {\"too_large\": 306}); client 2 server_no_input for 8100 ms from 51700 ms (input send errors {\"too_large\": 306}); client 3 server_no_input for 2366 ms from 5900 ms (input send errors {\"too_large\": 171}); client 3 server_no_input for 8200 ms from 17100 ms (input send errors {\"too_large\": 171}); client 3 server_no_input for 8468 ms from 34466 ms (input send errors {\"too_large\": 171}); client 3 server_no_input for 7934 ms from 51800 ms (input send errors {\"too_large\": 171}); client 4 server_no_input for 2066 ms from 6500 ms (input send errors {\"too_large\": 204}); client 4 server_no_input for 7966 ms from 17634 ms (input send errors {\"too_large\": 204}); client 4 server_no_input for 7934 ms from 35000 ms (input send errors {\"too_large\": 204}); client 4 server_no_input for 7966 ms from 52034 ms (input send errors {\"too_large\": 204}); client 5 server_no_input for 2134 ms from 6666 ms (input send errors {\"too_large\": 160}); client 5 server_no_input for 2368 ms from 24966 ms (input send errors {\"too_large\": 160}); client 5 server_no_input for 8200 ms from 36166 ms (input send errors {\"too_large\": 160}); client 5 server_no_input for 6534 ms from 53466 ms (input send errors {\"too_large\": 160}); client 6 server_no_input for 2166 ms from 6834 ms (input send errors {\"too_large\": 193}); client 6 server_no_input for 8468 ms from 17666 ms (input send errors {\"too_large\": 193}); client 6 server_no_input for 8300 ms from 35134 ms (input send errors {\"too_large\": 193}); client 6 server_no_input for 7500 ms from 52500 ms (input send errors {\"too_large\": 193}); client 7 server_no_input for 2100 ms from 7200 ms (input send errors {\"too_large\": 147}); client 7 server_no_input for 8534 ms from 18400 ms (input send errors {\"too_large\": 147}); client 7 server_no_input for 7966 ms from 35700 ms (input send errors {\"too_large\": 147}); client 7 server_no_input for 7234 ms from 52766 ms (input send errors {\"too_large\": 147})",
+          "known_blockers": []
+        },
+        {
+          "id": "bandwidth_within_budget",
+          "passed": true,
+          "detail": "highest second-half offered downstream 252147 bit/s, cap 256000 bit/s",
+          "known_blockers": []
+        }
+      ],
+      "metrics": {
+        "joined": 8,
+        "ends_by_cause": {},
+        "server_ends_by_cause": {},
+        "ends_excused": 0,
+        "connect_refusals": {},
+        "connect_timeouts": 0,
+        "reconnects": 1,
+        "reconnects_ok": 1,
+        "reconnect_max_ms": 192,
+        "inputs_sent": 12511,
+        "input_send_errors": {
+          "too_large": 1463
+        },
+        "inputs_stamped_behind": 26,
+        "server_ticks_with_input": 7051,
+        "server_ticks_missed": 6965,
+        "worst_missed_fraction": 0.5806997742663657,
+        "corrections": 5764,
+        "correction_rate": 0.41680526429966014,
+        "correction_steps_p50": 2,
+        "correction_steps_max": 4,
+        "rollback_ticks_p50": 10,
+        "rollback_ticks_p99": 24,
+        "staleness_ticks_p50": 5,
+        "staleness_ticks_p99": 24,
+        "staleness_ticks_max": 25,
+        "worst_client_staleness_p99": 24,
+        "staleness_max_by_10s": [
+          25,
+          13,
+          25,
+          13,
+          13,
+          13,
+          1
+        ],
+        "staleness_max_by_client_10s": [
+          [
+            25,
+            13,
+            13,
+            11,
+            10,
+            13,
+            1
+          ],
+          [
+            25,
+            12,
+            10,
+            11,
+            11,
+            11
+          ],
+          [
+            25,
+            11,
+            10,
+            11,
+            10,
+            11
+          ],
+          [
+            25,
+            11,
+            11,
+            11,
+            11,
+            11
+          ],
+          [
+            25,
+            13,
+            13,
+            13,
+            10,
+            11
+          ],
+          [
+            25,
+            7,
+            25,
+            11,
+            11,
+            11
+          ],
+          [
+            25,
+            11,
+            10,
+            12,
+            10,
+            11
+          ],
+          [
+            25,
+            11,
+            11,
+            13,
+            13,
+            11
+          ]
+        ],
+        "commands_sent": 160,
+        "commands_acked": 160,
+        "command_rtt_p99_ms": 1216,
+        "down_bps_mean": 192245,
+        "down_bps_max": 196341,
+        "down_bps_second_half_max": 252147,
+        "up_bps_mean": 99117,
+        "up_bps_max": 107779,
+        "down_budget_bps": 256000,
+        "up_budget_bps": 256000,
+        "min_entity_budget": 8,
+        "server_tick_us_p50": 143,
+        "server_tick_us_p99": 365,
+        "server_tick_us_max": 50656,
+        "peak_heap_bytes": 0,
+        "drops": {
+          "queue": 4202
+        },
+        "largest_client_datagram": 1200,
+        "largest_server_datagram": 1200
+      },
+      "ends": [],
+      "reconnects": [
+        {
+          "client": 5,
+          "kind": "scripted",
+          "start_ms": 20002,
+          "link_up_ms": 20002,
+          "connected_ms": 20194
+        }
+      ],
+      "wedges": [
+        {
+          "client": 0,
+          "kind": "server_no_input",
+          "start_ms": 5466,
+          "length_ms": 2034,
+          "send_errors": {
+            "too_large": 179
+          }
+        },
+        {
+          "client": 0,
+          "kind": "server_no_input",
+          "start_ms": 16634,
+          "length_ms": 7966,
+          "send_errors": {
+            "too_large": 179
+          }
+        },
+        {
+          "client": 0,
+          "kind": "server_no_input",
+          "start_ms": 33966,
+          "length_ms": 8268,
+          "send_errors": {
+            "too_large": 179
+          }
+        },
+        {
+          "client": 0,
+          "kind": "server_no_input",
+          "start_ms": 51300,
+          "length_ms": 7966,
+          "send_errors": {
+            "too_large": 179
+          }
+        },
+        {
+          "client": 1,
+          "kind": "server_no_input",
+          "start_ms": 5700,
+          "length_ms": 2100,
+          "send_errors": {
+            "too_large": 103
+          }
+        },
+        {
+          "client": 1,
+          "kind": "server_no_input",
+          "start_ms": 16900,
+          "length_ms": 7966,
+          "send_errors": {
+            "too_large": 103
+          }
+        },
+        {
+          "client": 1,
+          "kind": "server_no_input",
+          "start_ms": 34200,
+          "length_ms": 8666,
+          "send_errors": {
+            "too_large": 103
+          }
+        },
+        {
+          "client": 1,
+          "kind": "server_no_input",
+          "start_ms": 51566,
+          "length_ms": 8134,
+          "send_errors": {
+            "too_large": 103
+          }
+        },
+        {
+          "client": 2,
+          "kind": "server_no_input",
+          "start_ms": 5966,
+          "length_ms": 2068,
+          "send_errors": {
+            "too_large": 306
+          }
+        },
+        {
+          "client": 2,
+          "kind": "input_send_failing",
+          "start_ms": 12004,
+          "length_ms": 6528,
+          "send_errors": {
+            "too_large": 188
+          }
+        },
+        {
+          "client": 2,
+          "kind": "server_no_input",
+          "start_ms": 12066,
+          "length_ms": 13568,
+          "send_errors": {
+            "too_large": 306
+          }
+        },
+        {
+          "client": 2,
+          "kind": "server_no_input",
+          "start_ms": 34700,
+          "length_ms": 8000,
+          "send_errors": {
+            "too_large": 306
+          }
+        },
+        {
+          "client": 2,
+          "kind": "server_no_input",
+          "start_ms": 51700,
+          "length_ms": 8100,
+          "send_errors": {
+            "too_large": 306
+          }
+        },
+        {
+          "client": 3,
+          "kind": "server_no_input",
+          "start_ms": 5900,
+          "length_ms": 2366,
+          "send_errors": {
+            "too_large": 171
+          }
+        },
+        {
+          "client": 3,
+          "kind": "server_no_input",
+          "start_ms": 17100,
+          "length_ms": 8200,
+          "send_errors": {
+            "too_large": 171
+          }
+        },
+        {
+          "client": 3,
+          "kind": "server_no_input",
+          "start_ms": 34466,
+          "length_ms": 8468,
+          "send_errors": {
+            "too_large": 171
+          }
+        },
+        {
+          "client": 3,
+          "kind": "server_no_input",
+          "start_ms": 51800,
+          "length_ms": 7934,
+          "send_errors": {
+            "too_large": 171
+          }
+        },
+        {
+          "client": 4,
+          "kind": "server_no_input",
+          "start_ms": 6500,
+          "length_ms": 2066,
+          "send_errors": {
+            "too_large": 204
+          }
+        },
+        {
+          "client": 4,
+          "kind": "server_no_input",
+          "start_ms": 17634,
+          "length_ms": 7966,
+          "send_errors": {
+            "too_large": 204
+          }
+        },
+        {
+          "client": 4,
+          "kind": "server_no_input",
+          "start_ms": 35000,
+          "length_ms": 7934,
+          "send_errors": {
+            "too_large": 204
+          }
+        },
+        {
+          "client": 4,
+          "kind": "server_no_input",
+          "start_ms": 52034,
+          "length_ms": 7966,
+          "send_errors": {
+            "too_large": 204
+          }
+        },
+        {
+          "client": 5,
+          "kind": "server_no_input",
+          "start_ms": 6666,
+          "length_ms": 2134,
+          "send_errors": {
+            "too_large": 160
+          }
+        },
+        {
+          "client": 5,
+          "kind": "server_no_input",
+          "start_ms": 24966,
+          "length_ms": 2368,
+          "send_errors": {
+            "too_large": 160
+          }
+        },
+        {
+          "client": 5,
+          "kind": "server_no_input",
+          "start_ms": 36166,
+          "length_ms": 8200,
+          "send_errors": {
+            "too_large": 160
+          }
+        },
+        {
+          "client": 5,
+          "kind": "server_no_input",
+          "start_ms": 53466,
+          "length_ms": 6534,
+          "send_errors": {
+            "too_large": 160
+          }
+        },
+        {
+          "client": 6,
+          "kind": "server_no_input",
+          "start_ms": 6834,
+          "length_ms": 2166,
+          "send_errors": {
+            "too_large": 193
+          }
+        },
+        {
+          "client": 6,
+          "kind": "server_no_input",
+          "start_ms": 17666,
+          "length_ms": 8468,
+          "send_errors": {
+            "too_large": 193
+          }
+        },
+        {
+          "client": 6,
+          "kind": "server_no_input",
+          "start_ms": 35134,
+          "length_ms": 8300,
+          "send_errors": {
+            "too_large": 193
+          }
+        },
+        {
+          "client": 6,
+          "kind": "server_no_input",
+          "start_ms": 52500,
+          "length_ms": 7500,
+          "send_errors": {
+            "too_large": 193
+          }
+        },
+        {
+          "client": 7,
+          "kind": "server_no_input",
+          "start_ms": 7200,
+          "length_ms": 2100,
+          "send_errors": {
+            "too_large": 147
+          }
+        },
+        {
+          "client": 7,
+          "kind": "server_no_input",
+          "start_ms": 18400,
+          "length_ms": 8534,
+          "send_errors": {
+            "too_large": 147
+          }
+        },
+        {
+          "client": 7,
+          "kind": "server_no_input",
+          "start_ms": 35700,
+          "length_ms": 7966,
+          "send_errors": {
+            "too_large": 147
+          }
+        },
+        {
+          "client": 7,
+          "kind": "server_no_input",
+          "start_ms": 52766,
+          "length_ms": 7234,
+          "send_errors": {
+            "too_large": 147
+          }
+        }
+      ],
+      "hostile": null,
+      "server_totals": {
+        "datagrams_in": 20734,
+        "datagrams_out": 19829,
+        "foreign": 0,
+        "malformed": 0,
+        "accepted": 9,
+        "denied": 0,
+        "socket_errors": 0,
+        "rate_limited": 0,
+        "inbound_dropped": 0,
+        "sealed_out": 19811,
+        "opened_in": 20714,
+        "auth_failed": 2,
+        "replayed": 0,
+        "handshakes": 9,
+        "handshakes_refused": 0,
+        "pre_proof_shed": 0,
+        "rebinds": 0,
+        "rebinds_refused": 0
+      },
+      "wall_ms": 995,
+      "reproduce": "cargo xtask net-soak --profiles congested --clients 8 --modes dedicated --seed 1592590337 --seconds 60"
+    },
+    {
+      "label": "flappy/8/dedicated",
+      "scenario": {
+        "profile": {
+          "name": "flappy",
+          "summary": "good-wifi plus a 3 s outage every 20 s, and one 12 s outage (beyond the 10 s timeout) on every fourth client",
+          "up": {
+            "latency_ms": 4,
+            "jitter_ms": 4,
+            "loss": 0.002,
+            "burst": null,
+            "reorder": 0.001,
+            "reorder_ms": 10,
+            "duplicate": 0.0005,
+            "bandwidth_bps": 20000000,
+            "queue_bytes": 65536,
+            "mtu": 0
+          },
+          "down": {
+            "latency_ms": 4,
+            "jitter_ms": 4,
+            "loss": 0.002,
+            "burst": null,
+            "reorder": 0.001,
+            "reorder_ms": 10,
+            "duplicate": 0.0005,
+            "bandwidth_bps": 50000000,
+            "queue_bytes": 65536,
+            "mtu": 0
+          },
+          "flaps": [
+            15000,
+            20000,
+            3000
+          ],
+          "long_outage_ms": 12000,
+          "rebind_at": null,
+          "hostile": false
+        },
+        "clients": 8,
+        "mode": "dedicated",
+        "seed": 1592590337,
+        "duration_ms": 60000
+      },
+      "passed": true,
+      "bars": [
+        {
+          "id": "involuntary_disconnects",
+          "passed": true,
+          "detail": "0 involuntary ends (2 excused by outages beyond the timeout)",
+          "known_blockers": []
+        },
+        {
+          "id": "reconnect_within_grace",
+          "passed": true,
+          "detail": "3 rejoins, longest 163 ms after the link was up (grace 3000 ms)",
+          "known_blockers": []
+        },
+        {
+          "id": "no_wedged_client",
+          "passed": true,
+          "detail": "8 of 8 clients joined, no wedge",
+          "known_blockers": []
+        }
+      ],
+      "metrics": {
+        "joined": 8,
+        "ends_by_cause": {},
+        "server_ends_by_cause": {
+          "timeout": 3
+        },
+        "ends_excused": 2,
+        "connect_refusals": {},
+        "connect_timeouts": 0,
+        "reconnects": 3,
+        "reconnects_ok": 3,
+        "reconnect_max_ms": 163,
+        "inputs_sent": 12489,
+        "input_send_errors": {
+          "too_large": 1397
+        },
+        "inputs_stamped_behind": 13,
+        "server_ticks_with_input": 10453,
+        "server_ticks_missed": 1157,
+        "worst_missed_fraction": 0.19624470018170806,
+        "corrections": 805,
+        "correction_rate": 0.0712957222566646,
+        "correction_steps_p50": 2,
+        "correction_steps_max": 105,
+        "rollback_ticks_p50": 2,
+        "rollback_ticks_p99": 3,
+        "staleness_ticks_p50": 1,
+        "staleness_ticks_p99": 231,
+        "staleness_ticks_max": 301,
+        "worst_client_staleness_p99": 255,
+        "staleness_max_by_10s": [
+          2,
+          92,
+          2,
+          289,
+          301,
+          92,
+          2
+        ],
+        "staleness_max_by_client_10s": [
+          [
+            2,
+            92,
+            2,
+            92,
+            2,
+            92,
+            2
+          ],
+          [
+            2,
+            92,
+            2,
+            91,
+            2,
+            91
+          ],
+          [
+            2,
+            92,
+            2,
+            91,
+            2,
+            91
+          ],
+          [
+            2,
+            92,
+            2,
+            289,
+            301,
+            91
+          ],
+          [
+            2,
+            92,
+            2,
+            92,
+            2,
+            92
+          ],
+          [
+            2,
+            70,
+            2,
+            92,
+            2,
+            92
+          ],
+          [
+            2,
+            92,
+            2,
+            92,
+            2,
+            92
+          ],
+          [
+            2,
+            92,
+            2,
+            272,
+            300,
+            92
+          ]
+        ],
+        "commands_sent": 154,
+        "commands_acked": 147,
+        "command_rtt_p99_ms": 2432,
+        "down_bps_mean": 318457,
+        "down_bps_max": 345069,
+        "down_bps_second_half_max": 402123,
+        "up_bps_mean": 120259,
+        "up_bps_max": 157554,
+        "down_budget_bps": 1000000,
+        "up_budget_bps": 256000,
+        "min_entity_budget": 20,
+        "server_tick_us_p50": 184,
+        "server_tick_us_p99": 28382,
+        "server_tick_us_max": 76334,
+        "peak_heap_bytes": 0,
+        "drops": {
+          "no_route": 208,
+          "outage": 8385,
+          "random": 83
+        },
+        "largest_client_datagram": 1200,
+        "largest_server_datagram": 1200
+      },
+      "ends": [
+        {
+          "client": 3,
+          "at_ms": 40414,
+          "side": "client",
+          "cause": "timeout",
+          "peer": 4,
+          "voluntary": false
+        },
+        {
+          "client": 7,
+          "at_ms": 40950,
+          "side": "client",
+          "cause": "timeout",
+          "peer": 8,
+          "voluntary": false
+        }
+      ],
+      "reconnects": [
+        {
+          "client": 5,
+          "kind": "scripted",
+          "start_ms": 20002,
+          "link_up_ms": 20002,
+          "connected_ms": 20114
+        },
+        {
+          "client": 3,
+          "kind": "involuntary",
+          "start_ms": 40414,
+          "link_up_ms": 42411,
+          "connected_ms": 42574
+        },
+        {
+          "client": 7,
+          "kind": "involuntary",
+          "start_ms": 40950,
+          "link_up_ms": 42959,
+          "connected_ms": 43110
+        }
+      ],
+      "wedges": [],
+      "hostile": null,
+      "server_totals": {
+        "datagrams_in": 17439,
+        "datagrams_out": 26773,
+        "foreign": 0,
+        "malformed": 0,
+        "accepted": 11,
+        "denied": 0,
+        "socket_errors": 0,
+        "rate_limited": 0,
+        "inbound_dropped": 0,
+        "sealed_out": 26751,
+        "opened_in": 17411,
+        "auth_failed": 0,
+        "replayed": 6,
+        "handshakes": 11,
+        "handshakes_refused": 0,
+        "pre_proof_shed": 0,
+        "rebinds": 0,
+        "rebinds_refused": 0
+      },
+      "wall_ms": 3714,
+      "reproduce": "cargo xtask net-soak --profiles flappy --clients 8 --modes dedicated --seed 1592590337 --seconds 60"
+    },
+    {
+      "label": "hostile/8/dedicated",
+      "scenario": {
+        "profile": {
+          "name": "hostile",
+          "summary": "good-wifi plus one hostile peer: over-cap and malformed inputs and messages, replays, garbage and oversized datagrams, floods",
+          "up": {
+            "latency_ms": 4,
+            "jitter_ms": 4,
+            "loss": 0.002,
+            "burst": null,
+            "reorder": 0.001,
+            "reorder_ms": 10,
+            "duplicate": 0.0005,
+            "bandwidth_bps": 20000000,
+            "queue_bytes": 65536,
+            "mtu": 0
+          },
+          "down": {
+            "latency_ms": 4,
+            "jitter_ms": 4,
+            "loss": 0.002,
+            "burst": null,
+            "reorder": 0.001,
+            "reorder_ms": 10,
+            "duplicate": 0.0005,
+            "bandwidth_bps": 50000000,
+            "queue_bytes": 65536,
+            "mtu": 0
+          },
+          "flaps": null,
+          "long_outage_ms": null,
+          "rebind_at": null,
+          "hostile": true
+        },
+        "clients": 8,
+        "mode": "dedicated",
+        "seed": 1592590337,
+        "duration_ms": 60000
+      },
+      "passed": false,
+      "bars": [
+        {
+          "id": "involuntary_disconnects",
+          "passed": true,
+          "detail": "0 involuntary ends (0 excused by outages beyond the timeout)",
+          "known_blockers": []
+        },
+        {
+          "id": "reconnect_within_grace",
+          "passed": true,
+          "detail": "1 rejoins, longest 112 ms after the link was up (grace 3000 ms)",
+          "known_blockers": []
+        },
+        {
+          "id": "no_wedged_client",
+          "passed": false,
+          "detail": "client 2 input_send_failing for 6448 ms from 12036 ms (input send errors {\"too_large\": 193}) [known blocker v051-net-input-mtu]; client 2 server_no_input for 6400 ms from 12100 ms (input send errors {\"too_large\": 304}) [known blocker v051-net-input-mtu]",
+          "known_blockers": [
+            "v051-net-input-mtu"
+          ]
+        },
+        {
+          "id": "hostile_dropped",
+          "passed": false,
+          "detail": "hostile session over_cap_input was never dropped (618 hostile sends from 10112 ms to 20000 ms) [known blocker v051-net-input-rejection]; hostile session malformed_messages was never dropped (629 hostile sends from 20112 ms to 30000 ms); hostile session flood was never dropped (1902080 hostile sends from 30112 ms to 40000 ms)",
+          "known_blockers": []
+        },
+        {
+          "id": "others_unaffected",
+          "passed": false,
+          "detail": "client 2 input_send_failing at 12036 ms [known blocker v051-net-input-mtu]; client 2 server_no_input at 12100 ms [known blocker v051-net-input-mtu]; client 0 snapshot staleness reached 32 ticks while the hostile peer was active (before: 2)",
+          "known_blockers": []
+        }
+      ],
+      "metrics": {
+        "joined": 8,
+        "ends_by_cause": {},
+        "server_ends_by_cause": {},
+        "ends_excused": 0,
+        "connect_refusals": {},
+        "connect_timeouts": 0,
+        "reconnects": 1,
+        "reconnects_ok": 1,
+        "reconnect_max_ms": 112,
+        "inputs_sent": 12446,
+        "input_send_errors": {
+          "too_large": 1538
+        },
+        "inputs_stamped_behind": 13,
+        "server_ticks_with_input": 12659,
+        "server_ticks_missed": 1371,
+        "worst_missed_fraction": 0.15736040609137056,
+        "corrections": 1081,
+        "correction_rate": 0.07989062153573276,
+        "correction_steps_p50": 2,
+        "correction_steps_max": 59,
+        "rollback_ticks_p50": 2,
+        "rollback_ticks_p99": 3,
+        "staleness_ticks_p50": 1,
+        "staleness_ticks_p99": 22,
+        "staleness_ticks_max": 32,
+        "worst_client_staleness_p99": 31,
+        "staleness_max_by_10s": [
+          2,
+          32,
+          32,
+          32,
+          32,
+          2,
+          2
+        ],
+        "staleness_max_by_client_10s": [
+          [
+            2,
+            32,
+            32,
+            32,
+            32,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ]
+        ],
+        "commands_sent": 156,
+        "commands_acked": 156,
+        "command_rtt_p99_ms": 1008,
+        "down_bps_mean": 394370,
+        "down_bps_max": 433819,
+        "down_bps_second_half_max": 436396,
+        "up_bps_mean": 102575,
+        "up_bps_max": 108892,
+        "down_budget_bps": 1000000,
+        "up_budget_bps": 256000,
+        "min_entity_budget": 8,
+        "server_tick_us_p50": 214,
+        "server_tick_us_p99": 32344,
+        "server_tick_us_max": 145531,
+        "peak_heap_bytes": 0,
+        "drops": {
+          "no_route": 4,
+          "random": 107
+        },
+        "largest_client_datagram": 1200,
+        "largest_server_datagram": 1200
+      },
+      "ends": [],
+      "reconnects": [
+        {
+          "client": 5,
+          "kind": "scripted",
+          "start_ms": 20002,
+          "link_up_ms": 20002,
+          "connected_ms": 20114
+        }
+      ],
+      "wedges": [
+        {
+          "client": 2,
+          "kind": "input_send_failing",
+          "start_ms": 12036,
+          "length_ms": 6448,
+          "send_errors": {
+            "too_large": 193
+          }
+        },
+        {
+          "client": 2,
+          "kind": "server_no_input",
+          "start_ms": 12100,
+          "length_ms": 6400,
+          "send_errors": {
+            "too_large": 304
+          }
+        }
+      ],
+      "hostile": {
+        "sessions": [
+          {
+            "kind": "over_cap_input",
+            "start_ms": 10000,
+            "end_ms": 20000,
+            "connected_ms": 10112,
+            "first_act_ms": 10112,
+            "dropped_ms": null,
+            "end_cause": null,
+            "acts": 618
+          },
+          {
+            "kind": "malformed_messages",
+            "start_ms": 20000,
+            "end_ms": 30000,
+            "connected_ms": 20112,
+            "first_act_ms": 20112,
+            "dropped_ms": null,
+            "end_cause": null,
+            "acts": 629
+          },
+          {
+            "kind": "flood",
+            "start_ms": 30000,
+            "end_ms": 40000,
+            "connected_ms": 30112,
+            "first_act_ms": 30112,
+            "dropped_ms": null,
+            "end_cause": null,
+            "acts": 1902080
+          }
+        ],
+        "replays_sent": 4992,
+        "garbage_sent": 15000,
+        "oversized_sent": 312
+      },
+      "server_totals": {
+        "datagrams_in": 64352,
+        "datagrams_out": 30365,
+        "foreign": 15256,
+        "malformed": 1245,
+        "accepted": 12,
+        "denied": 0,
+        "socket_errors": 0,
+        "rate_limited": 0,
+        "inbound_dropped": 206266,
+        "sealed_out": 30341,
+        "opened_in": 44038,
+        "auth_failed": 6,
+        "replayed": 1846,
+        "handshakes": 12,
+        "handshakes_refused": 0,
+        "pre_proof_shed": 0,
+        "rebinds": 28,
+        "rebinds_refused": 3182
+      },
+      "wall_ms": 7651,
+      "reproduce": "cargo xtask net-soak --profiles hostile --clients 8 --modes dedicated --seed 1592590337 --seconds 60"
+    },
+    {
+      "label": "bad-wifi/32/dedicated",
+      "scenario": {
+        "profile": {
+          "name": "bad-wifi",
+          "summary": "8 ms + 0-30 ms jitter, 1 % random + Gilbert-Elliott bursts (~3 % total), 1 % reorder, 2/6 Mbit/s",
+          "up": {
+            "latency_ms": 8,
+            "jitter_ms": 30,
+            "loss": 0.01,
+            "burst": {
+              "p_good_to_bad": 0.01,
+              "p_bad_to_good": 0.3,
+              "loss_good": 0.0,
+              "loss_bad": 0.6
+            },
+            "reorder": 0.01,
+            "reorder_ms": 30,
+            "duplicate": 0.005,
+            "bandwidth_bps": 2000000,
+            "queue_bytes": 65536,
+            "mtu": 0
+          },
+          "down": {
+            "latency_ms": 8,
+            "jitter_ms": 30,
+            "loss": 0.01,
+            "burst": {
+              "p_good_to_bad": 0.01,
+              "p_bad_to_good": 0.3,
+              "loss_good": 0.0,
+              "loss_bad": 0.6
+            },
+            "reorder": 0.01,
+            "reorder_ms": 30,
+            "duplicate": 0.005,
+            "bandwidth_bps": 6000000,
+            "queue_bytes": 65536,
+            "mtu": 0
+          },
+          "flaps": null,
+          "long_outage_ms": null,
+          "rebind_at": null,
+          "hostile": false
+        },
+        "clients": 32,
+        "mode": "dedicated",
+        "seed": 1592590337,
+        "duration_ms": 60000
+      },
+      "passed": false,
+      "bars": [
+        {
+          "id": "involuntary_disconnects",
+          "passed": true,
+          "detail": "0 involuntary ends (0 excused by outages beyond the timeout)",
+          "known_blockers": []
+        },
+        {
+          "id": "reconnect_within_grace",
+          "passed": true,
+          "detail": "4 rejoins, longest 1008 ms after the link was up (grace 3000 ms)",
+          "known_blockers": []
+        },
+        {
+          "id": "no_wedged_client",
+          "passed": false,
+          "detail": "client 2 input_send_failing for 6480 ms from 12004 ms (input send errors {\"too_large\": 194}) [known blocker v051-net-input-mtu]; client 2 server_no_input for 6468 ms from 12066 ms (input send errors {\"too_large\": 280}) [known blocker v051-net-input-mtu]; client 10 input_send_failing for 6432 ms from 12036 ms (input send errors {\"too_large\": 192}) [known blocker v051-net-input-mtu]; client 10 server_no_input for 6400 ms from 12100 ms (input send errors {\"too_large\": 397}) [known blocker v051-net-input-mtu]; client 18 input_send_failing for 6480 ms from 12004 ms (input send errors {\"too_large\": 194}) [known blocker v051-net-input-mtu]; client 18 server_no_input for 6468 ms from 12066 ms (input send errors {\"too_large\": 322}) [known blocker v051-net-input-mtu]; client 26 input_send_failing for 6384 ms from 12068 ms (input send errors {\"too_large\": 191}) [known blocker v051-net-input-mtu]; client 26 server_no_input for 6366 ms from 12134 ms (input send errors {\"too_large\": 374}) [known blocker v051-net-input-mtu]",
+          "known_blockers": [
+            "v051-net-input-mtu"
+          ]
+        }
+      ],
+      "metrics": {
+        "joined": 32,
+        "ends_by_cause": {},
+        "server_ends_by_cause": {},
+        "ends_excused": 0,
+        "connect_refusals": {},
+        "connect_timeouts": 0,
+        "reconnects": 4,
+        "reconnects_ok": 4,
+        "reconnect_max_ms": 1008,
+        "inputs_sent": 50198,
+        "input_send_errors": {
+          "too_large": 5848
+        },
+        "inputs_stamped_behind": 0,
+        "server_ticks_with_input": 50610,
+        "server_ticks_missed": 5307,
+        "worst_missed_fraction": 0.21380090497737556,
+        "corrections": 4601,
+        "correction_rate": 0.08334239031989277,
+        "correction_steps_p50": 1,
+        "correction_steps_max": 8,
+        "rollback_ticks_p50": 3,
+        "rollback_ticks_p99": 4,
+        "staleness_ticks_p50": 2,
+        "staleness_ticks_p99": 3,
+        "staleness_ticks_max": 9,
+        "worst_client_staleness_p99": 4,
+        "staleness_max_by_10s": [
+          7,
+          6,
+          9,
+          6,
+          6,
+          6,
+          2
+        ],
+        "staleness_max_by_client_10s": [
+          [
+            3,
+            3,
+            3,
+            4,
+            3,
+            4,
+            1
+          ],
+          [
+            3,
+            5,
+            4,
+            5,
+            6,
+            4
+          ],
+          [
+            4,
+            3,
+            3,
+            3,
+            4,
+            4
+          ],
+          [
+            3,
+            4,
+            9,
+            6,
+            6,
+            4
+          ],
+          [
+            4,
+            4,
+            6,
+            5,
+            5,
+            4
+          ],
+          [
+            6,
+            4,
+            4,
+            4,
+            4,
+            3
+          ],
+          [
+            4,
+            3,
+            3,
+            3,
+            3,
+            3
+          ],
+          [
+            3,
+            3,
+            5,
+            4,
+            5,
+            3
+          ],
+          [
+            3,
+            3,
+            3,
+            3,
+            3,
+            4,
+            1
+          ],
+          [
+            3,
+            3,
+            3,
+            4,
+            4,
+            3
+          ],
+          [
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ],
+          [
+            3,
+            3,
+            3,
+            4,
+            3,
+            3
+          ],
+          [
+            3,
+            3,
+            3,
+            3,
+            4,
+            4
+          ],
+          [
+            3,
+            3,
+            4,
+            4,
+            3,
+            3
+          ],
+          [
+            3,
+            3,
+            3,
+            3,
+            3,
+            4
+          ],
+          [
+            3,
+            3,
+            4,
+            3,
+            3,
+            3
+          ],
+          [
+            3,
+            4,
+            5,
+            3,
+            3,
+            3,
+            2
+          ],
+          [
+            7,
+            4,
+            4,
+            5,
+            4,
+            3
+          ],
+          [
+            3,
+            3,
+            4,
+            5,
+            5,
+            6
+          ],
+          [
+            3,
+            3,
+            3,
+            3,
+            4,
+            3
+          ],
+          [
+            3,
+            3,
+            3,
+            3,
+            5,
+            3
+          ],
+          [
+            3,
+            5,
+            3,
+            4,
+            3,
+            3
+          ],
+          [
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ],
+          [
+            3,
+            3,
+            5,
+            4,
+            3,
+            3
+          ],
+          [
+            3,
+            3,
+            7,
+            4,
+            3,
+            3,
+            2
+          ],
+          [
+            3,
+            3,
+            3,
+            3,
+            4,
+            3
+          ],
+          [
+            3,
+            4,
+            4,
+            4,
+            4,
+            4
+          ],
+          [
+            3,
+            5,
+            4,
+            4,
+            4,
+            4
+          ],
+          [
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ],
+          [
+            5,
+            3,
+            4,
+            3,
+            3,
+            3
+          ],
+          [
+            3,
+            6,
+            3,
+            4,
+            3,
+            3
+          ],
+          [
+            3,
+            4,
+            4,
+            4,
+            5,
+            5
+          ]
+        ],
+        "commands_sent": 628,
+        "commands_acked": 628,
+        "command_rtt_p99_ms": 256,
+        "down_bps_mean": 352488,
+        "down_bps_max": 422201,
+        "down_bps_second_half_max": 436574,
+        "up_bps_mean": 101592,
+        "up_bps_max": 113050,
+        "down_budget_bps": 1000000,
+        "up_budget_bps": 256000,
+        "min_entity_budget": 8,
+        "server_tick_us_p50": 723,
+        "server_tick_us_p99": 36946,
+        "server_tick_us_max": 205247,
+        "peak_heap_bytes": 0,
+        "drops": {
+          "burst": 3561,
+          "random": 1912
+        },
+        "largest_client_datagram": 1200,
+        "largest_server_datagram": 1200
+      },
+      "ends": [],
+      "reconnects": [
+        {
+          "client": 5,
+          "kind": "scripted",
+          "start_ms": 20002,
+          "link_up_ms": 20002,
+          "connected_ms": 21010
+        },
+        {
+          "client": 13,
+          "kind": "scripted",
+          "start_ms": 20002,
+          "link_up_ms": 20002,
+          "connected_ms": 20242
+        },
+        {
+          "client": 21,
+          "kind": "scripted",
+          "start_ms": 20002,
+          "link_up_ms": 20002,
+          "connected_ms": 20482
+        },
+        {
+          "client": 29,
+          "kind": "scripted",
+          "start_ms": 20002,
+          "link_up_ms": 20002,
+          "connected_ms": 20194
+        }
+      ],
+      "wedges": [
+        {
+          "client": 2,
+          "kind": "input_send_failing",
+          "start_ms": 12004,
+          "length_ms": 6480,
+          "send_errors": {
+            "too_large": 194
+          }
+        },
+        {
+          "client": 2,
+          "kind": "server_no_input",
+          "start_ms": 12066,
+          "length_ms": 6468,
+          "send_errors": {
+            "too_large": 280
+          }
+        },
+        {
+          "client": 10,
+          "kind": "input_send_failing",
+          "start_ms": 12036,
+          "length_ms": 6432,
+          "send_errors": {
+            "too_large": 192
+          }
+        },
+        {
+          "client": 10,
+          "kind": "server_no_input",
+          "start_ms": 12100,
+          "length_ms": 6400,
+          "send_errors": {
+            "too_large": 397
+          }
+        },
+        {
+          "client": 18,
+          "kind": "input_send_failing",
+          "start_ms": 12004,
+          "length_ms": 6480,
+          "send_errors": {
+            "too_large": 194
+          }
+        },
+        {
+          "client": 18,
+          "kind": "server_no_input",
+          "start_ms": 12066,
+          "length_ms": 6468,
+          "send_errors": {
+            "too_large": 322
+          }
+        },
+        {
+          "client": 26,
+          "kind": "input_send_failing",
+          "start_ms": 12068,
+          "length_ms": 6384,
+          "send_errors": {
+            "too_large": 191
+          }
+        },
+        {
+          "client": 26,
+          "kind": "server_no_input",
+          "start_ms": 12134,
+          "length_ms": 6366,
+          "send_errors": {
+            "too_large": 374
+          }
+        }
+      ],
+      "hostile": null,
+      "server_totals": {
+        "datagrams_in": 85581,
+        "datagrams_out": 102780,
+        "foreign": 0,
+        "malformed": 0,
+        "accepted": 36,
+        "denied": 0,
+        "socket_errors": 0,
+        "rate_limited": 0,
+        "inbound_dropped": 0,
+        "sealed_out": 102705,
+        "opened_in": 85076,
+        "auth_failed": 8,
+        "replayed": 422,
+        "handshakes": 36,
+        "handshakes_refused": 0,
+        "pre_proof_shed": 0,
+        "rebinds": 0,
+        "rebinds_refused": 0
+      },
+      "wall_ms": 6935,
+      "reproduce": "cargo xtask net-soak --profiles bad-wifi --clients 32 --modes dedicated --seed 1592590337 --seconds 60"
+    },
+    {
+      "label": "mobile-4g/32/dedicated",
+      "scenario": {
+        "profile": {
+          "name": "mobile-4g",
+          "summary": "35 ms + 0-25 ms jitter, 0.5 % + bursts, MTU 1232, 2/8 Mbit/s with a 128 KiB queue, one NAT rebinding",
+          "up": {
+            "latency_ms": 35,
+            "jitter_ms": 25,
+            "loss": 0.005,
+            "burst": {
+              "p_good_to_bad": 0.005,
+              "p_bad_to_good": 0.2,
+              "loss_good": 0.0,
+              "loss_bad": 0.5
+            },
+            "reorder": 0.005,
+            "reorder_ms": 40,
+            "duplicate": 0.001,
+            "bandwidth_bps": 2000000,
+            "queue_bytes": 131072,
+            "mtu": 1232
+          },
+          "down": {
+            "latency_ms": 35,
+            "jitter_ms": 25,
+            "loss": 0.005,
+            "burst": {
+              "p_good_to_bad": 0.005,
+              "p_bad_to_good": 0.2,
+              "loss_good": 0.0,
+              "loss_bad": 0.5
+            },
+            "reorder": 0.005,
+            "reorder_ms": 40,
+            "duplicate": 0.001,
+            "bandwidth_bps": 8000000,
+            "queue_bytes": 131072,
+            "mtu": 1232
+          },
+          "flaps": null,
+          "long_outage_ms": null,
+          "rebind_at": 0.4,
+          "hostile": false
+        },
+        "clients": 32,
+        "mode": "dedicated",
+        "seed": 1592590337,
+        "duration_ms": 60000
+      },
+      "passed": false,
+      "bars": [
+        {
+          "id": "involuntary_disconnects",
+          "passed": true,
+          "detail": "0 involuntary ends (0 excused by outages beyond the timeout)",
+          "known_blockers": []
+        },
+        {
+          "id": "reconnect_within_grace",
+          "passed": true,
+          "detail": "4 rejoins, longest 384 ms after the link was up (grace 3000 ms)",
+          "known_blockers": []
+        },
+        {
+          "id": "no_wedged_client",
+          "passed": false,
+          "detail": "client 2 input_send_failing for 6400 ms from 12052 ms (input send errors {\"too_large\": 192}) [known blocker v051-net-input-mtu]; client 2 server_no_input for 6400 ms from 12100 ms (input send errors {\"too_large\": 300}) [known blocker v051-net-input-mtu]; client 10 input_send_failing for 6400 ms from 12036 ms (input send errors {\"too_large\": 192}) [known blocker v051-net-input-mtu]; client 10 server_no_input for 6400 ms from 12100 ms (input send errors {\"too_large\": 384}) [known blocker v051-net-input-mtu]; client 18 input_send_failing for 6432 ms from 12036 ms (input send errors {\"too_large\": 193}) [known blocker v051-net-input-mtu]; client 18 server_no_input for 6434 ms from 12100 ms (input send errors {\"too_large\": 314}) [known blocker v051-net-input-mtu]; client 26 input_send_failing for 6432 ms from 12052 ms (input send errors {\"too_large\": 193}) [known blocker v051-net-input-mtu]; client 26 server_no_input for 6434 ms from 12100 ms (input send errors {\"too_large\": 374}) [known blocker v051-net-input-mtu]",
+          "known_blockers": [
+            "v051-net-input-mtu"
+          ]
+        }
+      ],
+      "metrics": {
+        "joined": 32,
+        "ends_by_cause": {},
+        "server_ends_by_cause": {},
+        "ends_excused": 0,
+        "connect_refusals": {},
+        "connect_timeouts": 0,
+        "reconnects": 4,
+        "reconnects_ok": 4,
+        "reconnect_max_ms": 384,
+        "inputs_sent": 50101,
+        "input_send_errors": {
+          "too_large": 5853
+        },
+        "inputs_stamped_behind": 0,
+        "server_ticks_with_input": 49895,
+        "server_ticks_missed": 5737,
+        "worst_missed_fraction": 0.21052631578947367,
+        "corrections": 5177,
+        "correction_rate": 0.09349490717330058,
+        "correction_steps_p50": 2,
+        "correction_steps_max": 7,
+        "rollback_ticks_p50": 4,
+        "rollback_ticks_p99": 5,
+        "staleness_ticks_p50": 3,
+        "staleness_ticks_p99": 4,
+        "staleness_ticks_max": 9,
+        "worst_client_staleness_p99": 4,
+        "staleness_max_by_10s": [
+          6,
+          6,
+          9,
+          7,
+          5,
+          5,
+          3
+        ],
+        "staleness_max_by_client_10s": [
+          [
+            4,
+            4,
+            6,
+            4,
+            4,
+            4,
+            3
+          ],
+          [
+            4,
+            6,
+            6,
+            5,
+            4,
+            3
+          ],
+          [
+            4,
+            4,
+            6,
+            5,
+            4,
+            4
+          ],
+          [
+            4,
+            4,
+            6,
+            4,
+            4,
+            4
+          ],
+          [
+            4,
+            5,
+            5,
+            4,
+            4,
+            5
+          ],
+          [
+            4,
+            4,
+            7,
+            4,
+            4,
+            4
+          ],
+          [
+            4,
+            4,
+            9,
+            4,
+            4,
+            4
+          ],
+          [
+            4,
+            4,
+            6,
+            4,
+            4,
+            4
+          ],
+          [
+            5,
+            4,
+            6,
+            4,
+            4,
+            4,
+            3
+          ],
+          [
+            5,
+            4,
+            7,
+            4,
+            4,
+            4
+          ],
+          [
+            4,
+            3,
+            8,
+            7,
+            5,
+            4
+          ],
+          [
+            4,
+            4,
+            6,
+            6,
+            5,
+            4
+          ],
+          [
+            4,
+            4,
+            7,
+            5,
+            4,
+            4
+          ],
+          [
+            4,
+            5,
+            7,
+            4,
+            4,
+            4
+          ],
+          [
+            3,
+            4,
+            7,
+            4,
+            3,
+            4
+          ],
+          [
+            4,
+            4,
+            7,
+            5,
+            5,
+            4
+          ],
+          [
+            4,
+            3,
+            6,
+            5,
+            4,
+            4,
+            2
+          ],
+          [
+            6,
+            4,
+            6,
+            4,
+            4,
+            3
+          ],
+          [
+            4,
+            4,
+            5,
+            4,
+            4,
+            4
+          ],
+          [
+            5,
+            4,
+            7,
+            4,
+            4,
+            3
+          ],
+          [
+            4,
+            4,
+            5,
+            4,
+            5,
+            5
+          ],
+          [
+            4,
+            4,
+            7,
+            4,
+            4,
+            4
+          ],
+          [
+            4,
+            4,
+            7,
+            4,
+            4,
+            4
+          ],
+          [
+            4,
+            4,
+            5,
+            4,
+            4,
+            5
+          ],
+          [
+            4,
+            5,
+            6,
+            4,
+            4,
+            4,
+            3
+          ],
+          [
+            4,
+            4,
+            4,
+            5,
+            4,
+            5
+          ],
+          [
+            4,
+            6,
+            8,
+            4,
+            4,
+            4
+          ],
+          [
+            5,
+            4,
+            6,
+            4,
+            4,
+            4
+          ],
+          [
+            4,
+            4,
+            6,
+            4,
+            4,
+            4
+          ],
+          [
+            4,
+            3,
+            6,
+            4,
+            5,
+            4
+          ],
+          [
+            4,
+            4,
+            7,
+            4,
+            5,
+            4
+          ],
+          [
+            4,
+            4,
+            5,
+            4,
+            4,
+            4
+          ]
+        ],
+        "commands_sent": 627,
+        "commands_acked": 624,
+        "command_rtt_p99_ms": 336,
+        "down_bps_mean": 400500,
+        "down_bps_max": 424283,
+        "down_bps_second_half_max": 436506,
+        "up_bps_mean": 102110,
+        "up_bps_max": 116051,
+        "down_budget_bps": 1000000,
+        "up_budget_bps": 256000,
+        "min_entity_budget": 28,
+        "server_tick_us_p50": 831,
+        "server_tick_us_p99": 25087,
+        "server_tick_us_max": 65170,
+        "peak_heap_bytes": 0,
+        "drops": {
+          "burst": 2589,
+          "no_route": 232,
+          "random": 986
+        },
+        "largest_client_datagram": 1200,
+        "largest_server_datagram": 1200
+      },
+      "ends": [],
+      "reconnects": [
+        {
+          "client": 5,
+          "kind": "scripted",
+          "start_ms": 20002,
+          "link_up_ms": 20002,
+          "connected_ms": 20386
+        },
+        {
+          "client": 13,
+          "kind": "scripted",
+          "start_ms": 20002,
+          "link_up_ms": 20002,
+          "connected_ms": 20386
+        },
+        {
+          "client": 21,
+          "kind": "scripted",
+          "start_ms": 20002,
+          "link_up_ms": 20002,
+          "connected_ms": 20386
+        },
+        {
+          "client": 29,
+          "kind": "scripted",
+          "start_ms": 20002,
+          "link_up_ms": 20002,
+          "connected_ms": 20370
+        }
+      ],
+      "wedges": [
+        {
+          "client": 2,
+          "kind": "input_send_failing",
+          "start_ms": 12052,
+          "length_ms": 6400,
+          "send_errors": {
+            "too_large": 192
+          }
+        },
+        {
+          "client": 2,
+          "kind": "server_no_input",
+          "start_ms": 12100,
+          "length_ms": 6400,
+          "send_errors": {
+            "too_large": 300
+          }
+        },
+        {
+          "client": 10,
+          "kind": "input_send_failing",
+          "start_ms": 12036,
+          "length_ms": 6400,
+          "send_errors": {
+            "too_large": 192
+          }
+        },
+        {
+          "client": 10,
+          "kind": "server_no_input",
+          "start_ms": 12100,
+          "length_ms": 6400,
+          "send_errors": {
+            "too_large": 384
+          }
+        },
+        {
+          "client": 18,
+          "kind": "input_send_failing",
+          "start_ms": 12036,
+          "length_ms": 6432,
+          "send_errors": {
+            "too_large": 193
+          }
+        },
+        {
+          "client": 18,
+          "kind": "server_no_input",
+          "start_ms": 12100,
+          "length_ms": 6434,
+          "send_errors": {
+            "too_large": 314
+          }
+        },
+        {
+          "client": 26,
+          "kind": "input_send_failing",
+          "start_ms": 12052,
+          "length_ms": 6432,
+          "send_errors": {
+            "too_large": 193
+          }
+        },
+        {
+          "client": 26,
+          "kind": "server_no_input",
+          "start_ms": 12100,
+          "length_ms": 6434,
+          "send_errors": {
+            "too_large": 374
+          }
+        }
+      ],
+      "hostile": null,
+      "server_totals": {
+        "datagrams_in": 91817,
+        "datagrams_out": 112398,
+        "foreign": 0,
+        "malformed": 0,
+        "accepted": 36,
+        "denied": 0,
+        "socket_errors": 0,
+        "rate_limited": 0,
+        "inbound_dropped": 0,
+        "sealed_out": 112326,
+        "opened_in": 91638,
+        "auth_failed": 8,
+        "replayed": 99,
+        "handshakes": 36,
+        "handshakes_refused": 0,
+        "pre_proof_shed": 0,
+        "rebinds": 32,
+        "rebinds_refused": 0
+      },
+      "wall_ms": 6016,
+      "reproduce": "cargo xtask net-soak --profiles mobile-4g --clients 32 --modes dedicated --seed 1592590337 --seconds 60"
+    },
+    {
+      "label": "flappy/32/dedicated",
+      "scenario": {
+        "profile": {
+          "name": "flappy",
+          "summary": "good-wifi plus a 3 s outage every 20 s, and one 12 s outage (beyond the 10 s timeout) on every fourth client",
+          "up": {
+            "latency_ms": 4,
+            "jitter_ms": 4,
+            "loss": 0.002,
+            "burst": null,
+            "reorder": 0.001,
+            "reorder_ms": 10,
+            "duplicate": 0.0005,
+            "bandwidth_bps": 20000000,
+            "queue_bytes": 65536,
+            "mtu": 0
+          },
+          "down": {
+            "latency_ms": 4,
+            "jitter_ms": 4,
+            "loss": 0.002,
+            "burst": null,
+            "reorder": 0.001,
+            "reorder_ms": 10,
+            "duplicate": 0.0005,
+            "bandwidth_bps": 50000000,
+            "queue_bytes": 65536,
+            "mtu": 0
+          },
+          "flaps": [
+            15000,
+            20000,
+            3000
+          ],
+          "long_outage_ms": 12000,
+          "rebind_at": null,
+          "hostile": false
+        },
+        "clients": 32,
+        "mode": "dedicated",
+        "seed": 1592590337,
+        "duration_ms": 60000
+      },
+      "passed": true,
+      "bars": [
+        {
+          "id": "involuntary_disconnects",
+          "passed": true,
+          "detail": "0 involuntary ends (8 excused by outages beyond the timeout)",
+          "known_blockers": []
+        },
+        {
+          "id": "reconnect_within_grace",
+          "passed": true,
+          "detail": "12 rejoins, longest 179 ms after the link was up (grace 3000 ms)",
+          "known_blockers": []
+        },
+        {
+          "id": "no_wedged_client",
+          "passed": true,
+          "detail": "32 of 32 clients joined, no wedge",
+          "known_blockers": []
+        }
+      ],
+      "metrics": {
+        "joined": 32,
+        "ends_by_cause": {},
+        "server_ends_by_cause": {
+          "timeout": 12
+        },
+        "ends_excused": 8,
+        "connect_refusals": {},
+        "connect_timeouts": 0,
+        "reconnects": 12,
+        "reconnects_ok": 12,
+        "reconnect_max_ms": 179,
+        "inputs_sent": 49527,
+        "input_send_errors": {
+          "too_large": 5895
+        },
+        "inputs_stamped_behind": 55,
+        "server_ticks_with_input": 41507,
+        "server_ticks_missed": 4847,
+        "worst_missed_fraction": 0.20357142857142857,
+        "corrections": 3348,
+        "correction_rate": 0.07429433694301438,
+        "correction_steps_p50": 2,
+        "correction_steps_max": 118,
+        "rollback_ticks_p50": 2,
+        "rollback_ticks_p99": 7,
+        "staleness_ticks_p50": 1,
+        "staleness_ticks_p99": 231,
+        "staleness_ticks_max": 301,
+        "worst_client_staleness_p99": 255,
+        "staleness_max_by_10s": [
+          2,
+          92,
+          3,
+          299,
+          301,
+          92,
+          2
+        ],
+        "staleness_max_by_client_10s": [
+          [
+            2,
+            92,
+            2,
+            92,
+            2,
+            92,
+            2
+          ],
+          [
+            2,
+            92,
+            2,
+            92,
+            2,
+            92
+          ],
+          [
+            2,
+            91,
+            2,
+            91,
+            2,
+            92
+          ],
+          [
+            2,
+            92,
+            2,
+            289,
+            301,
+            92
+          ],
+          [
+            2,
+            92,
+            2,
+            92,
+            2,
+            92
+          ],
+          [
+            2,
+            70,
+            2,
+            91,
+            3,
+            92
+          ],
+          [
+            2,
+            92,
+            2,
+            92,
+            2,
+            92
+          ],
+          [
+            2,
+            91,
+            2,
+            272,
+            300,
+            92
+          ],
+          [
+            2,
+            92,
+            2,
+            92,
+            3,
+            92,
+            2
+          ],
+          [
+            2,
+            92,
+            2,
+            92,
+            2,
+            92
+          ],
+          [
+            2,
+            92,
+            2,
+            92,
+            2,
+            92
+          ],
+          [
+            2,
+            92,
+            2,
+            285,
+            300,
+            92
+          ],
+          [
+            2,
+            91,
+            2,
+            92,
+            2,
+            92
+          ],
+          [
+            2,
+            67,
+            2,
+            92,
+            2,
+            91
+          ],
+          [
+            2,
+            92,
+            2,
+            91,
+            2,
+            92
+          ],
+          [
+            2,
+            92,
+            2,
+            299,
+            301,
+            92
+          ],
+          [
+            2,
+            91,
+            2,
+            91,
+            2,
+            91,
+            2
+          ],
+          [
+            2,
+            92,
+            2,
+            92,
+            2,
+            92
+          ],
+          [
+            2,
+            92,
+            2,
+            92,
+            2,
+            92
+          ],
+          [
+            2,
+            92,
+            2,
+            282,
+            300,
+            92
+          ],
+          [
+            2,
+            92,
+            2,
+            91,
+            2,
+            91
+          ],
+          [
+            2,
+            64,
+            2,
+            91,
+            2,
+            91
+          ],
+          [
+            2,
+            91,
+            3,
+            91,
+            2,
+            91
+          ],
+          [
+            2,
+            92,
+            3,
+            296,
+            300,
+            92
+          ],
+          [
+            2,
+            92,
+            2,
+            92,
+            2,
+            92,
+            2
+          ],
+          [
+            2,
+            92,
+            2,
+            91,
+            2,
+            91
+          ],
+          [
+            2,
+            92,
+            2,
+            92,
+            2,
+            91
+          ],
+          [
+            2,
+            92,
+            2,
+            281,
+            301,
+            92
+          ],
+          [
+            2,
+            92,
+            2,
+            91,
+            2,
+            92
+          ],
+          [
+            2,
+            61,
+            2,
+            92,
+            2,
+            91
+          ],
+          [
+            2,
+            92,
+            2,
+            92,
+            2,
+            92
+          ],
+          [
+            2,
+            92,
+            2,
+            293,
+            301,
+            91
+          ]
+        ],
+        "commands_sent": 622,
+        "commands_acked": 592,
+        "command_rtt_p99_ms": 3120,
+        "down_bps_mean": 317280,
+        "down_bps_max": 352186,
+        "down_bps_second_half_max": 404982,
+        "up_bps_mean": 118954,
+        "up_bps_max": 190341,
+        "down_budget_bps": 1000000,
+        "up_budget_bps": 256000,
+        "min_entity_budget": 20,
+        "server_tick_us_p50": 763,
+        "server_tick_us_p99": 17250,
+        "server_tick_us_max": 226392,
+        "peak_heap_bytes": 0,
+        "drops": {
+          "no_route": 851,
+          "outage": 33653,
+          "random": 309
+        },
+        "largest_client_datagram": 1200,
+        "largest_server_datagram": 1200
+      },
+      "ends": [
+        {
+          "client": 15,
+          "at_ms": 40054,
+          "side": "client",
+          "cause": "timeout",
+          "peer": 16,
+          "voluntary": false
+        },
+        {
+          "client": 23,
+          "at_ms": 40150,
+          "side": "client",
+          "cause": "timeout",
+          "peer": 24,
+          "voluntary": false
+        },
+        {
+          "client": 31,
+          "at_ms": 40246,
+          "side": "client",
+          "cause": "timeout",
+          "peer": 32,
+          "voluntary": false
+        },
+        {
+          "client": 3,
+          "at_ms": 40414,
+          "side": "client",
+          "cause": "timeout",
+          "peer": 4,
+          "voluntary": false
+        },
+        {
+          "client": 11,
+          "at_ms": 40510,
+          "side": "client",
+          "cause": "timeout",
+          "peer": 12,
+          "voluntary": false
+        },
+        {
+          "client": 19,
+          "at_ms": 40622,
+          "side": "client",
+          "cause": "timeout",
+          "peer": 20,
+          "voluntary": false
+        },
+        {
+          "client": 27,
+          "at_ms": 40686,
+          "side": "client",
+          "cause": "timeout",
+          "peer": 28,
+          "voluntary": false
+        },
+        {
+          "client": 7,
+          "at_ms": 40950,
+          "side": "client",
+          "cause": "timeout",
+          "peer": 8,
+          "voluntary": false
+        }
+      ],
+      "reconnects": [
+        {
+          "client": 5,
+          "kind": "scripted",
+          "start_ms": 20002,
+          "link_up_ms": 20002,
+          "connected_ms": 20114
+        },
+        {
+          "client": 13,
+          "kind": "scripted",
+          "start_ms": 20002,
+          "link_up_ms": 20002,
+          "connected_ms": 20114
+        },
+        {
+          "client": 21,
+          "kind": "scripted",
+          "start_ms": 20002,
+          "link_up_ms": 20002,
+          "connected_ms": 20114
+        },
+        {
+          "client": 29,
+          "kind": "scripted",
+          "start_ms": 20002,
+          "link_up_ms": 20002,
+          "connected_ms": 20114
+        },
+        {
+          "client": 15,
+          "kind": "involuntary",
+          "start_ms": 40054,
+          "link_up_ms": 42055,
+          "connected_ms": 42214
+        },
+        {
+          "client": 23,
+          "kind": "involuntary",
+          "start_ms": 40150,
+          "link_up_ms": 42151,
+          "connected_ms": 42310
+        },
+        {
+          "client": 31,
+          "kind": "involuntary",
+          "start_ms": 40246,
+          "link_up_ms": 42247,
+          "connected_ms": 42406
+        },
+        {
+          "client": 3,
+          "kind": "involuntary",
+          "start_ms": 40414,
+          "link_up_ms": 42411,
+          "connected_ms": 42574
+        },
+        {
+          "client": 11,
+          "kind": "involuntary",
+          "start_ms": 40510,
+          "link_up_ms": 42507,
+          "connected_ms": 42686
+        },
+        {
+          "client": 19,
+          "kind": "involuntary",
+          "start_ms": 40622,
+          "link_up_ms": 42603,
+          "connected_ms": 42782
+        },
+        {
+          "client": 27,
+          "kind": "involuntary",
+          "start_ms": 40686,
+          "link_up_ms": 42699,
+          "connected_ms": 42846
+        },
+        {
+          "client": 7,
+          "kind": "involuntary",
+          "start_ms": 40950,
+          "link_up_ms": 42959,
+          "connected_ms": 43110
+        }
+      ],
+      "wedges": [],
+      "hostile": null,
+      "server_totals": {
+        "datagrams_in": 67966,
+        "datagrams_out": 106951,
+        "foreign": 0,
+        "malformed": 0,
+        "accepted": 44,
+        "denied": 0,
+        "socket_errors": 0,
+        "rate_limited": 0,
+        "inbound_dropped": 0,
+        "sealed_out": 106863,
+        "opened_in": 67850,
+        "auth_failed": 0,
+        "replayed": 28,
+        "handshakes": 44,
+        "handshakes_refused": 0,
+        "pre_proof_shed": 0,
+        "rebinds": 0,
+        "rebinds_refused": 0
+      },
+      "wall_ms": 4740,
+      "reproduce": "cargo xtask net-soak --profiles flappy --clients 32 --modes dedicated --seed 1592590337 --seconds 60"
+    },
+    {
+      "label": "hostile/32/dedicated",
+      "scenario": {
+        "profile": {
+          "name": "hostile",
+          "summary": "good-wifi plus one hostile peer: over-cap and malformed inputs and messages, replays, garbage and oversized datagrams, floods",
+          "up": {
+            "latency_ms": 4,
+            "jitter_ms": 4,
+            "loss": 0.002,
+            "burst": null,
+            "reorder": 0.001,
+            "reorder_ms": 10,
+            "duplicate": 0.0005,
+            "bandwidth_bps": 20000000,
+            "queue_bytes": 65536,
+            "mtu": 0
+          },
+          "down": {
+            "latency_ms": 4,
+            "jitter_ms": 4,
+            "loss": 0.002,
+            "burst": null,
+            "reorder": 0.001,
+            "reorder_ms": 10,
+            "duplicate": 0.0005,
+            "bandwidth_bps": 50000000,
+            "queue_bytes": 65536,
+            "mtu": 0
+          },
+          "flaps": null,
+          "long_outage_ms": null,
+          "rebind_at": null,
+          "hostile": true
+        },
+        "clients": 32,
+        "mode": "dedicated",
+        "seed": 1592590337,
+        "duration_ms": 60000
+      },
+      "passed": false,
+      "bars": [
+        {
+          "id": "involuntary_disconnects",
+          "passed": true,
+          "detail": "0 involuntary ends (0 excused by outages beyond the timeout)",
+          "known_blockers": []
+        },
+        {
+          "id": "reconnect_within_grace",
+          "passed": true,
+          "detail": "4 rejoins, longest 112 ms after the link was up (grace 3000 ms)",
+          "known_blockers": []
+        },
+        {
+          "id": "no_wedged_client",
+          "passed": false,
+          "detail": "client 2 input_send_failing for 6576 ms from 11892 ms (input send errors {\"too_large\": 197}) [known blocker v051-net-input-mtu]; client 2 server_no_input for 6534 ms from 11966 ms (input send errors {\"too_large\": 301}) [known blocker v051-net-input-mtu]; client 10 input_send_failing for 6400 ms from 12036 ms (input send errors {\"too_large\": 192}) [known blocker v051-net-input-mtu]; client 10 server_no_input for 6366 ms from 12100 ms (input send errors {\"too_large\": 395}) [known blocker v051-net-input-mtu]; client 18 input_send_failing for 6464 ms from 12004 ms (input send errors {\"too_large\": 194}) [known blocker v051-net-input-mtu]; client 18 server_no_input for 6434 ms from 12066 ms (input send errors {\"too_large\": 320}) [known blocker v051-net-input-mtu]; client 26 input_send_failing for 6400 ms from 12036 ms (input send errors {\"too_large\": 192}) [known blocker v051-net-input-mtu]; client 26 server_no_input for 6366 ms from 12100 ms (input send errors {\"too_large\": 357}) [known blocker v051-net-input-mtu]",
+          "known_blockers": [
+            "v051-net-input-mtu"
+          ]
+        },
+        {
+          "id": "hostile_dropped",
+          "passed": false,
+          "detail": "hostile session over_cap_input was never dropped (618 hostile sends from 10112 ms to 20000 ms) [known blocker v051-net-input-rejection]; hostile session malformed_messages was never dropped (629 hostile sends from 20112 ms to 30000 ms); hostile session flood was never dropped (1901468 hostile sends from 30112 ms to 40000 ms)",
+          "known_blockers": []
+        },
+        {
+          "id": "others_unaffected",
+          "passed": false,
+          "detail": "client 2 input_send_failing at 11892 ms [known blocker v051-net-input-mtu]; client 2 server_no_input at 11966 ms [known blocker v051-net-input-mtu]; client 10 input_send_failing at 12036 ms [known blocker v051-net-input-mtu]; client 10 server_no_input at 12100 ms [known blocker v051-net-input-mtu]; client 18 input_send_failing at 12004 ms [known blocker v051-net-input-mtu]; client 18 server_no_input at 12066 ms [known blocker v051-net-input-mtu]; client 26 input_send_failing at 12036 ms [known blocker v051-net-input-mtu]; client 26 server_no_input at 12100 ms [known blocker v051-net-input-mtu]; client 0 snapshot staleness reached 32 ticks while the hostile peer was active (before: 2)",
+          "known_blockers": []
+        }
+      ],
+      "metrics": {
+        "joined": 32,
+        "ends_by_cause": {},
+        "server_ends_by_cause": {},
+        "ends_excused": 0,
+        "connect_refusals": {},
+        "connect_timeouts": 0,
+        "reconnects": 4,
+        "reconnects_ok": 4,
+        "reconnect_max_ms": 112,
+        "inputs_sent": 50181,
+        "input_send_errors": {
+          "too_large": 5897
+        },
+        "inputs_stamped_behind": 14,
+        "server_ticks_with_input": 51175,
+        "server_ticks_missed": 4866,
+        "worst_missed_fraction": 0.20225988700564973,
+        "corrections": 4128,
+        "correction_rate": 0.07432347274986047,
+        "correction_steps_p50": 1,
+        "correction_steps_max": 24,
+        "rollback_ticks_p50": 2,
+        "rollback_ticks_p99": 3,
+        "staleness_ticks_p50": 1,
+        "staleness_ticks_p99": 3,
+        "staleness_ticks_max": 32,
+        "worst_client_staleness_p99": 31,
+        "staleness_max_by_10s": [
+          2,
+          32,
+          32,
+          32,
+          31,
+          2,
+          2
+        ],
+        "staleness_max_by_client_10s": [
+          [
+            2,
+            32,
+            32,
+            32,
+            31,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            1
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ]
+        ],
+        "commands_sent": 624,
+        "commands_acked": 624,
+        "command_rtt_p99_ms": 272,
+        "down_bps_mean": 418132,
+        "down_bps_max": 433647,
+        "down_bps_second_half_max": 436431,
+        "up_bps_mean": 101198,
+        "up_bps_max": 115106,
+        "down_budget_bps": 1000000,
+        "up_budget_bps": 256000,
+        "min_entity_budget": 8,
+        "server_tick_us_p50": 886,
+        "server_tick_us_p99": 25395,
+        "server_tick_us_max": 45184,
+        "peak_heap_bytes": 0,
+        "drops": {
+          "no_route": 4,
+          "random": 397
+        },
+        "largest_client_datagram": 1200,
+        "largest_server_datagram": 1200
+      },
+      "ends": [],
+      "reconnects": [
+        {
+          "client": 5,
+          "kind": "scripted",
+          "start_ms": 20002,
+          "link_up_ms": 20002,
+          "connected_ms": 20114
+        },
+        {
+          "client": 13,
+          "kind": "scripted",
+          "start_ms": 20002,
+          "link_up_ms": 20002,
+          "connected_ms": 20114
+        },
+        {
+          "client": 21,
+          "kind": "scripted",
+          "start_ms": 20002,
+          "link_up_ms": 20002,
+          "connected_ms": 20114
+        },
+        {
+          "client": 29,
+          "kind": "scripted",
+          "start_ms": 20002,
+          "link_up_ms": 20002,
+          "connected_ms": 20114
+        }
+      ],
+      "wedges": [
+        {
+          "client": 2,
+          "kind": "input_send_failing",
+          "start_ms": 11892,
+          "length_ms": 6576,
+          "send_errors": {
+            "too_large": 197
+          }
+        },
+        {
+          "client": 2,
+          "kind": "server_no_input",
+          "start_ms": 11966,
+          "length_ms": 6534,
+          "send_errors": {
+            "too_large": 301
+          }
+        },
+        {
+          "client": 10,
+          "kind": "input_send_failing",
+          "start_ms": 12036,
+          "length_ms": 6400,
+          "send_errors": {
+            "too_large": 192
+          }
+        },
+        {
+          "client": 10,
+          "kind": "server_no_input",
+          "start_ms": 12100,
+          "length_ms": 6366,
+          "send_errors": {
+            "too_large": 395
+          }
+        },
+        {
+          "client": 18,
+          "kind": "input_send_failing",
+          "start_ms": 12004,
+          "length_ms": 6464,
+          "send_errors": {
+            "too_large": 194
+          }
+        },
+        {
+          "client": 18,
+          "kind": "server_no_input",
+          "start_ms": 12066,
+          "length_ms": 6434,
+          "send_errors": {
+            "too_large": 320
+          }
+        },
+        {
+          "client": 26,
+          "kind": "input_send_failing",
+          "start_ms": 12036,
+          "length_ms": 6400,
+          "send_errors": {
+            "too_large": 192
+          }
+        },
+        {
+          "client": 26,
+          "kind": "server_no_input",
+          "start_ms": 12100,
+          "length_ms": 6366,
+          "send_errors": {
+            "too_large": 357
+          }
+        }
+      ],
+      "hostile": {
+        "sessions": [
+          {
+            "kind": "over_cap_input",
+            "start_ms": 10000,
+            "end_ms": 20000,
+            "connected_ms": 10112,
+            "first_act_ms": 10112,
+            "dropped_ms": null,
+            "end_cause": null,
+            "acts": 618
+          },
+          {
+            "kind": "malformed_messages",
+            "start_ms": 20000,
+            "end_ms": 30000,
+            "connected_ms": 20112,
+            "first_act_ms": 20112,
+            "dropped_ms": null,
+            "end_cause": null,
+            "acts": 629
+          },
+          {
+            "kind": "flood",
+            "start_ms": 30000,
+            "end_ms": 40000,
+            "connected_ms": 30112,
+            "first_act_ms": 30112,
+            "dropped_ms": null,
+            "end_cause": null,
+            "acts": 1901468
+          }
+        ],
+        "replays_sent": 4992,
+        "garbage_sent": 15000,
+        "oversized_sent": 312
+      },
+      "server_totals": {
+        "datagrams_in": 126751,
+        "datagrams_out": 115443,
+        "foreign": 15255,
+        "malformed": 1243,
+        "accepted": 39,
+        "denied": 0,
+        "socket_errors": 0,
+        "rate_limited": 0,
+        "inbound_dropped": 204424,
+        "sealed_out": 115365,
+        "opened_in": 106345,
+        "auth_failed": 12,
+        "replayed": 1925,
+        "handshakes": 39,
+        "handshakes_refused": 0,
+        "pre_proof_shed": 0,
+        "rebinds": 28,
+        "rebinds_refused": 3136
+      },
+      "wall_ms": 8129,
+      "reproduce": "cargo xtask net-soak --profiles hostile --clients 32 --modes dedicated --seed 1592590337 --seconds 60"
+    },
+    {
+      "label": "good-wifi/8/listen",
+      "scenario": {
+        "profile": {
+          "name": "good-wifi",
+          "summary": "4 ms + 0-4 ms jitter, 0.2 % loss, 0.1 % reorder, 0.05 % dup, 20/50 Mbit/s",
+          "up": {
+            "latency_ms": 4,
+            "jitter_ms": 4,
+            "loss": 0.002,
+            "burst": null,
+            "reorder": 0.001,
+            "reorder_ms": 10,
+            "duplicate": 0.0005,
+            "bandwidth_bps": 20000000,
+            "queue_bytes": 65536,
+            "mtu": 0
+          },
+          "down": {
+            "latency_ms": 4,
+            "jitter_ms": 4,
+            "loss": 0.002,
+            "burst": null,
+            "reorder": 0.001,
+            "reorder_ms": 10,
+            "duplicate": 0.0005,
+            "bandwidth_bps": 50000000,
+            "queue_bytes": 65536,
+            "mtu": 0
+          },
+          "flaps": null,
+          "long_outage_ms": null,
+          "rebind_at": null,
+          "hostile": false
+        },
+        "clients": 8,
+        "mode": "listen",
+        "seed": 1592590337,
+        "duration_ms": 60000
+      },
+      "passed": false,
+      "bars": [
+        {
+          "id": "involuntary_disconnects",
+          "passed": true,
+          "detail": "0 involuntary ends (0 excused by outages beyond the timeout)",
+          "known_blockers": []
+        },
+        {
+          "id": "reconnect_within_grace",
+          "passed": true,
+          "detail": "1 rejoins, longest 112 ms after the link was up (grace 3000 ms)",
+          "known_blockers": []
+        },
+        {
+          "id": "no_wedged_client",
+          "passed": false,
+          "detail": "client 2 input_send_failing for 6416 ms from 12020 ms (input send errors {\"too_large\": 193}) [known blocker v051-net-input-mtu]; client 2 server_no_input for 6400 ms from 12066 ms (input send errors {\"too_large\": 283}) [known blocker v051-net-input-mtu]",
+          "known_blockers": [
+            "v051-net-input-mtu"
+          ]
+        }
+      ],
+      "metrics": {
+        "joined": 8,
+        "ends_by_cause": {},
+        "server_ends_by_cause": {},
+        "ends_excused": 0,
+        "connect_refusals": {},
+        "connect_timeouts": 0,
+        "reconnects": 1,
+        "reconnects_ok": 1,
+        "reconnect_max_ms": 112,
+        "inputs_sent": 12632,
+        "input_send_errors": {
+          "too_large": 1428
+        },
+        "inputs_stamped_behind": 0,
+        "server_ticks_with_input": 12866,
+        "server_ticks_missed": 1166,
+        "worst_missed_fraction": 0.1471251409244645,
+        "corrections": 1001,
+        "correction_rate": 0.0713369441277081,
+        "correction_steps_p50": 2,
+        "correction_steps_max": 2,
+        "rollback_ticks_p50": 3,
+        "rollback_ticks_p99": 3,
+        "staleness_ticks_p50": 2,
+        "staleness_ticks_p99": 2,
+        "staleness_ticks_max": 2,
+        "worst_client_staleness_p99": 2,
+        "staleness_max_by_10s": [
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          1
+        ],
+        "staleness_max_by_client_10s": [
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            1
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ]
+        ],
+        "commands_sent": 155,
+        "commands_acked": 155,
+        "command_rtt_p99_ms": 64,
+        "down_bps_mean": 427773,
+        "down_bps_max": 435988,
+        "down_bps_second_half_max": 436824,
+        "up_bps_mean": 102051,
+        "up_bps_max": 114342,
+        "down_budget_bps": 1000000,
+        "up_budget_bps": 256000,
+        "min_entity_budget": 139,
+        "server_tick_us_p50": 214,
+        "server_tick_us_p99": 536,
+        "server_tick_us_max": 55525,
+        "peak_heap_bytes": 0,
+        "drops": {
+          "random": 114
+        },
+        "largest_client_datagram": 1200,
+        "largest_server_datagram": 1200
+      },
+      "ends": [],
+      "reconnects": [
+        {
+          "client": 5,
+          "kind": "scripted",
+          "start_ms": 20002,
+          "link_up_ms": 20002,
+          "connected_ms": 20114
+        }
+      ],
+      "wedges": [
+        {
+          "client": 2,
+          "kind": "input_send_failing",
+          "start_ms": 12020,
+          "length_ms": 6416,
+          "send_errors": {
+            "too_large": 193
+          }
+        },
+        {
+          "client": 2,
+          "kind": "server_no_input",
+          "start_ms": 12066,
+          "length_ms": 6400,
+          "send_errors": {
+            "too_large": 283
+          }
+        }
+      ],
+      "hostile": null,
+      "server_totals": {
+        "datagrams_in": 24103,
+        "datagrams_out": 28861,
+        "foreign": 0,
+        "malformed": 0,
+        "accepted": 9,
+        "denied": 0,
+        "socket_errors": 0,
+        "rate_limited": 0,
+        "inbound_dropped": 0,
+        "sealed_out": 28843,
+        "opened_in": 24076,
+        "auth_failed": 2,
+        "replayed": 7,
+        "handshakes": 9,
+        "handshakes_refused": 0,
+        "pre_proof_shed": 0,
+        "rebinds": 0,
+        "rebinds_refused": 0
+      },
+      "wall_ms": 1140,
+      "reproduce": "cargo xtask net-soak --profiles good-wifi --clients 8 --modes listen --seed 1592590337 --seconds 60"
+    },
+    {
+      "label": "congested/8/listen",
+      "scenario": {
+        "profile": {
+          "name": "congested",
+          "summary": "15 ms + 0-10 ms jitter, downstream capped at 256 kbit/s (below the game's ~450 kbit/s) behind a 16 KiB drop-tail queue, 1 Mbit/s up",
+          "up": {
+            "latency_ms": 15,
+            "jitter_ms": 10,
+            "loss": 0.0,
+            "burst": null,
+            "reorder": 0.0,
+            "reorder_ms": 0,
+            "duplicate": 0.0,
+            "bandwidth_bps": 1000000,
+            "queue_bytes": 16384,
+            "mtu": 0
+          },
+          "down": {
+            "latency_ms": 15,
+            "jitter_ms": 10,
+            "loss": 0.0,
+            "burst": null,
+            "reorder": 0.0,
+            "reorder_ms": 0,
+            "duplicate": 0.0,
+            "bandwidth_bps": 256000,
+            "queue_bytes": 16384,
+            "mtu": 0
+          },
+          "flaps": null,
+          "long_outage_ms": null,
+          "rebind_at": null,
+          "hostile": false
+        },
+        "clients": 8,
+        "mode": "listen",
+        "seed": 1592590337,
+        "duration_ms": 60000
+      },
+      "passed": false,
+      "bars": [
+        {
+          "id": "involuntary_disconnects",
+          "passed": true,
+          "detail": "0 involuntary ends (0 excused by outages beyond the timeout)",
+          "known_blockers": []
+        },
+        {
+          "id": "reconnect_within_grace",
+          "passed": true,
+          "detail": "1 rejoins, longest 240 ms after the link was up (grace 3000 ms)",
+          "known_blockers": []
+        },
+        {
+          "id": "no_wedged_client",
+          "passed": false,
+          "detail": "client 0 server_no_input for 3632 ms from 3634 ms (input send errors {\"too_large\": 150}); client 0 server_no_input for 8200 ms from 16100 ms (input send errors {\"too_large\": 150}); client 0 server_no_input for 8200 ms from 33434 ms (input send errors {\"too_large\": 150}); client 0 server_no_input for 8534 ms from 50766 ms (input send errors {\"too_large\": 150}); client 1 server_no_input for 2834 ms from 4666 ms (input send errors {\"too_large\": 103}); client 1 server_no_input for 8432 ms from 16634 ms (input send errors {\"too_large\": 103}); client 1 server_no_input for 8232 ms from 33934 ms (input send errors {\"too_large\": 103}); client 1 server_no_input for 8568 ms from 51266 ms (input send errors {\"too_large\": 103}); client 2 server_no_input for 3366 ms from 4434 ms (input send errors {\"too_large\": 284}); client 2 input_send_failing for 6416 ms from 12004 ms (input send errors {\"too_large\": 186}) [known blocker v051-net-input-mtu]; client 2 server_no_input for 12800 ms from 12066 ms (input send errors {\"too_large\": 284}) [known blocker v051-net-input-mtu]; client 2 server_no_input for 8234 ms from 33966 ms (input send errors {\"too_large\": 284}); client 2 server_no_input for 8200 ms from 51334 ms (input send errors {\"too_large\": 284}); client 3 server_no_input for 2100 ms from 6266 ms (input send errors {\"too_large\": 161}); client 3 server_no_input for 8000 ms from 17434 ms (input send errors {\"too_large\": 161}); client 3 server_no_input for 8066 ms from 34700 ms (input send errors {\"too_large\": 161}); client 3 server_no_input for 7900 ms from 52100 ms (input send errors {\"too_large\": 161}); client 4 server_no_input for 3366 ms from 4900 ms (input send errors {\"too_large\": 211}); client 4 server_no_input for 8466 ms from 17400 ms (input send errors {\"too_large\": 211}); client 4 server_no_input for 8700 ms from 34966 ms (input send errors {\"too_large\": 211}); client 4 server_no_input for 7400 ms from 52600 ms (input send errors {\"too_large\": 211}); client 5 server_no_input for 2300 ms from 6200 ms (input send errors {\"too_large\": 155}); client 5 server_no_input for 2366 ms from 25200 ms (input send errors {\"too_large\": 155}); client 5 server_no_input for 8268 ms from 36166 ms (input send errors {\"too_large\": 155}); client 5 server_no_input for 6500 ms from 53500 ms (input send errors {\"too_large\": 155}); client 6 server_no_input for 3366 ms from 5434 ms (input send errors {\"too_large\": 159}); client 6 server_no_input for 8532 ms from 17934 ms (input send errors {\"too_large\": 159}); client 6 server_no_input for 8268 ms from 34966 ms (input send errors {\"too_large\": 159}); client 6 server_no_input for 7700 ms from 52300 ms (input send errors {\"too_large\": 159}); client 7 server_no_input for 3634 ms from 5366 ms (input send errors {\"too_large\": 176}); client 7 server_no_input for 8732 ms from 17834 ms (input send errors {\"too_large\": 176}); client 7 server_no_input for 8168 ms from 35466 ms (input send errors {\"too_large\": 176}); client 7 server_no_input for 7466 ms from 52534 ms (input send errors {\"too_large\": 176})",
+          "known_blockers": []
+        },
+        {
+          "id": "bandwidth_within_budget",
+          "passed": true,
+          "detail": "highest second-half offered downstream 251076 bit/s, cap 256000 bit/s",
+          "known_blockers": []
+        }
+      ],
+      "metrics": {
+        "joined": 8,
+        "ends_by_cause": {},
+        "server_ends_by_cause": {},
+        "ends_excused": 0,
+        "connect_refusals": {},
+        "connect_timeouts": 0,
+        "reconnects": 1,
+        "reconnects_ok": 1,
+        "reconnect_max_ms": 240,
+        "inputs_sent": 12562,
+        "input_send_errors": {
+          "too_large": 1399
+        },
+        "inputs_stamped_behind": 23,
+        "server_ticks_with_input": 6670,
+        "server_ticks_missed": 7270,
+        "worst_missed_fraction": 0.589582140812822,
+        "corrections": 6122,
+        "correction_rate": 0.4436231884057971,
+        "correction_steps_p50": 2,
+        "correction_steps_max": 4,
+        "rollback_ticks_p50": 10,
+        "rollback_ticks_p99": 25,
+        "staleness_ticks_p50": 5,
+        "staleness_ticks_p99": 24,
+        "staleness_ticks_max": 25,
+        "worst_client_staleness_p99": 24,
+        "staleness_max_by_10s": [
+          25,
+          13,
+          25,
+          13,
+          13,
+          13,
+          2
+        ],
+        "staleness_max_by_client_10s": [
+          [
+            25,
+            11,
+            10,
+            11,
+            10,
+            11,
+            2
+          ],
+          [
+            25,
+            11,
+            11,
+            12,
+            10,
+            11
+          ],
+          [
+            25,
+            11,
+            11,
+            12,
+            11,
+            11
+          ],
+          [
+            25,
+            11,
+            10,
+            13,
+            13,
+            11
+          ],
+          [
+            25,
+            12,
+            10,
+            11,
+            11,
+            12
+          ],
+          [
+            25,
+            9,
+            25,
+            12,
+            12,
+            13
+          ],
+          [
+            25,
+            13,
+            13,
+            13,
+            13,
+            11
+          ],
+          [
+            25,
+            12,
+            12,
+            11,
+            11,
+            13
+          ]
+        ],
+        "commands_sent": 156,
+        "commands_acked": 156,
+        "command_rtt_p99_ms": 656,
+        "down_bps_mean": 191421,
+        "down_bps_max": 195094,
+        "down_bps_second_half_max": 251076,
+        "up_bps_mean": 99632,
+        "up_bps_max": 110285,
+        "down_budget_bps": 256000,
+        "up_budget_bps": 256000,
+        "min_entity_budget": 8,
+        "server_tick_us_p50": 143,
+        "server_tick_us_p99": 20315,
+        "server_tick_us_max": 260285,
+        "peak_heap_bytes": 0,
+        "drops": {
+          "queue": 4255
+        },
+        "largest_client_datagram": 1200,
+        "largest_server_datagram": 1200
+      },
+      "ends": [],
+      "reconnects": [
+        {
+          "client": 5,
+          "kind": "scripted",
+          "start_ms": 20002,
+          "link_up_ms": 20002,
+          "connected_ms": 20242
+        }
+      ],
+      "wedges": [
+        {
+          "client": 0,
+          "kind": "server_no_input",
+          "start_ms": 3634,
+          "length_ms": 3632,
+          "send_errors": {
+            "too_large": 150
+          }
+        },
+        {
+          "client": 0,
+          "kind": "server_no_input",
+          "start_ms": 16100,
+          "length_ms": 8200,
+          "send_errors": {
+            "too_large": 150
+          }
+        },
+        {
+          "client": 0,
+          "kind": "server_no_input",
+          "start_ms": 33434,
+          "length_ms": 8200,
+          "send_errors": {
+            "too_large": 150
+          }
+        },
+        {
+          "client": 0,
+          "kind": "server_no_input",
+          "start_ms": 50766,
+          "length_ms": 8534,
+          "send_errors": {
+            "too_large": 150
+          }
+        },
+        {
+          "client": 1,
+          "kind": "server_no_input",
+          "start_ms": 4666,
+          "length_ms": 2834,
+          "send_errors": {
+            "too_large": 103
+          }
+        },
+        {
+          "client": 1,
+          "kind": "server_no_input",
+          "start_ms": 16634,
+          "length_ms": 8432,
+          "send_errors": {
+            "too_large": 103
+          }
+        },
+        {
+          "client": 1,
+          "kind": "server_no_input",
+          "start_ms": 33934,
+          "length_ms": 8232,
+          "send_errors": {
+            "too_large": 103
+          }
+        },
+        {
+          "client": 1,
+          "kind": "server_no_input",
+          "start_ms": 51266,
+          "length_ms": 8568,
+          "send_errors": {
+            "too_large": 103
+          }
+        },
+        {
+          "client": 2,
+          "kind": "server_no_input",
+          "start_ms": 4434,
+          "length_ms": 3366,
+          "send_errors": {
+            "too_large": 284
+          }
+        },
+        {
+          "client": 2,
+          "kind": "input_send_failing",
+          "start_ms": 12004,
+          "length_ms": 6416,
+          "send_errors": {
+            "too_large": 186
+          }
+        },
+        {
+          "client": 2,
+          "kind": "server_no_input",
+          "start_ms": 12066,
+          "length_ms": 12800,
+          "send_errors": {
+            "too_large": 284
+          }
+        },
+        {
+          "client": 2,
+          "kind": "server_no_input",
+          "start_ms": 33966,
+          "length_ms": 8234,
+          "send_errors": {
+            "too_large": 284
+          }
+        },
+        {
+          "client": 2,
+          "kind": "server_no_input",
+          "start_ms": 51334,
+          "length_ms": 8200,
+          "send_errors": {
+            "too_large": 284
+          }
+        },
+        {
+          "client": 3,
+          "kind": "server_no_input",
+          "start_ms": 6266,
+          "length_ms": 2100,
+          "send_errors": {
+            "too_large": 161
+          }
+        },
+        {
+          "client": 3,
+          "kind": "server_no_input",
+          "start_ms": 17434,
+          "length_ms": 8000,
+          "send_errors": {
+            "too_large": 161
+          }
+        },
+        {
+          "client": 3,
+          "kind": "server_no_input",
+          "start_ms": 34700,
+          "length_ms": 8066,
+          "send_errors": {
+            "too_large": 161
+          }
+        },
+        {
+          "client": 3,
+          "kind": "server_no_input",
+          "start_ms": 52100,
+          "length_ms": 7900,
+          "send_errors": {
+            "too_large": 161
+          }
+        },
+        {
+          "client": 4,
+          "kind": "server_no_input",
+          "start_ms": 4900,
+          "length_ms": 3366,
+          "send_errors": {
+            "too_large": 211
+          }
+        },
+        {
+          "client": 4,
+          "kind": "server_no_input",
+          "start_ms": 17400,
+          "length_ms": 8466,
+          "send_errors": {
+            "too_large": 211
+          }
+        },
+        {
+          "client": 4,
+          "kind": "server_no_input",
+          "start_ms": 34966,
+          "length_ms": 8700,
+          "send_errors": {
+            "too_large": 211
+          }
+        },
+        {
+          "client": 4,
+          "kind": "server_no_input",
+          "start_ms": 52600,
+          "length_ms": 7400,
+          "send_errors": {
+            "too_large": 211
+          }
+        },
+        {
+          "client": 5,
+          "kind": "server_no_input",
+          "start_ms": 6200,
+          "length_ms": 2300,
+          "send_errors": {
+            "too_large": 155
+          }
+        },
+        {
+          "client": 5,
+          "kind": "server_no_input",
+          "start_ms": 25200,
+          "length_ms": 2366,
+          "send_errors": {
+            "too_large": 155
+          }
+        },
+        {
+          "client": 5,
+          "kind": "server_no_input",
+          "start_ms": 36166,
+          "length_ms": 8268,
+          "send_errors": {
+            "too_large": 155
+          }
+        },
+        {
+          "client": 5,
+          "kind": "server_no_input",
+          "start_ms": 53500,
+          "length_ms": 6500,
+          "send_errors": {
+            "too_large": 155
+          }
+        },
+        {
+          "client": 6,
+          "kind": "server_no_input",
+          "start_ms": 5434,
+          "length_ms": 3366,
+          "send_errors": {
+            "too_large": 159
+          }
+        },
+        {
+          "client": 6,
+          "kind": "server_no_input",
+          "start_ms": 17934,
+          "length_ms": 8532,
+          "send_errors": {
+            "too_large": 159
+          }
+        },
+        {
+          "client": 6,
+          "kind": "server_no_input",
+          "start_ms": 34966,
+          "length_ms": 8268,
+          "send_errors": {
+            "too_large": 159
+          }
+        },
+        {
+          "client": 6,
+          "kind": "server_no_input",
+          "start_ms": 52300,
+          "length_ms": 7700,
+          "send_errors": {
+            "too_large": 159
+          }
+        },
+        {
+          "client": 7,
+          "kind": "server_no_input",
+          "start_ms": 5366,
+          "length_ms": 3634,
+          "send_errors": {
+            "too_large": 176
+          }
+        },
+        {
+          "client": 7,
+          "kind": "server_no_input",
+          "start_ms": 17834,
+          "length_ms": 8732,
+          "send_errors": {
+            "too_large": 176
+          }
+        },
+        {
+          "client": 7,
+          "kind": "server_no_input",
+          "start_ms": 35466,
+          "length_ms": 8168,
+          "send_errors": {
+            "too_large": 176
+          }
+        },
+        {
+          "client": 7,
+          "kind": "server_no_input",
+          "start_ms": 52534,
+          "length_ms": 7466,
+          "send_errors": {
+            "too_large": 176
+          }
+        }
+      ],
+      "hostile": null,
+      "server_totals": {
+        "datagrams_in": 20942,
+        "datagrams_out": 19904,
+        "foreign": 0,
+        "malformed": 0,
+        "accepted": 9,
+        "denied": 0,
+        "socket_errors": 0,
+        "rate_limited": 0,
+        "inbound_dropped": 0,
+        "sealed_out": 19886,
+        "opened_in": 20922,
+        "auth_failed": 2,
+        "replayed": 0,
+        "handshakes": 9,
+        "handshakes_refused": 0,
+        "pre_proof_shed": 0,
+        "rebinds": 0,
+        "rebinds_refused": 0
+      },
+      "wall_ms": 2728,
+      "reproduce": "cargo xtask net-soak --profiles congested --clients 8 --modes listen --seed 1592590337 --seconds 60"
+    }
+  ],
+  "tick_hz": 30
+}

@@ -1,0 +1,4 @@
+# Oracle for hero-slides-in: the calls a careful agent makes after the setup.
+{"method":"play.pause"}
+{"method":"sequence.player","params":{"action":"load","seq_ron":"(version: 2, name: \"slide\", fps: 30.0, tracks: [(name: \"move\", target: \"hero\", property: \"transform.position\", keys: Vec3([(time: 0.0, value: (0.0, 0.0, 0.0)), (time: 2.0, value: (10.0, 0.0, 0.0))]))], markers: [(name: \"arrived\", time: 2.0)])","bindings":{"hero":"$h"},"end":"hold","play":true}}
+{"method":"play.step","params":{"frames":200}}

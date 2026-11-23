@@ -1,0 +1,31 @@
+// The arena bot (spec 38): wait out the warm-up, fight while armed, restock at a resupply
+// station (a smart object) when the magazine is empty. `Sense` runs first on every tick and
+// writes `in_round`, `ammo`, `has_target` and `target_dist` to the blackboard.
+(
+    format_version: 2,
+    description: "samples/arena bot",
+    root: "Bot",
+    state_key: "state",
+    ambient: ["arena::brain::Sense"],
+    states: [
+        // A completed child would finish the whole tree; start over from the top instead.
+        (name: "Bot", children: ["Idle", "Fight", "Resupply"],
+         transitions: [(trigger: Completed, target: State("Bot"))]),
+        (name: "Idle",
+         enter: Not(Key("in_round")),
+         transitions: [(trigger: Tick, condition: Key("in_round"), target: Parent)]),
+        (name: "Fight",
+         enter: Compare(key: "ammo", op: Ge, value: 1.0),
+         tasks: ["arena::brain::Engage"],
+         transitions: [
+             (trigger: Tick, condition: Not(Key("in_round")), priority: 2, target: State("Idle")),
+             (trigger: Tick, condition: Compare(key: "ammo", op: Lt, value: 1.0), priority: 1, target: State("Resupply")),
+         ]),
+        (name: "Resupply",
+         tasks: ["arena::brain::Restock"],
+         transitions: [
+             (trigger: Tick, condition: Not(Key("in_round")), priority: 2, target: State("Idle")),
+             (trigger: Succeeded, target: State("Fight")),
+         ]),
+    ],
+)

@@ -1,0 +1,22 @@
+ProcGraph(
+    format_version: 1,
+    description: "Road tool preset: the Path tool's spline becomes a road ribbon with junction patches and markings (spec 64 § 7, spec 67 § 5)",
+    nodes: {
+        1: (ty: "in.self", settings: {}, at: (0.0, 0.0)),
+        2: (ty: "items.by_kind", settings: {kinds: ["Spline"]}, at: (220.0, 0.0)),
+        3: (ty: "in.ground", settings: {}, at: (220.0, 160.0)),
+        4: (ty: "road.junctions", settings: {profile: RoadProfile(format_version: 1, width_m: 6.0, shoulders_m: (0.6, 0.6), markings: [(pattern: "dash(3, 9)", offset_m: 0.0, width_m: 0.15, color: (1.0, 1.0, 0.9))])}, at: (440.0, 0.0)),
+        5: (ty: "road.ribbon", settings: {profile: RoadProfile(format_version: 1, width_m: 6.0, shoulders_m: (0.6, 0.6), markings: [(pattern: "dash(3, 9)", offset_m: 0.0, width_m: 0.15, color: (1.0, 1.0, 0.9))])}, at: (660.0, 0.0)),
+        6: (ty: "road.markings", settings: {profile: RoadProfile(format_version: 1, width_m: 6.0, shoulders_m: (0.6, 0.6), markings: [(pattern: "dash(3, 9)", offset_m: 0.0, width_m: 0.15, color: (1.0, 1.0, 0.9))])}, at: (660.0, 160.0)),
+    },
+    edges: [
+        (from: (1, "out"), to: (2, "in")),
+        (from: (2, "inside"), to: (4, "splines")),
+        (from: (3, "out"), to: (4, "ground")),
+        (from: (4, "out_splines"), to: (5, "splines")),
+        (from: (3, "out"), to: (5, "ground")),
+        (from: (4, "out_splines"), to: (6, "splines")),
+        (from: (3, "out"), to: (6, "ground")),
+    ],
+    flags: (starter: true, tool: Some("path")),
+)
