@@ -11,15 +11,21 @@
 //! The server key the endpoint pins is the one in the owner's ticket that came over the
 //! authenticated hub link. A relay whose ticket names another key fails the reach with
 //! `hub_key_mismatch` before the endpoint sends anything.
+//!
+//! [`JoinPlanDriver`] runs the same plan when the game keeps the socket: it pushes received
+//! datagrams and reads the ones to send (ADR-10376). [`HubReach`] stays the wrapper that owns a
+//! socket. Neither needs the `ecs` feature.
 
+use std::collections::VecDeque;
 use std::io;
 use std::net::SocketAddr;
+use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
 
 use super::HubError;
 use super::join::{JoinPlan, ReachKind};
 use crate::crypto::ServerKey;
 use crate::server_host::{JoinPath, JoinRoute, JoinSocket};
-use crate::socket::DatagramSocket;
+use crate::socket::{DatagramSocket, MAX_DATAGRAM_BYTES};
 
 /// The socket the member's game endpoint uses once the reach is ready.
 pub enum ReachSocket<S> {
@@ -232,17 +238,211 @@ impl<S: DatagramSocket> HubReach<S> {
     }
 }
 
+fn lock<T>(m: &Mutex<T>) -> MutexGuard<'_, T> {
+    m.lock().unwrap_or_else(PoisonError::into_inner)
+}
+
+/// Datagrams queued in one direction of a [`JoinPlanDriver`] before the next one is dropped.
+pub const PLAN_QUEUE: usize = 4096;
+
+struct PlanQueues {
+    inbound: VecDeque<(Vec<u8>, SocketAddr)>,
+    outbound: VecDeque<(Vec<u8>, SocketAddr)>,
+    local: SocketAddr,
+    dropped: u64,
+}
+
+/// The in-memory socket a [`JoinPlanDriver`] runs a [`JoinPlan`] on.
+///
+/// The game does not bind this socket. It feeds datagrams with [`JoinPlanDriver::push_datagram`]
+/// and sends what [`JoinPlanDriver::poll_send`] returns on the socket it owns. Once
+/// [`JoinPlanDriver::take_endpoint`] hands the endpoint its socket, both share this queue.
+pub struct PlanSocket {
+    queues: Arc<Mutex<PlanQueues>>,
+}
+
+impl std::fmt::Debug for PlanSocket {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let q = lock(&self.queues);
+        f.debug_struct("PlanSocket")
+            .field("local", &q.local)
+            .field("inbound", &q.inbound.len())
+            .field("outbound", &q.outbound.len())
+            .field("dropped", &q.dropped)
+            .finish()
+    }
+}
+
+impl DatagramSocket for PlanSocket {
+    fn send_to(&mut self, bytes: &[u8], dest: SocketAddr) -> io::Result<()> {
+        if bytes.len() > MAX_DATAGRAM_BYTES {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "datagram exceeds MAX_DATAGRAM_BYTES",
+            ));
+        }
+        let mut q = lock(&self.queues);
+        if q.outbound.len() >= PLAN_QUEUE {
+            q.dropped = q.dropped.saturating_add(1);
+            return Err(io::Error::new(io::ErrorKind::WouldBlock, "plan send queue full"));
+        }
+        q.outbound.push_back((bytes.to_vec(), dest));
+        Ok(())
+    }
+
+    fn recv_from(&mut self, buf: &mut [u8]) -> io::Result<Option<(usize, SocketAddr)>> {
+        let mut q = lock(&self.queues);
+        let Some((bytes, _)) = q.inbound.front() else {
+            return Ok(None);
+        };
+        if buf.len() < bytes.len() {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "datagram buffer shorter than the queued datagram",
+            ));
+        }
+        let Some((bytes, from)) = q.inbound.pop_front() else {
+            return Ok(None);
+        };
+        let n = bytes.len();
+        buf[..n].copy_from_slice(&bytes);
+        Ok(Some((n, from)))
+    }
+
+    fn local_addr(&self) -> io::Result<SocketAddr> {
+        Ok(lock(&self.queues).local)
+    }
+}
+
+/// The socket a member's game endpoint uses once [`JoinPlanDriver::take_endpoint`] is ready.
+pub type PlanEndpoint = ReachSocket<PlanSocket>;
+
+/// A member's [`JoinPlan`] on a socket the caller owns (ADR-10376).
+///
+/// [`HubReach`] owns the socket it is given. A game that already owns its socket keeps it and
+/// drives this instead: each frame, push the datagrams the socket received, call [`Self::advance`]
+/// with the game's clock, and send whatever [`Self::poll_send`] returns. [`Self::take_endpoint`]
+/// then gives the game endpoint a socket on the same queues, so the handshake and a relay control
+/// half that is still running share the caller's socket.
+///
+/// No wire format changes. A relay ticket that names another key than the plan fails with
+/// `hub_key_mismatch`; a plan the reach cannot run fails with `hub_reach_invalid`; a join path
+/// that fails carries that path's `JoinError` code. All of those are lowercase.
+pub struct JoinPlanDriver {
+    queues: Arc<Mutex<PlanQueues>>,
+    reach: HubReach<PlanSocket>,
+}
+
+impl std::fmt::Debug for JoinPlanDriver {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("JoinPlanDriver")
+            .field("reach", &self.reach)
+            .field("dropped", &self.dropped())
+            .finish()
+    }
+}
+
+impl JoinPlanDriver {
+    /// Starts `plan` as if the game socket were bound at `local`. `client_key` is the member's
+    /// secret relay allocation key (`server_host::fresh_allocation_key`).
+    ///
+    /// # Errors
+    ///
+    /// [`HubError::ReachInvalid`] (`hub_reach_invalid`) for a mapped plan without an address, or a
+    /// punch or relay plan without a relay and a valid join code. The same rules as
+    /// [`HubReach::new`].
+    pub fn start(
+        local: SocketAddr,
+        plan: &JoinPlan,
+        client_key: [u8; crate::relay::RELAY_ALLOCATION_KEY_BYTES],
+    ) -> Result<Self, HubError> {
+        let queues = Arc::new(Mutex::new(PlanQueues {
+            inbound: VecDeque::new(),
+            outbound: VecDeque::new(),
+            local,
+            dropped: 0,
+        }));
+        let socket = PlanSocket {
+            queues: Arc::clone(&queues),
+        };
+        let reach = HubReach::new(socket, plan, client_key)?;
+        Ok(Self { queues, reach })
+    }
+
+    /// Copies one datagram the caller's socket received from `from`.
+    ///
+    /// Returns `false` without queueing when `bytes` is longer than [`MAX_DATAGRAM_BYTES`] (the
+    /// datagram is refused whole, never cut short) or the inbound queue already holds
+    /// [`PLAN_QUEUE`] datagrams. A refused datagram counts in [`Self::dropped`].
+    pub fn push_datagram(&self, from: SocketAddr, bytes: &[u8]) -> bool {
+        let mut q = lock(&self.queues);
+        if bytes.len() > MAX_DATAGRAM_BYTES || q.inbound.len() >= PLAN_QUEUE {
+            q.dropped = q.dropped.saturating_add(1);
+            return false;
+        }
+        q.inbound.push_back((bytes.to_vec(), from));
+        true
+    }
+
+    /// The next datagram the plan or the endpoint wants sent, and the address to send it to.
+    /// `Ok(())` from the plan's socket means the datagram is in this queue.
+    pub fn poll_send(&self) -> Option<(Vec<u8>, SocketAddr)> {
+        lock(&self.queues).outbound.pop_front()
+    }
+
+    /// Datagrams [`Self::push_datagram`] refused, plus sends the plan's socket could not queue.
+    pub fn dropped(&self) -> u64 {
+        lock(&self.queues).dropped
+    }
+
+    /// The plan.
+    pub fn plan(&self) -> &JoinPlan {
+        self.reach.plan()
+    }
+
+    /// The state.
+    pub fn state(&self) -> &ReachState {
+        self.reach.state()
+    }
+
+    /// The join path (punch and relay plans).
+    pub fn join_path(&self) -> Option<&JoinPath<PlanSocket>> {
+        self.reach.join_path()
+    }
+
+    /// Runs the path's relay control and checks. Call it every frame after pushing what the
+    /// caller's socket received and before reading [`Self::poll_send`].
+    pub fn advance(&mut self, now_ms: u64) -> &ReachState {
+        self.reach.update(now_ms)
+    }
+
+    /// The path that carries the session and the connectivity checks sent, once it is settled.
+    /// Report it with `HubLobbyBackend::report_reach` after the endpoint connected.
+    pub fn outcome(&self) -> Option<(ReachKind, u32)> {
+        self.reach.outcome()
+    }
+
+    /// The endpoint's socket, the address to connect it to, and the key to pin, once
+    /// [`ReachState::Ready`] (once). The key is the plan's. The returned socket shares this
+    /// driver's queues: keep calling [`Self::push_datagram`] and [`Self::poll_send`].
+    pub fn take_endpoint(&mut self) -> Option<(PlanEndpoint, SocketAddr, Option<ServerKey>)> {
+        self.reach.take_socket()
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    use std::io;
     use std::net::SocketAddr;
 
-    use super::{HubReach, ReachState};
+    use super::{HubReach, JoinPlanDriver, ReachState};
     use crate::crypto::{PlayerKey, ServerIdentity, ServerKey};
     use crate::lobby::hub::join::{JoinPlan, ReachKind};
     use crate::lobby::{LobbyId, MemberId};
     use crate::relay::{RELAY_ALLOCATION_KEY_BYTES, RelayServer};
     use crate::server_host::{JoinTicket, RelayRegistrar};
-    use crate::socket::{LoopbackNet, LoopbackSocket};
+    use crate::socket::DatagramSocket;
+    use crate::socket::{LoopbackNet, LoopbackSocket, MAX_DATAGRAM_BYTES};
 
     struct Registered {
         net: LoopbackNet,
@@ -384,5 +584,66 @@ mod tests {
                 ReachState::Dialing => panic!("{path:?} did not settle"),
             }
         }
+    }
+
+    /// A mapped plan on a caller-owned socket is ready at once, pins the plan's key, and
+    /// round-trips datagrams through the queues the game feeds (ADR-10376).
+    #[test]
+    fn a_mapped_plan_on_a_caller_owned_socket_round_trips() {
+        let local: SocketAddr = "10.0.0.2:5000".parse().expect("local");
+        let mapped: SocketAddr = "198.51.100.7:7777".parse().expect("mapped");
+        let key = ServerIdentity::from_private([6; 32]).expect("curve").public();
+        let ticket = JoinTicket {
+            addr: mapped,
+            server_key: Some(key),
+        };
+        let plan = JoinPlan {
+            lobby: LobbyId(1),
+            peer: MemberId(1),
+            peer_identity: PlayerKey([1; 32]),
+            path: ReachKind::Mapped,
+            mapped: Some(mapped),
+            candidates: Vec::new(),
+            relay: None,
+            join_code: None,
+            ticket: ticket.encode(),
+        };
+        let mut driver =
+            JoinPlanDriver::start(local, &plan, [9; RELAY_ALLOCATION_KEY_BYTES]).expect("mapped plan");
+        assert!(matches!(driver.state(), ReachState::Ready));
+        assert_eq!(driver.outcome(), Some((ReachKind::Mapped, 0)));
+        assert!(driver.join_path().is_none(), "a mapped plan dials the address");
+        let (mut endpoint, addr, pin) = driver.take_endpoint().expect("ready");
+        assert_eq!(addr, mapped);
+        assert_eq!(pin, Some(key));
+        assert_eq!(pin, plan.server_key());
+        assert!(driver.take_endpoint().is_none(), "the endpoint is taken once");
+
+        let from: SocketAddr = "198.51.100.7:9".parse().expect("from");
+        assert!(driver.push_datagram(from, b""));
+        assert!(driver.push_datagram(from, b"hello"));
+        let mut buf = [0u8; 64];
+        assert_eq!(endpoint.recv_from(&mut buf).expect("recv"), Some((0, from)));
+        assert_eq!(endpoint.recv_from(&mut buf).expect("recv"), Some((5, from)));
+        assert_eq!(&buf[..5], b"hello");
+
+        let too_long = vec![0u8; MAX_DATAGRAM_BYTES + 1];
+        assert!(
+            !driver.push_datagram(from, &too_long),
+            "an oversized datagram is refused whole"
+        );
+        assert_eq!(driver.dropped(), 1);
+        assert!(endpoint.recv_from(&mut buf).expect("empty").is_none());
+
+        let err = endpoint
+            .send_to(&too_long, mapped)
+            .expect_err("send refuses the same bound");
+        assert_eq!(err.kind(), io::ErrorKind::InvalidInput);
+        assert_eq!(driver.dropped(), 1, "a refused send is not a dropped queue slot");
+        assert!(driver.poll_send().is_none());
+
+        endpoint.send_to(b"out", mapped).expect("queue the reply");
+        assert_eq!(driver.poll_send(), Some((b"out".to_vec(), mapped)));
+        assert!(driver.poll_send().is_none());
     }
 }

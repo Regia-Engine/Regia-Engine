@@ -19,6 +19,11 @@
 //! ([`HubRequest::ReachDone`](super::HubRequest::ReachDone)); the hub records it per member for
 //! `lobby.hub_join_status` and tells the owner.
 //!
+//! When `relay_only` is set on the call, on the owner's offer or on the member's offer, the only
+//! success path is the relay (spec 89 § 16.4, ADR-10391). Neither plan carries a candidate or a
+//! mapped address, and the member's ticket is rewritten to an unspecified address with the same
+//! server key. A listen exchange with the flag clear keeps the order above.
+//!
 //! The order, the mapped-first rule and the punch-or-relay prediction follow DO27's `ir-hub`
 //! `join.rs` as requirements only (`docs/do27-port-review.md` § 2); no line is copied.
 
@@ -26,8 +31,10 @@ use std::net::SocketAddr;
 
 use serde::{Deserialize, Serialize};
 
+use super::binding::ServerPresence;
+use super::{HubError, HubServer};
 use crate::crypto::{PlayerKey, ServerKey};
-use crate::lobby::{LobbyId, MemberId};
+use crate::lobby::{LobbyId, LobbySpec, MemberId};
 use crate::nat::{Candidate, CandidateKind};
 use crate::relay::{NatFiltering, NatMapping, PunchResult, SimNat, simulate_hole_punch};
 
@@ -141,7 +148,12 @@ impl NatClass {
 }
 
 /// What one side tells the hub about how its game socket is reached.
+///
+/// `non_exhaustive`: a struct pattern in another crate needs `..`. Another crate
+/// cannot use a struct literal. Build one with `ReachOffer::default()` and assign
+/// the fields.
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
+#[non_exhaustive]
 pub struct ReachOffer {
     /// The game socket's candidates (host, mapped, server-reflexive), at most
     /// [`crate::nat::NAT_MAX_CANDIDATES`].
@@ -156,6 +168,9 @@ pub struct ReachOffer {
     /// The owner's join ticket bytes (`server_host::JoinTicket`: the game port and the server key
     /// the member pins; the owner only).
     pub ticket: Vec<u8>,
+    /// When set, this side offers only the relay. Omitted on the wire when false, so a version-1
+    /// offer is unchanged (ADR-10378).
+    pub relay_only: bool,
 }
 
 impl ReachOffer {
@@ -252,14 +267,26 @@ pub enum BrokerError {
 
 /// Chooses a member's path to the owner (see the module docs for the order).
 ///
+/// An owner offer with [`ReachOffer::relay_only`] returns [`ReachKind::Relay`] when it has a
+/// relay and a join code, and [`BrokerError::NoReach`] otherwise. It does not return a mapped or
+/// punch path. The member's own flag and the lobby flag are applied by [`plans_for`].
+///
 /// # Errors
 ///
-/// [`BrokerError::NoReach`] when the owner offered no mapping, no candidate and no relay.
+/// [`BrokerError::NoReach`] when the owner offered no mapping, no candidate and no relay, or
+/// offered only the relay without a relay and a join code.
 pub fn broker_reach(owner: &ReachOffer, member_nat: Option<NatClass>) -> Result<ReachKind, BrokerError> {
+    let relay = owner.relay.is_some() && owner.join_code.is_some();
+    if owner.relay_only {
+        return if relay {
+            Ok(ReachKind::Relay)
+        } else {
+            Err(BrokerError::NoReach)
+        };
+    }
     if owner.mapped().is_some() {
         return Ok(ReachKind::Mapped);
     }
-    let relay = owner.relay.is_some() && owner.join_code.is_some();
     if let (Some(host), Some(client)) = (owner.nat, member_nat)
         && predict(host, client) == PunchResult::NeedsRelay
         && relay
@@ -270,6 +297,188 @@ pub fn broker_reach(owner: &ReachOffer, member_nat: Option<NatClass>) -> Result<
         return Ok(ReachKind::Punch);
     }
     Err(BrokerError::NoReach)
+}
+
+/// Registers a dedicated server on `member`'s session.
+///
+/// # Errors
+///
+/// The codes in spec 89 § 16.3. One bad owner proof fails the whole call.
+pub fn register_server(
+    server: &mut HubServer,
+    member: MemberId,
+    presence: &ServerPresence,
+    now_ms: u64,
+) -> Result<(), HubError> {
+    server.register_server(member, presence, now_ms)
+}
+
+/// Revokes the binding `(member's player key, server_key, serial)`.
+///
+/// # Errors
+///
+/// [`HubError::NotAPlayer`] when the session has no player key, [`HubError::RevokeFull`] at the cap.
+pub fn revoke_binding(
+    server: &mut HubServer,
+    member: MemberId,
+    server_key: ServerKey,
+    serial: u64,
+    now_ms: u64,
+) -> Result<(), HubError> {
+    server.revoke_binding(member, server_key, serial, now_ms)
+}
+
+/// Creates a delegated lobby owned by `member` and hosted by `server_key`.
+///
+/// # Errors
+///
+/// The create rows of spec 89 § 16.3.
+pub fn create_delegated(
+    server: &mut HubServer,
+    member: MemberId,
+    spec: &LobbySpec,
+    server_key: ServerKey,
+    now_ms: u64,
+) -> Result<LobbyId, HubError> {
+    server.create_delegated(member, spec, server_key, now_ms)
+}
+
+/// Sets whether `lobby` offers only the relay (spec 89 § 16.4).
+///
+/// The listen owner, the delegated lobby's owning player or its bound server, or the
+/// ownerless lobby's server session may set or clear the flag. Every member is then sent
+/// the room, and a listed lobby's directory card updates. `approve` applies the stored
+/// flag to every member's exchange.
+///
+/// # Errors
+///
+/// [`HubError::NoSession`] when `member` has no session. [`crate::lobby::LobbyError::NotInLobby`]
+/// when the lobby is missing or a listen caller is not in it. [`crate::lobby::LobbyError::NotOwner`]
+/// when a listen or ownerless caller may not change it. [`HubError::BindingNotOwner`] when a
+/// delegated caller is neither the owning player nor the bound server.
+pub fn set_reach_mode(
+    server: &mut HubServer,
+    member: MemberId,
+    lobby: LobbyId,
+    relay_only: bool,
+    now_ms: u64,
+) -> Result<(), HubError> {
+    server.set_reach_mode(member, lobby, relay_only, now_ms)
+}
+
+/// Replaces `lobby`'s ban list with `keys`.
+///
+/// # Errors
+///
+/// [`HubError::NotReady`] until the behavior lane lands.
+pub fn set_bans(
+    server: &mut HubServer,
+    member: MemberId,
+    lobby: LobbyId,
+    keys: &[PlayerKey],
+    now_ms: u64,
+) -> Result<(), HubError> {
+    let _ = (server, member, lobby, keys, now_ms);
+    Err(HubError::NotReady)
+}
+
+/// Closes `lobby`. Listen-lobby close stays on the existing leave path and returns
+/// [`HubError::NotReady`].
+///
+/// # Errors
+///
+/// [`HubError::NotReady`] for a listen lobby, [`HubError::BindingNotOwner`] when the caller is not
+/// the delegated owner.
+pub fn close_lobby(
+    server: &mut HubServer,
+    member: MemberId,
+    lobby: LobbyId,
+    now_ms: u64,
+) -> Result<(), HubError> {
+    server.close_lobby(member, lobby, now_ms)
+}
+
+/// The member's plan and the owner's plan for one approved ask.
+///
+/// With the flag clear, the order is today's: mapped, then punch, then relay ([`broker_reach`]).
+/// The member's plan carries the owner's candidates, mapped address, relay, join code and ticket.
+/// The owner's plan carries the member's candidates, no mapped address and an empty ticket.
+///
+/// `relay_only`, [`ReachOffer::relay_only`] on the owner, or [`ReachOffer::relay_only`] on the
+/// member hides that exchange (spec 89 § 16.4). The path is [`ReachKind::Relay`] when the owner
+/// offered a relay and a join code, and [`BrokerError::NoReach`] otherwise. Neither plan carries
+/// a candidate or a mapped address. The member's ticket is rewritten to
+/// `JoinTicket::from_game_socket` (unspecified address, port 0, the same server key). The relay
+/// address and the join code stay on the member's plan. The owner's ticket stays empty.
+///
+/// # Errors
+///
+/// [`BrokerError::NoReach`] when the owner offered nothing the chosen path can use.
+#[allow(clippy::too_many_arguments)] // ADR-10378: frozen signature, eight arguments.
+pub fn plans_for(
+    owner_offer: &ReachOffer,
+    member_offer: &ReachOffer,
+    relay_only: bool,
+    lobby: LobbyId,
+    owner: MemberId,
+    owner_identity: PlayerKey,
+    member: MemberId,
+    member_identity: PlayerKey,
+) -> Result<(JoinPlan, JoinPlan), BrokerError> {
+    let hide = relay_only || owner_offer.relay_only || member_offer.relay_only;
+    if hide && (owner_offer.relay.is_none() || owner_offer.join_code.is_none()) {
+        return Err(BrokerError::NoReach);
+    }
+    let path = if hide {
+        ReachKind::Relay
+    } else {
+        broker_reach(owner_offer, member_offer.nat)?
+    };
+    let for_member = JoinPlan {
+        lobby,
+        peer: owner,
+        peer_identity: owner_identity,
+        path,
+        mapped: (!hide && path == ReachKind::Mapped)
+            .then(|| owner_offer.mapped())
+            .flatten(),
+        candidates: if hide {
+            Vec::new()
+        } else {
+            owner_offer.candidates.clone()
+        },
+        relay: owner_offer.relay,
+        join_code: owner_offer.join_code.clone(),
+        ticket: if hide {
+            unspecified_ticket(&owner_offer.ticket)
+        } else {
+            owner_offer.ticket.clone()
+        },
+    };
+    let for_owner = JoinPlan {
+        peer: member,
+        peer_identity: member_identity,
+        mapped: None,
+        candidates: if hide {
+            Vec::new()
+        } else {
+            member_offer.candidates.clone()
+        },
+        ticket: Vec::new(),
+        ..for_member.clone()
+    };
+    Ok((for_member, for_owner))
+}
+
+/// The member's ticket with the address removed and the server key kept (spec 89 § 16.4).
+///
+/// Bytes that are not a ticket still become an unspecified ticket, so a relay-only plan never
+/// copies an address blob through.
+fn unspecified_ticket(bytes: &[u8]) -> Vec<u8> {
+    let key = crate::server_host::JoinTicket::decode(bytes)
+        .ok()
+        .and_then(|ticket| ticket.server_key);
+    crate::server_host::JoinTicket::from_game_socket(key).encode()
 }
 
 /// What the RFC 4787 model says two NAT behaviors can do without the relay. Two sides that both map
@@ -290,9 +499,17 @@ pub fn predict(host: NatClass, client: NatClass) -> PunchResult {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::lobby::hub::HubEvent;
 
     fn relay() -> SocketAddr {
         SocketAddr::from(([192, 0, 2, 1], 7800))
+    }
+
+    fn has_ip(bytes: &[u8], addr: SocketAddr) -> bool {
+        let std::net::IpAddr::V4(ip) = addr.ip() else {
+            return false;
+        };
+        bytes.windows(4).any(|window| window == ip.octets())
     }
 
     fn offer(candidates: Vec<Candidate>, nat: Option<NatClass>) -> ReachOffer {
@@ -302,7 +519,161 @@ mod tests {
             relay: Some(relay()),
             join_code: Some("ABCDEF".into()),
             ticket: Vec::new(),
+            relay_only: false,
         }
+    }
+
+    /// `relay_only` drops both candidate lists and rewrites the member's ticket to an unspecified
+    /// address with the same server key, even when the owner has a mapped candidate.
+    #[test]
+    fn plans_for_honors_relay_only() {
+        let host: SocketAddr = "198.51.100.7:7777".parse().expect("host");
+        let mapped: SocketAddr = "198.51.100.50:7778".parse().expect("mapped");
+        let member_addr: SocketAddr = "203.0.113.20:5000".parse().expect("member");
+        let key = ServerKey([0x11; 32]);
+        let ticket = crate::server_host::JoinTicket {
+            addr: host,
+            server_key: Some(key),
+        };
+        let mut owner_offer = offer(
+            vec![
+                Candidate::new(CandidateKind::Host, host),
+                Candidate::new(CandidateKind::Mapped, mapped),
+            ],
+            Some(NatClass::FULL_CONE),
+        );
+        owner_offer.ticket = ticket.encode();
+        let member_offer = ReachOffer {
+            candidates: vec![Candidate::new(CandidateKind::Host, member_addr)],
+            nat: Some(NatClass::PORT_RESTRICTED),
+            ..ReachOffer::default()
+        };
+        let (for_member, for_owner) = plans_for(
+            &owner_offer,
+            &member_offer,
+            true,
+            LobbyId(7),
+            MemberId(2),
+            PlayerKey([2; 32]),
+            MemberId(3),
+            PlayerKey([3; 32]),
+        )
+        .expect("relay plan");
+        assert_eq!(for_member.path, ReachKind::Relay);
+        assert!(for_member.candidates.is_empty());
+        assert!(for_member.mapped.is_none());
+        assert_eq!(for_member.relay, Some(relay()));
+        assert_eq!(for_member.join_code.as_deref(), Some("ABCDEF"));
+        let (addr, got_key) = for_member.ticket_parts().expect("rewritten ticket");
+        assert!(addr.ip().is_unspecified() && addr.port() == 0);
+        assert_eq!(got_key, Some(key));
+        assert!(for_owner.candidates.is_empty());
+        assert!(for_owner.ticket.is_empty());
+        assert_eq!(for_owner.peer, MemberId(3));
+        assert_eq!(for_owner.path, ReachKind::Relay);
+        let member_bytes = HubEvent::Plan(for_member).to_bytes().expect("member plan bytes");
+        let owner_bytes = HubEvent::Plan(for_owner).to_bytes().expect("owner plan bytes");
+        assert!(!has_ip(&member_bytes, host));
+        assert!(!has_ip(&member_bytes, mapped));
+        assert!(!has_ip(&owner_bytes, member_addr));
+    }
+
+    /// The member's own flag hides that exchange. The owner's mapped offer still plans a mapped
+    /// path for a member who did not set the flag.
+    #[test]
+    fn one_members_relay_only_does_not_hide_the_other() {
+        let host: SocketAddr = "198.51.100.7:7777".parse().expect("host");
+        let mapped: SocketAddr = "198.51.100.50:7778".parse().expect("mapped");
+        let hidden: SocketAddr = "203.0.113.20:5000".parse().expect("hidden");
+        let open: SocketAddr = "203.0.113.21:5001".parse().expect("open");
+        let mut owner_offer = offer(
+            vec![
+                Candidate::new(CandidateKind::Host, host),
+                Candidate::new(CandidateKind::Mapped, mapped),
+            ],
+            Some(NatClass::FULL_CONE),
+        );
+        owner_offer.ticket = crate::server_host::JoinTicket {
+            addr: host,
+            server_key: Some(ServerKey([0x11; 32])),
+        }
+        .encode();
+        let mut hiding = ReachOffer {
+            candidates: vec![Candidate::new(CandidateKind::Host, hidden)],
+            relay_only: true,
+            ..ReachOffer::default()
+        };
+        hiding.nat = Some(NatClass::PORT_RESTRICTED);
+        let open_offer = ReachOffer {
+            candidates: vec![Candidate::new(CandidateKind::Host, open)],
+            nat: Some(NatClass::PORT_RESTRICTED),
+            ..ReachOffer::default()
+        };
+        let (hidden_member, hidden_owner) = plans_for(
+            &owner_offer,
+            &hiding,
+            false,
+            LobbyId(1),
+            MemberId(2),
+            PlayerKey([2; 32]),
+            MemberId(3),
+            PlayerKey([3; 32]),
+        )
+        .expect("hidden");
+        assert_eq!(hidden_member.path, ReachKind::Relay);
+        assert!(hidden_member.candidates.is_empty());
+        assert!(hidden_owner.candidates.is_empty());
+        let (open_member, open_owner) = plans_for(
+            &owner_offer,
+            &open_offer,
+            false,
+            LobbyId(1),
+            MemberId(2),
+            PlayerKey([2; 32]),
+            MemberId(4),
+            PlayerKey([4; 32]),
+        )
+        .expect("open");
+        assert_eq!(open_member.path, ReachKind::Mapped);
+        assert_eq!(open_member.mapped, Some(mapped));
+        assert_eq!(open_member.candidates, owner_offer.candidates);
+        assert_eq!(open_owner.candidates, open_offer.candidates);
+        let hidden_bytes = HubEvent::Plan(hidden_member).to_bytes().expect("bytes");
+        let owner_bytes = HubEvent::Plan(hidden_owner).to_bytes().expect("bytes");
+        assert!(!has_ip(&hidden_bytes, host));
+        assert!(!has_ip(&hidden_bytes, mapped));
+        assert!(!has_ip(&owner_bytes, hidden));
+    }
+
+    /// A relay-only offer with no relay and no join code is not a punch.
+    #[test]
+    fn relay_only_without_a_relay_is_no_reach() {
+        let mut owner_offer = offer(
+            vec![Candidate::new(
+                CandidateKind::Host,
+                "198.51.100.7:7777".parse().expect("host"),
+            )],
+            Some(NatClass::FULL_CONE),
+        );
+        owner_offer.relay_only = true;
+        owner_offer.join_code = None;
+        assert_eq!(
+            broker_reach(&owner_offer, Some(NatClass::FULL_CONE)),
+            Err(BrokerError::NoReach)
+        );
+        assert_eq!(
+            plans_for(
+                &owner_offer,
+                &ReachOffer::default(),
+                false,
+                LobbyId(1),
+                MemberId(2),
+                PlayerKey([2; 32]),
+                MemberId(3),
+                PlayerKey([3; 32]),
+            ),
+            Err(BrokerError::NoReach)
+        );
     }
 
     /// Acceptance (NL-05): a port mapping wins over punching and the relay, even when both sides

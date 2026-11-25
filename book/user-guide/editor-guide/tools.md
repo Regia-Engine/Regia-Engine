@@ -1,5 +1,7 @@
 # Tools
 
+Panel id: `tools`.
+
 The **Tools** tab runs **editor tools**: separate programs the editor launches from a small
 manifest file, such as a review queue, a publishing calendar or an asset checker. Each tool shows
 its status, progress bars, a small view it describes itself, its log and the methods it provides.

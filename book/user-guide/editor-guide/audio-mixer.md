@@ -1,5 +1,7 @@
 # Audio mixer
 
+Panel id: `audio_mixer`.
+
 The **Audio Mixer** tab shows the audio bus tree with a fader, a mute and a solo button per bus, and live meters
 (peak, RMS and short-term loudness per bus, plus the loudness of the whole output) while the game plays in the
 editor. Use it to balance music, effects and voice against each other and to see which bus is loud, without

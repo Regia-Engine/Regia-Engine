@@ -190,6 +190,25 @@ fn run_bench() -> Result<(), String> {
     Ok(())
 }
 
+/// Project directory of this sample in a dev build, resolved at runtime (ADR-10370).
+///
+/// The shipping binary does not insert agent settings, so this is debug-only.
+/// `cargo run` exports `CARGO_MANIFEST_DIR`. The compile-time macro is not remapped.
+#[cfg(debug_assertions)]
+fn sample_project_dir() -> Option<std::path::PathBuf> {
+    if let Some(dir) = std::env::var_os("CARGO_MANIFEST_DIR") {
+        return Some(dir.into());
+    }
+    let root = std::env::current_exe()
+        .ok()?
+        .parent()?
+        .parent()?
+        .parent()?
+        .to_path_buf();
+    let project = root.join("samples").join("arena");
+    project.is_dir().then_some(project)
+}
+
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().collect();
     let (exit_after, seed, bots, no_local_player, bench) = match (
@@ -252,7 +271,7 @@ fn main() -> ExitCode {
         // with no project directory the agent server uses the per-user data dir.
         #[cfg(debug_assertions)]
         app.insert_resource(regia::agent::AgentSettings {
-            project_dir: Some(env!("CARGO_MANIFEST_DIR").into()),
+            project_dir: sample_project_dir(),
         });
         let mut config = ArenaConfig::default();
         if let Some(n) = bots {

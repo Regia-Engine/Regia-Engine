@@ -23,7 +23,27 @@ fn main() -> ExitCode {
 /// `regia agent --project samples/lightmap_device` looks for the endpoint.
 #[cfg(debug_assertions)]
 fn agent_project_dir() -> Option<PathBuf> {
-    Some(env!("CARGO_MANIFEST_DIR").into())
+    // Runtime path (ADR-10370). Release keeps the working directory below.
+    sample_project_dir()
+}
+
+/// Project directory of this sample, resolved at runtime (ADR-10370).
+///
+/// Debug builds only. `cargo run` exports `CARGO_MANIFEST_DIR`. A binary under
+/// `target/<profile>` walks up to `samples/lightmap_device`.
+#[cfg(debug_assertions)]
+fn sample_project_dir() -> Option<PathBuf> {
+    if let Some(dir) = std::env::var_os("CARGO_MANIFEST_DIR") {
+        return Some(dir.into());
+    }
+    let root = std::env::current_exe()
+        .ok()?
+        .parent()?
+        .parent()?
+        .parent()?
+        .to_path_buf();
+    let project = root.join("samples").join("lightmap_device");
+    project.is_dir().then_some(project)
 }
 
 /// The agent's project directory in a release build (the tier profiles' shipping packages, ADR-5382): the working

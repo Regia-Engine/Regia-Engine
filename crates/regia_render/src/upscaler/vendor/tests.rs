@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MPL-2.0
 //! Tests of the vendor seam (ADR-1150). No GPU, no SDK: the lifecycle runs on the CPU target with
 //! a fake binding that logs every call.
 

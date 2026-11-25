@@ -146,7 +146,8 @@ impl ServerIdentity {
         self.public
     }
 
-    pub(super) fn private_bytes(&self) -> &[u8; KEY_BYTES] {
+    /// The scalar. Visible inside `crypto` (player proofs and binding proofs). Not a public export.
+    pub(in crate::crypto) fn private_bytes(&self) -> &[u8; KEY_BYTES] {
         &self.private
     }
 

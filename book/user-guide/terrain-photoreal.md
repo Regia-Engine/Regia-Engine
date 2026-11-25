@@ -1,9 +1,18 @@
 # Photoreal terrain
 
-The photoreal material path for `regia_terrain` (DO27 alpha lane): height-blended layers,
-triplanar projection, micro-normal detail and whole-map macro variation, over the CDLOD
-heightfield the simulation agrees with. Without a material, the terrain renders the plain
-M13 look.
+<!-- index: Photoreal terrain -->
+<!-- index: Height blend -->
+<!-- index: Triplanar projection -->
+<!-- index: Anti-tiling -->
+<!-- index: Terrain material -->
+<!-- index: Macro variation -->
+
+The photoreal material path for `regia_terrain` (`docs/specs/26-terrain-vfx-highend.md`):
+height-blended layers, triplanar projection, micro-normal detail and whole-map macro variation,
+over the CDLOD heightfield the simulation agrees with. Without a material, the terrain renders
+the plain heightfield look. How rain and snow change a layer is the `weather` block below and
+[Sky Lab](sky-lab.md) (`docs/specs/99-weather-precipitation.md`). The task procedure is
+[Author a terrain](../how-to/world/terrain.md).
 
 There is one terrain texture cook, `regia_asset_pipeline::cook_tiled_texture`. The 8K
 masks and macros are cooked by it and streamed by `regia_terrain::TileCache`.

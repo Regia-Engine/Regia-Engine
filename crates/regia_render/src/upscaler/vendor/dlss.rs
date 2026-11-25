@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MPL-2.0
 //! DLSS Super Resolution through NGX behind the vendor seam (ADR-2002).
 //!
 //! - [`DlssNgx`]: the binding. With the `dlss` cargo feature and an NGX-linked `regia_dlss`

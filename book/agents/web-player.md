@@ -1,8 +1,25 @@
 # Web player
 
+<!-- index: Product viewer -->
+<!-- index: WebGPU -->
+<!-- index: WebGL2 -->
+<!-- index: Web game | see: Product viewer -->
+
 The product viewer in a browser: one configurable piece on a canvas, tap to switch options, drag to turn the view.
 No server and no stream: a page and a product package are static files. Spec: `docs/specs/42-product-viewer.md` § 3.
 Decision: ADR-2541.
+
+## What this program is
+
+WebGPU and WebGL2 are the graphics backends of this viewer (`backend` `webgpu`, `webgl2`, or `auto`).
+They are not a backend for a general game, and this page does not load a level, a pak, or the desktop
+renderer. A general web game target is parked (`docs/versions.md`, the Parked row). Building this
+player does not make that target exist.
+
+The same kind of viewer runs in a native window on Linux, Windows, and Android
+(`samples/product_viewer`). That window is still a product viewer. `auto` asks for WebGPU first. If
+WebGPU takes the canvas and then fails, the page creates the player again on a new canvas with
+`backend: "webgl2"` (`backend_unavailable` below). There is no further graphics API in this crate.
 
 ## Build it
 

@@ -1,5 +1,8 @@
 # Dynamic resolution
 
+<!-- index: Dynamic resolution -->
+<!-- index: Upscale quality -->
+
 `regia_render::DynResController` chooses an internal render scale in permille (`1000` is
 native, `500` is half) from GPU time. It is a pure function of the samples you give it: it does
 not read the device, it does not change `RenderSettings`, and it does not write the settings
@@ -103,3 +106,23 @@ telemetry row can use the names `dynres_permille`, `dynres_bound` and `dynres_me
 The owner's case, as a unit test in `dynamic_res`: GPU 31 ms, wall 66 ms, budget 16.6 ms, three
 minutes at about 15 fps, permille stays 1000. A GPU-bound overload steps down by 50 to 500 and
 stops there, then steps up by 25 when the load drops.
+
+## Inside an upscale quality mode
+
+When `RenderProfile::upscale_quality` is set, the frame's top size is that mode's render size,
+not the profile's `render_scale`. Build the controller's range from the mode so a step cannot
+leave it:
+
+```rust
+use regia_render::{DynResConfig, DynResController, UpscaleQuality};
+
+fn controller_for(mode: UpscaleQuality) -> DynResController {
+    let config = DynResConfig::default().within_quality(mode);
+    DynResController::new(config, mode.permille())
+}
+```
+
+`UpscaleQuality::permille_range` is Native 667–1000, Quality 588–667, Balanced 500–588,
+Performance 333–500. Ultra Performance holds 333. A vendor runtime that publishes its own range
+uses `DynResConfig::within_preferred` instead. The quality modes and the present modes are in
+[Quality and upscalers](../how-to/picture/quality-and-upscalers.md).

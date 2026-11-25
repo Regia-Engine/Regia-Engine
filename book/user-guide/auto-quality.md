@@ -1,6 +1,15 @@
 # Automatic quality detection
 
+<!-- index: Quality tier -->
+<!-- index: VeryLow -->
+<!-- index: Auto quality -->
+<!-- index: Graphics preset -->
+
 A player's first launch should look good and run smoothly without a trip to the options menu.
+The procedure for choosing a tier, an upscaler, and a present mode by hand is
+[Quality and upscalers](../how-to/picture/quality-and-upscalers.md). Cinematic is an offline
+render profile, not a tier this detector returns.
+
 On a first launch Regia Engine reads the GPU, picks a quality tier from a table of measured and
 estimated GPU classes, optionally checks it on the first scene, and saves the result in the
 settings file. It never overrides a preset the player chose.
@@ -38,7 +47,8 @@ the package wins again unless the player chose a preset. `render.get_profile` an
    probe held the splash 3–5 s on a first launch and timed visible frames, which a downclocked GPU
    failed). If the p95 GPU frame time is over budget and the median over 0.8 × budget (1000 / 60 ms
    on desktop, 1000 / 40 on the Deck, configurable), and the GPU was busy for at least half of each
-   frame interval, the tier steps down once (Ultra → High → Medium → Low): a
+   frame interval, the tier steps down once (Ultra → High → Medium → Low, and Low → VeryLow
+when the sustained time misses 30 fps): a
    `SettingsChanged` is sent and the renderer warms again behind the lobby (its 3D scene, if any,
    is hidden until the warm is back; the UI stays). A level load (`GameFrameWarm::request()`)
    before the probe has finished aborts it and keeps the table's pick. A lobby that draws no 3D
@@ -184,7 +194,9 @@ and that every measured GPU and many known ones map to their intended tier.
 
 The fields live in `GameSettings.graphics`:
 
-- `preset`: the menu preset (`Low`, `Medium`, `High`, `Ultra`, `Clean`, `Deck`).
+- `preset`: the menu preset (`Low`, `Medium`, `High`, `Ultra`, `Clean`, `Deck`, `VeryLow`).
+  `Clean` renders as High. On Android, Low and VeryLow become Mobile Low and every other
+  preset becomes Mobile High (`GraphicsPreset::tier`).
 - `preset_source`: `Unset`, `Detected` or `Player`. Read it with `graphics.source()`.
 - `detected`: the last detection (`tier`, `detected_tier` before the probe, `reason`, `rule`,
   `evidence`, `gpu`, `pci_id`, `vram_mb`, `driver`, `probe`).

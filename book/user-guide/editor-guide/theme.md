@@ -1,5 +1,7 @@
 # Theme
 
+Panel id: `theme`.
+
 The **Theme** tab edits a runtime UI theme, a `.theme.ron` file: the colors, sizes, durations and
 other tokens your game's interface is drawn with. Open a built-in theme or a theme file, change
 tokens, watch a swatch preview and the lint findings, and save. It edits a working copy (the draft)

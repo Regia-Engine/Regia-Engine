@@ -1,12 +1,18 @@
 # Post volumes and the physical camera
 
+<!-- index: Post volume -->
+<!-- index: Physical camera -->
+<!-- index: Exposure compensation -->
+
 A **post volume** changes the look of a place: walk into a cellar and the image warms, opens up a
 stop and loses a little saturation; walk out and it blends back. A **physical camera** exposes the
 image the way a photographer would, from ISO, shutter time and aperture.
 
 Both are components. Design and the exact rules are in
 `docs/specs/30-post-volumes-and-physical-camera.md`; agents use the
-[post volumes agent page](../agents/post-volumes.md).
+[post volumes agent page](../agents/post-volumes.md). A volume does not change the quality tier
+or the upscaler. Place the lights first ([Light a level](../how-to/picture/light-a-level.md)),
+then grade the place with a volume.
 
 ## Post volumes
 

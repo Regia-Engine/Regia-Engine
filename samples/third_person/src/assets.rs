@@ -38,8 +38,31 @@ pub struct FoxAssets {
 }
 
 /// The sample project directory (this crate's).
+///
+/// `cargo run` and `cargo test` export `CARGO_MANIFEST_DIR`. The compile-time
+/// `env!("CARGO_MANIFEST_DIR")` is not used: rustc does not remap it, so the
+/// build machine's path would ship in the binary (ADR-10370). A bare binary
+/// finds `samples/third_person` two levels above `target/<profile>`.
 pub fn project_dir() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+    sample_manifest_dir("third_person")
+}
+
+fn sample_manifest_dir(sample: &str) -> PathBuf {
+    if let Some(dir) = std::env::var_os("CARGO_MANIFEST_DIR") {
+        return PathBuf::from(dir);
+    }
+    if let Ok(exe) = std::env::current_exe()
+        && let Some(root) = exe
+            .parent()
+            .and_then(|dir| dir.parent())
+            .and_then(|dir| dir.parent())
+    {
+        let project = root.join("samples").join(sample);
+        if project.is_dir() {
+            return project;
+        }
+    }
+    std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
 }
 
 /// Serialises the one-time download and the in-place `regia cook` subprocess.

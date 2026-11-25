@@ -1,8 +1,14 @@
 # Extensions
 
+Panel id: `extensions`.
+
 The **Extensions** tab lists the extensions your project can use (versioned bundles of code,
 content or tools, described by a `regia-plugin.toml` manifest), shows what each one asks for, and
-enables, disables or reloads it. It also hosts the tabs extensions add to the editor. Depth:
+enables, disables or reloads it. It also hosts the tabs extensions add to the editor. Source
+extensions are built (spec `docs/specs/57-plugin-extension-api.md`): Rust and content the project
+compiles in. A dynamic extension is a library the editor can reload in a development build. A
+shipping player does not load one, and this version has no extension registry or marketplace. The
+manifest can carry publisher and licence fields. Depth:
 [Extensions (agents)](../../agents/plugins.md), [Hot reload](../hot-reload.md).
 
 **In-process extension code is trusted native code with the editor's full privileges.** The tab

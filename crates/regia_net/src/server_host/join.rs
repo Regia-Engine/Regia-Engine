@@ -22,7 +22,15 @@ use crate::host_check::{
     estimate_clients,
 };
 use crate::join_code::normalize_join_code;
+// `LinkSocket` stays the parameter name of `RelayRegistrar::new` (the API snapshot). With `ecs` it
+// is the link's socket; without `ecs` it is the same box, public so the registrar's signature does
+// not name a private type (ADR-10376).
+#[cfg(feature = "ecs")]
 use crate::link::LinkSocket;
+/// The socket a [`RelayRegistrar`] or [`JoinResolver`] owns in a build without `ecs`:
+/// `Box<dyn DatagramSocket + Send>`, the same type as `link::LinkSocket` in an `ecs` build.
+#[cfg(not(feature = "ecs"))]
+pub type LinkSocket = Box<dyn crate::socket::DatagramSocket + Send>;
 use crate::nat::{
     Candidate, CandidateKind, CandidateSource, CheckAgent, CheckPacer, HostCandidates, NAT_MAX_SESSIONS,
     NAT_SESSION_LIFETIME_MS, NatReport, Role, decode_check, gather, is_check,
@@ -30,7 +38,7 @@ use crate::nat::{
 use crate::port_map::PortMapping;
 use crate::relay::{
     RELAY_DEFAULT_PORT, RELAY_MAX_LIFETIME_S, RelayConfig, RelayError, RelayReply, RelayServer, RelayStatus,
-    encode_lookup, encode_register, encode_register_with_candidates,
+    encode_lookup, encode_register, encode_register_hidden, encode_register_with_candidates,
 };
 use crate::socket::{DatagramSocket, MAX_DATAGRAM_BYTES, UdpTransport};
 use crate::wire::{WireError, WireReader, WireWriter};
@@ -324,6 +332,9 @@ pub struct RelayRegistrar {
     confirmed: u64,
     /// NAT traversal runs (the registrar is on the game socket).
     traversal: bool,
+    /// Relay-only (spec 89 § 16.4): `Register` carries no candidates, and this socket sends no
+    /// punch introduction and answers no connectivity check.
+    hide_reach: bool,
     sources: Vec<Box<dyn CandidateSource>>,
     candidates: Vec<Candidate>,
     gathered: bool,
@@ -392,6 +403,7 @@ impl RelayRegistrar {
             relayed_clients: 0,
             confirmed: 0,
             traversal,
+            hide_reach: false,
             sources: vec![
                 Box::new(HostCandidates { toward: relay }),
                 Box::new(mapped.slot()),
@@ -538,8 +550,28 @@ impl RelayRegistrar {
         }
     }
 
+    /// Hide this socket's addresses (spec 89 § 16.4, ADR-10391).
+    ///
+    /// Call it before the first [`Self::update`] when the lobby, or this member's plan, is
+    /// relay-only. `Register` still renews the join code and the registrar still confirms relay
+    /// allocations. The ticket is rewritten with [`JoinTicket::from_game_socket`], so the token
+    /// carries no address. No host, reflexive or mapped candidate is gathered or sent. The
+    /// register carries the hide-address byte, so the relay does not publish this socket.
+    /// An introduction is ignored, and connectivity checks are not answered and not sent.
+    pub fn relay_only(mut self) -> Self {
+        if let Ok(ticket) = JoinTicket::decode(&self.token) {
+            self.token = JoinTicket::from_game_socket(ticket.server_key).encode();
+        }
+        self.hide_reach = true;
+        self.sources.clear();
+        self.candidates.clear();
+        self.gathered = true;
+        self
+    }
+
     /// Adds a source of candidates (a port mapping, from net-nat-hosting-flow); the next
     /// `Register` announces what it gives. Only a registrar on the game socket uses candidates.
+    /// A [`Self::relay_only`] registrar ignores the source.
     pub fn add_candidate_source(&mut self, source: Box<dyn CandidateSource>) {
         self.sources.push(source);
         self.gathered = false;
@@ -789,7 +821,7 @@ impl RelayRegistrar {
                 }
             };
             if is_check(&buf[..n]) {
-                if self.traversal {
+                if self.traversal && !self.hide_reach {
                     self.on_check(&buf[..n], from, now_ms);
                 }
                 continue;
@@ -826,7 +858,11 @@ impl RelayRegistrar {
                 Ok(Some(RelayReply::ClientJoined { port, host_key, .. })) => {
                     self.on_client_joined(port, host_key, now_ms);
                 }
-                Ok(Some(RelayReply::Introduced(intro))) => self.on_introduced(intro, now_ms),
+                Ok(Some(RelayReply::Introduced(intro))) => {
+                    if !self.hide_reach {
+                        self.on_introduced(intro, now_ms);
+                    }
+                }
                 Ok(Some(
                     reply @ (RelayReply::ProbeSent { .. }
                     | RelayReply::MeasureAck { .. }
@@ -867,18 +903,22 @@ impl RelayRegistrar {
             }
         }
         if now_ms >= self.next_send_ms {
-            if self.traversal && !self.gathered {
+            if self.traversal && !self.hide_reach && !self.gathered {
                 let base = self.socket.local_addr().unwrap_or(self.relay);
                 self.candidates = gather(&mut self.sources, base, now_ms);
                 self.gathered = true;
             }
             let lifetime_s = if self.revoke.is_some() { 0 } else { self.lifetime_s };
-            let datagram = encode_register_with_candidates(
-                lifetime_s,
-                &self.token,
-                self.cookie.as_ref(),
-                &self.candidates,
-            );
+            let datagram = if self.hide_reach {
+                encode_register_hidden(lifetime_s, &self.token, self.cookie.as_ref())
+            } else {
+                encode_register_with_candidates(
+                    lifetime_s,
+                    &self.token,
+                    self.cookie.as_ref(),
+                    &self.candidates,
+                )
+            };
             if let Ok(bytes) = datagram {
                 if let Err(e) = self.socket.send_to(&bytes, self.relay) {
                     tracing::debug!(error = %e, relay = %self.relay, "join code: register send error");
@@ -896,10 +936,12 @@ impl RelayRegistrar {
             }
         }
         self.send_refreshes(now_ms);
-        if self.traversal {
+        if self.traversal && !self.hide_reach {
             self.run_checks(now_ms);
         }
-        self.run_host_check(now_ms);
+        if !self.hide_reach {
+            self.run_host_check(now_ms);
+        }
         learned
     }
 }

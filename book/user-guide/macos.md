@@ -1,8 +1,25 @@
 # macOS (testing only)
 
+<!-- index: macOS -->
+<!-- index: Metal -->
+<!-- index: Cursor grab -->
+
 Regia Engine builds and runs its test suite on macOS with Metal. This is a bring-up for testing
 (ADR-264, which amends ADR-009), not a supported release target: there is no macOS release build,
 packaging, signing or notarization, and macOS tests never gate a merge.
+
+There is no dedicated-server package. `regia package --server` is Linux and Windows, and any other
+platform exits 2 with `server_platform_unsupported`. `--format app` is rejected on every platform:
+the macOS app-bundle format is not built. An iOS release is parked and is not this testing build.
+DLSS is never linked on macOS. The graphics backend here is Metal.
+
+`CursorGrab::Confined` is not available, so a Confined request is sent as Locked and logged once
+per process. Locked stays Locked. Spec 11: only the primary window becomes an operating-system
+window (ADR-2252).
+
+Install and day-to-day development on Linux are [Linux](linux.md) and
+[Installing Regia Engine](../start/install.md). `regia doctor --platform macos` runs on the Mac
+(Xcode command-line tools and `spirv-val`).
 
 State recorded for v0.1.22, on an Apple M5 (32 GB, macOS 26.6, Metal 4) with Homebrew `rustc` 1.99.1:
 the whole workspace builds, and 4979 of 5006 test cases pass (472 test binaries, 38 ignored).

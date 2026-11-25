@@ -1,5 +1,10 @@
 # Scenes: entities, levels and prefabs
 
+<!-- index: Level -->
+<!-- index: Prefab -->
+<!-- index: Level directory | see: Level -->
+<!-- index: Persistent | see: Level -->
+
 A **level** is a saved scene — a list of entities, each a set of components with values — stored as
 canonical RON (`.level.ron`). A **prefab** (`.prefab.ron`) is the same idea for a reusable subtree:
 spawn it, then override individual properties per instance.
@@ -96,6 +101,29 @@ A level can also carry `LevelSettings` (a reflected resource stored with the lev
 game-rules name, ambient audio, the acoustic medium (how sound travels: Earth air, thin Mars air
 or none, see [Audio](audio.md)), the planet atmosphere preset with time of day and sky body, and
 the map's look. [Rendering](rendering.md) shows the atmosphere block.
+
+Spec: `docs/specs/14-scene-and-framework.md`. The task steps are in
+[Make a level and a prefab](../how-to/create/levels-and-prefabs.md).
+
+## One file or a directory
+
+A level is one `.level.ron` or a directory `<name>.level.d/` with one file per entity
+(spec 37, format `level-dir` v1,
+[`docs/formats/level-dir.md`](../../docs/formats/level-dir.md)). The directory is for
+authoring, so version control can merge one entity. A package does not ship it. A level
+may exist in only one of the two forms. Both siblings at once is `ambiguous_level_form`.
+
+```console
+$ regia level split assets/levels/room.level.ron
+$ regia level merge assets/levels/room.level.d
+$ regia level validate assets/levels/room.level.ron
+```
+
+`split` and `merge` remove the source after a successful conversion. `--keep` leaves it.
+`--out` names another destination. `validate` checks layer bindings and memberships and
+exits 1 when it finds one. The directory wrapper stays at `level-dir` v1. A new split
+writes entity records at the current scene format version (14). Older scene versions still
+load through the same in-memory migrators as a single file.
 
 ## Despawning a hierarchy
 

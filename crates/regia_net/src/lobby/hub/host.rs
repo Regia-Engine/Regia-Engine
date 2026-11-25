@@ -5,12 +5,12 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::net::IpAddr;
 
 use super::limits::AdmitGate;
-use super::wire::{HubMessage, HubRequest, HubWire};
-use super::{HubError, HubLimits, HubReport, HubServer, HubSettings};
+use super::wire::{self, HubMessage, HubRequest, HubWire};
+use super::{HubError, HubEvent, HubLimits, HubReport, HubServer, HubSettings};
 use crate::connection::{Channel, SendError};
 use crate::crypto::{CryptoMode, PlayerKey, ServerIdentity, ServerKey, verify_player_proof};
 use crate::handshake::DisconnectReason;
-use crate::lobby::{LobbySpec, MemberId};
+use crate::lobby::{LobbyId, LobbySpec, MemberId};
 use crate::server::{NetServer, ServerConfig, ServerEvent};
 use crate::session::PeerId;
 use crate::socket::DatagramSocket;
@@ -48,6 +48,8 @@ pub struct HubHost<S: DatagramSocket> {
     /// Refused player proofs per link without a session (ADR-8734). At [`PROOF_FAILURE_LIMIT`]
     /// the link is dropped and its later proofs are not checked.
     proof_failures: BTreeMap<PeerId, u8>,
+    /// Codec generation the peer announced. Missing means wire 1 (a v0.7.0 client). ADR-10378.
+    peer_wire: BTreeMap<PeerId, u8>,
 }
 
 impl<S: DatagramSocket> std::fmt::Debug for HubHost<S> {
@@ -75,7 +77,8 @@ impl<S: DatagramSocket> HubHost<S> {
         settings: HubSettings,
         mut config: ServerConfig,
     ) -> Self {
-        let core = HubServer::new(settings);
+        let mut core = HubServer::new(settings);
+        core.set_hub_identity(identity.clone());
         config.identity = Some(identity.clone());
         config.crypto = CryptoMode::Required;
         config.max_peers = core.settings().session_cap;
@@ -93,6 +96,7 @@ impl<S: DatagramSocket> HubHost<S> {
             draining: false,
             dormant: BTreeSet::new(),
             proof_failures: BTreeMap::new(),
+            peer_wire: BTreeMap::new(),
         }
     }
 
@@ -159,6 +163,13 @@ impl<S: DatagramSocket> HubHost<S> {
         self.draining && self.by_peer.is_empty() && self.unconfirmed.is_empty() && self.dormant.is_empty()
     }
 
+    /// True while draining once no session is left, live or dormant. A refused link that has
+    /// not left yet may still be unconfirmed ([`Self::finished_draining`] waits for it too).
+    #[must_use]
+    pub(super) fn sessions_gone(&self) -> bool {
+        self.draining && self.by_peer.is_empty() && self.dormant.is_empty()
+    }
+
     /// True when a new hello would be accepted.
     #[must_use]
     pub fn accepts_sessions(&self) -> bool {
@@ -169,11 +180,13 @@ impl<S: DatagramSocket> HubHost<S> {
     /// the hub sessions.
     pub fn begin_drain(&mut self) {
         self.draining = true;
+        self.core.set_draining(true);
         let members: Vec<MemberId> = self.by_member.keys().copied().collect();
         for member in members {
             if let Some(peer) = self.by_member.remove(&member) {
                 self.by_peer.remove(&peer);
                 self.dormant.remove(&peer);
+                self.peer_wire.remove(&peer);
                 self.server.kick(peer, DisconnectReason::ServerShutdown);
             }
             self.core.disconnect(member);
@@ -182,6 +195,7 @@ impl<S: DatagramSocket> HubHost<S> {
         for peer in pending {
             self.unconfirmed.remove(&peer);
             self.dormant.remove(&peer);
+            self.peer_wire.remove(&peer);
             self.server.kick(peer, DisconnectReason::ServerShutdown);
         }
     }
@@ -221,6 +235,7 @@ impl<S: DatagramSocket> HubHost<S> {
                     self.unconfirmed.remove(&peer);
                     self.dormant.remove(&peer);
                     self.proof_failures.remove(&peer);
+                    self.peer_wire.remove(&peer);
                     if let Some(member) = self.by_peer.remove(&peer) {
                         self.by_member.remove(&member);
                         self.core.disconnect(member);
@@ -261,6 +276,7 @@ impl<S: DatagramSocket> HubHost<S> {
             if let Some(peer) = self.by_member.remove(member) {
                 self.by_peer.remove(&peer);
                 self.dormant.remove(&peer);
+                self.peer_wire.remove(&peer);
                 self.server.kick(peer, DisconnectReason::Timeout);
             }
         }
@@ -289,8 +305,10 @@ impl<S: DatagramSocket> HubHost<S> {
     /// reliable stream never skips an event; an event the link refuses outright is counted
     /// `hub_send_failed`.
     fn drain(&mut self, member: MemberId, peer: PeerId) {
+        let wire = self.peer_wire.get(&peer).copied().unwrap_or(1);
         let mut events = self.core.take_events(member).into_iter();
         while let Some(event) = events.next() {
+            let event = rewrite_for_wire(wire, event);
             let message = HubMessage::Event(event);
             match self.server.send(peer, Channel::GAME_RPC, &message) {
                 Ok(()) => {}
@@ -299,7 +317,7 @@ impl<S: DatagramSocket> HubHost<S> {
                         return;
                     };
                     let mut rest = vec![event];
-                    rest.extend(events);
+                    rest.extend(events.map(|event| rewrite_for_wire(wire, event)));
                     self.core.requeue(member, rest);
                     return;
                 }
@@ -315,6 +333,26 @@ impl<S: DatagramSocket> HubHost<S> {
         let _ = self
             .server
             .send(peer, Channel::GAME_RPC, &HubMessage::Event(event));
+    }
+
+    /// Whether a `relay_only` ask would put a generation-2 tail on a wire-1 owner's stream.
+    ///
+    /// The sender's dialect is not enough: a wire-2 member can ask a wire-1 owner. The tail is
+    /// the byte `put_offer` appends, and a v0.7.0 client ends the link on it. An unknown lobby,
+    /// or a caller who is not a member, returns false so the core's own error stands. An owner
+    /// with no live link counts as wire 1: the queued ask would go out on reconnect, and that
+    /// peer has not announced wire 2.
+    fn relay_tail_hits_wire_1_owner(&self, member: MemberId, lobby: LobbyId) -> bool {
+        let Some(info) = self.core.lobby_info(lobby) else {
+            return false;
+        };
+        if info.owner == member || !info.has_member(member) {
+            return false;
+        }
+        let Some(owner_peer) = self.by_member.get(&info.owner) else {
+            return true;
+        };
+        u32::from(self.peer_wire.get(owner_peer).copied().unwrap_or(1)) < wire::HUB_WIRE_VERSION
     }
 
     /// Counts one refused keyed Hello of `peer` (ADR-8734, ADR-8883); at [`PROOF_FAILURE_LIMIT`]
@@ -389,9 +427,14 @@ impl<S: DatagramSocket> HubHost<S> {
                         {
                             self.by_peer.remove(&old);
                             self.dormant.remove(&old);
+                            self.peer_wire.remove(&old);
                             self.server.kick(old, DisconnectReason::Kicked);
                         }
                         self.by_peer.insert(peer, member);
+                        self.core.note_source(member, addr);
+                        if let Some(hash) = self.server.peer_handshake_hash(peer) {
+                            self.core.note_link_hash(member, hash);
+                        }
                     }
                     Err(e) => {
                         self.reply_refused(peer, &e);
@@ -417,6 +460,32 @@ impl<S: DatagramSocket> HubHost<S> {
             self.reply_refused(peer, &error);
             return;
         }
+        self.core.note_source(member, addr);
+        if let HubRequest::AnnounceWire { version } = request {
+            if version == wire::HUB_WIRE_VERSION as u8 {
+                self.peer_wire.insert(peer, version);
+                self.core.set_wire(member, u32::from(version));
+            } else {
+                self.core.note_refused(HubError::NeedsWireV2.code());
+                self.reply_refused(peer, &HubError::NeedsWireV2);
+            }
+            return;
+        }
+        let dialect = u32::from(self.peer_wire.get(&peer).copied().unwrap_or(1));
+        if wire::gate_request(dialect, &request).is_err() {
+            // A version-2 call from a wire-1 peer is a refusal, never a disconnect (ADR-10378).
+            self.core.note_refused(HubError::NeedsWireV2.code());
+            self.reply_refused(peer, &HubError::NeedsWireV2);
+            return;
+        }
+        // Computed before `core` is borrowed. A wire-2 member's `relay_only` ask is legal for
+        // the sender and still illegal for a wire-1 owner: `put_offer` would append the tail.
+        let block_relay_tail = match &request {
+            HubRequest::AskReach { lobby, offer } if offer.relay_only => {
+                self.relay_tail_hits_wire_1_owner(member, *lobby)
+            }
+            _ => false,
+        };
         let core = &mut self.core;
         let failed: Option<HubError> = match request {
             HubRequest::Hello { .. } | HubRequest::Heartbeat => core.heartbeat(member, now_ms).err(),
@@ -490,8 +559,22 @@ impl<S: DatagramSocket> HubHost<S> {
                 muted,
             } => core.mute(member, lobby, target, muted, now_ms).err(),
             HubRequest::Chat { scope, text } => core.chat(member, scope, &text, now_ms).err(),
-            HubRequest::Offer { lobby, offer } => core.offer_reach(member, lobby, offer, now_ms).err(),
-            HubRequest::AskReach { lobby, offer } => core.ask_reach(member, lobby, offer, now_ms).err(),
+            HubRequest::Offer { lobby, offer } => {
+                // Stored on the room. `Plan` encodes `relay_only: false`, so this arm does not
+                // write a generation-2 tail to another peer. A wire-1 sender is already refused
+                // by `gate_request` when the flag is set.
+                core.offer_reach(member, lobby, offer, now_ms).err()
+            }
+            HubRequest::AskReach { lobby, offer } => {
+                if block_relay_tail {
+                    // Do not call `ask_reach`: it queues `ReachAsk` for the owner, and that
+                    // event carries the tail. The member is refused; the owner is sent nothing.
+                    core.note_refused(HubError::NeedsWireV2.code());
+                    Some(HubError::NeedsWireV2)
+                } else {
+                    core.ask_reach(member, lobby, offer, now_ms).err()
+                }
+            }
             HubRequest::Approve {
                 lobby,
                 member: target,
@@ -502,9 +585,53 @@ impl<S: DatagramSocket> HubHost<S> {
                 path,
                 punch_attempts,
             } => core.reach_done(member, lobby, path, punch_attempts, now_ms).err(),
+            HubRequest::AnnounceWire { .. } => None,
+            HubRequest::RegisterServer { presence } => {
+                super::join::register_server(core, member, &presence, now_ms).err()
+            }
+            HubRequest::RevokeBinding { server_key, serial } => {
+                super::join::revoke_binding(core, member, server_key, serial, now_ms).err()
+            }
+            HubRequest::CreateDelegated {
+                request,
+                visibility,
+                max_members,
+                joinable,
+                data,
+                server_key,
+            } => {
+                let spec = LobbySpec {
+                    visibility,
+                    max_members,
+                    data,
+                    joinable,
+                };
+                let result = super::join::create_delegated(core, member, &spec, server_key, now_ms)
+                    .map_err(|e| e.code().to_owned());
+                self.send_reply(peer, request, result);
+                None
+            }
+            HubRequest::SetReachMode { lobby, relay_only } => {
+                super::join::set_reach_mode(core, member, lobby, relay_only, now_ms).err()
+            }
+            HubRequest::SetBans { lobby, keys } => core.set_bans(member, lobby, &keys, now_ms).err(),
+            HubRequest::CloseLobby { lobby } => super::join::close_lobby(core, member, lobby, now_ms).err(),
         };
         if let Some(e) = failed {
             self.reply_refused(peer, &e);
+        }
+        let replaced = self.core.take_replaced_servers();
+        for old in replaced {
+            self.core.note_refused(HubError::ServerInUse.code());
+            let Some(old_peer) = self.by_member.remove(&old) else {
+                continue;
+            };
+            self.by_peer.remove(&old_peer);
+            self.dormant.remove(&old_peer);
+            self.peer_wire.remove(&old_peer);
+            self.reply_refused(old_peer, &HubError::ServerInUse);
+            self.core.disconnect(old);
+            self.server.kick(old_peer, DisconnectReason::Kicked);
         }
     }
 
@@ -520,6 +647,20 @@ impl<S: DatagramSocket> HubHost<S> {
                 .server
                 .send(peer, Channel::GAME_RPC, &HubMessage::Event(reply));
         }
+    }
+}
+
+/// A wire-1 peer still decodes [`HubEvent::ServerSet`]. `SessionConfirmed` has no address, and
+/// neither does the `ServerSet` of `None` a version-1 peer is sent instead. Wire 2 and newer
+/// receive `SessionConfirmed`.
+fn rewrite_for_wire(wire: u8, event: HubEvent) -> HubEvent {
+    if wire >= 2 {
+        return event;
+    }
+    if let HubEvent::SessionConfirmed { lobby, .. } = event {
+        HubEvent::ServerSet { lobby, server: None }
+    } else {
+        event
     }
 }
 
@@ -933,6 +1074,314 @@ mod tests {
              toward PROOF_FAILURE_LIMIT (hub_proof_dropped {})",
             raw.is_connected(),
             count(&hub, "hub_proof_dropped")
+        );
+    }
+
+    fn register_server() -> HubMessage {
+        HubMessage::Request(HubRequest::RegisterServer {
+            presence: crate::lobby::hub::ServerPresence {
+                server_proof: vec![0x11; crate::crypto::PLAYER_PROOF_BYTES],
+                proofs: Vec::new(),
+                capacity: 1,
+                load: 0,
+                protocol: 1,
+                game_version: "2".into(),
+                relay_only: false,
+                grace_ms: 0,
+                bans: Vec::new(),
+            },
+        })
+    }
+
+    /// A v0.7.0 peer (no `AnnounceWire`) stays on wire 1. A version-2 call is
+    /// `hub_needs_wire_v2` and the link stays up. After generation 2 is announced a dummy
+    /// presence proof is `hub_binding_invalid` and a heartbeat still works.
+    #[test]
+    fn a_wire_1_peer_keeps_its_session_when_a_v2_call_is_refused() {
+        let (net, key, mut hub) = open_hub(0x27);
+        let mut now = 0;
+        let ann = PlayerIdentity::from_private([12; 32]).expect("curve");
+        let mut raw = connect_raw(&net, &mut hub, 6800, key, &mut now);
+        let proof = ann
+            .prove(&key, &raw.handshake_hash().expect("sealed"))
+            .expect("proof");
+        raw.send(Channel::GAME_RPC, &hello("ann", proof)).expect("hello");
+        let refused = pump(&mut hub, &mut raw, &mut now, 40);
+        assert!(refused.is_empty(), "{refused:?}");
+        assert!(hub.core().member_by_handle("ann").is_some());
+
+        raw.send(Channel::GAME_RPC, &register_server()).expect("register");
+        let refused = pump(&mut hub, &mut raw, &mut now, 40);
+        assert_eq!(refused, ["hub_needs_wire_v2".to_owned()]);
+        assert!(raw.is_connected(), "a v2 call does not drop a v1 peer");
+        assert!(hub.core().member_by_handle("ann").is_some());
+        assert_eq!(hub.report().refused.get("hub_needs_wire_v2").copied(), Some(1));
+
+        raw.send(Channel::GAME_RPC, &HubMessage::Request(HubRequest::Heartbeat))
+            .expect("heartbeat");
+        let refused = pump(&mut hub, &mut raw, &mut now, 20);
+        assert!(refused.is_empty(), "a v1 heartbeat still works, got {refused:?}");
+        assert!(raw.is_connected());
+
+        raw.send(
+            Channel::GAME_RPC,
+            &HubMessage::Request(HubRequest::AnnounceWire { version: 1 }),
+        )
+        .expect("bad announce");
+        let refused = pump(&mut hub, &mut raw, &mut now, 20);
+        assert_eq!(refused, ["hub_needs_wire_v2".to_owned()]);
+        assert!(raw.is_connected());
+
+        raw.send(Channel::GAME_RPC, &register_server()).expect("still v1");
+        let refused = pump(&mut hub, &mut raw, &mut now, 20);
+        assert_eq!(refused, ["hub_needs_wire_v2".to_owned()]);
+
+        raw.send(
+            Channel::GAME_RPC,
+            &HubMessage::Request(HubRequest::AnnounceWire { version: 2 }),
+        )
+        .expect("announce");
+        let refused = pump(&mut hub, &mut raw, &mut now, 20);
+        assert!(refused.is_empty(), "{refused:?}");
+        raw.send(Channel::GAME_RPC, &register_server())
+            .expect("register v2");
+        let refused = pump(&mut hub, &mut raw, &mut now, 40);
+        assert_eq!(refused, ["hub_binding_invalid".to_owned()]);
+        assert!(raw.is_connected(), "a bad binding does not drop the peer");
+        assert!(hub.core().member_by_handle("ann").is_some());
+        assert_eq!(hub.report().refused.get("hub_binding_invalid").copied(), Some(1));
+
+        raw.send(Channel::GAME_RPC, &HubMessage::Request(HubRequest::Heartbeat))
+            .expect("heartbeat after");
+        let refused = pump(&mut hub, &mut raw, &mut now, 20);
+        assert!(refused.is_empty(), "{refused:?}");
+        assert!(raw.is_connected());
+        assert_eq!(hub.server().session().peers().count(), 1);
+    }
+
+    /// A sealed server link registers with a real presence proof, and the bound owner creates.
+    #[test]
+    fn a_real_presence_registers_and_the_owner_creates() {
+        let (net, key, mut hub) = open_hub(0x31);
+        let mut now = 0u64;
+        let ann = PlayerIdentity::from_private([12; 32]).expect("curve");
+        let game = ServerIdentity::from_private([0x71; 32]).expect("curve");
+        let mut owner = connect_raw(&net, &mut hub, 6900, key, &mut now);
+        let owner_proof = ann
+            .prove(&key, &owner.handshake_hash().expect("sealed"))
+            .expect("proof");
+        owner
+            .send(Channel::GAME_RPC, &hello("ann", owner_proof))
+            .expect("hello");
+        assert!(pump(&mut hub, &mut owner, &mut now, 40).is_empty());
+
+        let mut srv = connect_raw(&net, &mut hub, 6901, key, &mut now);
+        srv.send(Channel::GAME_RPC, &hello("srv", Vec::new()))
+            .expect("hello");
+        assert!(pump(&mut hub, &mut srv, &mut now, 40).is_empty());
+        srv.send(
+            Channel::GAME_RPC,
+            &HubMessage::Request(HubRequest::AnnounceWire { version: 2 }),
+        )
+        .expect("announce");
+        assert!(pump(&mut hub, &mut srv, &mut now, 20).is_empty());
+
+        let claims = crate::lobby::hub::BindingClaims {
+            version: 1,
+            server_key: game.public(),
+            expiry_ms: 0,
+            serial: 3,
+        };
+        let payload = crate::lobby::hub::encode_binding_payload(&claims).expect("payload");
+        let binding = crate::crypto::binding::prove_binding(&ann, &key, &payload).expect("binding");
+        let presence = crate::crypto::binding::prove_server_presence(
+            &game,
+            &key,
+            &srv.handshake_hash().expect("sealed"),
+        )
+        .expect("presence");
+        srv.send(
+            Channel::GAME_RPC,
+            &HubMessage::Request(HubRequest::RegisterServer {
+                presence: crate::lobby::hub::ServerPresence {
+                    server_proof: presence,
+                    proofs: vec![binding],
+                    capacity: 4,
+                    load: 0,
+                    protocol: 1,
+                    game_version: "2".into(),
+                    relay_only: false,
+                    grace_ms: 0,
+                    bans: Vec::new(),
+                },
+            }),
+        )
+        .expect("register");
+        let refused = pump(&mut hub, &mut srv, &mut now, 40);
+        assert!(refused.is_empty(), "{refused:?}");
+        assert_eq!(hub.report().servers.len(), 1);
+        assert!(srv.is_connected());
+
+        owner
+            .send(
+                Channel::GAME_RPC,
+                &HubMessage::Request(HubRequest::AnnounceWire { version: 2 }),
+            )
+            .expect("announce");
+        assert!(pump(&mut hub, &mut owner, &mut now, 20).is_empty());
+        owner
+            .send(
+                Channel::GAME_RPC,
+                &HubMessage::Request(HubRequest::CreateDelegated {
+                    request: 1,
+                    visibility: LobbyVisibility::Public,
+                    max_members: 8,
+                    joinable: true,
+                    data: Default::default(),
+                    server_key: game.public(),
+                }),
+            )
+            .expect("create");
+        let refused = pump(&mut hub, &mut owner, &mut now, 40);
+        assert!(refused.is_empty(), "{refused:?}");
+        assert_eq!(hub.core().lobbies().len(), 1);
+        assert_eq!(
+            hub.core().lobbies()[0].kind,
+            crate::lobby::hub::LobbyKind::Dedicated
+        );
+        assert!(owner.is_connected());
+        assert!(srv.is_connected());
+    }
+
+    fn pump_two(
+        hub: &mut HubHost<LoopbackSocket>,
+        owner: &mut NetClient<HubWire, LoopbackSocket>,
+        member: &mut NetClient<HubWire, LoopbackSocket>,
+        now: &mut u64,
+        steps: u32,
+    ) -> (Vec<String>, Vec<HubEvent>) {
+        let mut member_refused = Vec::new();
+        let mut owner_events = Vec::new();
+        for _ in 0..steps {
+            *now += 10;
+            owner.update(*now);
+            member.update(*now);
+            hub.update(*now);
+            while let Some(event) = owner.poll_event() {
+                if let ClientEvent::Message {
+                    message: HubMessage::Event(ev),
+                    ..
+                } = event
+                {
+                    owner_events.push(ev);
+                }
+            }
+            while let Some(event) = member.poll_event() {
+                if let ClientEvent::Message {
+                    message: HubMessage::Event(HubEvent::Refused { code }),
+                    ..
+                } = event
+                {
+                    member_refused.push(code);
+                }
+            }
+        }
+        (member_refused, owner_events)
+    }
+
+    /// A `relay_only` ask is a version-2 tail on a message a v0.7.0 peer also uses.
+    ///
+    /// The owner has not announced wire 2. The hub must refuse the member with
+    /// `hub_needs_wire_v2` and send the owner no `ReachAsk`. The tail is one byte past the
+    /// version-1 offer. A v0.7.0 client reads hub traffic on the reliable channel and ends the
+    /// link on trailing bytes (`DisconnectReason::ProtocolError`). Both sessions stay up.
+    #[test]
+    fn a_relay_only_ask_is_not_forwarded_to_a_wire_1_owner() {
+        let (net, key, mut hub) = open_hub(0x31);
+        let mut now = 0;
+        let owner_id = PlayerIdentity::from_private([12; 32]).expect("curve");
+        let member_id = PlayerIdentity::from_private([13; 32]).expect("curve");
+        let mut owner = connect_raw(&net, &mut hub, 6910, key, &mut now);
+        let mut member = connect_raw(&net, &mut hub, 6911, key, &mut now);
+        let owner_proof = owner_id
+            .prove(&key, &owner.handshake_hash().expect("sealed"))
+            .expect("proof");
+        let member_proof = member_id
+            .prove(&key, &member.handshake_hash().expect("sealed"))
+            .expect("proof");
+        owner
+            .send(Channel::GAME_RPC, &hello("owner", owner_proof))
+            .expect("hello");
+        member
+            .send(Channel::GAME_RPC, &hello("member", member_proof))
+            .expect("hello");
+        let _ = pump_two(&mut hub, &mut owner, &mut member, &mut now, 40);
+        let owner_member = hub.core().member_by_handle("owner").expect("owner session");
+        let member_member = hub.core().member_by_handle("member").expect("member session");
+        let lobby = hub
+            .core_mut()
+            .create(owner_member, &LobbySpec::default(), now)
+            .expect("lobby");
+        hub.core_mut()
+            .join(member_member, lobby, None, now)
+            .expect("join");
+
+        let mut offer = crate::lobby::hub::ReachOffer {
+            candidates: vec![crate::nat::Candidate::new(
+                crate::nat::CandidateKind::Host,
+                SocketAddr::from(([10, 0, 0, 2], 7777)),
+            )],
+            ..crate::lobby::hub::ReachOffer::default()
+        };
+        owner
+            .send(
+                Channel::GAME_RPC,
+                &HubMessage::Request(HubRequest::Offer {
+                    lobby,
+                    offer: offer.clone(),
+                }),
+            )
+            .expect("offer");
+        let refused_before = hub.report().refused.clone();
+        let _ = pump_two(&mut hub, &mut owner, &mut member, &mut now, 20);
+        assert_eq!(
+            hub.report().refused,
+            refused_before,
+            "the version-1 offer is accepted"
+        );
+
+        member
+            .send(
+                Channel::GAME_RPC,
+                &HubMessage::Request(HubRequest::AnnounceWire { version: 2 }),
+            )
+            .expect("announce");
+        let (refused, _) = pump_two(&mut hub, &mut owner, &mut member, &mut now, 20);
+        assert!(
+            refused.is_empty(),
+            "announcing wire 2 is accepted, got {refused:?}"
+        );
+
+        offer.relay_only = true;
+        member
+            .send(
+                Channel::GAME_RPC,
+                &HubMessage::Request(HubRequest::AskReach { lobby, offer }),
+            )
+            .expect("ask");
+        let (member_refused, owner_events) = pump_two(&mut hub, &mut owner, &mut member, &mut now, 40);
+        assert!(owner.is_connected(), "the wire-1 owner stays connected");
+        assert!(member.is_connected(), "the wire-2 member stays connected");
+        assert!(hub.core().member_by_handle("owner").is_some());
+        assert!(hub.core().member_by_handle("member").is_some());
+        let asks: Vec<_> = owner_events
+            .iter()
+            .filter(|ev| matches!(ev, HubEvent::ReachAsk { .. }))
+            .collect();
+        assert!(
+            asks.is_empty() && member_refused == ["hub_needs_wire_v2".to_owned()],
+            "a relay-only ask toward a wire-1 owner is hub_needs_wire_v2 and is not forwarded; \
+             owner asks {asks:?}; member refused {member_refused:?}"
         );
     }
 }

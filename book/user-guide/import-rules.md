@@ -1,5 +1,8 @@
 # Import folder rules
 
+<!-- index: Import rule -->
+<!-- index: import_rules.ron | see: Import rule -->
+
 `config/import_rules.ron` (v1) gives every source under a path glob the same importer settings
 without editing each `.meta` — folder-level import policy for a large project. It is read by the
 cook (the rules are merged at cook time), by `regia assets import-rules check`, and by the agent

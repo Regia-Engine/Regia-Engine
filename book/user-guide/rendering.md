@@ -1,13 +1,57 @@
 # Rendering
 
-The renderer is a forward+ Vulkan renderer behind `regia_render::RenderPlugin` (added by
+<!-- index: Vulkan -->
+<!-- index: DX12 -->
+<!-- index: Metal -->
+<!-- index: WebGPU -->
+<!-- index: WebGL2 -->
+<!-- index: Quality tier -->
+<!-- index: VeryLow -->
+<!-- index: Cinematic -->
+<!-- index: Upscale quality -->
+<!-- index: TAAU -->
+<!-- index: TSR -->
+<!-- index: FSR 3 -->
+<!-- index: DLSS -->
+<!-- index: XeSS -->
+<!-- index: Frame generation -->
+<!-- index: Present mode -->
+<!-- index: Vsync -->
+<!-- index: VsyncRelaxed -->
+
+The renderer is a forward+ renderer behind `regia_render::RenderPlugin` (added by
 `DefaultPlugins`). It covers PBR materials, sun and local lights, shadows, an IBL sky, post
 processing (AgX tonemap, bloom, TAA), and — for the high tiers — temporal upscaling and atmosphere
 (`docs/specs/13`, `docs/specs/26`).
 
+The frame runs on the graphics API the platform opens (`regia_render::backend_policy`):
+
+| Platform | APIs the instance opens | What the default pick uses |
+|---|---|---|
+| Windows | Vulkan and DX12 | A Vulkan hardware adapter when one exists. DX12 is the fallback, or the adapter `REGIA_GPU_INDEX` or `REGIA_GPU_NAME` names. |
+| macOS (testing builds) | Metal | wgpu's adapter pick. Metal is the testing backend (ADR-009, ADR-264). macOS is not a dedicated-server package target. |
+| Linux, Android | Vulkan | Vulkan. |
+
+GL is never opened. A persistent pipeline cache (`.fpc`) applies on Vulkan. DX12 and Metal rely
+on the driver's own disk cache. The product viewer (`regia_web`) is a separate path: it draws on
+a page canvas with WebGPU, or with WebGL2 when WebGPU is missing or the page asks for
+`backend: "webgl2"`. That viewer is not a general web game. A general web game target stays on
+the version ladder.
+
+DLSS and XeSS are optional link crates (`regia_dlss`, `regia_xess`) against SDKs that are not in
+this repository. A build without the SDK falls back to the built-in upscalers. See
+[Vendor upscalers](#vendor-upscalers) below.
+
+Task procedures: [Quality and upscalers](../how-to/picture/quality-and-upscalers.md),
+[Light a level](../how-to/picture/light-a-level.md),
+[Materials](../how-to/picture/materials.md).
+
 Related chapters: [The default look](default-look.md) (what a frame looks like before you touch
-anything, and how to tune it), [Lighting, shadows and GI](../systems/lighting.md), and the
-generated [render profile table](../reference/render-profiles.md) with every preset's values.
+anything, and how to tune it), [Lighting, shadows and GI](../systems/lighting.md),
+[Automatic quality detection](auto-quality.md),
+[Dynamic resolution](dynamic-resolution.md), and the
+generated [render profile table](../reference/render-profiles.md). That table lists the six
+real-time presets. It omits the VeryLow tier and the Cinematic profile.
 
 ## Render profiles
 
@@ -22,18 +66,107 @@ fn configure(app: &mut App) {
 }
 ```
 
-Presets (`RenderProfilePreset`): `MobileLow`, `MobileHigh`, `DesktopLow`, `DesktopHigh`,
-`DesktopUltra`, and the Steam Deck `Deck`. Desktop High and Ultra render at native resolution
-with temporal AA; a game may set Desktop High's `render_scale` to 0.67 for a temporally upsampled
-(TAAU) performance budget, which ADR-041 introduced and the default stopped using on 2026-10-07
-because that TAAU loses thin geometry and floor reflections. Deck renders at 70% and Mobile Low
-at 70%, upsampled. The [render profile table](../reference/render-profiles.md) is generated from
-the code and lists the main values; not every `RenderProfile` field has a row (for example
-`gi_probes`, `texture_streaming`, `contact_shadows` and `emissive_lights` do not), so read the
-rustdoc for the rest. The user-facing quality ladder is a separate enum,
-`GameSettings.graphics.preset` (`GraphicsPreset`: `Low`, `Medium`, `High`, `Ultra`, `Clean`) —
-individual fields (shadow quality, render scale) can override the preset. See the
+Real-time presets (`RenderProfilePreset::ALL`): `MobileLow`, `MobileHigh`, `DesktopLow`,
+`DesktopHigh`, `DesktopUltra`, and the Steam Deck `Deck`. `Cinematic` is a seventh preset
+(`RenderProfilePreset::WITH_OFFLINE`). It is Desktop Ultra with native scale, 8192² sun cascades,
+every cloud texel marched, the light caps at their maximum, and mesh LOD held toward LOD 0
+(ADR-1403). No menu and no detector pick it. `regia_render::cinematic::gate_preset` runs it on a
+desktop whose detected tier is High or Ultra. On Android the applied preset is Mobile High
+(`cinematic_needs_desktop`). On a detected tier below High the applied preset is that tier's own
+(`cinematic_tier_too_low`) unless the caller passes `force`. Hosts read `--render-profile`, then
+`REGIA_RENDER_PROFILE`, then `render_profile.txt` in the scene directory.
+
+Desktop High and Ultra render at native resolution with temporal AA. A game may set Desktop
+High's `render_scale` to 0.67 for a temporally upsampled (TAAU) performance budget, which ADR-041
+introduced and the default stopped using on 2026-10-07 because that TAAU loses thin geometry and
+floor reflections. The Medium quality tier is that 0.67 scale with Balanced lighting. Deck and
+Mobile Low render at 70%, upsampled. The [render profile table](../reference/render-profiles.md)
+is generated from the six real-time presets and lists the main values; not every `RenderProfile`
+field has a row (for example `gi_probes`, `texture_streaming`, `contact_shadows` and
+`emissive_lights` do not), so read the rustdoc for the rest.
+
+The user-facing ladder is `QualityTier`: `MobileLow`, `MobileHigh`, `Deck`, `VeryLow`, `Low`,
+`Medium`, `High`, `Ultra`. `VeryLow` is not its own preset. It is Desktop Low at render scale
+1/3 with the SGSR 1 spatial upscaler and a 384 MiB lazy texture budget (ADR-7882). Content
+budgets stay on Low, and `RenderSettings::preset` still answers Desktop Low. The saved menu
+value is `GraphicsPreset` (`Low`, `Medium`, `High`, `Ultra`, `Clean`, `Deck`, `VeryLow`).
+`Clean` renders as High. On Android, Low and VeryLow become Mobile Low and every other menu
+preset becomes Mobile High. Individual profile fields can still override the preset. See
+[Automatic quality detection](auto-quality.md) and the
 [agent guide](../agents/framework.md).
+
+## Upscale quality
+
+<!-- index: Native -->
+<!-- index: Ultra Performance -->
+
+`RenderProfile::upscale_quality` is `None` on every preset, so `render_scale` applies.
+`Some(UpscaleQuality)` replaces that scale. The ratio is display size divided by render size,
+as an exact fraction, rounded to the nearest integer (halves up, at least 1):
+
+| Mode | Ratio | Permille |
+|---|---|---|
+| `Native` | 1/1 | 1000 |
+| `Quality` | 3/2 | 667 |
+| `Balanced` | 17/10 | 588 |
+| `Performance` | 2/1 | 500 |
+| `UltraPerformance` | 3/1 | 333 |
+
+The mode sets the size. On a TAA frame the upscaler is still `temporal_upscaler`. On any other
+frame it is `spatial_upscaler` (`Bilinear`, or `Sgsr` on VeryLow). Dynamic resolution, when a
+host applies it, stays inside the mode's permille range (`DynResConfig::within_quality`).
+
+## Temporal upscalers
+
+`temporal_upscaler` is consulted when anti-aliasing is TAA. The default on every preset is
+`Taau` (neighbourhood clamp, bilinear history). `Tsr` is the reconstruction upscaler
+(depth-dilated motion, disocclusion, variance clipping, thin-feature locks, a reactive mask).
+`Fsr3` is the FSR 3.1 upscaler ported from the AMD FidelityFX SDK v1.1.4. All three are compiled
+into every build. The opt-in example under [Renderer features](#renderer-features-and-opt-ins)
+sets `Tsr`.
+
+## Vendor upscalers
+
+`VendorUpscaler` is separate from `TemporalUpscaler` so a host's exhaustive match on the built-in
+enum keeps compiling. `FrameRenderer::set_vendor_upscaler` tries DLSS or XeSS on a single-sample
+TAA frame and falls back to `temporal_upscaler` when the vendor cannot run.
+`vendor_upscaler_report` records the reason. Agents read the same facts from `render.get_upscalers`.
+
+- **DLSS** (`regia_dlss`). Optional `sdk` feature plus an external `DLSS_SDK` path. NGX on Vulkan,
+  Linux and Windows. Android and macOS never link. A missing runtime, a non-NVIDIA adapter, or a
+  DX12 device (`dlss_needs_vulkan`) uses the built-in upscaler.
+- **XeSS** (`regia_xess`). Optional `sdk` feature plus an external `XESS_SDK` path. Windows
+  Vulkan. Other targets are not linked. Without the SDK the runtime answer is `not_linked`.
+
+The SDK binaries are not in the repository. Refusal codes live in `regia_render::upscaler::reason`
+and on [Upscalers (agents)](../agents/upscalers.md).
+
+## Frame generation
+
+Frame generation presents one interpolated frame between two rendered frames. It is a WGSL port
+of the FidelityFX SDK v1.1.4 interpolation and optical-flow shaders, paced on Regia's wgpu
+surfaces. No vendor binary is involved. It stays off until `FrameGenSettings.enabled` is set, and
+the cargo feature `frame-gen` has to be compiled in (`not_compiled` otherwise). A headless app
+reports `headless`. A device without the storage-texture and storage-buffer counts, or a GL
+device, reports `needs_desktop_gpu`. The default pauses generation when the rendered rate is
+under 55 fps. The HUD is redrawn on the generated image. It is not interpolated. The agent method
+is `render.frame_gen`. See [Frame generation (agents)](../agents/frame-gen.md).
+
+## Present modes
+
+<!-- index: Immediate -->
+
+`PresentMode` on the primary window is `Vsync` (wait for vertical blank; the default),
+`VsyncRelaxed` (vsync, and a late frame may tear), or `Immediate` (no wait; the image may tear).
+`GameSettings.display.vsync` applies live: on selects `Vsync`, or keeps `VsyncRelaxed` when that
+was already the window's mode; off selects `Immediate`. When the window asks for `Immediate`,
+the swapchain takes the first unsynced mode the surface offers (`Immediate`, then `Mailbox`),
+and FIFO when the surface has none. `Mailbox` and FIFO are surface modes, not `PresentMode`
+variants. `DisplayApplied` reports the window mode that stuck and the swapchain summary.
+On Android, off is refused (`android_display_paced`): frames stay on the display's vsync grid,
+and the rate comes from `display.frame_cap`. A surface with no unsynced mode keeps FIFO
+(`no_unsynced_mode_offered`). A host variable-refresh policy picks its own mode
+(`host_vrr_policy`).
 
 ## Renderer features and opt-ins
 

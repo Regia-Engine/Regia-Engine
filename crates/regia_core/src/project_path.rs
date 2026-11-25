@@ -340,6 +340,31 @@ pub fn resolve_in_roots(roots: &[PathBuf], path: &str) -> Result<PathBuf, Projec
     Ok(joined)
 }
 
+/// `path` without Windows' verbatim prefix on a drive path: `\\?\C:\x` becomes `C:\x`; every other
+/// path (a verbatim UNC `\\?\UNC\…` path, any Unix path, a path that is not UTF-8) is returned
+/// unchanged. `canonicalize` returns the verbatim form on Windows, and Cargo (`path = "//?/C:/…"`:
+/// "invalid path url"), shortcuts and other programs refuse it, so a canonical path that is written
+/// into a file or shown to the user goes through this first (ADR-10616). The rule is plain text, so it
+/// holds the same on every host.
+#[must_use]
+pub fn strip_verbatim(path: &Path) -> PathBuf {
+    match path.to_str().and_then(|text| text.strip_prefix(r"\\?\")) {
+        Some(rest) if rest.as_bytes().get(1) == Some(&b':') => PathBuf::from(rest),
+        _ => path.to_path_buf(),
+    }
+}
+
+/// [`std::fs::canonicalize`] through [`strip_verbatim`]: the absolute path with symlinks resolved,
+/// spelled `C:\…` rather than `\\?\C:\…` on Windows (ADR-10616). For paths that are written into a
+/// file or shown to the user; compare canonical paths with canonical paths.
+///
+/// # Errors
+///
+/// As [`std::fs::canonicalize`]: the path does not exist or cannot be resolved.
+pub fn canonicalize_plain(path: &Path) -> std::io::Result<PathBuf> {
+    path.canonicalize().map(|path| strip_verbatim(&path))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -352,6 +377,41 @@ mod tests {
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).expect("temp root");
         dir
+    }
+
+    /// ADR-10616: a verbatim drive path loses its prefix (the `regia new` Cargo.toml bug), and
+    /// nothing else changes.
+    #[test]
+    fn verbatim_drive_paths_lose_their_prefix() {
+        assert_eq!(strip_verbatim(Path::new(r"\\?\C:\x\y")), PathBuf::from(r"C:\x\y"));
+        assert_eq!(
+            strip_verbatim(Path::new(r"\\?\C:\Users\me\AppData\Local\Regia\e")),
+            PathBuf::from(r"C:\Users\me\AppData\Local\Regia\e")
+        );
+        for unchanged in [
+            r"\\?\UNC\server\share",
+            r"C:\x",
+            "/home/me/e",
+            r"\\?\",
+            r"\\?\C",
+            "rel/x",
+        ] {
+            assert_eq!(strip_verbatim(Path::new(unchanged)), PathBuf::from(unchanged));
+        }
+        let dir = temp_root("plain");
+        let plain = canonicalize_plain(&dir).expect("canonical");
+        assert!(plain.is_absolute());
+        assert!(
+            !plain.to_string_lossy().starts_with(r"\\?\"),
+            "{}",
+            plain.display()
+        );
+        assert_eq!(
+            plain.canonicalize().expect("canonical"),
+            dir.canonicalize().expect("canonical")
+        );
+        assert!(canonicalize_plain(&dir.join("missing")).is_err());
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     #[cfg(unix)]

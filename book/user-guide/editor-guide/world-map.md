@@ -1,5 +1,7 @@
 # World Map
 
+Panel id: `world_map`.
+
 The **World Map** tab edits a large streamed level a few cells at a time. It draws the level's streaming grid; you
 pick cells and load their entities into the edit world, where they appear in the Outliner and the Inspector like any
 other entity. Saving a cell writes back only that cell's entity files, so the rest of the world keeps its bytes.

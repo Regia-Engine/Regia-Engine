@@ -1,11 +1,15 @@
 # DCC Feed
 
+Panel id: `dcc_feed`.
+
 The **DCC Feed** tab controls the live scene feed: a content tool (a modeling or animation
 application with a feed add-on) streams meshes, transforms and clips into the running editor, where
 they appear as ordinary entities marked as feed-owned. When you are happy with the result you
-**bake** the items into normal `.glb` assets. The feed is a development channel: it exists only in
-builds with the `dcc-feed` feature (the editor), and it is off until the project turns it on.
-Depth: [DCC scene feed (agents)](../../agents/dcc-feed.md).
+**bake** the items into normal `.glb` assets. The feed is a development channel. The `regia` crate
+feature `dcc-feed` is off by default and is not part of a shipping profile. The editor turns on
+`regia_agent`'s `dcc-feed-assets` feature, so this tab is in the editor, and the listener stays off
+until the project sets `[dcc_feed]` with `enabled = true` in `Regia.toml`.
+Depth: [DCC scene feed (agents)](../../agents/dcc-feed.md). Spec: `docs/specs/60-dcc-scene-feed.md`.
 
 ## Open it
 

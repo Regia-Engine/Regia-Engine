@@ -243,7 +243,18 @@ fn tail(text: &str, max: usize) -> &str {
 }
 
 fn workspace_root() -> Result<PathBuf, String> {
-    let start = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    // Runtime path (ADR-10370). `env!("CARGO_MANIFEST_DIR")` is not remapped by rustc.
+    // `cargo run` exports the variable. A binary under `target/<profile>` still walks up
+    // to the workspace `Cargo.toml`.
+    let start = if let Some(dir) = std::env::var_os("CARGO_MANIFEST_DIR") {
+        PathBuf::from(dir)
+    } else if let Ok(exe) = std::env::current_exe()
+        && let Some(dir) = exe.parent()
+    {
+        dir.to_path_buf()
+    } else {
+        std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
+    };
     let mut dir = start.as_path();
     loop {
         let manifest = dir.join("Cargo.toml");

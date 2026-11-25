@@ -1,5 +1,10 @@
 # Windows
 
+<!-- index: Windows -->
+<!-- index: DX12 -->
+<!-- index: Direct3D 12 -->
+<!-- index: Cursor grab -->
+
 The v0.2.17 Windows pass exercised Vulkan and DX12 on the owner's a test machine, including
 native crash capture, deliberate device-loss exit and clean quits; the N150 laptop also had
 a native pass. See the v0217 notes, `docs/releases/v0.1.28-windows-pass-v0217.md`.
@@ -7,6 +12,14 @@ That evidence belongs to its recorded source revision. **The v0.2.20 candidate s
 its own native Windows acceptance**; its handoff, `docs/evidence/windows/v02020-acceptance-b.md`,
 records the frozen source and exact commands. Windows is verified on the owner's machines
 only (ADR-009); there are no hosted Windows runners.
+
+## What a Windows package is
+
+`regia package --platform windows` writes `dist/windows/<slug>-windows.zip`. On Linux the same command cross-compiles with cargo-xwin when [regia doctor](doctor.md) `--platform windows` is clean, and it does not run the exe on the Linux host. A dedicated server is `regia package --server --platform windows`. The procedure is [Package a game](../how-to/platforms/package-a-game.md). [Linux](linux.md) is the other desktop shipping target.
+
+Vulkan is the default adapter. DX12 is in the same adapter list after the Vulkan entries. `REGIA_GPU_INDEX` or `REGIA_GPU_NAME` selects a DX12 adapter when the machine has one. A pass on a machine with no DX12 hardware adapter still records that run as `unreachable` (`BLOCKED`). The sections below are the acceptance history and the checks that do not need the Windows machine.
+
+`CursorGrab::Locked` is requested as Confined on Windows, because that is the grab winit applies there. Confined stays Confined. Spec 11: only the primary window becomes an operating-system window (ADR-2252).
 
 ## What is checked without a Windows machine
 

@@ -1,5 +1,7 @@
 # Fracture
 
+Panel id: `fracture`.
+
 The **Fracture** tab breaks a box or a project mesh into chunks for destruction: pick the
 source, set the fracture and cook settings, preview the chunks (exploded in the viewport if you
 like), then save a `.fracture.ron` plus a `.destructible.ron`, or write the settings into the

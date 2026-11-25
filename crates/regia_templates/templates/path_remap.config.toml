@@ -1,0 +1,109 @@
+# Privacy remaps (ADR-10370, ADR-10354). rustc applies `--remap-path-prefix` to
+# `file!()` and panic locations, including dependency and standard-library paths,
+# so these directory roots become `/builder`. `regia new` and the editor append
+# this machine's home directory as the LAST flag of each list: rustc uses the
+# last matching prefix, and without that line a plain `cargo build` keeps
+# `/builder/<account>/.cargo/...` when the account name is itself private.
+# Copying this file by hand does not append it. Setting `RUSTFLAGS` replaces
+# these flags: restate every one there, home directory last.
+# `env!` values are not remapped. Read `CARGO_MANIFEST_DIR` from the environment
+# instead of `env!("CARGO_MANIFEST_DIR")`.
+
+[target.x86_64-unknown-linux-gnu]
+rustflags = [
+    "--remap-path-prefix=/home=/builder",
+    "--remap-path-prefix=/media=/builder",
+    "--remap-path-prefix=/srv=/builder",
+    "--remap-path-prefix=/models=/builder",
+    "--remap-path-prefix=/root=/builder",
+    "--remap-path-prefix=/mnt=/builder",
+    "--remap-path-prefix=/Users=/builder",
+]
+
+[target.aarch64-unknown-linux-gnu]
+rustflags = [
+    "--remap-path-prefix=/home=/builder",
+    "--remap-path-prefix=/media=/builder",
+    "--remap-path-prefix=/srv=/builder",
+    "--remap-path-prefix=/models=/builder",
+    "--remap-path-prefix=/root=/builder",
+    "--remap-path-prefix=/mnt=/builder",
+    "--remap-path-prefix=/Users=/builder",
+]
+
+[target.x86_64-pc-windows-msvc]
+rustflags = [
+    "--remap-path-prefix=/home=/builder",
+    "--remap-path-prefix=/media=/builder",
+    "--remap-path-prefix=/srv=/builder",
+    "--remap-path-prefix=/models=/builder",
+    "--remap-path-prefix=/root=/builder",
+    "--remap-path-prefix=/mnt=/builder",
+    "--remap-path-prefix=/Users=/builder",
+]
+
+[target.x86_64-pc-windows-gnu]
+rustflags = [
+    "--remap-path-prefix=/home=/builder",
+    "--remap-path-prefix=/media=/builder",
+    "--remap-path-prefix=/srv=/builder",
+    "--remap-path-prefix=/models=/builder",
+    "--remap-path-prefix=/root=/builder",
+    "--remap-path-prefix=/mnt=/builder",
+    "--remap-path-prefix=/Users=/builder",
+]
+
+[target.wasm32-unknown-unknown]
+rustflags = [
+    "--remap-path-prefix=/home=/builder",
+    "--remap-path-prefix=/media=/builder",
+    "--remap-path-prefix=/srv=/builder",
+    "--remap-path-prefix=/models=/builder",
+    "--remap-path-prefix=/root=/builder",
+    "--remap-path-prefix=/mnt=/builder",
+    "--remap-path-prefix=/Users=/builder",
+]
+
+[target.aarch64-linux-android]
+rustflags = [
+    "--remap-path-prefix=/home=/builder",
+    "--remap-path-prefix=/media=/builder",
+    "--remap-path-prefix=/srv=/builder",
+    "--remap-path-prefix=/models=/builder",
+    "--remap-path-prefix=/root=/builder",
+    "--remap-path-prefix=/mnt=/builder",
+    "--remap-path-prefix=/Users=/builder",
+]
+
+[target.x86_64-linux-android]
+rustflags = [
+    "--remap-path-prefix=/home=/builder",
+    "--remap-path-prefix=/media=/builder",
+    "--remap-path-prefix=/srv=/builder",
+    "--remap-path-prefix=/models=/builder",
+    "--remap-path-prefix=/root=/builder",
+    "--remap-path-prefix=/mnt=/builder",
+    "--remap-path-prefix=/Users=/builder",
+]
+
+[target.aarch64-apple-darwin]
+rustflags = [
+    "--remap-path-prefix=/home=/builder",
+    "--remap-path-prefix=/media=/builder",
+    "--remap-path-prefix=/srv=/builder",
+    "--remap-path-prefix=/models=/builder",
+    "--remap-path-prefix=/root=/builder",
+    "--remap-path-prefix=/mnt=/builder",
+    "--remap-path-prefix=/Users=/builder",
+]
+
+[target.x86_64-apple-darwin]
+rustflags = [
+    "--remap-path-prefix=/home=/builder",
+    "--remap-path-prefix=/media=/builder",
+    "--remap-path-prefix=/srv=/builder",
+    "--remap-path-prefix=/models=/builder",
+    "--remap-path-prefix=/root=/builder",
+    "--remap-path-prefix=/mnt=/builder",
+    "--remap-path-prefix=/Users=/builder",
+]

@@ -1,11 +1,18 @@
 # Goal-oriented action planning (GOAP)
 
+<!-- index: GOAP -->
+<!-- index: World state -->
+<!-- index: Planner -->
+
 `regia_ai::goap` is a planner for agents that choose *what to do next* by chaining actions:
 give it the actions an agent can perform (each with preconditions, effects and a cost), the
 world as it is now, and a goal as a partial description of the world as it should be. It
 returns a minimum-cost sequence of actions that reaches the goal, or says why it cannot.
 The formulation is Jeff Orkin's GOAP ("Three States and a Plan", GDC 2006); see
-`docs/provenance.md` for the sources.
+`docs/provenance.md` for the sources. GOAP has no spec file of its own. It ships beside the
+behavior trees in [spec 22](../../docs/specs/22-tier2.md). It plans action names. It does not
+apply damage, play montages, or move the body. A tree leaf or a character step does that. See
+[Combat and abilities](../how-to/play/combat-abilities.md).
 
 GOAP complements behavior trees: a tree decides *that* the agent wants a table, the planner
 works out *how* (fetch an axe, chop, craft — or the expensive stick-collecting fallback when

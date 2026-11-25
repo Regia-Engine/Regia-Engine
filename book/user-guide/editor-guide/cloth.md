@@ -1,5 +1,7 @@
 # Cloth
 
+Panel id: `cloth`.
+
 The **Cloth** tab opens a `.cloth.ron` (or a `.soft.ron` soft body) from the project, edits its
 simulation parameters, and paints per-vertex maps on the simulation mesh in the viewport. It edits
 the file through its own types and saves it atomically; the level is only touched when you change an

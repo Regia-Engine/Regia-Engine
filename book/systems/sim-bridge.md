@@ -1,11 +1,16 @@
 # Networking and the sim bridge
 
+<!-- index: Sim bridge -->
+<!-- index: Lockstep -->
+<!-- index: Rollback -->
+
 Some games keep their authoritative state outside the engine: a deterministic lockstep or
 rollback simulation, a server-authoritative model, a simulation written as a separate library and
-shared with a dedicated server. Regia Engine supports this as a first-class pattern, the **sim bridge**
+shared with a dedicated server. Regia Engine supports this pattern, the **sim bridge**
 (`regia_framework::sim_bridge`, `docs/specs/25-sim-bridge-and-do27.md` § 3): the simulation owns
 the truth and its own clock; Regia Engine is the presentation layer that sends it input and draws
-what it reports.
+what it reports. Choosing lockstep, rollback, or a replicated server is
+[Lockstep and rollback](../how-to/online/lockstep-and-rollback.md).
 
 > **Networking status.** Regia Engine ships its own client-server networking crate, `regia_net`
 > (since v0.2.5; replication, prediction, interpolation, lag compensation, lobbies and a
@@ -14,6 +19,8 @@ what it reports.
 > The sim bridge is the other path: a game that keeps its own netcode inside an external
 > simulation connects that simulation to the engine through the bridge; this is how
 > *Direct Order 27* works. The two do not exclude each other.
+> Steam sockets and Steam lobbies are mock-tested (ADR-2828, 2026-11-05). QUIC is partial and is
+> not a session transport for a shipped game. See [Host a game](../how-to/online/host-a-game.md).
 
 ## How it fits
 

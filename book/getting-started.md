@@ -2,6 +2,11 @@
 
 <!-- Steps 1 to 5 run as written in crates/regia_cli/tests/getting_started_walkthrough.rs: keep every command, the Cargo.toml fence and the lib.rs fence runnable. -->
 
+Two shorter paths sit beside this walkthrough. [Quickstart for a person](start/quickstart-human.md)
+goes from a built toolchain to a running game. [Quickstart for an agent](start/quickstart-agent.md)
+connects to a project and makes one call. This chapter is the longer tour, and its commands are
+the ones the engine's test runs.
+
 This chapter creates a project, runs it, puts something on screen, makes it move, opens it in
 the editor and takes a screenshot through the agent protocol. It assumes the tools from
 [Installing Regia Engine](start/install.md) are on your `PATH`.
@@ -47,8 +52,8 @@ regia new "Garden Patrol" --template top_down
 The editor's project browser and the `editor.new_project` agent method create the same
 templates except `quick`.
 
-The generated `game/Cargo.toml` depends on the engine by path (the checkout that built your
-`regia` binary), so `cargo` always builds your game against exactly that engine. If you move
+The generated `game/Cargo.toml` depends on the engine by path (the engine checkout your
+`regia` binary runs from), so `cargo` always builds your game against exactly that engine. If you move
 the engine, update the path. [Project structure](user-guide/project-structure.md) describes every
 file; the ones you need now are:
 
@@ -67,7 +72,10 @@ $ regia run
 
 `regia run` cooks the assets, builds the launcher and starts it (`regia run --dev` also reloads
 assets you save while it runs); `cargo run -p my_game_launcher` builds and runs it without the
-cook.
+cook. The `<name>_launcher` crate comes with the `blank`, `first_person`, `third_person` and
+`top_down` templates; a `quick` app has none (use plain `cargo build` and `cargo run`), and a
+`net_game` project builds with plain `cargo build` and runs its `<name>_server` and `<name>_client`
+crates as its `README.md` says.
 
 The first build compiles the engine, which takes a few minutes; later builds only compile your
 crates. A window opens. It is empty: the blank `Game` plugin adds no systems, there is no camera

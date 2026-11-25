@@ -25,8 +25,29 @@ use regia_terrain::TerrainLayers;
 pub const GENERATOR: &str = "road network";
 
 /// The directory of the sample's graph and road profile.
+///
+/// Resolved at runtime (ADR-10370): `env!("CARGO_MANIFEST_DIR")` would embed the
+/// build machine's path, which rustc does not remap.
 pub fn assets_dir() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("assets")
+    sample_manifest_dir("procgen_roads").join("assets")
+}
+
+fn sample_manifest_dir(sample: &str) -> PathBuf {
+    if let Some(dir) = std::env::var_os("CARGO_MANIFEST_DIR") {
+        return PathBuf::from(dir);
+    }
+    if let Ok(exe) = std::env::current_exe()
+        && let Some(root) = exe
+            .parent()
+            .and_then(|dir| dir.parent())
+            .and_then(|dir| dir.parent())
+    {
+        let project = root.join("samples").join(sample);
+        if project.is_dir() {
+            return project;
+        }
+    }
+    std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
 }
 
 fn spline_entity(world: &mut World, points: &[[f32; 2]], tag: &str, guid: u128, closed: bool) -> Entity {

@@ -1,5 +1,7 @@
 # VFX Editor
 
+Panel id: `vfx_editor`.
+
 The **VFX Editor** tab edits a `.vfx.ron` particle effect: the list of emitters, each emitter's
 module stack (gravity, drag, size over life, ...), curve and gradient editors, a live preview and a
 table of what each emitter costs. Every change is one step on the editor's shared undo stack and is

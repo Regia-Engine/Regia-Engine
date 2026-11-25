@@ -1,8 +1,14 @@
 # Deterministic simulation
 
+<!-- index: Lockstep -->
+<!-- index: Desync -->
+<!-- index: Deterministic simulation -->
+
 A lockstep game runs the same simulation on every machine and sends only inputs. Every peer must compute the same
 bits from the same inputs. Regia's lockstep pieces live in `regia_detsim` (math, fixed ticks, goldens) and
-`regia_nav::det` (the navigation grid and its search). The reference pages are
+`regia_nav::det` (the navigation grid and its search). Choose strict lockstep or rollback lockstep, and check a
+running match, in [Lockstep and rollback](../how-to/online/lockstep-and-rollback.md). The wire protocol is in
+[Networking](networking.md#lockstep-matches). The reference pages are
 [Lockstep math and the determinism scan](../agents/lockstep-math.md) and
 [Deterministic navigation grid](../agents/det-grid.md). The hover step has its own page:
 [Hover step (lockstep)](../agents/det-hover.md).

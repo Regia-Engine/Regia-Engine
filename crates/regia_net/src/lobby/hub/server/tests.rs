@@ -222,10 +222,18 @@ fn the_session_address_goes_to_members_only_and_moves_presence() {
     h.confirm_session(host, lobby, Some(server), 0).expect("confirm");
     h.flush();
     for m in [host, member] {
-        assert!(h.take_events(m).contains(&HubEvent::ServerSet {
-            lobby,
-            server: Some(server)
-        }));
+        let ev = h.take_events(m);
+        assert!(
+            ev.contains(&HubEvent::SessionConfirmed {
+                lobby,
+                confirmed: true
+            }),
+            "{ev:?}"
+        );
+        for e in &ev {
+            let bytes = e.to_bytes().expect("encodes");
+            assert!(!bytes.windows(4).any(|w| w == [10, 1, 2, 3]), "{e:?}");
+        }
     }
     let outside = h.take_events(outsider);
     for e in &outside {
@@ -239,10 +247,10 @@ fn the_session_address_goes_to_members_only_and_moves_presence() {
             .all(|r| r.presence == HubPresence::InGame)
     );
     assert!(!h.lobbies()[0].data.contains_key(keys::SERVER));
-    // `regia.server` through set_data is the same confirm; a bad value is refused.
+    // `regia.server` is not stored. Any value, including one that is not an address, is refused.
     assert_eq!(
         h.set_data(host, lobby, keys::SERVER, Some("tcp:nope"), 0),
-        Err(LobbyError::ValueTooLong.into())
+        Err(HubError::AddressInData)
     );
     h.set_data(host, lobby, keys::SERVER, None, 0).expect("withdraw");
     assert_eq!(h.lobby_info(lobby).and_then(|l| l.server), None);
@@ -604,8 +612,11 @@ fn after_the_owner_leaves_only_the_new_owner_confirms_and_it_is_checked() {
     for m in [heir, other] {
         let ev = h.take_events(m);
         assert!(
-            ev.contains(&HubEvent::ServerSet { lobby, server: None }),
-            "{m:?} was not told the address went: {ev:?}"
+            ev.contains(&HubEvent::SessionConfirmed {
+                lobby,
+                confirmed: false
+            }),
+            "{m:?} was not told the session was withdrawn: {ev:?}"
         );
     }
     let in_game = h
@@ -619,18 +630,22 @@ fn after_the_owner_leaves_only_the_new_owner_confirms_and_it_is_checked() {
         h.confirm_session(other, lobby, Some(second), 0),
         Err(LobbyError::NotOwner.into())
     );
-    // The confirm is lobby data: over the byte budget it is refused and nothing changes.
+    // Confirm is a flag, not lobby data: a full byte budget does not refuse it, and no address
+    // is stored.
     h.set_data(heir, lobby, "pad", Some(&"x".repeat(50)), 0)
         .expect("pad");
-    assert_eq!(
-        h.confirm_session(heir, lobby, Some(second), 0),
-        Err(HubError::DataTooLarge)
-    );
+    h.confirm_session(heir, lobby, Some(second), 0)
+        .expect("confirm ignores the address bytes");
     assert_eq!(h.lobby_info(lobby).and_then(|l| l.server), None);
+    assert!(
+        h.players()
+            .iter()
+            .any(|p| p.member == heir && p.presence == HubPresence::InGame)
+    );
     h.set_data(heir, lobby, "pad", None, 0).expect("unpad");
     h.confirm_session(heir, lobby, Some(second), 0)
-        .expect("the new owner confirms its own game");
-    assert_eq!(h.lobby_info(lobby).and_then(|l| l.server), Some(second));
+        .expect("the same flag is a no-op");
+    assert_eq!(h.lobby_info(lobby).and_then(|l| l.server), None);
 }
 
 /// Finding 2: the drain after a burst ends with a resync (the room as it stands), so a session
@@ -1027,6 +1042,7 @@ fn a_member_cannot_read_the_owners_ticket_before_approval() {
         join_code: Some("ABCDEF".into()),
         ticket: b"RGJT-owner-ticket".to_vec(),
         nat: None,
+        relay_only: false,
     };
     h.offer_reach(host, lobby, offer, 0).expect("offer");
     h.ask_reach(bob, lobby, ReachOffer::default(), 0).expect("ask");
@@ -1070,14 +1086,15 @@ fn ask_and_approve_do_not_tell_a_missing_lobby_from_another() {
         .create(host, &spec(LobbyVisibility::Private), 0)
         .expect("create");
     let missing = LobbyId(9_000);
+    // NL-09: a missing id and a private lobby the caller is not in both answer `lobby_not_found`.
     assert_eq!(
         h.ask_reach(stranger, missing, ReachOffer::default(), 0)
             .map(|_| ()),
-        Err(LobbyError::NotInLobby.into())
+        Err(LobbyError::NotFound.into())
     );
     assert_eq!(
         h.ask_reach(stranger, lobby, ReachOffer::default(), 0).map(|_| ()),
-        Err(LobbyError::NotInLobby.into())
+        Err(LobbyError::NotFound.into())
     );
     assert_eq!(
         h.approve(stranger, missing, host, true, 0).map(|_| ()),

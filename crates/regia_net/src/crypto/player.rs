@@ -109,6 +109,12 @@ impl PlayerIdentity {
         PlayerKey(self.0.public().0)
     }
 
+    /// The static pair. Visible to the other `crypto` modules (binding proofs); not a public key
+    /// export.
+    pub(in crate::crypto) fn static_identity(&self) -> &ServerIdentity {
+        &self.0
+    }
+
     /// The proof for the sealed link to the hub whose key is `hub` and whose handshake hash is
     /// `binding`: one `Noise_X` message to `hub` carrying `binding`.
     ///

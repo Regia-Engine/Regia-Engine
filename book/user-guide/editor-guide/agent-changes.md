@@ -1,5 +1,7 @@
 # Agent Changes
 
+Panel id: `agent_changes`.
+
 When an agent wants to change project files, it does not write them. It **proposes** a set of text
 files with a reason, and the proposal waits in the **Agent Changes** tab. You read each file's diff
 and accept or reject. Nothing changes in the project until you accept. An agent cannot approve its

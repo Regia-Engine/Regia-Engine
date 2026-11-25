@@ -1,10 +1,24 @@
 # Vehicles
 
+<!-- index: Vehicle -->
+<!-- index: Wheel -->
+<!-- index: Drivetrain -->
+<!-- index: Trailer -->
+<!-- index: Aircraft -->
+<!-- index: Hover craft -->
+<!-- index: Bike -->
+<!-- index: Tracked vehicle -->
+
 `regia_physics::vehicle` drives wheeled vehicles with rapier's ray-cast vehicle controller. A
 vehicle is one dynamic chassis body. Each wheel is a ray cast down its suspension each step, not a
 rigid body. The ray finds the ground, a spring and damper push the chassis up, and tire impulses
 drive, brake and corner it. This is cheap and stable at game speeds. It does not model tire
-deformation, a drivetrain or wheel inertia.
+deformation. Wheel spin, a gearbox, and differentials are the optional geared drivetrain below.
+Trailers, a two-wheel bike, a hover hull, a fixed-wing aircraft, and skid-steer tracks are
+separate models under [Other hulls](#other-hulls). The editor's
+[Vehicle Tuning](editor-guide/vehicle-tuning.md) tab edits the car, trailer, aircraft, bike,
+and hover hull. Agent calls are
+[Vehicles (agents)](../agents/vehicles.md).
 
 ## Axes and units
 
@@ -192,6 +206,35 @@ fn limited_slip_car() -> VehicleConfig {
 A held brake leaves a slow creep on a slope, because a locked tire's force comes from its slip. The speed is
 about `peak_slip · tan(slope) / peak_friction`, a little more at a 60 Hz step: with the default tire about 3.4 cm/s on a 15
 degree hill, or 2 m a minute.
+
+## Other hulls
+
+These share the engine axes (forward is local −Z, right is +X, up is +Y) and they are not the
+ray-cast car. None of them is a lockstep model. A lockstep game uses
+`regia_detsim::ground_vehicle` for tracked and wheeled units. See
+[Movement models](movement-models.md).
+
+- **Trailer** (`regia_physics::vehicle_trailer`). A trailer chassis couples to a tow vehicle at a
+  hitch, or a tractor couples at a fifth wheel. Brakes, a jackknife stop in reverse, and a
+  multi-trailer train are part of the model. The asset is a trailer configuration beside the car.
+- **Bike** (`regia_physics::vehicle_bike`, `.bike.ron`). Lean, steer, and speed for two wheels.
+  It does not drive the car solver and it does not read a chassis body. The caller passes steer,
+  speed, the drive command, and the two wheel-ray lengths each step. Below the upright speed the
+  target lean is zero and a spring stands the bike up. Lean past the limit sets `fallen`.
+- **Hover hull** (`regia_physics::hover`, `.hoverhull.ron`). A dynamic box held up by ray-cast
+  thrusters. Each thruster pushes along the ground normal. Drive, brake, yaw, and lateral-slip
+  impulses act only while some thruster has ground. `VehiclePlugin` reads the entity's
+  `VehicleInput`. Forward is the same axis as the car.
+- **Aircraft** (`regia_physics::aero`, `.aircraft.ron`). One dynamic body, lifting surfaces,
+  engines, and landing-gear rays. Positive pitch raises the nose, positive roll lowers the right
+  wing, positive yaw turns the nose right. The model has no downwash, no ground effect, no
+  propeller wash, no compressibility, and no stall hysteresis. `trim` solves level flight offline.
+- **Tracks** (`regia_physics::vehicle_track`). Two track speeds on one rigid body in the XZ plane.
+  This is a pure function, not the wheeled solver. Throttle is clamped to −1..=1. Coasting moves
+  a track toward zero and does not reverse it. Yaw rate is the speed difference divided by the
+  track separation (2 m).
+
+The proving-ground rides for these hulls are editor actions. This chapter is the runtime.
 
 ## Determinism
 

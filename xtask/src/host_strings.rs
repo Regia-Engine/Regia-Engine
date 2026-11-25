@@ -36,13 +36,24 @@ pub struct Args {
 /// The release sample the check runs over when `--binary` is not given, and the package that
 /// builds it.
 const DEFAULT_PACKAGE: &str = "hello_window";
-const DEFAULT_BINARY: &str = "target/release/hello_window";
+const DEFAULT_BINARY: &str = "release/hello_window";
+
+/// Where cargo puts the default binary: `CARGO_TARGET_DIR` when it is set (relative to `root` if
+/// it is a relative path), else `root/target`. Cargo builds into that directory, so the check reads
+/// the binary it just built rather than a stale or missing one under `root/target`.
+fn default_binary(root: &Path, cargo_target_dir: Option<&std::ffi::OsStr>) -> PathBuf {
+    let target = match cargo_target_dir.filter(|dir| !dir.is_empty()) {
+        Some(dir) => root.join(dir),
+        None => root.join("target"),
+    };
+    target.join(DEFAULT_BINARY)
+}
 
 /// Run `cargo xtask host-strings` from the workspace root: fails when any scanned executable is
 /// rejected (exit 1), after printing every rejected binary.
 pub fn run(root: &Path, args: &Args) -> Result<ExitCode> {
     let binaries: Vec<PathBuf> = if args.binaries.is_empty() {
-        let binary = root.join(DEFAULT_BINARY);
+        let binary = default_binary(root, std::env::var_os("CARGO_TARGET_DIR").as_deref());
         if !binary.is_file() {
             let status = Command::new("cargo")
                 .current_dir(root)
@@ -96,4 +107,32 @@ pub fn run(root: &Path, args: &Args) -> Result<ExitCode> {
         bail!("private host strings found; rebuild with the ADR-10354 path remaps");
     }
     Ok(ExitCode::SUCCESS)
+}
+
+#[cfg(test)]
+mod default_binary_tests {
+    use super::default_binary;
+    use std::ffi::OsStr;
+    use std::path::Path;
+
+    #[test]
+    fn the_default_binary_follows_cargo_target_dir() {
+        let root = Path::new("/w");
+        assert_eq!(
+            default_binary(root, None),
+            Path::new("/w/target/release/hello_window")
+        );
+        assert_eq!(
+            default_binary(root, Some(OsStr::new(""))),
+            Path::new("/w/target/release/hello_window")
+        );
+        assert_eq!(
+            default_binary(root, Some(OsStr::new("/t/x"))),
+            Path::new("/t/x/release/hello_window")
+        );
+        assert_eq!(
+            default_binary(root, Some(OsStr::new("out"))),
+            Path::new("/w/out/release/hello_window")
+        );
+    }
 }

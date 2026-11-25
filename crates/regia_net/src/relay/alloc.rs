@@ -177,6 +177,9 @@ struct Allocation {
     /// Bytes forwarded client to host, and host to client (`net.relay_status`).
     bytes_to_host: u64,
     bytes_to_client: u64,
+    /// The lobby asked not to publish either side's address (ADR-10399). Forwarding still
+    /// uses `host` and `client`.
+    hide_addr: bool,
 }
 
 /// A relay as an agent sees it (`net.relay_status`, spec 120 § 10.6, ADR-8183): a relay this
@@ -245,6 +248,8 @@ pub(super) struct Allocations {
     /// Free ports, oldest release first, so a port is reused as late as possible.
     free: VecDeque<u16>,
     known: HashSet<u16>,
+    /// A drain refuses a client key that does not already hold a port. Refresh is untouched.
+    refuse_new: bool,
     global: Bucket,
     key_secret: [u8; 32],
     next_key: u64,
@@ -262,6 +267,7 @@ impl Allocations {
             per_ip: HashMap::new(),
             free: VecDeque::new(),
             known: HashSet::new(),
+            refuse_new: false,
             global,
             key_secret: blake3::derive_key("regia_net relay host key v2", secret),
             next_key: 0,
@@ -271,6 +277,11 @@ impl Allocations {
 
     pub(super) fn config(&self) -> &RelayConfig {
         &self.config
+    }
+
+    /// Stops reserving a port for a client key that does not already hold one.
+    pub(super) fn stop_new(&mut self) {
+        self.refuse_new = true;
     }
 
     fn host_key(&mut self, port: u16) -> [u8; RELAY_ALLOCATION_KEY_BYTES] {
@@ -436,7 +447,7 @@ impl RelayCore {
         if len < RELAY_ALLOCATE_REQUEST_BYTES || head.version < 2 {
             return Vec::new();
         }
-        let Ok(host) = decode_addr(r) else {
+        let Ok(asked) = decode_addr(r) else {
             return Vec::new();
         };
         let (Ok(bind_key), Ok(client_key)) = (
@@ -446,9 +457,16 @@ impl RelayCore {
             return Vec::new();
         };
         let cookie = read_cookie(r);
-        let Some(lobby) = self.lobby_of(host, now_ms).filter(|_| host != from) else {
+        // An unspecified address is a hidden lobby: resolve it by the bind key before the
+        // cookie check, the same order as `NotAHost` today. The real host stays internal.
+        let Some(lobby) = self.allocate_lobby(asked, &bind_key, now_ms) else {
             return refusal(RelayError::NotAHost, from);
         };
+        let host = lobby.host;
+        let hide_addr = lobby.hide_addr;
+        if host == from {
+            return refusal(RelayError::NotAHost, from);
+        }
         if !constant_time_eq(&lobby.bind_key, &bind_key) {
             return refusal(RelayError::BadKey, from);
         }
@@ -474,8 +492,13 @@ impl RelayCore {
             };
             a.client = from;
             a.client_sent_ms = now_ms;
+            a.hide_addr = hide_addr;
             let (host_addr, host_key) = (a.host, a.host_key);
-            return self.allocation_answers(port, from, host, host_addr, host_key);
+            return self.allocation_answers(port, from, host, host_addr, host_key, hide_addr);
+        }
+        if self.alloc.refuse_new {
+            self.alloc.status.full_refused += 1;
+            return full(self.alloc.known.len() as u32, from);
         }
         let config = &self.alloc.config;
         let block = AddrBlock::of(from.ip());
@@ -517,6 +540,7 @@ impl RelayCore {
                 host_sent_ms: now_ms,
                 bytes_to_host: 0,
                 bytes_to_client: 0,
+                hide_addr,
             },
         );
         self.alloc.by_client.insert((host, client_key), port);
@@ -529,7 +553,7 @@ impl RelayCore {
             })
             .clients += 1;
         *self.alloc.per_ip.entry(block).or_insert(0) += 1;
-        self.allocation_answers(port, from, host, host, host_key)
+        self.allocation_answers(port, from, host, host, host_key, hide_addr)
     }
 
     /// `Allocated` to the client and `ClientJoined` to the host's registered address (both from
@@ -541,12 +565,23 @@ impl RelayCore {
         lobby_host: SocketAddr,
         host: SocketAddr,
         host_key: [u8; RELAY_ALLOCATION_KEY_BYTES],
+        hide_addr: bool,
     ) -> Vec<(Vec<u8>, SocketAddr)> {
+        let wire_client = if hide_addr {
+            super::unpublished_addr()
+        } else {
+            client
+        };
+        let wire_host = if hide_addr {
+            super::unpublished_addr()
+        } else {
+            host
+        };
         let mut w = control_v(RelayTag::ClientJoined, RELAY_PROTOCOL_VERSION);
         w.u16(port);
-        encode_addr(&mut w, client);
+        encode_addr(&mut w, wire_client);
         w.raw(&host_key);
-        vec![allocated(port, host, client), (w.finish(), lobby_host)]
+        vec![allocated(port, wire_host, client), (w.finish(), lobby_host)]
     }
 
     /// Handles one datagram that arrived on allocation port `port` from `from`; returns what to
@@ -657,12 +692,20 @@ impl RelayCore {
             return Vec::new();
         };
         let cookie = read_cookie(&mut r);
-        let Some(a) = self.alloc.table.get(&port) else {
-            return Vec::new();
+        let (is_client, is_host, current_client, current_host, hide_stored, lobby_host) = {
+            let Some(a) = self.alloc.table.get(&port) else {
+                return Vec::new();
+            };
+            (
+                constant_time_eq(&a.client_key, &key),
+                constant_time_eq(&a.host_key, &key),
+                a.client,
+                a.host,
+                a.hide_addr,
+                a.lobby_host,
+            )
         };
         // Both compared, so the time taken does not say which side a guess was near.
-        let is_client = constant_time_eq(&a.client_key, &key);
-        let is_host = constant_time_eq(&a.host_key, &key);
         let side = match (is_client, is_host) {
             (true, _) => Side::Client,
             (false, true) => Side::Host,
@@ -673,9 +716,10 @@ impl RelayCore {
             }
         };
         let current = match side {
-            Side::Client => a.client,
-            Side::Host => a.host,
+            Side::Client => current_client,
+            Side::Host => current_host,
         };
+        let hide = hide_stored || self.lobby_of(lobby_host, now_ms).is_some_and(|l| l.hide_addr);
         if from != current {
             let context = COOKIE_REFRESH | u64::from(port);
             let proved = cookie.is_some_and(|c| self.cookies.verify(from, context, &c, now_ms).is_some());
@@ -699,6 +743,7 @@ impl RelayCore {
                 a.client
             }
         };
+        let peer = if hide { super::unpublished_addr() } else { peer };
         vec![allocated(port, peer, from)]
     }
 }

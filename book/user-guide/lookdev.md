@@ -1,5 +1,8 @@
 # Look-dev harness
 
+<!-- index: Look-dev -->
+<!-- index: Shot list -->
+
 `samples/lookdev` is the measured feedback loop for the DO27 alpha maps. It builds two
 procedural stand-ins in the terrain data shape, renders a fixed shot list offscreen, and
 writes `shots.json`. After a render or terrain merge, `lookdev --compare` prints the deltas.
@@ -29,7 +32,10 @@ the particle form of Mei, Decaudin and Hu, Pacific Graphics 2007. Both rows are 
 Eight cameras per planet: close (1 m), mid (50 m), far (2 km), low sun, noon, tunnel mouth,
 road bend, sky-heavy. Three profiles: Ultra (`DesktopUltra`), High (`DesktopHigh`), and
 Deck-Medium. Deck-Medium selects the engine preset `Deck` (the profile table has one Deck
-row). That is 48 shots. Each shot renders 30 frames so temporal stability has a real window.
+row). That is 48 shots. The list does not include the VeryLow tier or the offline Cinematic
+profile. Render those with `RenderProfilePreset` (Cinematic through
+`regia_render::cinematic::gate_preset`) when the comparison needs them. Each shot renders 30
+frames so temporal stability has a real window.
 
 ```sh
 cargo run -p lookdev --release -- --shots /tmp/lookdev \

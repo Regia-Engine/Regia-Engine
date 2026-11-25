@@ -1,5 +1,7 @@
 # Ragdoll
 
+Panel id: `ragdoll`.
+
 The **Ragdoll** tab edits a character's physics asset, a `.ragdoll.ron` profile: one body per
 simulated joint (a capsule, sphere or box with a radius, mass and length) and the swing-twist limits
 of each joint to its nearest simulated ancestor. Select a character in the level and the tab checks

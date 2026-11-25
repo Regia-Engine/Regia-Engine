@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MPL-2.0
 //! Test tooling for the vendor seam (ADR-2679), hidden from the docs and never reached unless a
 //! test installs it with [`install_binding_factory`].
 //!

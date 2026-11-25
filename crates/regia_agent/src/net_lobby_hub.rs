@@ -167,6 +167,9 @@ pub fn report_json(label: &str, r: &HubReport) -> Value {
         },
         "expired": r.expired,
         "refused": r.refused,
+        "relay_allocations": r.relay_allocations,
+        "servers_online": r.servers_online,
+        "draining": r.draining,
         "players": players,
         "games": games,
     })

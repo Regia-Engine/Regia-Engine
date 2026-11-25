@@ -168,3 +168,6 @@ toggles it. To verify a profile: show the group, `seeing.screenshot`, and compar
   with a 1 km radar profile and distance tiers, 64 projectile spawns per tick, walking viewpoints). On an idle
   MacBook M5: relevance + priority + packing 4.11 ms mean, 4.3 ms p99, 35,392 allocations per send tick (the base
   before ADR-8031: 5.21 ms, 5.4-5.5 ms, 39,898). Budgets: `net_relevance_n214_*` in `docs/perf/budgets.ron`.
+  Allocation counts do not depend on the host: Linux gives the Mac's numbers at every commit measured (ADR-8885). The
+  bench fills every connection's view before it measures (it prints `fill: N ticks`; about 77 since spawns take the
+  byte test), then measures the steady load: 28,302 allocations per send tick, p99 30,501, at v0.6.1.

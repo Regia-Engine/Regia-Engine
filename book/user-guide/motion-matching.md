@@ -1,11 +1,22 @@
 # Motion matching
 
+<!-- index: Motion matching -->
+<!-- index: Motion database -->
+<!-- index: Trajectory predictor -->
+<!-- index: Foot lock -->
+
 Motion matching plays locomotion without a hand-built state machine. It cuts every frame of a set
 of clips into a feature vector: where the character is going, and how its feet are moving. Every
 few frames it searches for the frame that best continues the current pose along the path the game
 asks for, and jumps there. The method is the one from Simon Clavet's GDC 2016 talk "Motion Matching
 and The Road to Next-Gen Animation". It is also the baseline (non-learned) system in Holden et al.,
 "Learned Motion Matching" (SIGGRAPH 2020). The code lives in `regia_animation::motion_matching`.
+The behavior spec is [spec 52](../../docs/specs/52-motion-matching.md). This chapter is the
+runtime: build a database, run the matcher, predict a path, and plant the feet. Editing the
+`.motiondb.ron` document is included below. The panel that lists live candidates during play
+belongs to the editor guide. Agent calls for the database are on
+[Motion matching (agents)](../agents/motion-matching.md). Learned compression of the database
+is not built.
 
 ## Build a database
 

@@ -1,5 +1,7 @@
 # Kit
 
+Panel id: `kit`.
+
 The **Kit** tab shows an exported content kit: a folder with a `kit.json` manifest and a model
 (`<kit_id>.glb`), optionally with a cockpit model, a rig and sockets list, and a `SHA256SUMS`
 file. It lays out the kit's metadata, checksum result, warnings, clips, sockets and budget next to

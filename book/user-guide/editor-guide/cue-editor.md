@@ -1,5 +1,7 @@
 # Cue editor
 
+Panel id: `cue_editor`.
+
 The **Cue Editor** tab edits a sound cue, a `.cue.ron` file that names a set of sound variations and how the game
 picks and plays one: weights, pick mode, what happens at the instance limit, the volume and pitch ranges, a low-pass
 filter and a caption for subtitles. Its **Audition** button draws a variation the way the cue would and plays the

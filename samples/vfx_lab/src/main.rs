@@ -635,6 +635,25 @@ fn run_deck_validate(args: &[String]) -> i32 {
     i32::from(sweep.verdict() == Verdict::Fail)
 }
 
+/// Project directory of this sample, resolved at runtime (ADR-10370).
+///
+/// `cargo run` exports `CARGO_MANIFEST_DIR`. A binary under `target/<profile>`
+/// walks up to `samples/vfx_lab`. A packaged game finds neither and returns
+/// `None`. The compile-time `env!("CARGO_MANIFEST_DIR")` is not remapped by rustc.
+fn sample_project_dir() -> Option<PathBuf> {
+    if let Some(dir) = std::env::var_os("CARGO_MANIFEST_DIR") {
+        return Some(dir.into());
+    }
+    let root = std::env::current_exe()
+        .ok()?
+        .parent()?
+        .parent()?
+        .parent()?
+        .to_path_buf();
+    let project = root.join("samples").join("vfx_lab");
+    project.is_dir().then_some(project)
+}
+
 /// Windowed ECS runtime path.
 fn run_window(args: &[String]) -> i32 {
     let flag = |name: &str| -> Option<u32> {
@@ -666,7 +685,7 @@ fn run_window(args: &[String]) -> i32 {
             // Advertise the agent endpoint so `regia agent call
             // --project samples/vfx_lab seeing.screenshot` works.
             app.insert_resource(regia::agent::AgentSettings {
-                project_dir: Some(std::env!("CARGO_MANIFEST_DIR").into()),
+                project_dir: sample_project_dir(),
             });
         },
     );

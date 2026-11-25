@@ -1,6 +1,12 @@
 # App, plugins and schedules
 
-An `App` owns one ECS world, the frame schedules and the plugins that configured them. A runner
+<!-- index: Plugin -->
+<!-- index: Schedule -->
+<!-- index: Fixed timestep | see: Schedule -->
+<!-- index: DefaultPlugins | see: Plugin -->
+
+An `App` owns one ECS world, the frame schedules and the plugins that configured them.
+Spec: `docs/specs/10-core.md`. A runner
 drives it: the platform's window runner for games, `run_headless` for tests, servers and tools.
 Everything is configured through **plugins**, including the engine itself.
 

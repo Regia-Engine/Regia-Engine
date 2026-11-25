@@ -1,9 +1,13 @@
 # Test bundles for Windows and the Steam Deck
 
+<!-- index: Test bundle -->
+<!-- index: cargo xtask dist -->
+
 `cargo xtask dist` builds a folder (and a zip or tar of it) that you copy to a Windows PC or a
 Steam Deck to run engine binaries there, with no Rust toolchain on that machine. It is for engine
 testing: the owner's Windows pass, the Deck test run on [Steam Deck](steam-deck.md), a tester's
-crash report. A game ships with `regia package` instead ([Packaging](packaging.md)).
+crash report. A game ships with `regia package` instead ([Packaging](packaging.md),
+[Package a game](../how-to/platforms/package-a-game.md)).
 
 A bundle holds:
 

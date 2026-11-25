@@ -206,7 +206,7 @@ fn invite_card_carries_no_host_address() {
         .expect("create");
     rig.run(&mut [&mut ann, &mut bob, &mut eve], |p| created(p[0]).is_some());
     let lobby = created(&ann).expect("created");
-    // The owner confirms the session before inviting: the address now exists on the hub.
+    // The owner confirms the session before inviting. The hub stores a flag and no address.
     let session: SocketAddr = "10.20.30.40:7777".parse().expect("addr");
     ann.backend
         .set_server(lobby, LobbyServer::Address(session))
@@ -247,18 +247,14 @@ fn invite_card_carries_no_host_address() {
     );
     assert!(eve.backend.last_error().is_some_and(|e| e == "lobby_not_found"));
 
-    // Bob joins with the card's token and, as an approved member, gets the session address.
+    // Bob joins with the card's token. A member's lobby view still has no address.
     bob.backend.join(lobby).expect("request");
-    rig.run(&mut [&mut ann, &mut bob, &mut eve], |p| {
-        p[1].events
-            .iter()
-            .any(|e| matches!(e, LobbyEvent::ServerSet { .. }))
-    });
+    rig.run(&mut [&mut ann, &mut bob, &mut eve], |p| entered(p[1]).is_some());
     assert_eq!(entered(&bob), Some(Ok(lobby)));
-    assert_eq!(
-        bob.backend.lobby(lobby).and_then(|l| l.server),
-        Some(LobbyServer::Address(session))
-    );
+    assert_eq!(bob.backend.lobby(lobby).and_then(|l| l.server), None);
+    let member_view = format!("{:?}", bob.backend.lobby(lobby));
+    assert!(!member_view.contains("10.20.30.40"), "{member_view}");
+    assert!(!format!("{:?}", bob.events).contains("10.20.30.40"));
     assert!(
         !eve.events
             .iter()
@@ -287,8 +283,14 @@ fn a_listed_lobby_never_shows_its_session_address() {
     assert_eq!(list[0].server, None);
     assert!(!list[0].data.contains_key(keys::SERVER), "{:?}", list[0].data);
     assert_eq!(list[0].data[keys::STATE], "in_game");
-    // The owner, a member, sees it.
-    assert_eq!(ann.backend.lobby(lobby).and_then(|l| l.server), Some(session));
+    // The owner is a member and still has no address. A wire-1 peer is not told SessionConfirmed.
+    assert_eq!(ann.backend.lobby(lobby).and_then(|l| l.server), None);
+    assert!(
+        ann.backend
+            .take_notices()
+            .iter()
+            .all(|n| !matches!(n, regia_net::lobby::hub::HubNotice::SessionConfirmed { .. }))
+    );
 }
 
 #[test]

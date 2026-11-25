@@ -381,8 +381,8 @@
             hash: "6c8d0ac68f306f40d08ddcb53abc6b3937d4c8782197b2f3b78a137b0342a7e5",
         ),
         "hub-toml": (
-            version: 1,
-            hash: "3314f5b17a661005c3e09c7823c724c6f9747461a85fb449bd48d693804d3df0",
+            version: 2,
+            hash: "0d3de9936e467599b3206718de312492e3a337083b18638b21f0ca4a532eb079",
         ),
         "hull-set": (
             version: 1,

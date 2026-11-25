@@ -1,7 +1,19 @@
 # Runtime UI
 
+<!-- index: Runtime UI -->
+<!-- index: HUD -->
+<!-- index: Theme -->
+<!-- index: Focus ring -->
+<!-- index: Safe area -->
+<!-- index: Toast -->
+<!-- index: Screen reader -->
+<!-- index: Icon atlas -->
+
 `regia_ui` is the runtime (in-game) UI — HUD, menus, toasts — driven by taffy layout and
 cosmic-text, behind `UiPlugin` (added by `DefaultPlugins` when the `ui` feature is on).
+The runtime is [spec 18](../../docs/specs/18-runtime-ui.md). The default look is
+[the UI default design](../../docs/specs/ui-default-design.md). A task procedure is
+[UI and audio](../how-to/play/ui-and-audio.md).
 
 ## Authoring
 
@@ -209,3 +221,35 @@ Load an `IconSheet` (RGBA pages and named drawings such as `gear@16`, `gear@24`)
 spawn `Icon::new("gear")`: the icon picks the drawing that matches its size (`IconSize::Small`, `Medium`, `Large`
 follow the theme's icon size tokens), tints with the surrounding text color and recolors on a theme switch. The engine
 ships no icon artwork yet. See [UI icons](../agents/ui-icons.md).
+
+## Default design, and what is still open
+
+The default design ([spec file](../../docs/specs/ui-default-design.md), ADR-274) is largely
+built. The ADR is still `proposed`. Treat the code and this chapter as the status, and treat
+§ 10 of that file as the audit.
+
+Built and covered above: `.theme.ron` themes `regia-dark`, `regia-light`,
+`regia-high-contrast`, and `regia-light-high-contrast`; token resolution; the default widgets
+that have types; the focus ring in navigation mode; icon atlases once you supply a sheet; theme
+swap, including a light high-contrast variant and reduced motion.
+
+Still open. None of these block the four shipped themes. Do not describe them as done:
+
+- `font.mono` names JetBrains Mono, and no TTF for it ships under `regia_ui/assets/fonts`. The
+  platform monospace draws.
+- The engine ships no default icon glyphs. `<icon=name>` selects the font family `icon-<name>`.
+- There is no Checkbox widget. Radio, spin box, foldable, split, tabs, toast, progress, and
+  scroll draw with button or panel looks. They have no theme type of their own.
+- Toast role bars and hover-to-pause are not built. The compact tree indent and the split view's
+  5 percent keyboard step are not built.
+- `focus_mode` (`all`, `click`, `none`) is not a setting. Default edge rules for lists, menus,
+  and tab strips are not installed for you. `FocusGroup` rules work when the game sets them.
+- Gamepad-cursor snapping (`soft_cursor`) is not built.
+- Elevation tokens resolve onto the themed node. Nothing draws them as a drop shadow.
+- There is no JSON Schema for `.theme.ron`. `Regia.toml` has no `[ui] theme` key. Select a theme
+  with `ActiveTheme` or `ui.theme_select`.
+
+Hot reload of a theme polls every 30 frames and reports on the status line, not as a toast.
+The `wait_until` predicate is `{ "predicate": "ui.theme_generation", "at_least": n }`. Touch is
+not its own `UiInputMode`. Modes are `Pointer` and `Navigation`. An active touch turns the hover
+layer off.

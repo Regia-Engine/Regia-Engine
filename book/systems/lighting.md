@@ -1,16 +1,28 @@
 # Lighting, shadows and global illumination
 
+<!-- index: Directional light -->
+<!-- index: Point light -->
+<!-- index: Spot light -->
+<!-- index: GiLook -->
+<!-- index: DDGI -->
+<!-- index: Baked GI -->
+<!-- index: Lightmap -->
+<!-- index: Path tracer -->
+<!-- index: Screen-space GI -->
+<!-- index: Reflection probe -->
+
 Regia Engine lights scenes in physical units: the sun in lux, point lights in lumens, spot lights in
 candela, the sky in candela per square meter, and the camera exposed in EV100. This chapter covers
 the light types, shadows, indirect light (sky, ambient occlusion, irradiance probes, screen-space
 GI), reflections and interiors. What the defaults look like, and the order to tune them in, is in
-[The default look](../user-guide/default-look.md).
+[The default look](../user-guide/default-look.md). The task order (sun, a GI look, an interior,
+a bake) is [Light a level](../how-to/picture/light-a-level.md).
 
 ## Light components
 
 | Component | Units | Position and direction |
 |---|---|---|
-| `DirectionalLight` (the sun) | `illuminance` in lux | `direction` field: the way the light travels. One sun per frame (the first one found). |
+| `DirectionalLight` (the sun) | `illuminance` in lux | `direction` field: the way the light travels. Up to four per frame: the lowest entity is the sun and owns the cascaded shadow map; the other three are unshadowed. |
 | `PointLight` | `intensity` in lumens, `radius` cutoff in meters | the entity's `GlobalTransform` |
 | `SpotLight` | `intensity` in candela, `inner_angle` / `outer_angle` half-angles in radians, `range` | position from the transform; aims along the entity's −Z axis (rotate the entity to aim) |
 | `LightSourceSize` (optional, next to a `PointLight` or `SpotLight`) | `radius_m`: radius of the emitting sphere in meters (default 0.45) | sets the light's shadow softness and highlight size (see below) |
@@ -117,6 +129,14 @@ The profile picks cascade count, resolution and filter (`csm_cascade_count`, `cs
 
 ## Indirect light
 
+`RenderSettings.gi_look` picks the player-facing indirect light. `None` keeps the profile default.
+
+| `GiLook` | Light | Where it runs |
+|---|---|---|
+| `Balanced` | Sky irradiance, a sunlit-wall bounce, a mesh ground bounce. An installed baked volume is ignored. | Every platform. Medium forces the profile's probe column off and lands here unless the player chose another look. |
+| `Depth` | GPU irradiance probes (DDGI). | Desktop. `GiLook::depth_available` is false on Android. |
+| `Baked` | The map's `.fgiv` volume. With no volume installed, the frame shades as Balanced. | Any tier. A map that names a volume also uses it under Depth and under the preset default, including Low, with DDGI and screen-space GI off. |
+
 **Sky and ambient.** With `Environment::ibl` on (the default), the procedural sky lights
 everything that sees it: blue from above, a neutral ground bounce from below, plus reflections.
 With it off, `Environment::ambient_lux` is a flat fill.
@@ -218,4 +238,13 @@ and the checks.
   ([Look-dev harness](../user-guide/lookdev.md)).
 
 A ground-truth path tracer (`regia_pt`) renders the same scenes for comparison; renderer
-changes are measured against it (`docs/specs/27-renderer-excellence.md`).
+changes are measured against it (`docs/specs/27-renderer-excellence.md`). The tracer is offline.
+It does not ship in a game build, and runtime crates do not depend on it. It also writes the
+baked volumes (`regia bake-gi`) and the lightmaps (`regia bake-lightmaps`). A lightmap
+(`.flmap`, `look.lightmap`) stores irradiance per texel for static meshes and replaces diffuse
+indirect light on `LightmapReceiver` entities. The profile caps that lookup: bilinear on Mobile
+Low, bilinear plus directions on Mobile High, and the full bicubic-and-directions settings on
+the other presets (`RenderProfile::lightmap_tier`). Derived LOW and ULTRA_LOW lightmaps still
+miss their original seam and dark-point checks. The agent page is
+[Lightmaps](../agents/lightmaps.md). The editor's one-box probe bake is
+[The Bake panel](../user-guide/bake-panel.md).

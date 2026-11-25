@@ -1,5 +1,7 @@
 # Data Asset
 
+Panel id: `data_asset`.
+
 The **Data Asset** tab edits one `.data.ron` file: a single reflected value of a type your game
 registers as a data asset (the game derives `Asset` and registers it with `register_data_asset` or
 `#[reflect(Asset)]`). The panel draws the value with the same reflection widgets the

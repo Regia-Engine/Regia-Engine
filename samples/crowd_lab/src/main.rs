@@ -18,6 +18,26 @@ fn arg(args: &[String], name: &str, default: usize) -> Result<usize, String> {
     }
 }
 
+/// `target/anim_cache/project` beside this checkout, resolved at runtime (ADR-10370).
+///
+/// `env!("CARGO_MANIFEST_DIR")` would embed the build machine. `cargo run` exports
+/// the variable. A binary under `target/<profile>` walks up to the workspace root.
+#[cfg(not(target_os = "android"))]
+fn anim_cache_project() -> std::path::PathBuf {
+    if let Some(dir) = std::env::var_os("CARGO_MANIFEST_DIR") {
+        return std::path::PathBuf::from(dir).join("../../target/anim_cache/project");
+    }
+    if let Ok(exe) = std::env::current_exe()
+        && let Some(root) = exe
+            .parent()
+            .and_then(|dir| dir.parent())
+            .and_then(|dir| dir.parent())
+    {
+        return root.join("target/anim_cache/project");
+    }
+    std::path::PathBuf::from("target/anim_cache/project")
+}
+
 /// `--cesium`: print the real-content retarget reports.
 fn cesium() -> ExitCode {
     #[cfg(target_os = "android")]
@@ -27,8 +47,7 @@ fn cesium() -> ExitCode {
     }
     #[cfg(not(target_os = "android"))]
     {
-        let project =
-            std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../target/anim_cache/project");
+        let project = anim_cache_project();
         match crowd_lab::cesium_report(&project) {
             Ok(lines) => {
                 for line in lines {

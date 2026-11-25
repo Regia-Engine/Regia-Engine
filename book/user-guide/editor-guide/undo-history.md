@@ -1,5 +1,7 @@
 # Undo History
 
+Panel id: `undo_history`.
+
 The **Undo History** tab lists the editor's shared undo history: every retained edit, oldest first, with the
 documents it touched. Click an entry to go back (or forward) to that point; the details under the list say what
 the entry changed. It is the same history Ctrl+Z and Ctrl+Shift+Z walk, and the same history an agent reads with

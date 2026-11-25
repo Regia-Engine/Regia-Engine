@@ -404,6 +404,16 @@ standalone check over any built executable is
 `regia_cli::package_hygiene::check_executable_strings`, run by `cargo xtask host-strings`
 (default: the release `hello_window` sample, built on demand; CI runs it).
 
+Projects created by `regia new` and by the editor's project scaffold ship those same
+directory-root remaps in `.cargo/config.toml` (ADR-10370). The creator appends
+`--remap-path-prefix=<this machine's home>=/builder` as the last `rustflags` entry of
+every target. rustc applies the last matching prefix, so the account name under a
+generic root does not survive a plain `cargo build`. Copying a template without
+`regia new` does not add that last line. `RUSTFLAGS` still replaces the config flags.
+`env!` values are still not remapped: runtime code reads `CARGO_MANIFEST_DIR` from
+the environment (or the layout around the executable) instead of
+`env!("CARGO_MANIFEST_DIR")`.
+
 ### Package parity (ADR-8428, C-12)
 
 `regia package parity` diffs a dev access trace and a package access trace

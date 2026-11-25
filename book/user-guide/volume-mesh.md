@@ -1,9 +1,49 @@
 # Volumetric terrain: dual contouring chunks
 
+<!-- index: Dual contouring -->
+<!-- index: Signed-distance field -->
+<!-- index: Volume mesh -->
+<!-- index: Voxel terrain -->
+<!-- index: Mesh layer -->
+
 `regia_terrain::volume_mesh` meshes signed-distance fields — caves, overhangs, tunnels and
 other volumes a heightfield cannot express — by dual contouring (Ju, Losasso, Schaefer &
 Warren, SIGGRAPH 2002). It complements the CDLOD heightfield path: use heightfields for
 ordinary ground, and volume chunks where the surface folds over itself.
+The heightfield chapter is [Terrain, tunnels and scatter](terrain-vfx.md).
+
+## What is built, and what spec 122 is not
+
+This page is the mesher and the volume source on a terrain mesh layer (ADR-10071). You supply
+a signed-distance field. The cook meshes it and clips it to the ground. That is in the tree.
+
+`docs/specs/122-voxel-core.md` is a different feature: an integer voxel core,
+`regia_voxel_core`, with a fixed-point field, an operation log that replays bit for bit,
+integer queries, a `.voxfield` file, and a plug-in on `regia_world_geom`. That crate is not in
+this tree. There is no runtime voxel edit, no operation-log replay, and no `.voxfield` load.
+The catalog status for voxel terrain stays partial until that crate exists and this page
+describes it. Do not treat the sections below as that core.
+
+What you can do today:
+
+- Mesh a field you implement as `SdfField` (a cave, a carve, a heightfield adapted by
+  `TerrainMapField`).
+- Weld chunks and step LOD by 2× without skirts.
+- Cook a volume as one terrain mesh layer. The layer names an `sdf` string. The host passes
+  the field to `cook_mesh_layers_with_volumes`. There is no volume file format.
+
+What you cannot do in this version:
+
+- Dig or fill a stored voxel field at run time, on the simulation, with a replayable log.
+- Read a voxel volume from the world-geometry queries (`support`, `segment`, `push_disc`). Those
+  calls exist for the heightfield and for mesh layers. They do not read a voxel core, because
+  that core is not in the tree.
+- Load a `.voxfield`. The name `.fvox` is the cooked far proxy (`docs/formats/voxel-far.md`). It is not the voxel-core file.
+- Author a volume by dropping a file in the project. A `Volume` layer with no host-supplied field is refused with `cook_not_built`.
+
+A crater or a berm on the heightfield is a terrain edit, not a voxel volume. An overhang that
+stands above the ground is not a volume layer either: the cook clips the mesh to the ground.
+Author that overhang as a `Gltf` or `Collision` mesh layer.
 
 ## Defining a field
 

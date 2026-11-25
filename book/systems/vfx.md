@@ -1,9 +1,18 @@
 # VFX and decals
 
+<!-- index: Particles -->
+<!-- index: Decal -->
+<!-- index: Trail -->
+<!-- index: VFX -->
+
 `regia_vfx` provides GPU particles, projected decals, ribbon trails and camera shake. Particles
 are simulated and sorted in compute shaders; decals are box-projected volumes binned into screen
 tiles; everything draws in the frame's translucent pass. Specification:
-`docs/specs/26-terrain-vfx-highend.md` § 3.
+`docs/specs/26-terrain-vfx-highend.md` § 3. Precipitation and ambient particle counts follow
+`QualityTier::content_tier`: VeryLow uses Low's counts. The surface a decal lands on is a
+material ([Materials](../how-to/picture/materials.md)). Translucent particles draw after the
+upscaler resolve, so they do not write the upscaler's reactive mask
+([Upscalers](../agents/upscalers.md)).
 
 ## Setting it up
 

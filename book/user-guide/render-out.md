@@ -1,5 +1,8 @@
 # Rendering a video (render-out)
 
+<!-- index: Render-out -->
+<!-- index: Supersampling -->
+
 Render-out turns the running scene into finished frames: a PNG sequence, or an `ffmpeg` pipe to an
 FFV1, ProRes 4444 or DNxHR 444 movie, at any size and frame rate with 1x to 4x supersampling. The
 job drives the game clock by exactly one frame step per rendered frame and reads no wall clock, so
@@ -13,6 +16,9 @@ In the editor, **Sequence ▸ Render movie…** renders a saved sequence the sam
 
 - A renderer: a windowed app, or an app with `RenderPlugin { headless: true }`. Use a headless app
   when you can: a windowed app shares its TAA history between the window and the output size.
+  The job uses the profile already on `RenderSettings`, including `Cinematic` when
+  `gate_preset` honoured it. It does not switch tiers on its own. Set the tier and the upscaler
+  first ([Quality and upscalers](../how-to/picture/quality-and-upscalers.md)).
 - `ffmpeg` on `PATH` for the movie formats. Without it `render.out_start` fails with `F0019` and
   writes nothing; choose `png` and encode later with the arguments saved in the manifest.
 - Loading finished before the job starts (`assets.load_progress`), because asynchronous builds that

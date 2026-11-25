@@ -2,10 +2,13 @@
 //! The hub's messages and their bounded codec.
 //!
 //! Both directions ride one `regia_net` game, [`HubWire`] (`regia.lobby_hub`), on the reliable
-//! ordered channel. Its protocol version is [`HUB_WIRE_VERSION`]; it feeds the protocol id like any
-//! game's (spec 120 § 12.1), so a hub and a client of another hub wire version refuse each other at
-//! the handshake with `protocol_mismatch` and the version probe names the older side. There is no
-//! cross-version path.
+//! ordered channel. The codec generation is [`HUB_WIRE_VERSION`] (2). The handshake protocol
+//! version stays [`HUB_WIRE_VERSION_V1`] (1), so a v0.7.0 client and a v0.7.2 hub share a
+//! [`crate::protocol_id`] (ADR-10378). The version probe's game version on this build is `"2"`.
+//! A missing tail is the version-1 message. A version-2-only request from a peer that has not
+//! announced wire 2 is `hub_needs_wire_v2` and the link stays up. `Offer` and `AskReach` are
+//! version-2-only when `relay_only` is set: that flag is one trailing byte a v0.7.0 decoder
+//! rejects.
 //!
 //! Decoding is bounded: every string has a byte limit, every list a count limit checked before any
 //! element is read, nothing is allocated from a length the bytes do not back, and trailing bytes
@@ -14,9 +17,12 @@
 use std::collections::BTreeMap;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
 
+use serde::{Deserialize, Serialize};
+
+use super::binding::{self, ServerPresence};
 use super::join::{JoinPlan, MAX_TICKET_BYTES, NatClass, ReachKind, ReachOffer};
-use super::{HubLobbyCard, HubPresence, InviteCard, InviteToken, PresenceRow};
-use crate::crypto::{PLAYER_PROOF_BYTES, PlayerKey};
+use super::{HubError, HubLobbyCard, HubPresence, InviteCard, InviteToken, PresenceRow};
+use crate::crypto::{PLAYER_PROOF_BYTES, PlayerKey, ServerKey};
 use crate::handshake::{decode_addr, encode_addr};
 use crate::join_code::JOIN_CODE_LEN;
 use crate::lobby::{
@@ -29,11 +35,13 @@ use crate::wire::{WireError, WireReader, WireWriter};
 
 /// The hub's game id in the protocol id.
 pub const HUB_GAME_ID: &str = "regia.lobby_hub";
-/// The hub wire version (the [`HubWire`] protocol version). Bump it on any incompatible change
-/// after a release. Version 1 is unreleased, so NL-05's fields (the optional player proof in
-/// `Hello`, the player key in `Welcome`, friends by player key, the join broker's requests and
-/// events) are part of version 1 (ADR-8633 amends ADR-8607's bump; ADR-7724 practice).
-pub const HUB_WIRE_VERSION: u32 = 1;
+/// Codec generation. Version 2 adds delegated-session messages and optional tails (spec 89 § 16.2,
+/// ADR-10378). It is not the handshake protocol version: that stays [`HUB_WIRE_VERSION_V1`].
+pub const HUB_WIRE_VERSION: u32 = 2;
+/// Handshake protocol version shared with a v0.7.0 hub client. Feeds [`crate::protocol_id`].
+pub const HUB_WIRE_VERSION_V1: u32 = 1;
+/// Marker in front of a version-2 directory or room tail. A trailing `0` stays an error.
+const V2_TAIL: u8 = 0xA2;
 /// Largest hub message, whatever the link allows.
 pub const MAX_HUB_MESSAGE_BYTES: usize = 256 * 1024;
 /// Most presence rows or removals in one directory page.
@@ -54,7 +62,8 @@ impl NetGame for HubWire {
     type Input = ();
     type JoinData = ();
     const GAME_ID: &'static str = HUB_GAME_ID;
-    const PROTOCOL_VERSION: u32 = HUB_WIRE_VERSION;
+    const PROTOCOL_VERSION: u32 = HUB_WIRE_VERSION_V1;
+    const GAME_VERSION: &'static str = "2";
 }
 
 /// One hub message: a client's request or the hub's event.
@@ -76,7 +85,10 @@ pub enum ChatScope {
 }
 
 /// What a client asks the hub.
+///
+/// `non_exhaustive`: a match in another crate needs a `_` arm.
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum HubRequest {
     /// The confirm after the handshake: the hub allocates a session for this handle, under the
     /// player key the proof binds to this sealed link (`crate::crypto::PlayerIdentity::prove`).
@@ -219,11 +231,227 @@ pub enum HubRequest {
         /// Connectivity checks it sent before the path was chosen.
         punch_attempts: u32,
     },
+    /// Tells a version-2 hub that this peer speaks codec generation 2. Legal before the peer's
+    /// dialect is 2; it is what raises the dialect. `version` must be 2.
+    AnnounceWire {
+        /// The codec generation the peer will use. Only 2 is accepted.
+        version: u8,
+    },
+    /// Publishes a dedicated server on this session.
+    RegisterServer {
+        /// The presence. Proofs are carried, not checked, by this codec.
+        presence: ServerPresence,
+    },
+    /// Revokes one binding serial for a server key.
+    RevokeBinding {
+        /// The dedicated server.
+        server_key: ServerKey,
+        /// The owner's revocation id.
+        serial: u64,
+    },
+    /// Creates a delegated lobby. `request` is answered with [`HubEvent::Reply`].
+    CreateDelegated {
+        /// The client's request id.
+        request: u64,
+        /// Visibility.
+        visibility: LobbyVisibility,
+        /// Member limit.
+        max_members: u32,
+        /// Whether others may join.
+        joinable: bool,
+        /// Initial lobby data.
+        data: BTreeMap<String, String>,
+        /// The dedicated server that will host it.
+        server_key: ServerKey,
+    },
+    /// Sets whether a lobby offers only the relay.
+    SetReachMode {
+        /// The lobby.
+        lobby: LobbyId,
+        /// Relay only, or today's mapped/punch/relay order.
+        relay_only: bool,
+    },
+    /// Replaces one lobby's ban list.
+    SetBans {
+        /// The lobby.
+        lobby: LobbyId,
+        /// Player keys to refuse. At most `MAX_LOBBY_BANS`.
+        keys: Vec<PlayerKey>,
+    },
+    /// Closes a lobby.
+    CloseLobby {
+        /// The lobby.
+        lobby: LobbyId,
+    },
+}
+
+/// Listen or dedicated. Wire `0` or `1`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
+pub enum LobbyKind {
+    /// A listen lobby. The default, and every version-1 card.
+    #[default]
+    Listen,
+    /// A dedicated server's lobby.
+    Dedicated,
+}
+
+impl LobbyKind {
+    /// The wire byte.
+    pub fn to_u8(self) -> u8 {
+        match self {
+            Self::Listen => 0,
+            Self::Dedicated => 1,
+        }
+    }
+
+    /// Parses a wire byte.
+    pub fn from_u8(v: u8) -> Option<Self> {
+        Some(match v {
+            0 => Self::Listen,
+            1 => Self::Dedicated,
+            _ => return None,
+        })
+    }
+}
+
+/// A dedicated server as a directory page lists it. No address and no owner-key list.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ServerCard {
+    /// The server's public key.
+    pub server_key: ServerKey,
+    /// Seats it will take.
+    pub capacity: u16,
+    /// Seats in use.
+    pub load: u16,
+    /// Its game protocol number.
+    pub protocol: u32,
+    /// Its game version text.
+    pub game_version: String,
+    /// When set, the server offers only the relay.
+    pub relay_only: bool,
+    /// How many owners are bound. Not their keys.
+    pub owner_count: u8,
+}
+
+/// `ServerOnline` and `ServerOffline`. No address.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ServerNotice {
+    /// The server's public key.
+    pub server_key: ServerKey,
+    /// Seats it will take.
+    pub capacity: u16,
+    /// Seats in use.
+    pub load: u16,
+    /// Its game protocol number.
+    pub protocol: u32,
+    /// Its game version text.
+    pub game_version: String,
+    /// When set, the server offers only the relay.
+    pub relay_only: bool,
+    /// Grace after the owner leaves, milliseconds. `0` means no deadline.
+    pub grace_ms: u32,
+    /// How many owners are bound. Not their keys.
+    pub owner_count: u8,
+}
+
+/// What happened to one binding, as [`HubEvent::BindingChanged`] reports it.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BindingState {
+    /// The binding is live.
+    Live,
+    /// The expiry has passed.
+    Expired,
+    /// The owner revoked this serial.
+    Revoked,
+}
+
+impl BindingState {
+    /// The wire byte.
+    pub fn to_u8(self) -> u8 {
+        match self {
+            Self::Live => 0,
+            Self::Expired => 1,
+            Self::Revoked => 2,
+        }
+    }
+
+    /// Parses a wire byte.
+    pub fn from_u8(v: u8) -> Option<Self> {
+        Some(match v {
+            0 => Self::Live,
+            1 => Self::Expired,
+            2 => Self::Revoked,
+            _ => return None,
+        })
+    }
+}
+
+/// Whether `request` is refused to a wire-1 peer (`hub_needs_wire_v2`).
+///
+/// [`HubRequest::AnnounceWire`] is not in this set: it is how a peer becomes wire 2.
+/// [`HubRequest::Offer`] and [`HubRequest::AskReach`] are in this set only when `relay_only`
+/// is set. `put_offer` writes that flag as one trailing byte, and only then. A v0.7.0 decoder
+/// reports the byte as trailing data, so the call is version-2-only the same way `CloseLobby` is.
+/// A `relay_only: false` offer is the version-1 body and stays allowed.
+#[must_use]
+pub fn request_is_v2_only(request: &HubRequest) -> bool {
+    match request {
+        HubRequest::RegisterServer { .. }
+        | HubRequest::RevokeBinding { .. }
+        | HubRequest::CreateDelegated { .. }
+        | HubRequest::SetReachMode { .. }
+        | HubRequest::SetBans { .. }
+        | HubRequest::CloseLobby { .. } => true,
+        HubRequest::Offer { offer, .. } | HubRequest::AskReach { offer, .. } => offer.relay_only,
+        _ => false,
+    }
+}
+
+/// Refuses a version-2-only call when `peer_wire` is still 1. Other calls are allowed.
+///
+/// # Errors
+///
+/// [`HubError::NeedsWireV2`] when `request` is version-2-only and `peer_wire` is below 2.
+pub fn gate_request(peer_wire: u32, request: &HubRequest) -> Result<(), HubError> {
+    if request_is_v2_only(request) && peer_wire < HUB_WIRE_VERSION {
+        Err(HubError::NeedsWireV2)
+    } else {
+        Ok(())
+    }
+}
+
+/// The codec generation a version probe's game version names.
+///
+/// `"2"` is a v0.7.2 hub. Anything else, including empty, is a v0.7.0 hub and the client stays
+/// on wire 1.
+#[must_use]
+pub fn hub_wire_from_game_version(game_version: &str) -> u32 {
+    if game_version == "2" {
+        HUB_WIRE_VERSION
+    } else {
+        HUB_WIRE_VERSION_V1
+    }
+}
+
+/// `Ok` when `peer_wire` is 2 or newer, so a version-2 call may be sent.
+///
+/// # Errors
+///
+/// [`HubError::NeedsWireV2`] when the peer is still wire 1. The caller sends no bytes.
+pub fn v2_call_allowed(peer_wire: u32) -> Result<(), HubError> {
+    if peer_wire >= HUB_WIRE_VERSION {
+        Ok(())
+    } else {
+        Err(HubError::NeedsWireV2)
+    }
 }
 
 /// One page of the directory: a snapshot (`reset` on its first page) or a delta. Generations are
 /// the hub's after the change; a client moves its cursor when a page with `done` arrives.
+///
+/// `non_exhaustive`: a struct pattern in another crate needs `..`.
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
+#[non_exhaustive]
 pub struct DirectoryPage {
     /// The directory generation.
     pub dir_gen: u64,
@@ -241,10 +469,15 @@ pub struct DirectoryPage {
     pub lobbies: Vec<HubLobbyCard>,
     /// Lobbies no longer listed.
     pub removed_lobbies: Vec<LobbyId>,
+    /// Dedicated servers listed with this page. Empty on a version-1 page.
+    pub servers: Vec<ServerCard>,
 }
 
-/// A whole lobby, sent to a member when it enters. Members see the session address.
+/// A whole lobby, sent to a member when it enters. The snapshot carries no session address.
+///
+/// `non_exhaustive`: a struct pattern in another crate needs `..`.
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[non_exhaustive]
 pub struct RoomState {
     /// The lobby.
     pub lobby: LobbyId,
@@ -260,12 +493,23 @@ pub struct RoomState {
     pub data: BTreeMap<String, String>,
     /// Members in join order: id, handle, member data.
     pub members: Vec<(MemberId, String, BTreeMap<String, String>)>,
-    /// The confirmed session address.
+    /// Always `None`. Kept on the wire so a version-1 decoder still reads the field.
     pub server: Option<LobbyServer>,
+    /// Listen or dedicated. Version-1 rooms are listen.
+    pub kind: LobbyKind,
+    /// When set, joins offer only the relay.
+    pub relay_only: bool,
+    /// Dedicated-server capacity. `0` on a listen room.
+    pub capacity: u16,
+    /// Dedicated-server load. `0` on a listen room.
+    pub load: u16,
 }
 
 /// What the hub tells a client.
+///
+/// `non_exhaustive`: a match in another crate needs a `_` arm.
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum HubEvent {
     /// The session exists: its member id, handle, the player key the hub bound it to, and the
     /// hub's idle timeout. A client refuses a `Welcome` whose key is not its own
@@ -409,6 +653,46 @@ pub enum HubEvent {
         /// Connectivity checks it sent.
         punch_attempts: u32,
     },
+    /// A bound server came online. No address.
+    ServerOnline(ServerNotice),
+    /// A bound server went offline. No address.
+    ServerOffline(ServerNotice),
+    /// A delegated lobby named this server.
+    LobbyAssigned {
+        /// The lobby.
+        lobby: LobbyId,
+        /// The player key that owns it.
+        owner: PlayerKey,
+    },
+    /// The owner's session is gone and the lobby is in grace. `deadline_ms` of 0 means no deadline.
+    GraceStarted {
+        /// The lobby.
+        lobby: LobbyId,
+        /// Absolute deadline on the hub clock, or 0 for no deadline.
+        deadline_ms: u64,
+    },
+    /// Grace ended and the lobby closed.
+    GraceEnded {
+        /// The lobby.
+        lobby: LobbyId,
+    },
+    /// One binding changed for the owner who presented or revoked it.
+    BindingChanged {
+        /// The dedicated server.
+        server_key: ServerKey,
+        /// The revocation id.
+        serial: u64,
+        /// Live, expired, or revoked.
+        state: BindingState,
+    },
+    /// The session address was confirmed or withdrawn, with no address on the wire.
+    /// Version-1 members still receive [`HubEvent::ServerSet`].
+    SessionConfirmed {
+        /// The lobby.
+        lobby: LobbyId,
+        /// Whether a session address is confirmed.
+        confirmed: bool,
+    },
 }
 
 impl HubEvent {
@@ -483,6 +767,13 @@ const RQ_OFFER: u8 = 16;
 const RQ_ASK_REACH: u8 = 17;
 const RQ_APPROVE: u8 = 18;
 const RQ_REACH_DONE: u8 = 19;
+const RQ_ANNOUNCE_WIRE: u8 = 20;
+const RQ_REGISTER_SERVER: u8 = 21;
+const RQ_REVOKE_BINDING: u8 = 22;
+const RQ_CREATE_DELEGATED: u8 = 23;
+const RQ_SET_REACH_MODE: u8 = 24;
+const RQ_SET_BANS: u8 = 25;
+const RQ_CLOSE_LOBBY: u8 = 26;
 
 const EV_BASE: u8 = 64;
 const EV_WELCOME: u8 = 64;
@@ -505,6 +796,13 @@ const EV_REACH_ASK: u8 = 80;
 const EV_PLAN: u8 = 81;
 const EV_REACH_DENIED: u8 = 82;
 const EV_REACHED: u8 = 83;
+const EV_SERVER_ONLINE: u8 = 84;
+const EV_SERVER_OFFLINE: u8 = 85;
+const EV_LOBBY_ASSIGNED: u8 = 86;
+const EV_GRACE_STARTED: u8 = 87;
+const EV_GRACE_ENDED: u8 = 88;
+const EV_BINDING_CHANGED: u8 = 89;
+const EV_SESSION_CONFIRMED: u8 = 90;
 
 fn encode_request(w: &mut WireWriter, rq: &HubRequest) {
     match rq {
@@ -637,6 +935,52 @@ fn encode_request(w: &mut WireWriter, rq: &HubRequest) {
             w.u8(path.to_u8());
             w.u32(*punch_attempts);
         }
+        HubRequest::AnnounceWire { version } => {
+            w.u8(RQ_ANNOUNCE_WIRE);
+            w.u8(*version);
+        }
+        HubRequest::RegisterServer { presence } => {
+            w.u8(RQ_REGISTER_SERVER);
+            put_presence(w, presence);
+        }
+        HubRequest::RevokeBinding { server_key, serial } => {
+            w.u8(RQ_REVOKE_BINDING);
+            w.raw(&server_key.0);
+            w.u64(*serial);
+        }
+        HubRequest::CreateDelegated {
+            request,
+            visibility,
+            max_members,
+            joinable,
+            data,
+            server_key,
+        } => {
+            w.u8(RQ_CREATE_DELEGATED);
+            w.u64(*request);
+            w.u8(visibility_u8(*visibility));
+            w.u32(*max_members);
+            w.u8(u8::from(*joinable));
+            put_data(w, data);
+            w.raw(&server_key.0);
+        }
+        HubRequest::SetReachMode { lobby, relay_only } => {
+            w.u8(RQ_SET_REACH_MODE);
+            w.u64(lobby.0);
+            w.u8(u8::from(*relay_only));
+        }
+        HubRequest::SetBans { lobby, keys } => {
+            w.u8(RQ_SET_BANS);
+            w.u64(lobby.0);
+            put_count_u8(w, keys.len(), binding::MAX_LOBBY_BANS);
+            for key in keys.iter().take(binding::MAX_LOBBY_BANS) {
+                w.raw(&key.0);
+            }
+        }
+        HubRequest::CloseLobby { lobby } => {
+            w.u8(RQ_CLOSE_LOBBY);
+            w.u64(lobby.0);
+        }
     }
 }
 
@@ -731,6 +1075,38 @@ fn decode_request(tag: u8, r: &mut WireReader<'_>) -> Result<HubRequest, WireErr
             path: get_reach_kind(r)?,
             punch_attempts: r.u32()?,
         },
+        RQ_ANNOUNCE_WIRE => HubRequest::AnnounceWire { version: r.u8()? },
+        RQ_REGISTER_SERVER => HubRequest::RegisterServer {
+            presence: get_presence(r)?,
+        },
+        RQ_REVOKE_BINDING => HubRequest::RevokeBinding {
+            server_key: ServerKey(r.array()?),
+            serial: r.u64()?,
+        },
+        RQ_CREATE_DELEGATED => HubRequest::CreateDelegated {
+            request: r.u64()?,
+            visibility: get_visibility(r)?,
+            max_members: r.u32()?,
+            joinable: get_bool(r)?,
+            data: get_data(r)?,
+            server_key: ServerKey(r.array()?),
+        },
+        RQ_SET_REACH_MODE => HubRequest::SetReachMode {
+            lobby: LobbyId(r.u64()?),
+            relay_only: get_bool(r)?,
+        },
+        RQ_SET_BANS => {
+            let lobby = LobbyId(r.u64()?);
+            let n = get_count_u8(r, binding::MAX_LOBBY_BANS)?;
+            let mut keys = Vec::with_capacity(n);
+            for _ in 0..n {
+                keys.push(PlayerKey(r.array()?));
+            }
+            HubRequest::SetBans { lobby, keys }
+        }
+        RQ_CLOSE_LOBBY => HubRequest::CloseLobby {
+            lobby: LobbyId(r.u64()?),
+        },
         _ => return Err(WireError::Invalid("hub request tag")),
     })
 }
@@ -786,6 +1162,13 @@ fn encode_event(w: &mut WireWriter, ev: &HubEvent) {
                 put_data(w, data);
             }
             put_opt_server(w, room.server.as_ref());
+            if room_tail(room) {
+                w.u8(V2_TAIL);
+                w.u8(room.kind.to_u8());
+                w.u8(u8::from(room.relay_only));
+                w.u16(room.capacity);
+                w.u16(room.load);
+            }
         }
         HubEvent::MemberJoined {
             lobby,
@@ -893,6 +1276,7 @@ fn encode_event(w: &mut WireWriter, ev: &HubEvent) {
                     relay: plan.relay,
                     join_code: plan.join_code.clone(),
                     ticket: plan.ticket.clone(),
+                    relay_only: false,
                 },
             );
         }
@@ -911,6 +1295,43 @@ fn encode_event(w: &mut WireWriter, ev: &HubEvent) {
             w.u64(member.0);
             w.u8(path.to_u8());
             w.u32(*punch_attempts);
+        }
+        HubEvent::ServerOnline(notice) => {
+            w.u8(EV_SERVER_ONLINE);
+            put_notice(w, notice);
+        }
+        HubEvent::ServerOffline(notice) => {
+            w.u8(EV_SERVER_OFFLINE);
+            put_notice(w, notice);
+        }
+        HubEvent::LobbyAssigned { lobby, owner } => {
+            w.u8(EV_LOBBY_ASSIGNED);
+            w.u64(lobby.0);
+            w.raw(&owner.0);
+        }
+        HubEvent::GraceStarted { lobby, deadline_ms } => {
+            w.u8(EV_GRACE_STARTED);
+            w.u64(lobby.0);
+            w.u64(*deadline_ms);
+        }
+        HubEvent::GraceEnded { lobby } => {
+            w.u8(EV_GRACE_ENDED);
+            w.u64(lobby.0);
+        }
+        HubEvent::BindingChanged {
+            server_key,
+            serial,
+            state,
+        } => {
+            w.u8(EV_BINDING_CHANGED);
+            w.raw(&server_key.0);
+            w.u64(*serial);
+            w.u8(state.to_u8());
+        }
+        HubEvent::SessionConfirmed { lobby, confirmed } => {
+            w.u8(EV_SESSION_CONFIRMED);
+            w.u64(lobby.0);
+            w.u8(u8::from(*confirmed));
         }
     }
 }
@@ -946,6 +1367,8 @@ fn decode_event(tag: u8, r: &mut WireReader<'_>) -> Result<HubEvent, WireError> 
             for _ in 0..n {
                 members.push((MemberId(r.u64()?), get_str8(r, HANDLE_WIRE_BYTES)?, get_data(r)?));
             }
+            let server = get_opt_server(r)?;
+            let (kind, relay_only, capacity, load) = get_room_tail(r)?;
             HubEvent::Room(RoomState {
                 lobby,
                 owner,
@@ -954,7 +1377,11 @@ fn decode_event(tag: u8, r: &mut WireReader<'_>) -> Result<HubEvent, WireError> 
                 joinable,
                 data,
                 members,
-                server: get_opt_server(r)?,
+                server,
+                kind,
+                relay_only,
+                capacity,
+                load,
             })
         }
         EV_MEMBER_JOINED => HubEvent::MemberJoined {
@@ -1041,6 +1468,28 @@ fn decode_event(tag: u8, r: &mut WireReader<'_>) -> Result<HubEvent, WireError> 
             path: get_reach_kind(r)?,
             punch_attempts: r.u32()?,
         },
+        EV_SERVER_ONLINE => HubEvent::ServerOnline(get_notice(r)?),
+        EV_SERVER_OFFLINE => HubEvent::ServerOffline(get_notice(r)?),
+        EV_LOBBY_ASSIGNED => HubEvent::LobbyAssigned {
+            lobby: LobbyId(r.u64()?),
+            owner: PlayerKey(r.array()?),
+        },
+        EV_GRACE_STARTED => HubEvent::GraceStarted {
+            lobby: LobbyId(r.u64()?),
+            deadline_ms: r.u64()?,
+        },
+        EV_GRACE_ENDED => HubEvent::GraceEnded {
+            lobby: LobbyId(r.u64()?),
+        },
+        EV_BINDING_CHANGED => HubEvent::BindingChanged {
+            server_key: ServerKey(r.array()?),
+            serial: r.u64()?,
+            state: BindingState::from_u8(r.u8()?).ok_or(WireError::Invalid("hub binding state"))?,
+        },
+        EV_SESSION_CONFIRMED => HubEvent::SessionConfirmed {
+            lobby: LobbyId(r.u64()?),
+            confirmed: get_bool(r)?,
+        },
         _ => return Err(WireError::Invalid("hub event tag")),
     })
 }
@@ -1094,6 +1543,43 @@ fn encode_page(w: &mut WireWriter, page: &DirectoryPage) {
     for id in page.removed_lobbies.iter().take(MAX_PAGE_LOBBIES) {
         w.u64(id.0);
     }
+    let extras = page.lobbies.iter().any(card_has_extra);
+    if page.servers.is_empty() && !extras {
+        return;
+    }
+    w.u8(V2_TAIL);
+    let mut flags = 0u8;
+    if !page.servers.is_empty() {
+        flags |= 1;
+    }
+    if extras {
+        flags |= 2;
+    }
+    w.u8(flags);
+    if flags & 1 != 0 {
+        put_count_u16(w, page.servers.len(), MAX_PAGE_ROWS);
+        for card in page.servers.iter().take(MAX_PAGE_ROWS) {
+            put_server_card(w, card);
+        }
+    }
+    if flags & 2 != 0 {
+        let n = page.lobbies.len().min(MAX_PAGE_LOBBIES);
+        put_count_u16(w, n, MAX_PAGE_LOBBIES);
+        for card in page.lobbies.iter().take(n) {
+            w.u8(card.kind.to_u8());
+            w.u8(u8::from(card.relay_only));
+            w.u16(card.capacity);
+            w.u16(card.load);
+        }
+    }
+}
+
+fn card_has_extra(card: &HubLobbyCard) -> bool {
+    card.kind != LobbyKind::Listen || card.relay_only || card.capacity != 0 || card.load != 0
+}
+
+fn room_tail(room: &RoomState) -> bool {
+    room.kind != LobbyKind::Listen || room.relay_only || room.capacity != 0 || room.load != 0
 }
 
 fn decode_page(r: &mut WireReader<'_>) -> Result<DirectoryPage, WireError> {
@@ -1134,6 +1620,10 @@ fn decode_page(r: &mut WireReader<'_>) -> Result<DirectoryPage, WireError> {
             member_count: r.u32()?,
             joinable: get_bool(r)?,
             data: get_data(r)?,
+            kind: LobbyKind::Listen,
+            relay_only: false,
+            capacity: 0,
+            load: 0,
         });
     }
     let n = get_count_u16(r, MAX_PAGE_LOBBIES)?;
@@ -1141,6 +1631,7 @@ fn decode_page(r: &mut WireReader<'_>) -> Result<DirectoryPage, WireError> {
     for _ in 0..n {
         removed_lobbies.push(LobbyId(r.u64()?));
     }
+    let servers = get_page_tail(r, &mut lobbies)?;
     Ok(DirectoryPage {
         dir_gen,
         presence_gen,
@@ -1150,6 +1641,7 @@ fn decode_page(r: &mut WireReader<'_>) -> Result<DirectoryPage, WireError> {
         removed_players,
         lobbies,
         removed_lobbies,
+        servers,
     })
 }
 
@@ -1194,6 +1686,9 @@ fn put_offer(w: &mut WireWriter, offer: &ReachOffer) {
         None => w.u8(0),
     }
     let _ = w.bytes_u16(&offer.ticket, MAX_TICKET_BYTES);
+    if offer.relay_only {
+        w.u8(1);
+    }
 }
 
 fn get_offer(r: &mut WireReader<'_>) -> Result<ReachOffer, WireError> {
@@ -1209,12 +1704,23 @@ fn get_offer(r: &mut WireReader<'_>) -> Result<ReachOffer, WireError> {
         _ => return Err(WireError::Invalid("hub code flag")),
     };
     let ticket = r.bytes_u16(MAX_TICKET_BYTES)?.to_vec();
+    // A version-1 offer ends here. The only legal tail is one byte `1` (`relay_only`). A trailing
+    // `0` stays an error, and any further byte is left for `finish` to reject.
+    let relay_only = if r.remaining() == 1 {
+        match r.u8()? {
+            1 => true,
+            _ => return Err(WireError::Invalid("hub reach flag")),
+        }
+    } else {
+        false
+    };
     Ok(ReachOffer {
         candidates,
         nat,
         relay,
         join_code,
         ticket,
+        relay_only,
     })
 }
 
@@ -1247,6 +1753,222 @@ fn get_code(r: &mut WireReader<'_>) -> Result<String, WireError> {
         return Err(WireError::Invalid("hub error code"));
     }
     Ok(code)
+}
+
+fn put_count_u8(w: &mut WireWriter, n: usize, max: usize) {
+    if n > max {
+        w.fail(WireError::TooLong { len: n, max });
+    }
+    w.u8(n.min(max) as u8);
+}
+
+/// The count is refused before any `Vec` is allocated from it.
+fn get_count_u8(r: &mut WireReader<'_>, max: usize) -> Result<usize, WireError> {
+    let n = usize::from(r.u8()?);
+    if n > max {
+        return Err(WireError::TooLong { len: n, max });
+    }
+    Ok(n)
+}
+
+fn put_grace(w: &mut WireWriter, ms: u32) {
+    if !binding::grace_in_range(ms) {
+        w.fail(WireError::Invalid("hub grace"));
+    }
+    w.u32(ms);
+}
+
+fn get_grace(r: &mut WireReader<'_>) -> Result<u32, WireError> {
+    let ms = r.u32()?;
+    if !binding::grace_in_range(ms) {
+        return Err(WireError::Invalid("hub grace"));
+    }
+    Ok(ms)
+}
+
+fn put_presence(w: &mut WireWriter, presence: &ServerPresence) {
+    if presence.server_proof.len() != PLAYER_PROOF_BYTES {
+        w.fail(WireError::Invalid("hub server proof"));
+    }
+    let _ = w.bytes_u16(&presence.server_proof, PLAYER_PROOF_BYTES);
+    if presence.proofs.len() > binding::MAX_BINDING_OWNERS {
+        w.fail(WireError::TooLong {
+            len: presence.proofs.len(),
+            max: binding::MAX_BINDING_OWNERS,
+        });
+    }
+    let n = presence.proofs.len().min(binding::MAX_BINDING_OWNERS);
+    w.u8(n as u8);
+    for proof in presence.proofs.iter().take(n) {
+        if proof.len() != binding::BINDING_PROOF_BYTES {
+            w.fail(WireError::Invalid("hub binding proof"));
+        }
+        w.raw(proof);
+    }
+    w.u16(presence.capacity);
+    w.u16(presence.load);
+    w.u32(presence.protocol);
+    put_str8(w, &presence.game_version, binding::MAX_HUB_GAME_VERSION_BYTES);
+    w.u8(u8::from(presence.relay_only));
+    put_grace(w, presence.grace_ms);
+    put_count_u16(w, presence.bans.len(), binding::MAX_SERVER_BANS);
+    for key in presence.bans.iter().take(binding::MAX_SERVER_BANS) {
+        w.raw(&key.0);
+    }
+}
+
+fn get_presence(r: &mut WireReader<'_>) -> Result<ServerPresence, WireError> {
+    let proof = r.bytes_u16(PLAYER_PROOF_BYTES)?;
+    if proof.len() != PLAYER_PROOF_BYTES {
+        return Err(WireError::Invalid("hub server proof"));
+    }
+    let server_proof = proof.to_vec();
+    // Cap before `with_capacity`, so a hostile count allocates nothing.
+    let n = get_count_u8(r, binding::MAX_BINDING_OWNERS)?;
+    let mut proofs = Vec::with_capacity(n);
+    for _ in 0..n {
+        proofs.push(r.array::<{ binding::BINDING_PROOF_BYTES }>()?.to_vec());
+    }
+    let capacity = r.u16()?;
+    let load = r.u16()?;
+    let protocol = r.u32()?;
+    let game_version = get_str8(r, binding::MAX_HUB_GAME_VERSION_BYTES)?;
+    let relay_only = get_bool(r)?;
+    let grace_ms = get_grace(r)?;
+    let ban_count = get_count_u16(r, binding::MAX_SERVER_BANS)?;
+    let mut bans = Vec::with_capacity(ban_count);
+    for _ in 0..ban_count {
+        bans.push(PlayerKey(r.array()?));
+    }
+    Ok(ServerPresence {
+        server_proof,
+        proofs,
+        capacity,
+        load,
+        protocol,
+        game_version,
+        relay_only,
+        grace_ms,
+        bans,
+    })
+}
+
+fn put_notice(w: &mut WireWriter, notice: &ServerNotice) {
+    w.raw(&notice.server_key.0);
+    w.u16(notice.capacity);
+    w.u16(notice.load);
+    w.u32(notice.protocol);
+    put_str8(w, &notice.game_version, binding::MAX_HUB_GAME_VERSION_BYTES);
+    w.u8(u8::from(notice.relay_only));
+    put_grace(w, notice.grace_ms);
+    if usize::from(notice.owner_count) > binding::MAX_BINDING_OWNERS {
+        w.fail(WireError::TooLong {
+            len: usize::from(notice.owner_count),
+            max: binding::MAX_BINDING_OWNERS,
+        });
+    }
+    w.u8(notice.owner_count);
+}
+
+fn get_notice(r: &mut WireReader<'_>) -> Result<ServerNotice, WireError> {
+    let owner_count_at_end = ServerNotice {
+        server_key: ServerKey(r.array()?),
+        capacity: r.u16()?,
+        load: r.u16()?,
+        protocol: r.u32()?,
+        game_version: get_str8(r, binding::MAX_HUB_GAME_VERSION_BYTES)?,
+        relay_only: get_bool(r)?,
+        grace_ms: get_grace(r)?,
+        owner_count: r.u8()?,
+    };
+    if usize::from(owner_count_at_end.owner_count) > binding::MAX_BINDING_OWNERS {
+        return Err(WireError::TooLong {
+            len: usize::from(owner_count_at_end.owner_count),
+            max: binding::MAX_BINDING_OWNERS,
+        });
+    }
+    Ok(owner_count_at_end)
+}
+
+fn put_server_card(w: &mut WireWriter, card: &ServerCard) {
+    w.raw(&card.server_key.0);
+    w.u16(card.capacity);
+    w.u16(card.load);
+    w.u32(card.protocol);
+    put_str8(w, &card.game_version, binding::MAX_HUB_GAME_VERSION_BYTES);
+    w.u8(u8::from(card.relay_only));
+    if usize::from(card.owner_count) > binding::MAX_BINDING_OWNERS {
+        w.fail(WireError::TooLong {
+            len: usize::from(card.owner_count),
+            max: binding::MAX_BINDING_OWNERS,
+        });
+    }
+    w.u8(card.owner_count);
+}
+
+fn get_server_card(r: &mut WireReader<'_>) -> Result<ServerCard, WireError> {
+    let card = ServerCard {
+        server_key: ServerKey(r.array()?),
+        capacity: r.u16()?,
+        load: r.u16()?,
+        protocol: r.u32()?,
+        game_version: get_str8(r, binding::MAX_HUB_GAME_VERSION_BYTES)?,
+        relay_only: get_bool(r)?,
+        owner_count: r.u8()?,
+    };
+    if usize::from(card.owner_count) > binding::MAX_BINDING_OWNERS {
+        return Err(WireError::TooLong {
+            len: usize::from(card.owner_count),
+            max: binding::MAX_BINDING_OWNERS,
+        });
+    }
+    Ok(card)
+}
+
+fn get_room_tail(r: &mut WireReader<'_>) -> Result<(LobbyKind, bool, u16, u16), WireError> {
+    if r.remaining() == 0 {
+        return Ok((LobbyKind::Listen, false, 0, 0));
+    }
+    if r.u8()? != V2_TAIL {
+        return Err(WireError::Invalid("hub room tail"));
+    }
+    let kind = LobbyKind::from_u8(r.u8()?).ok_or(WireError::Invalid("hub lobby kind"))?;
+    let relay_only = get_bool(r)?;
+    Ok((kind, relay_only, r.u16()?, r.u16()?))
+}
+
+fn get_page_tail(r: &mut WireReader<'_>, lobbies: &mut [HubLobbyCard]) -> Result<Vec<ServerCard>, WireError> {
+    if r.remaining() == 0 {
+        return Ok(Vec::new());
+    }
+    if r.u8()? != V2_TAIL {
+        return Err(WireError::Invalid("hub page tail"));
+    }
+    let flags = r.u8()?;
+    if flags == 0 || flags & !0b11 != 0 {
+        return Err(WireError::Invalid("hub page tail"));
+    }
+    let mut servers = Vec::new();
+    if flags & 1 != 0 {
+        let n = get_count_u16(r, MAX_PAGE_ROWS)?;
+        servers = Vec::with_capacity(n.min(64));
+        for _ in 0..n {
+            servers.push(get_server_card(r)?);
+        }
+    }
+    if flags & 2 != 0 {
+        let n = get_count_u16(r, MAX_PAGE_LOBBIES)?;
+        if n != lobbies.len() {
+            return Err(WireError::Invalid("hub lobby extras"));
+        }
+        for card in lobbies.iter_mut() {
+            card.kind = LobbyKind::from_u8(r.u8()?).ok_or(WireError::Invalid("hub lobby kind"))?;
+            card.relay_only = get_bool(r)?;
+            card.capacity = r.u16()?;
+            card.load = r.u16()?;
+        }
+    }
+    Ok(servers)
 }
 
 fn put_count_u16(w: &mut WireWriter, n: usize, max: usize) {
@@ -1396,6 +2118,11 @@ fn get_opt_server(r: &mut WireReader<'_>) -> Result<Option<LobbyServer>, WireErr
 }
 
 /// A request and an event of every kind, for the round-trip tests and the fuzz fixture.
+///
+/// An offer, directory page, or room that carries a version-2 tail is absent here. That tail is a
+/// suffix of the version-1 body, so the body is a legal prefix (ADR-10378) and
+/// `every_message_round_trips` would accept it. `a_missing_tail_is_the_version_1_message`
+/// round-trips those forms. Every message in this list stays prefix-free.
 pub fn sample_messages() -> Vec<HubMessage> {
     let lobby = LobbyId(7);
     let mut data = BTreeMap::new();
@@ -1416,6 +2143,19 @@ pub fn sample_messages() -> Vec<HubMessage> {
         relay: Some(SocketAddr::from(([192, 0, 2, 1], 7800))),
         join_code: Some("ABCDEF".into()),
         ticket: b"RGJT\x01ticket".to_vec(),
+        relay_only: false,
+    };
+    let server_key = ServerKey([0x44; 32]);
+    let presence = ServerPresence {
+        server_proof: vec![0x5A; PLAYER_PROOF_BYTES],
+        proofs: vec![vec![0xB1; binding::BINDING_PROOF_BYTES]],
+        capacity: 32,
+        load: 4,
+        protocol: 7,
+        game_version: "2".into(),
+        relay_only: true,
+        grace_ms: binding::GRACE_MS_DEFAULT,
+        bans: vec![PlayerKey([0x0B; 32])],
     };
     let requests = vec![
         HubRequest::Hello {
@@ -1496,6 +2236,31 @@ pub fn sample_messages() -> Vec<HubMessage> {
             path: ReachKind::Punch,
             punch_attempts: 3,
         },
+        HubRequest::AnnounceWire { version: 2 },
+        HubRequest::RegisterServer {
+            presence: presence.clone(),
+        },
+        HubRequest::RevokeBinding {
+            server_key,
+            serial: 9,
+        },
+        HubRequest::CreateDelegated {
+            request: 11,
+            visibility: LobbyVisibility::Public,
+            max_members: 8,
+            joinable: true,
+            data: data.clone(),
+            server_key,
+        },
+        HubRequest::SetReachMode {
+            lobby,
+            relay_only: true,
+        },
+        HubRequest::SetBans {
+            lobby,
+            keys: vec![PlayerKey([0x0C; 32])],
+        },
+        HubRequest::CloseLobby { lobby },
     ];
     let events = vec![
         HubEvent::Welcome {
@@ -1534,8 +2299,13 @@ pub fn sample_messages() -> Vec<HubMessage> {
                 member_count: 1,
                 joinable: true,
                 data: data.clone(),
+                kind: LobbyKind::Listen,
+                relay_only: false,
+                capacity: 0,
+                load: 0,
             }],
             removed_lobbies: vec![LobbyId(3)],
+            servers: Vec::new(),
         }),
         HubEvent::Room(RoomState {
             lobby,
@@ -1546,6 +2316,10 @@ pub fn sample_messages() -> Vec<HubMessage> {
             data: data.clone(),
             members: vec![(MemberId(1), "ann".into(), BTreeMap::new())],
             server: Some(LobbyServer::Address(SocketAddr::from(([10, 0, 0, 1], 7777)))),
+            kind: LobbyKind::Listen,
+            relay_only: false,
+            capacity: 0,
+            load: 0,
         }),
         HubEvent::MemberJoined {
             lobby,
@@ -1629,6 +2403,44 @@ pub fn sample_messages() -> Vec<HubMessage> {
             member: MemberId(2),
             path: ReachKind::Relay,
             punch_attempts: 0,
+        },
+        HubEvent::ServerOnline(ServerNotice {
+            server_key,
+            capacity: 32,
+            load: 4,
+            protocol: 7,
+            game_version: "2".into(),
+            relay_only: true,
+            grace_ms: binding::GRACE_MS_DEFAULT,
+            owner_count: 1,
+        }),
+        HubEvent::ServerOffline(ServerNotice {
+            server_key,
+            capacity: 32,
+            load: 0,
+            protocol: 7,
+            game_version: "2".into(),
+            relay_only: false,
+            grace_ms: 0,
+            owner_count: 1,
+        }),
+        HubEvent::LobbyAssigned {
+            lobby,
+            owner: PlayerKey([0x11; 32]),
+        },
+        HubEvent::GraceStarted {
+            lobby,
+            deadline_ms: 0,
+        },
+        HubEvent::GraceEnded { lobby },
+        HubEvent::BindingChanged {
+            server_key,
+            serial: 9,
+            state: BindingState::Revoked,
+        },
+        HubEvent::SessionConfirmed {
+            lobby,
+            confirmed: true,
         },
     ];
     requests
@@ -1750,5 +2562,347 @@ mod tests {
             proof: vec![0; PLAYER_PROOF_BYTES + 1],
         });
         assert!(matches!(oversized.to_bytes(), Err(WireError::TooLong { .. })));
+    }
+
+    fn register_prefix() -> WireWriter {
+        let mut w = WireWriter::new();
+        w.u8(RQ_REGISTER_SERVER);
+        w.u16(PLAYER_PROOF_BYTES as u16);
+        w.raw(&[0u8; PLAYER_PROOF_BYTES]);
+        w
+    }
+
+    /// A proof count above 8, a game version above 32 bytes, a ban list above its cap, and a
+    /// grace past 24 h are refused before any `Vec` is grown from the untrusted count.
+    ///
+    /// Spec 89 § 16.2 clamps grace on `RegisterServer`. This codec rejects it instead
+    /// (ADR-10378); the behavior lane clamps only a value the codec already accepted.
+    #[test]
+    fn v2_caps_are_refused_before_allocation() {
+        let mut proofs = register_prefix();
+        proofs.u8(9);
+        assert_eq!(
+            HubMessage::decode_bounded(&proofs.finish()),
+            Err(WireError::TooLong {
+                len: 9,
+                max: binding::MAX_BINDING_OWNERS,
+            })
+        );
+
+        let mut version = register_prefix();
+        version.u8(0);
+        version.u16(0);
+        version.u16(0);
+        version.u32(0);
+        version.u8(33);
+        assert_eq!(
+            HubMessage::decode_bounded(&version.finish()),
+            Err(WireError::TooLong {
+                len: 33,
+                max: binding::MAX_HUB_GAME_VERSION_BYTES,
+            })
+        );
+
+        let mut bans = register_prefix();
+        bans.u8(0);
+        bans.u16(1);
+        bans.u16(0);
+        bans.u32(1);
+        bans.u8(0);
+        bans.u8(0);
+        bans.u32(0);
+        bans.u16((binding::MAX_SERVER_BANS + 1) as u16);
+        assert_eq!(
+            HubMessage::decode_bounded(&bans.finish()),
+            Err(WireError::TooLong {
+                len: binding::MAX_SERVER_BANS + 1,
+                max: binding::MAX_SERVER_BANS,
+            })
+        );
+
+        let mut grace = register_prefix();
+        grace.u8(0);
+        grace.u16(1);
+        grace.u16(0);
+        grace.u32(1);
+        grace.u8(0);
+        grace.u8(0);
+        grace.u32(binding::GRACE_MS_MAX + 1);
+        assert_eq!(
+            HubMessage::decode_bounded(&grace.finish()),
+            Err(WireError::Invalid("hub grace"))
+        );
+
+        for ms in [0, binding::GRACE_MS_MAX] {
+            let message = HubMessage::Request(HubRequest::RegisterServer {
+                presence: ServerPresence {
+                    server_proof: vec![0; PLAYER_PROOF_BYTES],
+                    proofs: Vec::new(),
+                    capacity: 1,
+                    load: 0,
+                    protocol: 1,
+                    game_version: "2".into(),
+                    relay_only: false,
+                    grace_ms: ms,
+                    bans: Vec::new(),
+                },
+            });
+            let bytes = message.to_bytes().expect("grace in range encodes");
+            assert_eq!(HubMessage::decode_bounded(&bytes).expect("decodes"), message);
+        }
+    }
+
+    /// A missing tail is the version-1 message. `relay_only` is one byte `1` and only when set.
+    #[test]
+    fn a_missing_tail_is_the_version_1_message() {
+        let lobby = LobbyId(1);
+        let plain = ReachOffer {
+            relay_only: false,
+            ..ReachOffer::default()
+        };
+        let flagged = ReachOffer {
+            relay_only: true,
+            ..plain.clone()
+        };
+        let plain_bytes = HubMessage::Request(HubRequest::Offer {
+            lobby,
+            offer: plain.clone(),
+        })
+        .to_bytes()
+        .expect("v1 offer");
+        let flagged_bytes = HubMessage::Request(HubRequest::Offer {
+            lobby,
+            offer: flagged,
+        })
+        .to_bytes()
+        .expect("flagged offer");
+        assert_eq!(flagged_bytes.len(), plain_bytes.len() + 1);
+        assert_eq!(*flagged_bytes.last().expect("byte"), 1);
+        assert!(!plain_bytes.contains(&0xA2));
+        match HubMessage::decode_bounded(&plain_bytes).expect("plain") {
+            HubMessage::Request(HubRequest::Offer { offer, .. }) => assert!(!offer.relay_only),
+            other => panic!("offer, got {other:?}"),
+        }
+        let mut zero = plain_bytes.clone();
+        zero.push(0);
+        assert_eq!(
+            HubMessage::decode_bounded(&zero),
+            Err(WireError::Invalid("hub reach flag"))
+        );
+        let mut other = plain_bytes;
+        other.push(2);
+        assert_eq!(
+            HubMessage::decode_bounded(&other),
+            Err(WireError::Invalid("hub reach flag"))
+        );
+
+        let page = HubMessage::Event(HubEvent::Directory(DirectoryPage::default()))
+            .to_bytes()
+            .expect("page");
+        assert!(!page.contains(&0xA2));
+        assert_eq!(
+            HubMessage::decode_bounded(&flagged_bytes).expect("flagged"),
+            HubMessage::Request(HubRequest::Offer {
+                lobby,
+                offer: ReachOffer {
+                    relay_only: true,
+                    ..plain
+                },
+            })
+        );
+        // The version-1 body is that prefix. A cut that stops on the flag byte is refused above
+        // when the byte is not `1`. A cut of the flag itself is the version-1 offer.
+        match HubMessage::decode_bounded(&flagged_bytes[..flagged_bytes.len() - 1]).expect("v1 prefix") {
+            HubMessage::Request(HubRequest::Offer { offer, .. }) => assert!(!offer.relay_only),
+            other => panic!("v1 offer, got {other:?}"),
+        }
+
+        let listen = room_listen(lobby);
+        let listen_msg = HubMessage::Event(HubEvent::Room(listen.clone()));
+        let listen_bytes = listen_msg.to_bytes().expect("room");
+        assert!(!listen_bytes.contains(&V2_TAIL));
+        let dedicated_room = RoomState {
+            kind: LobbyKind::Dedicated,
+            relay_only: true,
+            capacity: 4,
+            load: 1,
+            ..listen
+        };
+        let dedicated_msg = HubMessage::Event(HubEvent::Room(dedicated_room));
+        let dedicated = dedicated_msg.to_bytes().expect("dedicated");
+        assert!(dedicated.starts_with(&listen_bytes));
+        assert_eq!(dedicated[listen_bytes.len()], V2_TAIL);
+        assert_eq!(
+            HubMessage::decode_bounded(&dedicated).expect("dedicated decodes"),
+            dedicated_msg
+        );
+        assert_eq!(
+            HubMessage::decode_bounded(&dedicated[..listen_bytes.len()]).expect("v1 room"),
+            listen_msg
+        );
+        assert!(
+            HubMessage::decode_bounded(&dedicated[..listen_bytes.len() + 1]).is_err(),
+            "a cut inside the room tail"
+        );
+
+        let card = HubLobbyCard {
+            id: lobby,
+            owner: MemberId(1),
+            owner_handle: "ann".into(),
+            visibility: LobbyVisibility::Public,
+            max_members: 8,
+            member_count: 1,
+            joinable: true,
+            data: BTreeMap::new(),
+            kind: LobbyKind::Listen,
+            relay_only: false,
+            capacity: 0,
+            load: 0,
+        };
+        let plain_page = DirectoryPage {
+            dir_gen: 1,
+            presence_gen: 1,
+            reset: false,
+            done: true,
+            lobbies: vec![card.clone()],
+            ..DirectoryPage::default()
+        };
+        let mut dedicated_card = card;
+        dedicated_card.kind = LobbyKind::Dedicated;
+        dedicated_card.relay_only = true;
+        dedicated_card.capacity = 32;
+        dedicated_card.load = 4;
+        let extended_page = DirectoryPage {
+            lobbies: vec![dedicated_card],
+            servers: vec![ServerCard {
+                server_key: ServerKey([0x44; 32]),
+                capacity: 32,
+                load: 4,
+                protocol: 7,
+                game_version: "2".into(),
+                relay_only: true,
+                owner_count: 1,
+            }],
+            ..plain_page.clone()
+        };
+        let plain_page_bytes = HubMessage::Event(HubEvent::Directory(plain_page.clone()))
+            .to_bytes()
+            .expect("page");
+        assert!(!plain_page_bytes.contains(&V2_TAIL));
+        let extended_msg = HubMessage::Event(HubEvent::Directory(extended_page));
+        let extended = extended_msg.to_bytes().expect("extended page");
+        assert!(extended.starts_with(&plain_page_bytes));
+        assert_eq!(extended[plain_page_bytes.len()], V2_TAIL);
+        assert_eq!(
+            HubMessage::decode_bounded(&extended).expect("page decodes"),
+            extended_msg
+        );
+        assert_eq!(
+            HubMessage::decode_bounded(&extended[..plain_page_bytes.len()]).expect("v1 page"),
+            HubMessage::Event(HubEvent::Directory(plain_page))
+        );
+        assert!(
+            HubMessage::decode_bounded(&extended[..plain_page_bytes.len() + 1]).is_err(),
+            "a cut inside the page tail"
+        );
+    }
+
+    fn room_listen(lobby: LobbyId) -> RoomState {
+        RoomState {
+            lobby,
+            owner: MemberId(1),
+            visibility: LobbyVisibility::Public,
+            max_members: 8,
+            joinable: true,
+            data: BTreeMap::new(),
+            members: Vec::new(),
+            server: None,
+            kind: LobbyKind::Listen,
+            relay_only: false,
+            capacity: 0,
+            load: 0,
+        }
+    }
+
+    /// The handshake protocol stays 1. The probe's game version is `"2"`.
+    #[test]
+    fn the_handshake_stays_protocol_1_and_the_probe_says_2() {
+        struct WireOne;
+        impl NetGame for WireOne {
+            type Message = Vec<u8>;
+            type Input = ();
+            type JoinData = ();
+            const GAME_ID: &'static str = HUB_GAME_ID;
+            const PROTOCOL_VERSION: u32 = HUB_WIRE_VERSION_V1;
+        }
+        struct WireTwo;
+        impl NetGame for WireTwo {
+            type Message = Vec<u8>;
+            type Input = ();
+            type JoinData = ();
+            const GAME_ID: &'static str = HUB_GAME_ID;
+            const PROTOCOL_VERSION: u32 = HUB_WIRE_VERSION;
+        }
+        assert_eq!(
+            crate::payload::protocol_id::<HubWire>(),
+            crate::payload::protocol_id::<WireOne>()
+        );
+        assert_ne!(
+            crate::payload::protocol_id::<HubWire>(),
+            crate::payload::protocol_id::<WireTwo>()
+        );
+        let stamp = crate::version_probe::VersionStamp::of::<HubWire>();
+        assert_eq!(stamp.game_version, "2");
+        assert_eq!(stamp.protocol, HUB_WIRE_VERSION_V1);
+    }
+
+    /// Both directions of the dialect: an empty game version stays on wire 1 and a version-2
+    /// call is refused; `"2"` allows it. `"2.0"` is not generation 2.
+    #[test]
+    fn the_dialect_gate_covers_both_directions() {
+        assert_eq!(hub_wire_from_game_version(""), HUB_WIRE_VERSION_V1);
+        assert_eq!(hub_wire_from_game_version("2.0"), HUB_WIRE_VERSION_V1);
+        assert_eq!(hub_wire_from_game_version("2"), HUB_WIRE_VERSION);
+        let v2 = HubRequest::CloseLobby { lobby: LobbyId(1) };
+        let v1 = HubRequest::Heartbeat;
+        assert_eq!(gate_request(1, &v2), Err(HubError::NeedsWireV2));
+        assert_eq!(gate_request(2, &v2), Ok(()));
+        assert_eq!(gate_request(1, &v1), Ok(()));
+        assert_eq!(v2_call_allowed(1), Err(HubError::NeedsWireV2));
+        assert_eq!(v2_call_allowed(2), Ok(()));
+        assert!(request_is_v2_only(&v2));
+        assert!(!request_is_v2_only(&HubRequest::AnnounceWire { version: 2 }));
+    }
+
+    /// `relay_only` is a generation-2 tail on `Offer` and `AskReach`. A plain offer stays a
+    /// version-1 body. Wire 1 refuses the tail; wire 2 accepts it.
+    #[test]
+    fn a_relay_only_offer_is_v2_only_on_wire_1() {
+        let plain = HubRequest::Offer {
+            lobby: LobbyId(1),
+            offer: ReachOffer::default(),
+        };
+        let flagged_offer = HubRequest::Offer {
+            lobby: LobbyId(1),
+            offer: ReachOffer {
+                relay_only: true,
+                ..ReachOffer::default()
+            },
+        };
+        let flagged_ask = HubRequest::AskReach {
+            lobby: LobbyId(1),
+            offer: ReachOffer {
+                relay_only: true,
+                ..ReachOffer::default()
+            },
+        };
+        assert!(!request_is_v2_only(&plain));
+        assert!(request_is_v2_only(&flagged_offer));
+        assert!(request_is_v2_only(&flagged_ask));
+        assert_eq!(gate_request(1, &plain), Ok(()));
+        assert_eq!(gate_request(1, &flagged_offer), Err(HubError::NeedsWireV2));
+        assert_eq!(gate_request(1, &flagged_ask), Err(HubError::NeedsWireV2));
+        assert_eq!(gate_request(2, &flagged_offer), Ok(()));
+        assert_eq!(gate_request(2, &flagged_ask), Ok(()));
     }
 }

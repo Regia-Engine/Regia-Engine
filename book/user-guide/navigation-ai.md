@@ -1,7 +1,21 @@
 # Navigation & AI
 
+<!-- index: Navmesh -->
+<!-- index: Navigation agent -->
+<!-- index: Crowd -->
+<!-- index: Off-mesh link -->
+<!-- index: Behavior tree -->
+<!-- index: Perception -->
+<!-- index: Formation -->
+<!-- index: Flow field | see: Navigation agent -->
+
 `regia_nav` builds a navmesh from level geometry and moves agents over it with pathfinding and
-local avoidance. `regia_ai` adds behavior trees and a blackboard for decision-making.
+local avoidance. `regia_ai` adds behavior trees and a blackboard for decision-making. The tier-2
+scope is [spec 22](../../docs/specs/22-tier2.md). Off-mesh links are
+[spec 92](../../docs/specs/92-navmesh-offmesh.md). State trees are
+[spec 38](../../docs/specs/38-state-trees.md). Which stack to call from a game is
+[Choosing a navigation stack](choosing-navigation.md). Goal-oriented planning is
+[GOAP](goap.md).
 
 ## Navmesh generation
 

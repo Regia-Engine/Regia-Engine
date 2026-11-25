@@ -19,7 +19,9 @@ $ regia run
 
 `regia new` writes the project into `my_game/` ([A tour of the template](../user-guide/first-person-template.md)).
 `cargo build` compiles the engine and the game; the first build takes a few minutes, later builds
-only compile your crates. `regia run` cooks the assets and starts the launcher in a window. It
+only compile your crates. `my_game_launcher` is the template's desktop launcher crate: `blank`,
+`first_person`, `third_person` and `top_down` have one, `quick` and `net_game` do not (build those with
+plain `cargo build`). `regia run` cooks the assets and starts the launcher in a window. It
 keeps running until the game quits, so leave this terminal alone.
 
 ## 2. Check it from a second terminal

@@ -1,5 +1,7 @@
 # Sequencer
 
+Panel ids: `shots` and `seq_curves`.
+
 The editor's sequencer is the **Sequence Curves** tab: pick a `SequencePlayer` and one of its
 float or vec3 tracks, edit the curve's keys and tangents, scrub, and open or save the
 `.seq.ron`. Its section strip shows the clip, audio, sub-sequence and video tracks as bars you

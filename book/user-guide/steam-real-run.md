@@ -1,9 +1,18 @@
 # Steam real run: two accounts, two machines
 
+<!-- index: Steam sockets -->
+<!-- index: Lobby -->
+
 One owner session that checks `regia_steam` against a real Steam client (spec 24 § 4). Everything the
 SDK side can prove without Steam is already tested against the mock backend (`cargo test -p regia_steam`);
 this page is only the part that needs real accounts. Credentials stay on the machines: sign in to the Steam
 client yourself, and never put a password, token or Steam Guard code into a file, a log or a command line.
+
+**Status.** The 2026-11-05 versions note (ADR-2828) recorded Steam sockets and lobbies as mock-tested.
+This page is the procedure the owner runs. It is not a record that a real match has been played. A row
+in `docs/specs/24-steam.md` § 4 stays `not run` unless its step is in both logs and the verdict is
+`PASS`. `ignored`, `skipped`, `NOT RUN`, and `INCOMPLETE` are not a pass. Hosting over raw UDP does
+not use this page ([Host a game](../how-to/online/host-a-game.md)).
 
 ## What you need
 

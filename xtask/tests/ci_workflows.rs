@@ -198,3 +198,48 @@ fn the_workflow_parsers_read_block_and_inline_runs() {
     assert!(!ignored("docs/evidence/**", "docs/formats/a.ron"));
     assert!(ignored("README.md", "README.md"));
 }
+
+/// Repository variables follow the project's rename rule (write new, read both): every
+/// `vars.FERRITE_*` a workflow reads is read only beside its `vars.REGIA_*` spelling, and the
+/// `REGIA_` one comes first, so a repository that set only the new names is not ignored.
+#[test]
+fn workflow_variables_read_the_regia_name_and_the_legacy_one() {
+    let dir = root().join(".github/workflows");
+    let entries = std::fs::read_dir(&dir).unwrap_or_else(|e| panic!("reading {}: {e}", dir.display()));
+    let mut checked = 0;
+    for entry in entries.flatten() {
+        let path = entry.path();
+        if path.extension().and_then(|e| e.to_str()) != Some("yml") {
+            continue;
+        }
+        let text =
+            std::fs::read_to_string(&path).unwrap_or_else(|e| panic!("reading {}: {e}", path.display()));
+        for (n, line) in text.lines().enumerate() {
+            if line.trim_start().starts_with('#') {
+                continue;
+            }
+            let mut rest = line;
+            while let Some(at) = rest.find("vars.FERRITE_") {
+                let name: String = rest[at + "vars.FERRITE_".len()..]
+                    .chars()
+                    .take_while(|c| c.is_ascii_alphanumeric() || *c == '_')
+                    .collect();
+                let new = format!("vars.REGIA_{name}");
+                let new_at = line.find(&new);
+                let old_at = line.find(&format!("vars.FERRITE_{name}"));
+                assert!(
+                    new_at.is_some() && new_at < old_at,
+                    "{}:{}: vars.FERRITE_{name} is read without {new} before it: {line}",
+                    path.display(),
+                    n + 1
+                );
+                checked += 1;
+                rest = &rest[at + "vars.FERRITE_".len()..];
+            }
+        }
+    }
+    assert!(
+        checked >= 2,
+        "the nightly GPU job reads two renamed variables; found {checked}"
+    );
+}

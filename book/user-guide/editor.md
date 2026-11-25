@@ -106,7 +106,7 @@ camera: a click in it captures the mouse, Shift+F1 frees it, and closing it stop
 the size (and, off Wayland, the place) the last one had. The **⛶** menu next to it picks the size the
 game renders at in that window: the window's own, 720p, 1080p, a 9:16 or 9:19.5 phone, a 3:4 tablet, or a
 custom size. The picture is scaled to fit with black bars, and clicks land where they would on that screen.
-While the window is open, the viewport shows a note instead of a second copy of the game. See `docs/specs/19-editor.md` and the
+While the window is open, the viewport shows a note instead of a second copy of the game. The toolbar's other controls, pause, step and the Game tabs are on [Play-in-editor](editor-guide/play-in-editor.md). A listen or dedicated session with several clients is the [Net](editor-guide/net.md) tab (panel id `net`), not a match between two machines. See `docs/specs/19-editor.md` and the
 [agent guide's editor page](../agents/editor.md) for the full `editor.*` method surface.
 
 ## Scripts
@@ -213,3 +213,31 @@ names and shows a method's parameters, Up and Down walk the history (kept per pr
 is printed in the log. The main toolbar's **Quick settings** gathers snapping and its steps, the realtime
 viewport, the main viewport's show flags and preview sun, and autosave. Agents use the same features
 through [the status bar, drawer and console methods](../agents/editor-console.md).
+
+<!-- index: Primary window -->
+<!-- index: DCC scene feed -->
+<!-- index: Source plugin -->
+
+## Windows
+
+<!-- index: OS window -->
+
+A game has one primary OS window. `docs/specs/11-platform-and-input.md`: a `Window` component on another entity does not become an OS window. `apply_window_changes` skips a window entity that has no handle (ADR-2252). Closing the primary window asks the app to exit unless the game handles `WindowCloseRequested` itself. Runtime games normally use that one window.
+
+The editor's dock is separate from that limit. Drag a tab out of the dock to float its group. Preference `ui.floating_windows` is `os` or `in_window`. `os` is the default on Linux and Windows and makes the float its own OS window. `in_window` (the default elsewhere, and single-window mode) keeps the float inside the main editor window. A headless editor has no OS windows for floats. A floated window shares the editor's device, theme and worlds. Closing it docks the panels back. A window whose monitor is gone docks back. Where the window system gives no positions (Wayland), the compositor places the window. Details: [Floated panels and OS windows](../agents/editor-os-windows.md).
+
+The Outliner, Content Browser and Inspector can each open further copies: **Window ▸ New Outliner**, **New Content Browser** and **New Inspector**, up to seven besides the original. The tab id is `outliner#1` through `outliner#7`, and the same shape for `content` and `inspector`. Each copy keeps its own search, columns, folder or lock. They are not extra entries in the built-in panel list. The panel ids stay `outliner`, `content` and `inspector`.
+
+**⧉ Play in window** is a second OS window for the game picture during play. It is not a second game `Window` entity. See [Play window](editor-guide/play-window.md).
+
+## DCC scene feed
+
+The live scene feed (spec `docs/specs/60-dcc-scene-feed.md`) lets a content tool stream meshes, transforms and clips into the editor. Cargo feature `dcc-feed` on the `regia` crate is off by default and is not part of a shipping profile. The editor links the feed through `regia_agent`'s `dcc-feed-assets` feature, so the **DCC Feed** tab (panel id `dcc_feed`) is in the editor. The listener still stays off until the project sets `[dcc_feed]` with `enabled = true` in `Regia.toml`. A build compiled without the feature shows "The DCC feed is not in this build." Bake, sessions and the record file are on [DCC Feed](editor-guide/dcc-feed.md).
+
+## Source plugins
+
+An extension is a versioned bundle described by `regia-plugin.toml` (spec `docs/specs/57-plugin-extension-api.md`). Source plugins are built: Rust and content the project compiles in, discovered, ordered and enabled from the [Extensions](editor-guide/extensions.md) tab (panel id `extensions`) or with `plugin.enable`. Enabling changes `Regia.toml`. Code takes effect at the next start. In-process extension code is trusted native code with the editor's privileges. Capabilities are a review aid, not a sandbox.
+
+Dynamic extensions (a library the editor reloads in a development build, **Reload** on that tab) are not what a shipping player loads. This version has no setting that turns them on in a shipped game, and it has no extension registry or marketplace. The manifest can carry publisher and licence fields. Hosting a registry is out of scope for this version.
+
+The keymap, every built-in panel and the chords you can change are in the [editor guide](editor-guide/index.md).

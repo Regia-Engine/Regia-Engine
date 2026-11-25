@@ -1,5 +1,7 @@
 # Selected Object Debug and Visual Log
 
+Panel ids: `selected_debug` and `visual_log`.
+
 Two debugging tabs for gameplay. **Selected Object Debug** shows what the selected object's gameplay systems are doing
 right now: perception, the state-tree path, smart-object claims, navigation waypoints, abilities and effects, as text
 in the tab and as a label in the viewport. **Visual Log** replays the lines and text labels a game recorded per

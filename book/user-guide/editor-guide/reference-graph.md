@@ -1,5 +1,7 @@
 # Reference Graph
 
+Panel id: `reference_graph`.
+
 The **Reference Graph** tab answers "what uses this asset, and what does it use?" as columns:
 the assets that refer to it on the left (referrers), the asset itself in the middle, and what it
 refers to on the right (dependencies), one column per hop. Use it before you delete, move or

@@ -1,5 +1,8 @@
 # Asset registry
 
+<!-- index: Asset registry -->
+<!-- index: Asset tag | see: Asset registry -->
+
 The asset registry answers questions about the project's cooked assets without loading any of
 them: which assets carry a tag, which are textures, what a model depends on, what uses a texture.
 Tools, the editor, agents and game code all read the same file.

@@ -1,9 +1,16 @@
 # Montages, sync groups and motion warping
 
+<!-- index: Montage -->
+<!-- index: Sync group -->
+<!-- index: Motion warping -->
+<!-- index: Anim slot -->
+
 A **montage** is a one-shot action (an attack, a reload, a vault, an emote) that gameplay starts on a character and
 that plays over the character's anim graph. **Sync groups** keep locomotion cycles of different lengths in step while
 they blend. **Motion warping** bends a montage's root motion at runtime so the character lands where the game needs
-it (on the enemy it lunges at, on the ledge it vaults onto). Spec: `docs/specs/17-animation.md` § 4b.
+it (on the enemy it lunges at, on the ledge it vaults onto). Spec: [spec 17](../../docs/specs/17-animation.md) § 4b
+and [spec 34](../../docs/specs/34-montage-extensions.md). A combat procedure that starts a montage from a hit is
+[Combat and abilities](../how-to/play/combat-abilities.md).
 
 ## The montage asset (`.montage.ron`)
 

@@ -148,7 +148,7 @@ fn main() -> ExitCode {
                 },
             });
             app.insert_resource(regia::agent::AgentSettings {
-                project_dir: Some(env!("CARGO_MANIFEST_DIR").into()),
+                project_dir: Some(third_person::assets::project_dir()),
             });
             app.insert_resource(CapturePlan {
                 exit_after_frames: exit_after.unwrap_or(0),

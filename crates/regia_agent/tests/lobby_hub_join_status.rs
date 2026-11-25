@@ -101,15 +101,18 @@ fn lobby_hub_join_status_reports_paths_punches_relays_and_identity_refusals() {
     hub.offer_reach(
         owner,
         lobby,
-        ReachOffer {
-            candidates: vec![Candidate::new(
+        {
+            let mut offer = ReachOffer::default();
+            offer.candidates = vec![Candidate::new(
                 CandidateKind::Host,
                 "10.0.0.2:7777".parse().expect("addr"),
-            )],
-            nat: Some(NatClass::PORT_RESTRICTED),
-            relay: Some(relay),
-            join_code: Some("ABCDEF".into()),
-            ticket: Vec::new(),
+            )];
+            offer.nat = Some(NatClass::PORT_RESTRICTED);
+            offer.relay = Some(relay);
+            offer.join_code = Some("ABCDEF".into());
+            offer.ticket = Vec::new();
+            offer.relay_only = false;
+            offer
         },
         0,
     )
@@ -127,9 +130,10 @@ fn lobby_hub_join_status_reports_paths_punches_relays_and_identity_refusals() {
         hub.ask_reach(
             m,
             lobby,
-            ReachOffer {
-                nat,
-                ..ReachOffer::default()
+            {
+                let mut offer = ReachOffer::default();
+                offer.nat = nat;
+                offer
             },
             0,
         )

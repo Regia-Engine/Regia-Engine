@@ -8044,7 +8044,8 @@ pub const GUIDE_TOPICS: &[GuideTopic] = &[
                (HubHost::publish or NetAgentState::publish_hub): label, sessions, lobbies, listed (public \
                lobbies), invites, generations {directory, presence}, state_bytes, bytes_sent {directory, chat, \
                other}, expired, refused by code, players (member, handle, presence menu|lobby|in_game, lobby when \
-               public; at most 64) and games (listed lobby cards without the session address; at most 64). Ids \
+               public; at most 64), games (listed lobby cards without the session address; at most 64), \
+               relay_allocations, servers_online and draining. Ids \
                are decimal strings. Pass {} or {hub: label}. Errors hub_bad_params, hub_unknown. Hub refusal \
                codes in refused and in HubLobbyBackend::last_error: hub_key_unpinned, hub_key_mismatch, \
                hub_handle_invalid, hub_handle_taken, hub_session_cap, hub_no_session, hub_lobby_cap, \
@@ -8149,7 +8150,9 @@ pub const GUIDE_TOPICS: &[GuideTopic] = &[
         summary: "The regia-lobby-hub process: hub.toml, rate limits, health and lobby.hub_status",
         text: "regia-lobby-hub loads hub.toml and serves until SIGTERM or SIGINT, then drains. It publishes \
                the existing lobby.hub_status report under the label hub (HubProcess::publish). GET /health \
-               returns sessions, lobbies, listed, state_bytes, draining and refused; 503 while draining. \
+               returns sessions, lobbies, listed, state_bytes, draining, refused, relay_allocations and \
+               servers_online; 503 while draining. When relay.enabled is set the same process polls a \
+               relay on relay.port (7812). A migrated v1 file has relay.enabled false. \
                limits.per_address_per_sec and limits.per_identity_per_sec run before the hub core, including \
                before member-data writes. Refusal codes: hub_address_rate_limited, hub_identity_rate_limited, \
                hub_draining. A bad hub.toml field exits 2 as 'field: expected ...'. The server key is created \

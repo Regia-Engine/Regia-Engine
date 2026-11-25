@@ -1,9 +1,33 @@
 # Networking
 
+<!-- index: Raw UDP -->
+<!-- index: Listen server -->
+<!-- index: Client -->
+<!-- index: Content handshake -->
+<!-- index: Steam sockets -->
+<!-- index: QUIC -->
+<!-- index: Relay -->
+<!-- index: Join code -->
+<!-- index: NAT -->
+<!-- index: UPnP -->
+<!-- index: Prediction -->
+<!-- index: Interpolation -->
+<!-- index: Lag compensation -->
+<!-- index: Relevance -->
+<!-- index: Lockstep -->
+<!-- index: Rollback -->
+<!-- index: Reconnect -->
+<!-- index: Host migration -->
+<!-- index: Lobby hub -->
+<!-- index: Network conditioner -->
+
 `regia_net` is client-server networking over UDP with an authoritative server tick (ADR-1600). This page covers
 connections, sessions, input collection and the tools around them, and below, entity replication, client
 prediction and interpolation, which the crate provides (mark entities `Replicated` and let the server replicate them
 rather than sending your own state messages).
+
+The task procedures are [Host a game](../how-to/online/host-a-game.md) and
+[Lockstep and rollback](../how-to/online/lockstep-and-rollback.md). This page is the reference.
 
 ## Modes, transports and finding a game
 
@@ -14,13 +38,20 @@ rather than sending your own state messages).
 - **Sessions.** `NetSessionPlugin` adds the `NetSession` that takes a client from connect through the join handshake,
   level loading and travel to `in_game`, and a server through bans, kicks and reconnects; agents drive it with
   `session.host`, `session.connect` and `session.state`. See [Net session (agents)](../agents/net-session.md).
-- **Transports.** Every layer runs over a datagram socket: `UdpTransport` (raw UDP), the in-memory `LoopbackSocket`
-  for tests, or `regia_steam::SteamSocket`, which carries the same datagrams (at most 2048 bytes each) over Steam's
-  relay network to a Steam id, with NAT traversal and no exposed addresses.
+- **Transports.** Every supported session runs over a datagram socket. **Raw UDP** (`UdpTransport`) is the session
+  transport for a shipped game in this version. The in-memory `LoopbackSocket` is for tests.
+  `regia_steam::SteamSocket` carries the same datagrams (at most 2048 bytes each) over Steam's relay network to a
+  Steam id. Steam sockets are in the tree. The 2026-11-05 versions note (ADR-2828) recorded mock tests. A two-account
+  session is an owner procedure ([Steam real run](steam-real-run.md)). Record a PASS in `docs/specs/24-steam.md` § 4
+  before treating a real match as done. **QUIC is partial.** `regia_net::quic` and a loopback QUIC socket exist, and
+  the packet budgets later on this page describe that socket. v0.5 session scope names raw UDP and Steam sockets.
+  A shipped session uses raw UDP, or the Steam socket path once that owner session is recorded. This guide does not
+  treat QUIC as a supported session transport.
 - **Lobbies and matchmaking.** `LobbyPlugin` adds the `Lobbies` resource: a local in-process backend
-  (`LocalLobbyHub`) for tests and LAN builds, or Steam lobbies through `regia_steam::SteamLobbyPlugin`. Players
-  gather, mark themselves ready, and the owner launches; every member then connects to the published session. See
-  [Net lobbies (agents)](../agents/net-lobbies.md).
+  (`LocalLobbyHub`) for tests and LAN builds, a lobby hub you run, or Steam lobbies through
+  `regia_steam::SteamLobbyPlugin`. Players gather, mark themselves ready, and the owner launches; every member then
+  connects to the published session. Steam lobbies share the mock-tested limit above. The local directory and the
+  lobby hub do not. See [Net lobbies (agents)](../agents/net-lobbies.md).
 - **Content handshake.** A joining client must match the server's protocol version (`version_mismatch`), protocol
   hash (`protocol_mismatch`) and content manifest, the gameplay content and mods (`content_mismatch`, with lines
   such as `mod:speedrun: different`). `session.manifest` shows a process's manifest. Engine-created lobbies carry
@@ -479,7 +510,9 @@ client), so a game that sends each client less (interest management, rate tiers)
 - **Port mapping.** `port_map::try_port_mapping` asks the home router for a public port with PCP, then NAT-PMP,
   then UPnP IGD (`upnp::UpnpClient`; each step takes at most the client's timeout, and discovery only follows an
   answer to its own gateway search). Many routers refuse all three; fall back to the relay. The dedicated server's
-  `--no-port-map` turns the automatic mapping off (`port_map_disabled`). `default_gateway_v4`
+  `--no-port-map` turns the automatic mapping off (`port_map_disabled`). `--relay-only` with `--relay` registers
+  the game port and does not publish the host's address, and it skips the router mapping and the host check.
+  `default_gateway_v4`
   finds the gateway on Linux, Android, Windows and macOS (ADR-8893): the netlink route dump, IP Helper's routing table
   and the `PF_ROUTE` sysctl, no administrator rights. Where the platform hides the table (some Android builds) or there
   is no IPv4 default route, hosting reports `port_map_unavailable`; pass the gateway in yourself.
@@ -608,13 +641,42 @@ cargo run -p regia_net --no-default-features --example net_core_headless
 `regia_audio` or `bevy_ecs`; the core and the example must build without `ecs`; and the core's unit tests and the example's
 two-client session must pass without it. ADR-8501.
 
+### A caller-owned join socket
+
+The same build can use the lobby hub and the relay without handing the game its socket (ADR-10376). These already
+existed behind `ecs` only because the dedicated-server host lived in that feature. They now compile with
+`default-features = false` and no `ecs`:
+
+- **Relay helpers** (`regia_net::server_host`): `JoinTicket`, `RelayRegistrar`, `relay_split`, `JoinPath`, `JoinSocket`
+  and `TestClock`. `HostGame` and `ServerHost` stay behind `ecs`. The ECS host calls the same functions.
+- **Hub reach:** `HubReach` runs a member's `JoinPlan` on a socket it owns. `JoinPlanDriver` runs that plan when the
+  game already owns the socket.
+
+Each frame the game copies what its socket received into `JoinPlanDriver::push_datagram` (a datagram longer than
+`MAX_DATAGRAM_BYTES` is refused whole), calls `advance` with its clock in milliseconds, and sends whatever
+`poll_send` returns. `take_endpoint` then gives the game endpoint a socket on the same queues, the address to
+connect it to, and the `ServerKey` to pin. The key is the one in the owner's ticket from the hub, including when
+the path is the relay. Keep calling `push_datagram` and `poll_send` after that: the endpoint and a relay control
+half that is still running share the caller's socket.
+
+The path is still the hub's order: mapped, then punch, then relay. A mapped plan is ready at once. A relay plan
+sends no connectivity checks. Drive tests with `TestClock` and `HubClock::manual`; do not sleep.
+
+No new agent method and no new error code. A relay ticket that names another key than the plan fails with
+`hub_key_mismatch`. A plan the reach cannot run fails with `hub_reach_invalid`. A join path that fails carries
+that path's existing code: `join_code_invalid`, `join_relay_invalid`, `join_relay_bind_failed`, `join_refused`,
+`join_ticket_invalid`, `join_timeout`, `relay_too_old`, `relay_full`, `relay_no_allocation`. Without `ecs`, read
+`NetServer::status` and `peer_rows` directly. The acceptance test is `cargo test -p regia_net_soak
+--no-default-features --test ecs_free_join`. That package depends on `regia_net` with `default-features = false`.
+`regia_net`'s own test build pulls dev-dependencies that turn `ecs` back on, so it is not the proof.
+
 ## Limits in this phase
 
 - Traffic to every non-loopback peer is encrypted and authenticated by default; loopback stays plain. A client that does not
   pin the server's key is protected from a listener, not from an attacker in the middle. See
   [Net transport encryption](../agents/net-crypto.md).
 - State replication, interpolation and prediction are built (sections below); lag compensation is built too (`regia_net::lagcomp`, `book/agents/net-lag-compensation.md`).
-- A protocol 1 relay client (`encode_bind`) still gets one relayed flow per host address; protocol 2 clients use allocations (above). A join by code does not fall back to a protocol 1 bound flow: it ends with `relay_too_old` (ADR-8183). Candidate checks from the game socket are built (the NAT traversal section above, ADR-8340): host and server-reflexive candidates, paced checks, nomination of the first sealed pair, and the relay allocation when no direct pair completes by 1.5 s. A mapped candidate is added through `nat::CandidateSource` when a port mapping exists; gathering those mappings is a later lane.
+- A protocol 1 relay client (`encode_bind`) still gets one relayed flow per host address; protocol 2 clients use allocations (above). A join by code does not fall back to a protocol 1 bound flow: it ends with `relay_too_old` (ADR-8183). Candidate checks from the game socket are built (the NAT traversal section above, ADR-8340): host and server-reflexive candidates, paced checks, nomination of the first sealed pair, and the relay allocation when no direct pair completes by 1.5 s. A mapped candidate is added through `nat::CandidateSource`. Gathering the mapping is built: `port_map::try_port_mapping` tries PCP, then NAT-PMP, then UPnP IGD, and a dedicated server does this on start unless `--no-port-map` is set. Many routers refuse all three. The relay is the fallback.
 
 ## Replicating entities (specs 70 and 71)
 

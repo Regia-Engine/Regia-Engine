@@ -1,5 +1,9 @@
 # The default look
 
+<!-- index: AgX -->
+<!-- index: Auto exposure -->
+<!-- index: Default look -->
+
 What a frame looks like before a game touches any lighting or post setting, why, and which
 knobs move it. The defaults are physically based: a ~100 000 lux sun, a sky in cd/m², a
 camera exposed in EV100. Get the light levels right and the look follows; most "it looks
@@ -12,7 +16,9 @@ The reference shots are `cargo run --release -p lookdev --bin default_look -- --
 ## What you get by default
 
 `RenderSettings::default()` is the Desktop High profile on a desktop (on a Steam Deck it is `Deck`, on Android
-Mobile High; see [Steam Deck](steam-deck.md)). With Desktop High:
+Mobile High; see [Steam Deck](steam-deck.md)). VeryLow, Medium, Low, Ultra, and the offline
+Cinematic profile are choices a game or the detector makes later. They are not this default.
+With Desktop High:
 
 | Stage | Default | Setting |
 |---|---|---|

@@ -33,8 +33,9 @@ runs before member-data limits.
 Every `regia package --server` copies `regia-lobby-hub` (`.exe` for a Windows package) from beside
 the `regia` binary, writes `hub.toml`, appends a section to `README-server.txt` and writes
 `deploy/regia-hub.service`, whose `ExecStart` is the packaged binary with `--config` and
-`--key-file` (ADR-8891). The package does not build the hub; a missing binary stops the package
-with a message that names the build command. No relay unit is written: Regia has no standalone
+`--key-file` (ADR-8891). Its `TimeoutStopSec` is the 30 second relay drain plus 15 seconds
+(45 s, ADR-10419). The dedicated-server unit stays at 10 seconds. The package does not build the hub; a
+missing binary stops the package with a message that names the build command. No relay unit is written: Regia has no standalone
 relay binary yet. The `--json` object's `lobby_hub` is true for a server package.
 
 ## Verify

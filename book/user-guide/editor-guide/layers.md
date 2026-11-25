@@ -1,5 +1,7 @@
 # Layers
 
+Panel id: `layers`.
+
 The **Layers** tab works with the data layers of the open level: named groups of entities (night
 props, a quest's actors) that a game switches together. In the editor you show, hide, load and
 unload a layer to work on one group at a time, choose which layers new entities join, add the

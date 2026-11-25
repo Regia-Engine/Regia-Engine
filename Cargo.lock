@@ -282,7 +282,7 @@ checksum = "4b46cbb362ab8752921c97e041f5e366ee6297bd428a31275b9fcf1e380f7299"
 
 [[package]]
 name = "anim_lab"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "png 0.18.1",
  "regia_agent",
@@ -404,7 +404,7 @@ dependencies = [
 
 [[package]]
 name = "arena"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "png 0.18.1",
  "regia",
@@ -432,7 +432,7 @@ dependencies = [
 
 [[package]]
 name = "arena_android"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "arena",
  "regia",
@@ -783,7 +783,7 @@ dependencies = [
 
 [[package]]
 name = "audio_lab"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "regia",
  "regia_asset",
@@ -1109,7 +1109,7 @@ dependencies = [
 
 [[package]]
 name = "bike_lab"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "regia_physics",
 ]
@@ -1254,7 +1254,7 @@ dependencies = [
 
 [[package]]
 name = "boot_probe"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "postcard",
  "regia",
@@ -1955,7 +1955,7 @@ checksum = "a31eee39dddec8330830986fcd7625edb5a24ec90ea038215273bbc3adb08ac6"
 
 [[package]]
 name = "crowd_lab"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "regia_animation",
  "regia_asset",
@@ -2148,7 +2148,7 @@ dependencies = [
 
 [[package]]
 name = "dedicated_server"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "regia",
  "regia_scene",
@@ -2199,7 +2199,7 @@ dependencies = [
 
 [[package]]
 name = "destruction_lab"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "png 0.18.1",
  "regia",
@@ -2708,7 +2708,7 @@ dependencies = [
 
 [[package]]
 name = "ext_fixture"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "regia_app",
  "regia_dylib",
@@ -2787,7 +2787,7 @@ dependencies = [
 
 [[package]]
 name = "flight_lab"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "regia",
  "regia_agent",
@@ -3462,7 +3462,7 @@ checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
 
 [[package]]
 name = "hello_window"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "regia",
  "tracing",
@@ -3471,7 +3471,7 @@ dependencies = [
 
 [[package]]
 name = "hello_window_android"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "hello_window",
  "regia",
@@ -3491,7 +3491,7 @@ checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
 name = "hot_fixture"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "regia_app",
  "regia_dylib",
@@ -3518,7 +3518,7 @@ checksum = "6dbf3de79e51f3d586ab4cb9d5c3e2c14aa28ed23d180cf89b4df0454a69cc87"
 
 [[package]]
 name = "hud_draw2d"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "regia",
  "regia_app",
@@ -3857,7 +3857,7 @@ dependencies = [
 
 [[package]]
 name = "input_lab"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "regia_app",
  "regia_core",
@@ -4233,7 +4233,7 @@ dependencies = [
 
 [[package]]
 name = "lightmap_device"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "regia",
  "regia_core",
@@ -4245,7 +4245,7 @@ dependencies = [
 
 [[package]]
 name = "lightmap_device_android"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "lightmap_device",
  "regia",
@@ -4330,7 +4330,7 @@ dependencies = [
 
 [[package]]
 name = "lookdev"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "glam 0.33.12",
  "libc",
@@ -4752,7 +4752,7 @@ dependencies = [
 
 [[package]]
 name = "mm_locomotion"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "regia_agent",
  "regia_animation",
@@ -4887,7 +4887,7 @@ dependencies = [
 
 [[package]]
 name = "nav_world_lab"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "regia",
  "regia_agent",
@@ -4934,7 +4934,7 @@ dependencies = [
 
 [[package]]
 name = "net_game"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "crossbeam-channel",
  "png 0.18.1",
@@ -5839,7 +5839,7 @@ dependencies = [
 
 [[package]]
 name = "physics_lab"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "regia",
  "regia_agent",
@@ -6172,7 +6172,7 @@ dependencies = [
 
 [[package]]
 name = "procgen_biomes"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "procgen_common",
  "regia_agent",
@@ -6187,7 +6187,7 @@ dependencies = [
 
 [[package]]
 name = "procgen_common"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "regia",
  "regia_agent",
@@ -6202,7 +6202,7 @@ dependencies = [
 
 [[package]]
 name = "procgen_open_world"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "procgen_common",
  "regia_app",
@@ -6217,7 +6217,7 @@ dependencies = [
 
 [[package]]
 name = "procgen_roads"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "procgen_common",
  "regia_app",
@@ -6231,7 +6231,7 @@ dependencies = [
 
 [[package]]
 name = "product_viewer"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "blake3",
  "egui",
@@ -6260,7 +6260,7 @@ dependencies = [
 
 [[package]]
 name = "product_viewer_android"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "product_viewer",
 ]
@@ -6805,7 +6805,7 @@ checksum = "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4"
 
 [[package]]
 name = "regia"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "crossbeam-channel",
  "regia_2d",
@@ -6845,7 +6845,7 @@ dependencies = [
 
 [[package]]
 name = "regia_2d"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "bytemuck",
  "png 0.18.1",
@@ -6866,7 +6866,7 @@ dependencies = [
 
 [[package]]
 name = "regia_agent"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "blake3",
  "cosmic-text",
@@ -6934,7 +6934,7 @@ dependencies = [
 
 [[package]]
 name = "regia_ai"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "regia_app",
  "regia_asset",
@@ -6957,7 +6957,7 @@ dependencies = [
 
 [[package]]
 name = "regia_animation"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "postcard",
  "regia_app",
@@ -6974,7 +6974,7 @@ dependencies = [
 
 [[package]]
 name = "regia_app"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "criterion",
  "regia_core",
@@ -6985,7 +6985,7 @@ dependencies = [
 
 [[package]]
 name = "regia_asset"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "blake3",
  "ktx2",
@@ -7015,7 +7015,7 @@ dependencies = [
 
 [[package]]
 name = "regia_asset_pipeline"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "anyhow",
  "base64 0.22.1",
@@ -7085,7 +7085,7 @@ dependencies = [
 
 [[package]]
 name = "regia_audio"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "cpal",
  "crossbeam-channel",
@@ -7109,7 +7109,7 @@ dependencies = [
 
 [[package]]
 name = "regia_cli"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "anyhow",
  "base64 0.22.1",
@@ -7171,7 +7171,7 @@ dependencies = [
 
 [[package]]
 name = "regia_configurator"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "blake3",
  "regex",
@@ -7181,7 +7181,7 @@ dependencies = [
 
 [[package]]
 name = "regia_core"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "android_logger",
  "bevy_tasks",
@@ -7206,7 +7206,7 @@ dependencies = [
 
 [[package]]
 name = "regia_crash"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "rcgen",
  "regia_app",
@@ -7224,7 +7224,7 @@ dependencies = [
 
 [[package]]
 name = "regia_detsim"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "glam 0.33.12",
  "libc",
@@ -7239,7 +7239,7 @@ dependencies = [
 
 [[package]]
 name = "regia_dlss"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "ash",
  "bindgen",
@@ -7252,14 +7252,14 @@ dependencies = [
 
 [[package]]
 name = "regia_dylib"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "regia",
 ]
 
 [[package]]
 name = "regia_ecs"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "bevy_ecs",
  "bevy_reflect",
@@ -7275,7 +7275,7 @@ dependencies = [
 
 [[package]]
 name = "regia_editor"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "blake3",
  "crossbeam-channel",
@@ -7342,7 +7342,7 @@ dependencies = [
 
 [[package]]
 name = "regia_fluid"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "bytemuck",
  "glam 0.33.12",
@@ -7359,7 +7359,7 @@ dependencies = [
 
 [[package]]
 name = "regia_framework"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "blake3",
  "criterion",
@@ -7403,7 +7403,7 @@ dependencies = [
 
 [[package]]
 name = "regia_gen"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "blake3",
  "regia_asset",
@@ -7416,7 +7416,7 @@ dependencies = [
 
 [[package]]
 name = "regia_input"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "gilrs",
  "regia_app",
@@ -7433,7 +7433,7 @@ dependencies = [
 
 [[package]]
 name = "regia_looks"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "bytemuck",
  "glam 0.33.12",
@@ -7448,7 +7448,7 @@ dependencies = [
 
 [[package]]
 name = "regia_macros"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -7457,7 +7457,7 @@ dependencies = [
 
 [[package]]
 name = "regia_matgraph"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "naga",
  "png 0.18.1",
@@ -7478,7 +7478,7 @@ dependencies = [
 
 [[package]]
 name = "regia_media"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "crossbeam-channel",
  "lewton",
@@ -7504,7 +7504,7 @@ dependencies = [
 
 [[package]]
 name = "regia_nav"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "regia_app",
  "regia_core",
@@ -7522,7 +7522,7 @@ dependencies = [
 
 [[package]]
 name = "regia_nav_det"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "regia_detsim",
  "regia_world_geom",
@@ -7534,7 +7534,7 @@ dependencies = [
 
 [[package]]
 name = "regia_net"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "blake3",
  "criterion",
@@ -7565,7 +7565,7 @@ dependencies = [
 
 [[package]]
 name = "regia_net_soak"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "glam 0.33.12",
  "regia_core",
@@ -7580,7 +7580,7 @@ dependencies = [
 
 [[package]]
 name = "regia_physics"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "glam 0.33.12",
  "rapier2d",
@@ -7601,7 +7601,7 @@ dependencies = [
 
 [[package]]
 name = "regia_pick"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "regia_asset",
  "regia_core",
@@ -7614,7 +7614,7 @@ dependencies = [
 
 [[package]]
 name = "regia_platform"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "accesskit",
  "accesskit_android",
@@ -7641,7 +7641,7 @@ dependencies = [
 
 [[package]]
 name = "regia_procgen"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "bevy_tasks",
  "blake3",
@@ -7666,7 +7666,7 @@ dependencies = [
 
 [[package]]
 name = "regia_pt"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "bytemuck",
  "naga",
@@ -7692,7 +7692,7 @@ dependencies = [
 
 [[package]]
 name = "regia_quick"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "bytemuck",
  "cosmic-text",
@@ -7714,7 +7714,7 @@ dependencies = [
 
 [[package]]
 name = "regia_release_chunks"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "blake3",
  "regia_core",
@@ -7729,7 +7729,7 @@ dependencies = [
 
 [[package]]
 name = "regia_render"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "bevy_mikktspace",
  "blake3",
@@ -7766,7 +7766,7 @@ dependencies = [
 
 [[package]]
 name = "regia_rules"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "regia_detsim",
  "serde",
@@ -7777,7 +7777,7 @@ dependencies = [
 
 [[package]]
 name = "regia_scene"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "blake3",
  "postcard",
@@ -7795,7 +7795,7 @@ dependencies = [
 
 [[package]]
 name = "regia_script_lua"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "libc",
  "mlua",
@@ -7817,7 +7817,7 @@ dependencies = [
 
 [[package]]
 name = "regia_steam"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "regia_agent",
  "regia_app",
@@ -7842,7 +7842,7 @@ dependencies = [
 
 [[package]]
 name = "regia_telemetry"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "lz4_flex",
  "regia_app",
@@ -7862,7 +7862,7 @@ dependencies = [
 
 [[package]]
 name = "regia_templates"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "png 0.18.1",
  "toml",
@@ -7870,7 +7870,7 @@ dependencies = [
 
 [[package]]
 name = "regia_terrain"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "blake3",
  "bytemuck",
@@ -7900,7 +7900,7 @@ dependencies = [
 
 [[package]]
 name = "regia_test_utils"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "anyhow",
  "glam 0.33.12",
@@ -7930,7 +7930,7 @@ dependencies = [
 
 [[package]]
 name = "regia_ui"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "accesskit",
  "accesskit_consumer 0.36.0",
@@ -7966,7 +7966,7 @@ dependencies = [
 
 [[package]]
 name = "regia_vfx"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "bytemuck",
  "png 0.18.1",
@@ -7988,7 +7988,7 @@ dependencies = [
 
 [[package]]
 name = "regia_viewer"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "bytemuck",
  "glam 0.33.12",
@@ -8001,7 +8001,7 @@ dependencies = [
 
 [[package]]
 name = "regia_viewer_pack"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "blake3",
  "flate2",
@@ -8017,7 +8017,7 @@ dependencies = [
 
 [[package]]
 name = "regia_viewer_view"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "glam 0.33.12",
  "serde",
@@ -8026,7 +8026,7 @@ dependencies = [
 
 [[package]]
 name = "regia_web"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "glam 0.33.12",
  "js-sys",
@@ -8046,7 +8046,7 @@ dependencies = [
 
 [[package]]
 name = "regia_world"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "blake3",
  "crossbeam-channel",
@@ -8068,7 +8068,7 @@ dependencies = [
 
 [[package]]
 name = "regia_world_geom"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "blake3",
  "libm",
@@ -8084,7 +8084,7 @@ dependencies = [
 
 [[package]]
 name = "regia_xess"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "ash",
  "bindgen",
@@ -8097,7 +8097,7 @@ dependencies = [
 
 [[package]]
 name = "regia_xr"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "bytemuck",
  "regia_app",
@@ -8115,7 +8115,7 @@ dependencies = [
 
 [[package]]
 name = "render_lab"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "glam 0.33.12",
  "image",
@@ -8643,7 +8643,7 @@ checksum = "f8fadd59c855ef2080decdef8ff161eb6661b86933c9d82e5ba29dc602a55aba"
 
 [[package]]
 name = "showcase"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "image",
  "png 0.18.1",
@@ -8693,7 +8693,7 @@ dependencies = [
 
 [[package]]
 name = "sim_bridge"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "regia",
  "regia_agent",
@@ -8715,7 +8715,7 @@ dependencies = [
 
 [[package]]
 name = "sim_bridge_android"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "regia",
  "sim_bridge",
@@ -8802,7 +8802,7 @@ dependencies = [
 
 [[package]]
 name = "sky_lab"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "png 0.18.1",
  "regia_render",
@@ -9037,7 +9037,7 @@ checksum = "ae139f051204a4af015d4f0ed3a1f7a51020d03a44c7cf249168c543d88131e9"
 
 [[package]]
 name = "stream_world"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "image",
  "regia",
@@ -9357,7 +9357,7 @@ dependencies = [
 
 [[package]]
 name = "terrain_lab"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "png 0.18.1",
  "regia_asset",
@@ -9379,7 +9379,7 @@ dependencies = [
 
 [[package]]
 name = "third_person"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "gltf",
  "png 0.18.1",
@@ -9901,7 +9901,7 @@ dependencies = [
 
 [[package]]
 name = "ui_gallery"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "crossbeam-channel",
  "image",
@@ -10135,7 +10135,7 @@ checksum = "f1bddf1187be692e79c5ffeab891132dfb0f236ed36a43c7ed39f1165ee20191"
 
 [[package]]
 name = "vehicle_lab"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "png 0.18.1",
  "regia",
@@ -10185,7 +10185,7 @@ checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 
 [[package]]
 name = "vfx_lab"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "glam 0.33.12",
  "png 0.18.1",
@@ -10205,7 +10205,7 @@ dependencies = [
 
 [[package]]
 name = "vfx_lab_android"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "regia",
  "vfx_lab",
@@ -11259,7 +11259,7 @@ checksum = "ec7a2a501ed189703dba8b08142f057e887dfc4b2cc4db2d343ac6376ba3e0b9"
 
 [[package]]
 name = "xtask"
-version = "0.7.0"
+version = "0.7.2"
 dependencies = [
  "anyhow",
  "bevy_ecs",

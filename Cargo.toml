@@ -5,7 +5,7 @@ members = ["crates/*", "xtask", "samples/*", "samples/*/android"]
 exclude = ["crates/regia_templates/templates", "vendor/lewton", "vendor/kira", "extensions/hello_panel"]
 
 [workspace.package]
-version = "0.7.0"
+version = "0.7.2"
 edition = "2024"
 rust-version = "1.98"
 license = "MPL-2.0"

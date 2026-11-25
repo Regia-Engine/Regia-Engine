@@ -578,6 +578,7 @@ fn a_create_and_list_flood_from_one_and_many_connections_stays_bounded() {
     let open = HubLimits {
         per_address_per_sec: u32::MAX,
         per_identity_per_sec: u32::MAX,
+        ..HubLimits::default()
     };
     let f = flood(Some(open));
     let report = &f.report;

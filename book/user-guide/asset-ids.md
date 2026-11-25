@@ -1,5 +1,8 @@
 # Asset ids for sources not in version control
 
+<!-- index: Asset id -->
+<!-- index: .assetids.ron | see: Asset id -->
+
 Every source asset gets a stable id the first time it is cooked; the id is stored in the source's
 `.meta` sidecar, and levels, materials and paks refer to the asset by it. Many teams keep large
 binaries (textures, glTF files) out of version control and fetch them from a store, and their

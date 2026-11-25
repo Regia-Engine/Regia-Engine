@@ -1,5 +1,7 @@
 # Size Map
 
+Panel id: `size_map`.
+
 The **Size Map** tab draws what an asset, or a set of assets, costs: every asset the selection
 reaches is a rectangle in a treemap whose area is its cooked size. Use it to find the one
 texture that makes a level heavy, and to see how many bytes deleting the selection would free. The

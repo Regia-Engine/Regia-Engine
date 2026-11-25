@@ -1,5 +1,9 @@
 # The Bake panel
 
+<!-- index: Bake panel -->
+<!-- index: Baked GI -->
+<!-- index: FGIV -->
+
 The **Bake** tab (bottom dock, next to Kit) bakes indirect light for a part of the level into a `.fgiv` volume. You
 choose a box, a quality and press **Bake**. This is the same bake as `regia bake-gi`
 ([Baking GI from meshes](../agents/baked-gi-bake.md)); the panel writes the description for you.
@@ -43,3 +47,9 @@ settings (`look.baked_gi`) or tick **Name the volume in the level when done** an
   hand.
 - The box has number fields but no drag handles in the viewport yet.
 - An agent can do all of this: [Baking from the editor](../agents/baked-gi-editor.md).
+
+The volume is a probe bake (`regia_pt` writes it; the panel shells out to `regia bake-gi`). It is
+not a lightmap. A lightmap is a per-texel `.flmap` from `regia bake-lightmaps`, named in
+`look.lightmap`. The path tracer that produces both is an offline tool. It does not draw the
+game frame. How the two sit next to live probes is in
+[Light a level](../how-to/picture/light-a-level.md).

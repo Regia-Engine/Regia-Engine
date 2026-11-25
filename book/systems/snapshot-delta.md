@@ -1,11 +1,18 @@
 # Snapshot delta codec
 
+<!-- index: Snapshot delta -->
+<!-- index: Quantization -->
+
 `regia_net::snapshot_delta` is a standalone, schema-driven codec for sending world state as
-quantised snapshots: a full snapshot first, then per-entity deltas against the last snapshot the
+quantized snapshots: a full snapshot first, then per-entity deltas against the last snapshot the
 receiver acknowledged. It is a generic engine feature, independent of the ECS replication in
 `regia_net::replication`: use it when you already have (or want) plain snapshot values — replay
 streams, state-sync prototypes, tools, lockstep-adjacent state broadcasts — and do not want to
-mark components for replication.
+mark components for replication. When to choose it over lockstep or ECS replication is
+[Lockstep and rollback](../how-to/online/lockstep-and-rollback.md).
+
+The Rust type is spelled `Vec3Quantised`. The error helper is spelled
+`FieldKind::max_quantisation_error`. Prose on this page uses the US spelling.
 
 You describe the per-entity state once as a `SnapshotSchema`, hand whole `WorldSnapshot`s to a
 `SnapshotEncoder`, and get back one self-framing packet per call. The peer feeds packets to a
@@ -22,15 +29,15 @@ never as silent corruption.
 | `Bool` | `Bool(bool)` | 1 bit | exact |
 | `U8` / `U16` / `U32` | `U8` / `U16` / `U32` | 8 / 16 / 32 bits | exact |
 | `I32` | `I32(i32)` | 8–40 bits | zig-zag varint; small magnitudes stay small |
-| `Float { min, max, bits }` | `F32(f32)` | `bits` (1–32) | uniform quantisation over `[min, max]`; error at most half a step plus `f32` rounding (`FieldKind::max_quantisation_error`) |
-| `Vec3Quantised { min, max, bits }` | `Vec3(Vec3)` | 3 × `bits` | each axis quantised over its own range |
+| `Float { min, max, bits }` | `F32(f32)` | `bits` (1–32) | uniform quantization over `[min, max]`; error at most half a step plus `f32` rounding (`FieldKind::max_quantisation_error`) |
+| `Vec3Quantised { min, max, bits }` | `Vec3(Vec3)` | 3 × `bits` | each axis quantized over its own range |
 | `QuatSmallestThree { bits }` | `Quat(Quat)` | 2 + 3 × `bits` | dropped largest component rebuilt from the unit norm |
 | `Enum { variants }` | `Enum(u32)` | smallest width holding all variants | discriminants must be below `variants` |
 
-Values are quantised **before** comparison, so a change smaller than one quantisation step is not
+Values are quantized **before** comparison, so a change smaller than one quantization step is not
 a change: the per-entity change mask only names fields whose wire bits differ. Non-finite floats
 clamp to the nearer end of their range and a zero or non-finite quaternion travels as the identity,
-matching the crate's replication codec — degenerate input is defined behaviour, never an error and
+matching the crate's replication codec — degenerate input is defined behavior, never an error and
 never a panic. `SnapshotSchema::quantize_snapshot` (and `quantize_value`) show exactly what a
 receiver will reconstruct, which is what tests should compare against.
 
@@ -148,7 +155,7 @@ every packet, low-priority ones wait, so raise a waiting entity's priority over 
 accumulator) when that matters. A budget too small for even an empty packet returns
 `SnapshotError::BudgetTooSmall` and consumes no sequence number.
 
-## Wire format and failure behaviour
+## Wire format and failure behavior
 
 ```text
 packet  := magic u8 | version u8 | total_len u32le | crc32 u32le | body

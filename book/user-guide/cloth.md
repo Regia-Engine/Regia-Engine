@@ -1,5 +1,10 @@
 # Cloth and ropes
 
+<!-- index: Cloth -->
+<!-- index: Rope -->
+<!-- index: Soft body -->
+<!-- index: XPBD -->
+
 `regia_physics::cloth` is a small, deterministic CPU solver for flags, banners, capes, nets and
 ropes. It uses extended position-based dynamics (XPBD): particles joined by distance and bending
 constraints, each with a compliance (inverse stiffness), stepped at a fixed rate with substeps.

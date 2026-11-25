@@ -1,7 +1,23 @@
 # Animation
 
+<!-- index: Animation -->
+<!-- index: Anim graph -->
+<!-- index: Animation clip -->
+<!-- index: Root motion -->
+<!-- index: Foot IK -->
+<!-- index: Retargeting -->
+<!-- index: Ragdoll -->
+<!-- index: Spring bone -->
+<!-- index: Inertialization | see: Anim graph -->
+
 `regia_animation` imports glTF clips, plays skeletal animation, and runs **anim graphs** —
-state machines, blend spaces and layers that decide what plays.
+state machines, blend spaces and layers that decide what plays. The model is
+[spec 17](../../docs/specs/17-animation.md). One-shot actions are
+[Montages](montages.md) ([spec 34](../../docs/specs/34-montage-extensions.md)).
+Runtime motion matching is [Motion matching](motion-matching.md)
+([spec 52](../../docs/specs/52-motion-matching.md)). Crowd retargeting is
+[spec 85](../../docs/specs/85-retarget-crowds.md). A walking character that
+consumes `CharacterState` is [Move a character](../how-to/play/character.md).
 
 ## Importing clips
 

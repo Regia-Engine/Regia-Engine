@@ -1,6 +1,11 @@
 # Net prediction (agents)
 
+<!-- index: Prediction -->
+<!-- index: Reconciliation | see: Prediction -->
+<!-- index: Rollback -->
+
 Client prediction and server reconciliation in `regia_net::predict` (spec 73, ADR-1793). Guide topic `net-prediction`.
+When to use prediction instead of lockstep is [Lockstep and rollback](../how-to/online/lockstep-and-rollback.md).
 With a 100 ms round trip, a client that waits for the server before moving its own character feels broken. Prediction
 lets the owning client simulate its own entities at once from its own input, while the server stays the authority.
 

@@ -380,6 +380,9 @@ pub struct JoinPath<S> {
     intro: Option<Vec<u8>>,
     /// The relay answered the introduction `VersionTooNew`: `Lookup` only.
     intro_refused: bool,
+    /// Relay-only ([`Self::relay_first`], spec 89 § 16.4): gather and send no local candidates,
+    /// and do not start or answer connectivity checks.
+    hide_candidates: bool,
     /// The connectivity checks, once the relay introduced both sides.
     agent: Option<CheckAgent>,
     /// This side as the relay saw it.
@@ -456,6 +459,7 @@ impl<S: DatagramSocket> JoinPath<S> {
             local: Vec::new(),
             intro: None,
             intro_refused: false,
+            hide_candidates: false,
             agent: None,
             observed: None,
             nominate_sent: false,
@@ -470,8 +474,13 @@ impl<S: DatagramSocket> JoinPath<S> {
     /// The relay at once (a broker that knows no direct pair can work, `lobby::hub::join`): no
     /// introduction and no connectivity checks, the allocation starts with the direct attempt and
     /// wins as soon as it is confirmed.
+    ///
+    /// This is also the member path of a relay-only plan (spec 89 § 16.4, ADR-10391). Local
+    /// candidates are not gathered and not sent. A punch introduction is not sent, and a
+    /// connectivity check is not answered.
     pub fn relay_first(mut self) -> Self {
         self.intro_refused = true;
+        self.hide_candidates = true;
         self.race_start_ms = 0;
         self.fallback_ms = 0;
         self
@@ -618,6 +627,9 @@ impl<S: DatagramSocket> JoinPath<S> {
     }
 
     fn on_check(&mut self, n: usize, buf: &[u8], from: SocketAddr, now_ms: u64) {
+        if self.hide_candidates {
+            return;
+        }
         let (Some(agent), Some(check)) = (self.agent.as_mut(), decode_check(&buf[..n])) else {
             return;
         };
@@ -751,7 +763,7 @@ impl<S: DatagramSocket> JoinPath<S> {
                     };
                     self.accept_ticket(ticket, intro.peer, intro.bind_key, version, now_ms);
                 }
-                if self.phase == JoinRoute::Direct {
+                if self.phase == JoinRoute::Direct && !self.hide_candidates {
                     self.start_checks(&intro, now_ms);
                 }
             }
@@ -831,7 +843,7 @@ impl<S: DatagramSocket> JoinPath<S> {
             }
             return;
         }
-        if self.lookups == 0 && self.intro.is_none() {
+        if self.lookups == 0 && self.intro.is_none() && !self.hide_candidates {
             let base = self.control.local_addr().unwrap_or(self.relay);
             self.local = gather(&mut self.sources, base, now_ms);
             self.intro = encode_introduce(&self.code, &self.local);

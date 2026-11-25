@@ -82,20 +82,35 @@ picks one at Question 4), and say that you will ask about six questions.
 
    **(Question 4b · client)**, only for 2 and 3 when you cannot tell which assistant app you run in.
 5. **(Question 5 of 6 · template)** `regia new --help` lists the templates (`blank`, `first_person`,
-   `third_person`, `top_down`, `quick`, `net-game`). Default `first_person`.
+   `third_person`, `top_down`, `quick`, `net-game`). `quick` is one Cargo crate with one `main.rs`:
+   it uses `cargo build` and `cargo run`, and it does not open in the editor. Default `first_person`.
 6. **(Question 6 of 6 · project)** Name (default `My Game`) and projects folder (default `~/RegiaProjects`).
 
 Create the projects folder if it does not exist, then the project:
-`regia new "My Game" --template first_person --path ~/RegiaProjects`. Warm the build
-**(Consent · warm_build)**, saying it compiles the game crates first: `cargo build -p my_game_launcher` in the
-project (the crate is the snake_case name plus `_launcher`). Run it once with `regia run`, then open the editor with
-`regia editor`.
+`regia new "My Game" --template first_person --path ~/RegiaProjects`. Then branch by template:
 
-Modes 2 and 3 **(Consent · connect)**: write the editor connection into the game project only, with absolute
-paths: for Claude Code, `<project>/.mcp.json` in the shape of `dist/mcp/regia.mcp.json.example`; for any other
-client, the command line `<regia> mcp --project <project>` in its MCP settings (or `--http` for a client that cannot
-start processes). Then say: "I wrote the editor connection into your project. Start a new session of your assistant
-in `<project>` and approve the `regia` server when it asks." In that session, check the link with `agent.hello`.
+- `quick`: warm the build **(Consent · warm_build)**, saying it compiles the app crate first:
+  `cargo build` in the project. Run it once with `cargo run`. Quick apps are one crate with no
+  launcher crate or editor project, so skip `regia run`, `regia editor` and the MCP setup below;
+  point the user at `book/user-guide/quick-start.md`.
+- `net-game`: warm the build **(Consent · warm_build)**, saying it compiles the game crates first:
+  plain `cargo build` in the project (its default members are the game and the client; it has no
+  launcher crate, so `regia run` does not apply). Start the server and a client with the
+  `cargo run -p <snake_case name>_server` and `_client` lines of its `README.md`, then open the
+  editor with `regia editor`.
+- `blank`, `first_person`, `third_person`, `top_down` (the templates with a launcher crate): warm
+  the build **(Consent · warm_build)**, saying it compiles the game crates first:
+  `cargo build -p <snake_case name>_launcher` in the project. Run it once with `regia run`, then
+  open the editor with `regia editor`.
+
+Modes 2 and 3 with any non-`quick` template **(Consent · connect)**: write the editor connection
+into the game project only, with absolute paths: for Claude Code, `<project>/.mcp.json` in the
+shape of `dist/mcp/regia.mcp.json.example`; for any other client, the command line `<regia> mcp
+--project <project>` in its MCP settings (or `--http` for a client that cannot start processes).
+Then say: "I wrote the editor connection into your project. Start a new session of your assistant
+in `<project>` and approve the `regia` server when it asks." In that session, check the link with
+`agent.hello`. For `quick`, say that this first-project flow stays in local-first mode and
+recommend a full project template when the user wants editor-connected work.
 
 Default engine folders: Linux and macOS `~/Regia/regia-engine`, Windows `%LOCALAPPDATA%\Regia\e` (short: deep build
 paths). Every project refers to the engine folder by path, so it must stay where it is.

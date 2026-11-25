@@ -1,5 +1,9 @@
 # Continuous collision detection (CCD queries)
 
+<!-- index: Continuous collision detection -->
+<!-- index: Swept CCD -->
+<!-- index: Time of impact -->
+
 `regia_physics::ccd` answers one question without a physics world: two convex shapes
 move from pose A to pose B over one step — do they touch, and if so, when and where?
 Use it for projectiles and other fast movers that a discrete overlap test would let
@@ -7,6 +11,14 @@ tunnel through thin geometry, for kinematic sweeps, and for placement or probe c
 in tools. For simulated bodies, rapier's own CCD (`RigidBody::ccd`) still applies,
 and the opt-in `SweptCcd` component runs this module's angular sweep inside the step
 (see "Swept CCD in the step" below).
+
+The module is part of [spec 15](../../docs/specs/15-physics.md). Rapier's own CCD
+(`RigidBody { ccd: true, .. }`) sweeps a fast body against the other bodies' end-of-step
+poses. Two fast bodies closing on each other can still pass through (spec 15 records this
+limit). `SweptCcd` is the opt-in that sweeps both sides of a pair, including two bullets.
+The agent method `physics.time_of_impact` runs the same convex sweep on demand
+([Physics: time of impact](../agents/physics-time-of-impact.md)). Error strings from
+`ToiFailure::code()` are lowercase words such as `non_finite_input` and `degenerate_motion`.
 
 ## The query
 

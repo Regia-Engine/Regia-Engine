@@ -6,6 +6,25 @@ use std::process::ExitCode;
 use regia::prelude::*;
 use ui_gallery::gallery::UiGallery;
 
+/// Project directory of this sample, resolved at runtime (ADR-10370).
+///
+/// `cargo run` exports `CARGO_MANIFEST_DIR`. A binary under `target/<profile>`
+/// walks up to `samples/ui_gallery`. A packaged game finds neither and returns
+/// `None`. The compile-time `env!("CARGO_MANIFEST_DIR")` is not remapped by rustc.
+fn sample_project_dir() -> Option<std::path::PathBuf> {
+    if let Some(dir) = std::env::var_os("CARGO_MANIFEST_DIR") {
+        return Some(dir.into());
+    }
+    let root = std::env::current_exe()
+        .ok()?
+        .parent()?
+        .parent()?
+        .parent()?
+        .to_path_buf();
+    let project = root.join("samples").join("ui_gallery");
+    project.is_dir().then_some(project)
+}
+
 fn main() -> ExitCode {
     let exit = regia::run_with(UiGallery, |app| {
         app.insert_resource(WindowSettings {
@@ -15,7 +34,7 @@ fn main() -> ExitCode {
             },
         });
         app.insert_resource(regia::agent::AgentSettings {
-            project_dir: Some(env!("CARGO_MANIFEST_DIR").into()),
+            project_dir: sample_project_dir(),
         });
     });
     match exit {

@@ -1,5 +1,7 @@
 # Problems
 
+Panel id: `problems`.
+
 The **Problems** tab lists what the asset validators found: a missing reference, a bad name, a
 texture over its size limit, an orphaned asset, and the rules of the project's
 `config/validation.ron`. It is the one list a validation run, a level save and an agent all fill.

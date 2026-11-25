@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MPL-2.0
 // The scripted vendor binding's two compute passes (ADR-2679, upscaler/vendor/scripted.rs).
 //
 // cs_capture copies what the binding was handed (color, motion, depth, reactive mask) into a

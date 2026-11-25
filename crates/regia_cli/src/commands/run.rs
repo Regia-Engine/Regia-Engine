@@ -52,6 +52,42 @@ pub struct RunArgs {
     pub game_args: Vec<String>,
 }
 
+/// The `[package] name` of the manifest at `path`, when it has one.
+fn package_name(path: &Path) -> Option<String> {
+    let value: toml::Value = toml::from_str(&std::fs::read_to_string(path).ok()?).ok()?;
+    Some(value.get("package")?.get("name")?.as_str()?.to_string())
+}
+
+/// What to run instead when `regia run` (or, for a quick app, `regia editor`) cannot run `dir`
+/// (ADR-10616): a `quick` app (a Cargo package that depends on `regia`, with no `Regia.toml`)
+/// builds and runs with `cargo`, and a `net_game` project (a `Regia.toml`, no `launcher/`, a
+/// `server/` and a `client/` crate) runs its server and client crates. `None` for anything else.
+pub(crate) fn not_runnable_hint(dir: &Path) -> Option<String> {
+    if !regia_core::brand::is_project_root(dir) {
+        let text = std::fs::read_to_string(dir.join("Cargo.toml")).ok()?;
+        let value: toml::Value = toml::from_str(&text).ok()?;
+        let depends_on_regia = value
+            .get("dependencies")
+            .and_then(|deps| deps.get("regia"))
+            .is_some();
+        return (value.get("package").is_some() && depends_on_regia).then(|| {
+            "it looks like a `quick` app (one Cargo crate, no Regia.toml): build and run it with \
+             `cargo build` and `cargo run` in that folder. `regia run` and `regia editor` need a project \
+             from the blank, first_person, third_person, top_down or net_game template"
+                .to_string()
+        });
+    }
+    if dir.join("launcher/Cargo.toml").is_file() {
+        return None;
+    }
+    let server = package_name(&dir.join("server/Cargo.toml"))?;
+    let client = package_name(&dir.join("client/Cargo.toml"))?;
+    Some(format!(
+        "it is a `net_game` project, which has no launcher crate: build it with `cargo build`, then \
+         run `cargo run -p {server}` and `cargo run -p {client}` as its README.md says"
+    ))
+}
+
 /// The launcher's package name from `launcher/Cargo.toml`.
 pub(crate) fn launcher_package(project: &Path) -> Result<String> {
     let manifest = project.join("launcher").join("Cargo.toml");
@@ -238,6 +274,9 @@ fn prepare(args: &RunArgs) -> Result<Prepared> {
         .project
         .canonicalize()
         .with_context(|| format!("project directory {} not found", args.project.display()))?;
+    if let Some(hint) = not_runnable_hint(&project) {
+        bail!("`regia run` cannot run {}: {hint}", project.display());
+    }
     if !regia_core::brand::is_project_root(&project) {
         bail!(
             "{} is not a Regia Engine project (no Regia.toml)",
@@ -403,6 +442,61 @@ pub(crate) fn json_result(run: &RunSummary<'_>, exit_code: Option<i32>) -> serde
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// ADR-10616 (a public tester's `regia run` in a quick app said only "no Regia.toml"): a quick
+    /// app and a net_game project are told what to run instead; the launcher templates and plain
+    /// folders get no hint. Every template is generated, so a template change that breaks the rule
+    /// fails here.
+    #[test]
+    fn quick_and_net_game_projects_are_told_what_to_run_instead() {
+        let parent = regia_test_utils::unique_temp_dir("run-hint");
+        for &template in regia_templates::TEMPLATE_IDS {
+            let created = regia_cli::new_project::create_with_engine(
+                &regia_cli::new_project::NewProjectRequest {
+                    name: format!("Hint {template}"),
+                    template: template.into(),
+                    parent: parent.clone(),
+                },
+                "/engine",
+            )
+            .expect("create");
+            let hint = not_runnable_hint(&created.root);
+            match template {
+                "quick" => {
+                    let hint = hint.expect("quick hint");
+                    assert!(hint.contains("`cargo run`") && hint.contains("quick"), "{hint}");
+                }
+                "net_game" => {
+                    let hint = hint.expect("net_game hint");
+                    let crate_name = &created.crate_name;
+                    assert!(
+                        hint.contains(&format!("cargo run -p {crate_name}_server"))
+                            && hint.contains(&format!("cargo run -p {crate_name}_client")),
+                        "{hint}"
+                    );
+                }
+                _ => assert_eq!(hint, None, "{template}"),
+            }
+            if template == "quick" || template == "net_game" {
+                let run_args = RunArgs {
+                    project: created.root.clone(),
+                    ..args(false, false)
+                };
+                let error = prepare(&run_args).err().expect("refused").to_string();
+                assert!(error.contains("`regia run` cannot run"), "{error}");
+            }
+        }
+        let plain = parent.join("plain");
+        std::fs::create_dir_all(&plain).expect("plain dir");
+        assert_eq!(not_runnable_hint(&plain), None);
+        std::fs::write(plain.join("Cargo.toml"), "[package]\nname = \"other\"\n").expect("manifest");
+        assert_eq!(
+            not_runnable_hint(&plain),
+            None,
+            "a crate without regia is not a quick app"
+        );
+        let _ = std::fs::remove_dir_all(&parent);
+    }
 
     /// Spec 77 § 4.1 (ADR-7212): a dev run computes the net manifest from the dev cache, the same
     /// text `regia server` writes, follows a changed level, and hands its path to the game.

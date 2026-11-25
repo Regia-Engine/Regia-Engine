@@ -310,6 +310,11 @@ pub struct CliOverrides {
     /// port mapping (UPnP-IGD, NAT-PMP, PCP); the host check reports `port_map_disabled`. A
     /// `server.toml` key for the same switch waits for the v0.7 format batch.
     pub no_port_map: bool,
+    /// `--relay-only` (ADR-10399): with `--relay`, register the game port but do not publish
+    /// this host's address. The registrar calls `RelayRegistrar::relay_only`. The router
+    /// mapping and the host check are not started. A `server.toml` key waits for the v0.7
+    /// format batch.
+    pub relay_only: bool,
     /// `--bots N`: fill to N participants and cap bots at N (the net_game server exposes this flag).
     pub bots: Option<String>,
     /// `--upgrade-config` (spec 76 § 4, ADR-5650): rewrite the config file to the current
@@ -351,11 +356,12 @@ impl CliOverrides {
                 "--relay" => out.relay = value("--relay"),
                 "--shared-port" => out.shared_port = true,
                 "--no-port-map" => out.no_port_map = true,
+                "--relay-only" => out.relay_only = true,
                 "--bots" => out.bots = value("--bots"),
                 "--upgrade-config" => out.upgrade_config = true,
                 other => errors.push(FieldError {
                     field: other.to_owned(),
-                    expected: "one of --config, --port, --bind, --max-players, --level, --name, --log-dir, --console, --agent, --relay, --shared-port, --no-port-map, --bots, --upgrade-config".into(),
+                    expected: "one of --config, --port, --bind, --max-players, --level, --name, --log-dir, --console, --agent, --relay, --shared-port, --no-port-map, --relay-only, --bots, --upgrade-config".into(),
                 }),
             }
         }

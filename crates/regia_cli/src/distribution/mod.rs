@@ -244,9 +244,13 @@ impl fmt::Display for EngineSource {
     }
 }
 
-/// `path` with `/` separators (Cargo accepts them on every host).
+/// `path` with `/` separators (Cargo accepts them on every host), and without Windows' verbatim
+/// `\\?\` prefix on a drive path: Cargo refuses `path = "//?/C:/…"` with "invalid path url"
+/// (ADR-10616).
 pub fn slash_path(path: &Path) -> String {
-    path.to_string_lossy().replace('\\', "/")
+    regia_core::project_path::strip_verbatim(path)
+        .to_string_lossy()
+        .replace('\\', "/")
 }
 
 /// True for a `/`-rooted path or a Windows drive path (`C:/…`, `C:\…`) on any host.

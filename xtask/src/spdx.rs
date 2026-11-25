@@ -12,8 +12,10 @@
 //!   anyone may copy without conditions);
 //! - `MPL-2.0` everywhere else in scope (`crates/`, `xtask/`, `extensions/`, `fuzz/`, `examples/`).
 //!
-//! Never in scope: `vendor/` (third-party code under its own licence), `target/`, hidden
-//! directories and test inputs under `tests/**/fixtures/` ([`is_test_fixture`]). The walk reads the file system, not git, so it works in a tree without `.git` (the
+//! Never in scope: the repository-root `vendor/` (third-party code under its own licence — currently
+//! `kira` and `lewton`), `target/`, hidden directories and test inputs under `tests/**/fixtures/`
+//! ([`is_test_fixture`]). A `vendor` directory nested under an engine root (for example Regia's own
+//! `crates/regia_render/src/upscaler/vendor/`) is first-party code and stays in scope. The walk reads the file system, not git, so it works in a tree without `.git` (the
 //! merge gate's). `--check` (the default) lists every file whose first line is missing or wrong and
 //! exits 1; `--write` inserts or corrects the line and changes nothing else in the file (a wrong
 //! SPDX line in the first position is replaced; the line ending of the file is kept).
@@ -39,8 +41,11 @@ pub const ENGINE_ROOTS: &[&str] = &["crates", "xtask", "extensions", "fuzz", "ex
 /// over [`ENGINE_ROOTS`] (the templates live inside `crates/regia_templates`).
 pub const SAMPLE_ROOTS: &[&str] = &["samples", "crates/regia_templates/templates"];
 
-/// Directory names the walk never enters.
-const SKIP_DIRS: &[&str] = &["target", "vendor", "node_modules"];
+/// Directory names in-scope paths never fall under, at any depth (build output and third-party
+/// JavaScript). The repository-root `vendor/` is exempt separately in [`expected_id`] because it is
+/// not under an engine root; a `vendor` directory nested under an engine root is first-party and
+/// stays in scope (see the module docs).
+const SKIP_DIRS: &[&str] = &["target", "node_modules"];
 
 /// File extensions in scope.
 const EXTENSIONS: &[&str] = &["rs", "wgsl"];
@@ -107,6 +112,12 @@ pub fn ported_ids(ported: &[crate::notices::PortedSource]) -> BTreeMap<String, S
 pub fn expected_id(rel: &str, ported: &BTreeMap<String, String>) -> Option<String> {
     let ext = rel.rsplit_once('.').map(|(_, e)| e)?;
     if !EXTENSIONS.contains(&ext) {
+        return None;
+    }
+    // Only the repository-root `vendor/` tree is third-party and out of scope. A `vendor` directory
+    // nested under an engine root (Regia's own `crates/regia_render/src/upscaler/vendor/`) is
+    // first-party code and must carry its SPDX line.
+    if rel.split('/').next() == Some("vendor") {
         return None;
     }
     let under = |root: &str| rel.strip_prefix(root).is_some_and(|rest| rest.starts_with('/'));
@@ -283,7 +294,16 @@ mod tests {
         );
         // Out of scope: vendor, other roots, other extensions, build output, hidden dirs.
         assert_eq!(expected_id("vendor/lewton/src/lib.rs", &p), None);
-        assert_eq!(expected_id("crates/regia_x/vendor/y.rs", &p), None);
+        // A `vendor` directory nested under an engine root is first-party Regia code (the
+        // repository-root `vendor/` is the only exempt tree): it must be reported, never skipped.
+        assert_eq!(
+            expected_id("crates/regia_x/vendor/y.rs", &p).as_deref(),
+            Some("MPL-2.0")
+        );
+        assert_eq!(
+            expected_id("crates/x/src/vendor/foo.rs", &p).as_deref(),
+            Some("MPL-2.0")
+        );
         assert_eq!(expected_id("crates/regia_x/target/debug/build/out.rs", &p), None);
         assert_eq!(expected_id("crates/.hidden/a.rs", &p), None);
         assert_eq!(expected_id("spikes/hot_reload/src/main.rs", &p), None);
@@ -387,6 +407,10 @@ mod tests {
             "// Portions ported from ...\n",
         )?;
         w("samples/demo/src/main.rs", "fn main() {}\n")?;
+        w(
+            "crates/regia_a/src/vendor/b.rs",
+            "//! B, Regia's own nested vendor code.\n",
+        )?;
         w("crates/regia_a/target/gen.rs", "x\n")?;
         w("vendor/v/src/lib.rs", "x\n")?;
         w("crates/regia_a/README.md", "x\n")?;
@@ -398,6 +422,7 @@ mod tests {
             [
                 "crates/regia_a/shaders/s.wgsl",
                 "crates/regia_a/src/lib.rs",
+                "crates/regia_a/src/vendor/b.rs",
                 "crates/regia_render/shaders/sgsr.wgsl",
                 "samples/demo/src/main.rs"
             ]
@@ -407,8 +432,13 @@ mod tests {
             std::fs::read_to_string(root.join("crates/regia_a/src/lib.rs"))?,
             "//! A.\n"
         );
-        assert_eq!(run(&root, &p, true)?.len(), 4);
+        assert_eq!(run(&root, &p, true)?.len(), 5);
         assert!(run(&root, &p, false)?.is_empty());
+        // Nested-vendor Regia code got its header on `--write`; the repository-root vendor tree did not.
+        assert_eq!(
+            std::fs::read_to_string(root.join("crates/regia_a/src/vendor/b.rs"))?,
+            "// SPDX-License-Identifier: MPL-2.0\n//! B, Regia's own nested vendor code.\n"
+        );
         assert_eq!(
             std::fs::read_to_string(root.join("crates/regia_render/shaders/sgsr.wgsl"))?,
             "// SPDX-License-Identifier: BSD-3-Clause\n// Portions ported from ...\n"

@@ -1,5 +1,7 @@
 # Logic graph
 
+Panel id: `logic_graph`.
+
 The **Logic Graph** tab edits a `.logic.ron` logic graph: a list of *when event E happens, if condition C holds,
 run actions A1, A2, …* rules, drawn as nodes on a canvas. Events sit on the left, conditions in the middle and
 actions on the right; a rule is one event node wired through zero or more condition nodes into one or more action

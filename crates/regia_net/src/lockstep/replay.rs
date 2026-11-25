@@ -34,8 +34,9 @@
 //! * [`ReplayLibrary`]: a folder of replays, newest first, rotation, import with a SHA-256
 //!   duplicate check, export with a sidecar, damaged files listed apart.
 //!
-//! This is not the replication demo recorder ([`crate::recorder`]): that one records snapshots of
-//! an authoritative server; this one records the frames of a lockstep match.
+//! This is not the replication demo recorder (`crate::recorder`): that one records snapshots of
+//! an authoritative server; this one records the frames of a lockstep match. `recorder` is part of
+//! the `ecs` feature, so this page names it instead of linking it (ADR-10376).
 
 use std::io::Write;
 

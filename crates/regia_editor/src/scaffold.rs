@@ -99,7 +99,8 @@ fn compiled_checkout() -> Option<PathBuf> {
 }
 
 /// The override, the executable's ancestors, then the compiled-in checkout: the first directory
-/// with `crates/regia/Cargo.toml`, canonicalized when it can be.
+/// with `crates/regia/Cargo.toml`, canonicalized when it can be, without Windows' verbatim `\\?\`
+/// prefix (Cargo refuses `path = "//?/C:/…"`, ADR-10616).
 fn find_engine_checkout(
     override_dir: Option<PathBuf>,
     exe: Option<&Path>,
@@ -117,7 +118,7 @@ fn find_engine_checkout(
         .chain(from_exe)
         .chain(compiled)
         .find(|dir| is_checkout(dir))
-        .map(|dir| dir.canonicalize().unwrap_or(dir))
+        .map(|dir| regia_core::project_path::canonicalize_plain(&dir).unwrap_or(dir))
 }
 
 /// Turns a display name into a Rust package name (`"My Game"` → `my_game`), by the rule
@@ -125,6 +126,16 @@ fn find_engine_checkout(
 /// reserved words and Windows device names are refused.
 pub(crate) fn crate_name_for(name: &str) -> Result<String, NewProjectError> {
     regia_templates::project_crate_name(name).ok_or_else(|| NewProjectError::BadName(name.to_string()))
+}
+
+/// Append this machine's home directory as the last path remap (ADR-10370).
+fn home_remap_config(config: &str) -> Result<String, NewProjectError> {
+    let home = regia_templates::user_home_dir().ok_or_else(|| {
+        NewProjectError::Io(
+            "HOME (or USERPROFILE) is unset, so the home path remap cannot be written (ADR-10370)".into(),
+        )
+    })?;
+    regia_templates::with_home_path_remap(config, &home).map_err(NewProjectError::Io)
 }
 
 fn substitute(text: &str, name: &str, id: &str, crate_name: &str, engine: &str) -> String {
@@ -149,7 +160,9 @@ pub(crate) fn create(request: &NewProjectRequest) -> Result<CreatedProject, NewP
         .ok_or_else(|| NewProjectError::UnknownTemplate(request.template.clone()))?;
     let crate_name = crate_name_for(&request.name)?;
     let engine = engine_root()?;
-    let engine_text = engine.to_string_lossy().replace('\\', "/");
+    let engine_text = regia_core::project_path::strip_verbatim(&engine)
+        .to_string_lossy()
+        .replace('\\', "/");
     if engine_text.contains('"') {
         return Err(NewProjectError::Io(format!(
             "engine path {} cannot be written into Cargo.toml",
@@ -165,11 +178,14 @@ pub(crate) fn create(request: &NewProjectRequest) -> Result<CreatedProject, NewP
     // was written (`regia_templates::write_project_dir`, shared with `regia new`; spec 61 § 2.1).
     let mut rendered = Vec::with_capacity(files.len());
     for (rel, text) in files {
-        let body = substitute(text, request.name.trim(), &id, &crate_name, &engine_text);
+        let mut body = substitute(text, request.name.trim(), &id, &crate_name, &engine_text);
         if body.contains("{{") {
             return Err(NewProjectError::Io(format!(
                 "template {rel} still has an unsubstituted placeholder"
             )));
+        }
+        if *rel == ".cargo/config.toml" {
+            body = home_remap_config(&body)?;
         }
         rendered.push((*rel, body));
     }
@@ -206,7 +222,7 @@ mod tests {
         let lone = root.join("download");
         std::fs::create_dir_all(&lone).expect("download dir");
         let lone_exe = lone.join("regia-editor");
-        let found = Some(engine.canonicalize().expect("canonical"));
+        let found = Some(regia_core::project_path::canonicalize_plain(&engine).expect("canonical"));
         assert_eq!(find_engine_checkout(None, Some(&exe), None), found);
         assert_eq!(find_engine_checkout(None, Some(&lone_exe), None), None);
         assert_eq!(
@@ -381,5 +397,30 @@ mod tests {
             std::fs::read_to_string(created.root.join("game/src/character.rs")).expect("character");
         assert!(character.contains("CameraMode::ThirdPerson"), "{character}");
         let _ = std::fs::remove_dir_all(&created.root);
+    }
+
+    /// ADR-10370: the editor's copy of `regia new` appends this machine's home remap last.
+    #[test]
+    fn created_project_appends_the_home_remap_last() {
+        let parent = temp_parent("editor-remap");
+        let created = create(&NewProjectRequest {
+            name: "Remap Check".into(),
+            template: "blank".into(),
+            parent: parent.clone(),
+        })
+        .expect("create");
+        let config = std::fs::read_to_string(created.root.join(".cargo/config.toml")).expect("config");
+        let home = regia_templates::user_home_dir().expect("HOME");
+        let flag = regia_templates::home_remap_flag(&home).expect("flag");
+        for array in config.split("rustflags = [").skip(1) {
+            let body = array.split(']').next().unwrap_or("");
+            let last = body
+                .lines()
+                .rev()
+                .find(|line| line.contains("remap-path-prefix"))
+                .unwrap_or("");
+            assert!(last.contains(&flag), "{last}");
+        }
+        let _ = std::fs::remove_dir_all(&parent);
     }
 }

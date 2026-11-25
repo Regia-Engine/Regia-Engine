@@ -1,11 +1,27 @@
 # Gameplay: players, characters, rules and save games
 
+<!-- index: Gameplay -->
+<!-- index: Player -->
+<!-- index: Player controller -->
+<!-- index: Character -->
+<!-- index: Game rules -->
+<!-- index: Save game -->
+<!-- index: Gameplay tag -->
+<!-- index: Ability | see: Combat and abilities -->
+
 `regia_framework` is the gameplay layer: players and controllers, characters, game rules, scripts,
-settings, and save games. It is the "framework" half of `docs/specs/14`.
+settings, and save games. It is the framework half of
+[spec 14](../../docs/specs/14-scene-and-framework.md). Character motion against colliders is
+[spec 15](../../docs/specs/15-physics.md) § 4 and
+[spec 93](../../docs/specs/93-character-physics.md). Attributes, effects, and abilities are
+[spec 53](../../docs/specs/53-abilities-attributes-effects.md). Save slots and character records
+are [spec 91](../../docs/specs/91-character-save-templates.md). Procedures:
+[Move a character](../how-to/play/character.md) and
+[Combat and abilities](../how-to/play/combat-abilities.md).
 
 ## Players and controllers
 
-A **player** is a human participant (local, or networked in v0.4.0). A **controller** drives a
+A **player** is a human participant, local or in a network session. A **controller** drives a
 character: `PlayerController` for humans, `AiController` for bots.
 
 ```rust
@@ -238,3 +254,16 @@ tags your game uses in a `game.tags.ron` (`TagRegistry::load`), put a `TagContai
 questions with `has` (a held `Combat.Damage.Fire` satisfies `Combat.Damage`), `has_exact`, or a `TagQuery` such
 as `AllOf([Has("Combat.Damage"), NoneOf([Has("Status.Immune")])])`. A `TagsChanged` message fires when a
 container changes. The format and the agent methods are on the [gameplay tags](../agents/gameplay-tags.md) page.
+
+## Abilities, attributes and effects
+
+Health and a `DamageEvent` are enough for a hit that lowers a number. Stacking modifiers, timed
+effects, costs, and cooldowns are `regia_framework::abilities` (`AbilityPlugin`). Assets are
+`.attrs.ron`, `.effect.ron`, and `.ability.ron`. Cues ask the presentation layer to play a montage
+or a sound. They do not change the simulation. The step-by-step is
+[Combat and abilities](../how-to/play/combat-abilities.md). Methods and refusal causes are on
+[Abilities (agents)](../agents/abilities.md).
+
+`regia_ai::abilities` is a separate, smaller slot list for AI cooldowns. It does not share types
+with `AbilityPlugin`. Network prediction of the spec 53 book is not in this version. The spec
+reserves an intent sequence and does not replicate grants.

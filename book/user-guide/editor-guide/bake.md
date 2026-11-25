@@ -1,5 +1,7 @@
 # Baked lighting panels: Bake, Bake runner and Lightmaps
 
+Panel ids: `bake`, `bake_runner` and `lightmaps`.
+
 Three tabs run the offline lighting bakes from the editor. Each bake runs as a child process
 (the `regia` command-line program next to the editor, else `regia` on the `PATH`, or the one named by
 the `REGIA_CLI` environment variable), so the editor keeps drawing, **Cancel** stops it at once, and

@@ -1,5 +1,7 @@
 # Outliner
 
+Panel id: `outliner`.
+
 The **Outliner** tab (docked left) is the level's entity tree: every entity by name, children
 under their parents. Search it, select from it, rename, reparent by dragging, group, duplicate
 and delete. A multi-entity edit is one undo step. Depth: [Editor hierarchy drag and

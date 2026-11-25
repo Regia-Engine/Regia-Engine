@@ -1,7 +1,16 @@
 # Steam
 
+<!-- index: Steam sockets -->
+<!-- index: Steam Input -->
+<!-- index: Steam cloud -->
+<!-- index: Lobby -->
+
 `regia_steam` integrates Steamworks, and the CLI stages and uploads Steam builds. Steam is opt-in:
-without the `steam` feature the engine ships with no Steam code.
+without the `steam` feature the engine ships with no Steam code. The owner creates the Steam app.
+Credentials for upload come from the environment. This page does not record a completed real match.
+The 2026-11-05 versions note (ADR-2828) recorded Steam sockets and lobbies as mock-tested. The owner
+procedure is [Steam real run](steam-real-run.md). Hosting over raw UDP, which does not need Steam, is
+[Host a game](../how-to/online/host-a-game.md).
 
 ## Runtime integration
 
@@ -154,6 +163,11 @@ UGC to an entry is not available yet (ADR-2340).
 
 ## Multiplayer over Steam: lobbies and Steam sockets
 
+The code below is in the tree and is tested against `MockSteam`. ADR-2828 (2026-11-05) recorded that
+limit. A two-account session on a real Steam client is
+[Steam real run](steam-real-run.md). Fill `docs/specs/24-steam.md` § 4 from that run. A row stays
+`not run` until its step is in both logs and the verdict is `PASS`.
+
 `regia_steam::SteamLobbyPlugin` (add it after `SteamPlugin`) adds `regia_net`'s `LobbyPlugin` when it is not there
 yet and, once Steam is ready, gives the `Lobbies` resource the Steam lobby backend (ISteamMatchmaking) and a
 `SteamLobbyTransport` (ISteamNetworkingMessages). `lobby.launch` then hosts the session on a `SteamSocket` and
@@ -174,10 +188,15 @@ The lobby methods and events are on [net lobbies](../agents/net-lobbies.md); the
 
 ## Staging and upload
 
+The owner creates the Steam app and does the partner-site steps. This CLI stages depots and
+invokes steamcmd. It does not log in to partner tools, and it has no `--retries` field.
+
 ```console
 $ regia package --platform linux --steam
 $ regia package --platform windows --steam
-$ regia steam upload --branch beta
+$ regia steam input-manifest
+$ regia steam layout --family deck --check
+$ regia steam upload --branch beta --dry-run
 ```
 
 `regia steam upload` regenerates the VDFs from `[steam]` in `Regia.toml`, points steamcmd at
@@ -187,6 +206,10 @@ on its command line, which other local users can read while it runs: upload from
 machine or mount with `hidepid=2` when others can log in to it.
 `--branch default` publishes to the branch players get and needs `--live` plus a confirmation
 (`--yes` in CI); `--dry-run` prints the steamcmd invocation without uploading.
+`input-manifest` writes the in-game actions file from `config/input.ron`.
+`layout --check` exits 1 when an action has no gamepad binding. Families are `xbox`,
+`playstation`, `switch`, and `deck`. What Steam Input does not cover yet is in the Steam Input
+section above (action-set layers, several controllers, per-origin glyphs, Deck floating text).
 
 ## Shipping updates: what a patch costs players
 

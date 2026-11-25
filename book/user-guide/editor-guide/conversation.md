@@ -1,5 +1,7 @@
 # Conversation
 
+Panel id: `conversation`.
+
 The **Conversation** tab edits a `<id>.conv.ron` conversation as a graph: blocks of lines between labels, branch
 nodes for `If` and `Choice` steps, and End nodes, laid out automatically. An inspector edits the selected node, a
 findings list shows what the conversation validator reports on the nodes, and a preview runs the conversation from any

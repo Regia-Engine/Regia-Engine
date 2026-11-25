@@ -1,7 +1,11 @@
 # Voice chat
 
+<!-- index: Voice chat -->
+<!-- index: Push to talk | see: Voice chat -->
+
 Drive and verify voice chat (specs/59) without a microphone or a sound device: packets, the codec,
-channels, moderation and the packet-loss simulator. The older capture and playback baseline stays
+channels, moderation and the packet-loss simulator. How to turn voice on for a hosted session is
+[Host a game](../how-to/online/host-a-game.md). The older capture and playback baseline stays
 under `audio.*` ([Voice capture and loopback](voice.md)); `voice_chat.loopback` below is the
 full-chain loopback (encoder, packets, simulated network, jitter buffer, playout) and is different
 from `audio.voice_loopback_start`, which only replays frames the game pushes.

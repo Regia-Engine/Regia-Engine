@@ -549,6 +549,15 @@ fn local_adapters() -> Vec<AdapterBrief> {
         .collect()
 }
 
+/// The value of a machine's host variable. `REGIA_BUILDHOST` was called `REGIA_BUILDHOST_OLD` before
+/// v0.7.2 (ADR-10616); the old name is still read, after the new one, for one release.
+fn host_env_value(key: &str) -> Option<String> {
+    std::env::var(key).ok().or_else(|| match key {
+        "REGIA_BUILDHOST" => std::env::var("REGIA_BUILDHOST_OLD").ok(),
+        _ => None,
+    })
+}
+
 fn probe(machine: &MachineSpec, local_only: bool) -> Reach {
     let Place::Remote {
         host_env,
@@ -564,10 +573,7 @@ fn probe(machine: &MachineSpec, local_only: bool) -> Reach {
     if *requires_stable && std::env::var("REGIA_156_STABLE").ok().as_deref() != Some("1") {
         return Reach::NotStable;
     }
-    let host = host_of(
-        machine,
-        host_env.and_then(|key| std::env::var(key).ok()).as_deref(),
-    );
+    let host = host_of(machine, host_env.and_then(host_env_value).as_deref());
     if !safe_token(&host) {
         return Reach::Unreachable(format!("host `{host}` is not a plain name"));
     }
@@ -866,10 +872,7 @@ fn launch_child(job: &ChildLaunch<'_>) -> Result<i32> {
             cmd
         }
         Place::Remote { host_env, .. } => {
-            let host = host_of(
-                machine,
-                host_env.and_then(|key| std::env::var(key).ok()).as_deref(),
-            );
+            let host = host_of(machine, host_env.and_then(host_env_value).as_deref());
             let root = std::env::var("REGIA_SWEEP_REMOTE_ROOT").context("REGIA_SWEEP_REMOTE_ROOT")?;
             let remote_content =
                 std::env::var("REGIA_SWEEP_REMOTE_CONTENT").context("REGIA_SWEEP_REMOTE_CONTENT")?;
@@ -940,10 +943,7 @@ fn fetch_remote_summary(machine: &MachineSpec, scenario: &str, local: &Path) -> 
     let Place::Remote { host_env, .. } = &machine.place else {
         return Ok(());
     };
-    let host = host_of(
-        machine,
-        host_env.and_then(|key| std::env::var(key).ok()).as_deref(),
-    );
+    let host = host_of(machine, host_env.and_then(host_env_value).as_deref());
     let root = std::env::var("REGIA_SWEEP_REMOTE_ROOT")?;
     let remote = format!(
         "{root}/target/player-sweep/{}/{scenario}/summary.json",

@@ -1,5 +1,7 @@
 # Animation editor: Anim Graph, Clip and Skeleton
 
+Panel ids: `anim_graph`, `anim_clip` and `anim_skeleton`.
+
 Three tabs edit a character's animation: **Anim Graph** builds the blend tree and state machines
 (`.animgraph.ron`), **Clip** edits a clip's notifies, curves, property tracks and root-motion mode,
 and **Skeleton** adds sockets and IK chains to the rig. Clip and Skeleton write an authoring

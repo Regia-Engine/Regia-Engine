@@ -275,6 +275,15 @@ There are no default exceptions. The same check over any built executable is
 `hello_window` sample, built on demand; CI runs it). The read-only `--audit-dir` audit
 reports the same rule IDs.
 
+`regia new` and the editor's project scaffold write the same directory-root remaps
+into the new project's `.cargo/config.toml`, then append
+`--remap-path-prefix=<this machine's home>=/builder` as the last flag of every target
+(ADR-10370). rustc applies the last matching prefix, so a plain `cargo build` of that
+project does not keep the account name under `/builder`. Copying the template files
+by hand does not append the home line. A `RUSTFLAGS` value still replaces the config
+flags: restate them there, home directory last. `env!("CARGO_MANIFEST_DIR")` is not
+remapped; read `CARGO_MANIFEST_DIR` from the environment at runtime.
+
 Invalid stage globs use `package_hygiene_config` with location `stage_allow_N` or
 `legal_notices_N`. `errors.explain` documents `build_path`, `dev_flag`, `stage_allow` and
 `internal_notes`.

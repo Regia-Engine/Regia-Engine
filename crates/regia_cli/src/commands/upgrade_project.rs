@@ -896,6 +896,12 @@ fn hub_toml_version(bytes: &[u8]) -> Result<Option<u32>, String> {
     }
 }
 
+/// `hub.toml` v1 to v2. See [`regia_net::lobby::hub::migrate_hub_toml`].
+fn migrate_hub_toml(bytes: &[u8], _from: u32) -> Result<Vec<u8>, String> {
+    let text = std::str::from_utf8(bytes).map_err(|e| format!("not UTF-8: {e}"))?;
+    regia_net::lobby::hub::migrate_hub_toml(text).map(String::into_bytes)
+}
+
 /// `server.toml`: the top-level `format_version` (absent reads as 1, as the server does).
 fn server_toml_version(bytes: &[u8]) -> Result<Option<u32>, String> {
     let text = std::str::from_utf8(bytes).map_err(|e| format!("not UTF-8: {e}"))?;
@@ -2308,13 +2314,14 @@ fn formats() -> Vec<Format> {
             source: VersionSource::Ron,
             migrate: migrate_rules_ron,
         },
-        // Lobby hub config (`hub.toml`, v1, ADR-8648). The first version, so nothing migrates.
-        unmigrated(
-            "hub-toml",
-            &["/hub.toml"],
-            regia_net::lobby::hub::HUB_TOML_FORMAT_VERSION,
-            VersionSource::Probe(hub_toml_version),
-        ),
+        // Lobby hub config (`hub.toml`, v2, ADR-10397). v1 appends the relay with it off.
+        Format {
+            name: "hub-toml",
+            suffixes: &["/hub.toml"],
+            current: regia_net::lobby::hub::HUB_TOML_FORMAT_VERSION,
+            source: VersionSource::Probe(hub_toml_version),
+            migrate: migrate_hub_toml,
+        },
         // Release manifest signature sidecars (`manifest-<platform>.json.sig`, v1, ADR-8687,
         // registered by ADR-8846). v1 is the first version: listed, left in place.
         unmigrated(

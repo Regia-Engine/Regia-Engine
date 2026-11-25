@@ -1,5 +1,9 @@
 # Android device bring-up
 
+<!-- index: Android -->
+<!-- index: adb -->
+<!-- index: NDK -->
+
 A step-by-step guide from a bare machine to a game running on a phone, with the agent protocol
 attached. Every command here exists in `regia` (`regia_cli`), `cargo xtask` or `regia doctor`; the
 last section lists the messages those tools print and what to do about each. What the engine does on
@@ -15,7 +19,7 @@ checkout.
 |---|---|
 | A phone with USB debugging on | Android 10 (API 29) or newer with Vulkan. `min_sdk` in `Regia.toml` defaults to 29 and the manifest check refuses less than 24. |
 | A USB cable that carries data | Charge-only cables show no device in `adb devices`. |
-| A Linux, macOS or Windows host | Packaging is verified from Linux. |
+| A Linux, macOS or Windows host | Packaging is verified from Linux. The Linux page is [Linux](linux.md). |
 | About 6 GB of disk | SDK, NDK, Gradle caches and the Rust Android targets. |
 
 ## 1. Install the toolchain

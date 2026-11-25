@@ -1737,7 +1737,8 @@ mod tests {
 82 36 8:4 / /mnt/my\\040disk rw - ext4 /dev/sdb1 rw
 ";
         assert_eq!(
-            mount_point_from_mountinfo(body, Path::new("/srv/build-data/ferrite-lanes/x/target")).as_deref(),
+            mount_point_from_mountinfo(body, Path::new("/srv/build-data/ferrite-lanes/x/target"))
+                .as_deref(),
             Some("/srv/build-data")
         );
         assert_eq!(

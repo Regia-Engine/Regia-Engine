@@ -801,7 +801,12 @@ fn book_two_chunk_example_places_shared_images_and_checks_requires() {
         "/../../book/user-guide/content-chunks.md"
     ))
     .expect("the shared-image chunk upgrade guide must ship with its runnable example");
+    // The page opens with the general chunk-rules example; the shared-image example is the first
+    // one in its own section (ADR-10723).
     let example = page
+        .split_once("\n## Shared glTF images and content chunks\n")
+        .expect("the shared-image section of the content chunks page")
+        .1
         .split_once("```toml\n")
         .expect("TOML example")
         .1

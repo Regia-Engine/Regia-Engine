@@ -1,8 +1,16 @@
 # Terrain data: cooking and streaming
 
+<!-- index: Terrain tile cache -->
+<!-- index: Tiled heightfield -->
+<!-- index: Terrain index -->
+<!-- index: Virtual texture -->
+
 The photoreal terrain **DATA path** turns a 4096² 16-bit heightfield and 8K macro / 2K–4K layer
 textures into a streamable, byte-reproducible virtual-texture layout. It is the data half of the
-terrain feature; the shading and CDLOD/clipmap half is `docs/specs/26`.
+terrain feature; the shading and CDLOD/clipmap half is `docs/specs/26-terrain-vfx-highend.md`.
+Level cells and HLOD are a different stream: [World streaming](world-streaming.md)
+(`docs/specs/78-world-streaming.md`). The task procedure is
+[Author a terrain](../how-to/world/terrain.md).
 
 ## What cooks
 
@@ -63,7 +71,7 @@ a frozen-format change — see `docs/formats/terrain.md` § 9):
 
 ```text
 assets/textures/
-  terrain.layers.ron        layer stack (format v4; older v1..v3 files migrate through `upgrade-project`) (layer names + order)
+  terrain.layers.ron        layer stack (format v5; older v1..v4 files migrate through `upgrade-project`) (layer names + order)
   heightfield.png           16-bit gray R16 heightfield
   heightfield.json          optional world extents: `size_m`, `origin`
   macro_albedo.png          sRGB → BC7 sRGB

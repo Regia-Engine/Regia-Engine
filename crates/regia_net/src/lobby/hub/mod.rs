@@ -9,8 +9,10 @@
 //! | [`HubLobbyBackend`] | The client: a [`crate::lobby::LobbyBackend`] over a [`crate::NetClient`] pinned to the hub's [`crate::ServerKey`]. An unpinned or mismatched key is refused. |
 //! | [`HubRequest`], [`HubEvent`] | The messages, carried as the `regia.lobby_hub` game on the reliable channel; bounded decode. |
 //! | [`join`] | Join brokering (NL-05, ADR-8607): the owner's [`ReachOffer`], the member's ask, the owner's approval, and a [`JoinPlan`] in the order mapped, punch, relay. |
-//! | `HubReach` (feature `ecs`) | Runs a member's [`JoinPlan`] on its game socket: the mapped address, or `server_host::JoinPath` (punch, then the relay). |
+//! | [`HubReach`] | Runs a member's [`JoinPlan`] on a socket it owns: the mapped address, or `server_host::JoinPath` (punch, then the relay). |
+//! | [`JoinPlanDriver`] | The same plan on a socket the caller owns: the game pushes datagrams and time (ADR-10376). No `ecs`. |
 //! | [`HubFile`] | `hub.toml` for the `regia-lobby-hub` process (NL-06, ADR-8648): port, key path, caps, and per-address and per-identity rate limits. |
+//! | [`HubDocument`] | `hub.toml` v2 (NL-11, ADR-10397): the relay, the ban file and the log directory. A v1 file still loads with the relay off. |
 //!
 //! A session's identity is a player key ([`crate::crypto::PlayerKey`]): the client's static X25519
 //! key, proven inside the sealed hub link by a proof bound to that link's Noise handshake hash
@@ -21,9 +23,10 @@
 //! Rules the hub keeps:
 //! - A hub session is allocated only after the client's `Hello`, which can only arrive over a
 //!   connection whose handshake (cookie and Noise) is complete.
-//! - A game session's address exists on the hub only after the lobby owner confirms it
-//!   ([`crate::lobby::LobbyBackend::set_server`]), and goes to the lobby's members only. Directory
-//!   cards, presence rows and invite cards never carry it.
+//! - Confirming a session sets a flag and moves presence. The hub does not store a session address
+//!   and does not send one. Directory cards, presence rows, room snapshots, invites and `lobby()`
+//!   carry none. A handle that is an address spelling is stored as a stand-in that is not one.
+//!   Reach addresses travel only on an admitted `ReachAsk` or `Plan`.
 //! - An invite card carries a lobby id and an invite token, never a host address.
 //! - Nothing is broadcast on a timer: a generation moves only when a row changes, and a session that
 //!   already has a generation is sent nothing.
@@ -36,41 +39,63 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
-use super::{LobbyError, LobbyId, LobbyServer, LobbyVisibility, MemberId};
+use super::{LobbyError, LobbyId, LobbyVisibility, MemberId};
+use crate::crypto::ServerKey;
 
+mod binding;
 mod client;
 mod config;
 mod host;
 pub mod join;
 mod limits;
 mod process;
-#[cfg(feature = "ecs")]
 mod reach;
 mod server;
 mod soak;
 mod wire;
 
-pub use client::{HubClientConfig, HubClock, HubLinkState, HubLobbyBackend, ReachAsk};
+pub use binding::{
+    BINDING_MAX_HORIZON_MS, BINDING_PAYLOAD_BYTES, BINDING_PROOF_BYTES, BindingClaims, GRACE_MS_DEFAULT,
+    GRACE_MS_MAX, MAX_BINDING_OWNERS, MAX_HUB_GAME_VERSION_BYTES, MAX_LOBBY_BANS, MAX_SERVER_BANS,
+    SERVER_BINDING_PROLOGUE, SERVER_PRESENCE_PROLOGUE, ServerPresence, decode_binding_payload,
+    encode_binding_payload, grace_in_range, verify_binding, verify_server_presence,
+};
+pub use client::{
+    HubClientConfig, HubClock, HubLinkState, HubLobbyBackend, HubNotice, LocalBinding, ReachAsk,
+    ServerRegister,
+};
 pub use config::{
     DEFAULT_HUB_PORT, DEFAULT_HUB_TOML, DEFAULT_PER_ADDRESS_PER_SEC, DEFAULT_PER_IDENTITY_PER_SEC,
-    DEFAULT_STATUS_PORT, HUB_TOML_FORMAT_VERSION, HUB_TOML_KEYS, HubCaps, HubFieldError, HubFile, HubLimits,
-    HubStatusFile, default_key_path, hub_toml_migration_sources, hub_toml_schema_fingerprint,
-    key_path_is_inside_project, validate_key_path,
+    DEFAULT_RELAY_ALLOCATION_CAP, DEFAULT_RELAY_PER_ADDRESS_PER_SEC, DEFAULT_RELAY_PORT, DEFAULT_STATUS_PORT,
+    HUB_TOML_FORMAT_VERSION, HUB_TOML_KEYS, HubBansFile, HubCaps, HubDocument, HubFieldError, HubFile,
+    HubLimits, HubLogFile, HubRelayFile, HubStatusFile, default_key_path, hub_toml_migration_sources,
+    hub_toml_schema_fingerprint, key_path_is_inside_project, load_ban_keys, migrate_hub_toml,
+    validate_key_path,
 };
 pub use host::{HubHost, PROOF_FAILURE_LIMIT};
-pub use join::{BrokerError, JoinPlan, JoinRow, NatClass, ReachKind, ReachOffer, broker_reach};
+pub use join::{
+    BrokerError, JoinPlan, JoinRow, NatClass, ReachKind, ReachOffer, broker_reach, close_lobby,
+    create_delegated, plans_for, register_server, revoke_binding, set_bans, set_reach_mode,
+};
 pub use limits::AdmitGate;
-pub use process::{HUB_STATUS_LABEL, HubProcess};
+pub use process::{HUB_RELAY_DRAIN_MS, HUB_STATUS_LABEL, HubProcess};
+// Both cfgs, so the API snapshot keeps `#[cfg(feature = "ecs")]` on HubReach and records the
+// ecs-free export as an addition (ADR-10376).
 #[cfg(feature = "ecs")]
 pub use reach::{HubReach, ReachSocket, ReachState};
+#[cfg(not(feature = "ecs"))]
+pub use reach::{HubReach, ReachSocket, ReachState};
+pub use reach::{JoinPlanDriver, PLAN_QUEUE, PlanEndpoint, PlanSocket};
 pub use server::HubServer;
 pub use soak::{
     SOAK_ALLOC_BOUND, SOAK_CYCLES, SOAK_PRESENCES, SOAK_SIMULATED_MS, SOAK_STATE_BOUND, SoakReport,
     run_hub_soak_1000,
 };
 pub use wire::{
-    ChatScope, DirectoryPage, HUB_GAME_ID, HUB_WIRE_VERSION, HubEvent, HubMessage, HubRequest, HubWire,
-    MAX_CODE_BYTES, MAX_HUB_MESSAGE_BYTES, MAX_PAGE_LOBBIES, MAX_PAGE_ROWS, RoomState, sample_messages,
+    BindingState, ChatScope, DirectoryPage, HUB_GAME_ID, HUB_WIRE_VERSION, HUB_WIRE_VERSION_V1, HubEvent,
+    HubMessage, HubRequest, HubWire, LobbyKind, MAX_CODE_BYTES, MAX_HUB_MESSAGE_BYTES, MAX_PAGE_LOBBIES,
+    MAX_PAGE_ROWS, RoomState, ServerCard, ServerNotice, gate_request, hub_wire_from_game_version,
+    request_is_v2_only, sample_messages, v2_call_allowed,
 };
 
 /// Longest handle the wire carries, whatever the settings say (the handshake's name limit).
@@ -140,6 +165,36 @@ pub struct HubSettings {
     /// Reliable messages [`HubHost`] sends one peer per second (ADR-8633; default 1024,
     /// `64..=65536`). What the link refuses stays in the session's outbox for the next update.
     pub reliable_msgs_per_s: u32,
+    /// `AskReach` calls one player key may make per 10 seconds (spec 89 § 16.5). Wire cap 4.
+    /// [`HubSettings::sanitized`] clamps into `1..=4` and does not raise a lower setting.
+    #[serde(default = "default_ask_per_identity_per_10s")]
+    pub ask_per_identity_per_10s: u32,
+    /// `AskReach` calls one source address may make per 10 seconds. Wire cap 16. Checked before
+    /// the player-key window, so many keys on one address share it.
+    #[serde(default = "default_ask_per_address_per_10s")]
+    pub ask_per_address_per_10s: u32,
+    /// Open asks (`Asked` or `Planned`) one player key may hold. Wire cap 2.
+    #[serde(default = "default_ask_inflight_per_identity")]
+    pub ask_inflight_per_identity: u32,
+    /// Open asks the hub may hold. Wire cap 64. Past it, `AskReach` is `hub_ask_inflight`.
+    #[serde(default = "default_ask_inflight_hub")]
+    pub ask_inflight_hub: u32,
+}
+
+fn default_ask_per_identity_per_10s() -> u32 {
+    limits::ASK_PER_IDENTITY_CAP
+}
+
+fn default_ask_per_address_per_10s() -> u32 {
+    limits::ASK_PER_ADDRESS_CAP
+}
+
+fn default_ask_inflight_per_identity() -> u32 {
+    limits::ASK_INFLIGHT_PER_IDENTITY_CAP
+}
+
+fn default_ask_inflight_hub() -> u32 {
+    limits::ASK_INFLIGHT_HUB_CAP
 }
 
 impl Default for HubSettings {
@@ -165,6 +220,10 @@ impl Default for HubSettings {
             global_chat_per_sec: 16,
             list_rewind_ms: 10_000,
             reliable_msgs_per_s: 1024,
+            ask_per_identity_per_10s: default_ask_per_identity_per_10s(),
+            ask_per_address_per_10s: default_ask_per_address_per_10s(),
+            ask_inflight_per_identity: default_ask_inflight_per_identity(),
+            ask_inflight_hub: default_ask_inflight_hub(),
         }
     }
 }
@@ -193,6 +252,14 @@ impl HubSettings {
             global_chat_per_sec: self.global_chat_per_sec.max(1),
             list_rewind_ms: self.list_rewind_ms,
             reliable_msgs_per_s: self.reliable_msgs_per_s.clamp(64, 1 << 16),
+            ask_per_identity_per_10s: self
+                .ask_per_identity_per_10s
+                .clamp(1, limits::ASK_PER_IDENTITY_CAP),
+            ask_per_address_per_10s: self.ask_per_address_per_10s.clamp(1, limits::ASK_PER_ADDRESS_CAP),
+            ask_inflight_per_identity: self
+                .ask_inflight_per_identity
+                .clamp(1, limits::ASK_INFLIGHT_PER_IDENTITY_CAP),
+            ask_inflight_hub: self.ask_inflight_hub.clamp(1, limits::ASK_INFLIGHT_HUB_CAP),
         }
     }
 }
@@ -253,8 +320,11 @@ pub struct PresenceRow {
 }
 
 /// One listed lobby as the directory shows it: never the session address (`regia.server` is
-/// dropped from its data).
+/// dropped from its data, and so is any value that parses as an address).
+///
+/// `non_exhaustive`: a struct pattern in another crate needs `..`.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct HubLobbyCard {
     /// The lobby.
     pub id: LobbyId,
@@ -272,6 +342,18 @@ pub struct HubLobbyCard {
     pub joinable: bool,
     /// Lobby data without `regia.server`.
     pub data: BTreeMap<String, String>,
+    /// Listen or dedicated. Missing on old reports, which are listen lobbies.
+    #[serde(default)]
+    pub kind: wire::LobbyKind,
+    /// When set, joins to this lobby offer only the relay.
+    #[serde(default)]
+    pub relay_only: bool,
+    /// Dedicated-server capacity. `0` on a listen card.
+    #[serde(default)]
+    pub capacity: u16,
+    /// Dedicated-server load. `0` on a listen card.
+    #[serde(default)]
+    pub load: u16,
 }
 
 impl HubLobbyCard {
@@ -328,7 +410,10 @@ impl InviteCard {
 }
 
 /// What the hub reports to the agent protocol (`lobby.hub_status`) and logs.
+///
+/// `non_exhaustive`: a struct pattern in another crate needs `..`.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct HubReport {
     /// Sessions.
     pub sessions: usize,
@@ -361,10 +446,47 @@ pub struct HubReport {
     /// Brokered joins, at most 256 (lobby, then member order): `lobby.hub_join_status`.
     #[serde(default)]
     pub joins: Vec<JoinRow>,
+    /// Dedicated servers the hub lists, at most 64. No address. `lobby.hub_servers`.
+    #[serde(default)]
+    pub servers: Vec<HubServerCard>,
+    /// Dedicated servers online. The full count, not the 64-card page.
+    #[serde(default)]
+    pub servers_online: usize,
+    /// Relay allocations this process holds. Zero when the process is not running the relay.
+    #[serde(default)]
+    pub relay_allocations: usize,
+    /// True while the process is draining.
+    #[serde(default)]
+    pub draining: bool,
+}
+
+/// One dedicated server as `lobby.hub_servers` and [`HubReport::servers`] list it. No address and
+/// no owner-key list.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct HubServerCard {
+    /// The server's public key, hex text on the wire of the report.
+    pub server_key: ServerKey,
+    /// Seats it will take.
+    pub capacity: u16,
+    /// Seats in use.
+    pub load: u16,
+    /// Its game protocol number.
+    pub protocol: u32,
+    /// Its game version text.
+    pub game_version: String,
+    /// When set, the server offers only the relay. The relay-only planner is a later lane.
+    pub relay_only: bool,
+    /// How many owners are bound. Not their keys.
+    pub owner_count: u8,
+    /// Grace after the owner leaves, milliseconds. `0` means no deadline.
+    pub grace_ms: u32,
 }
 
 /// Why a hub call failed. [`HubError::code`] is the stable lowercase code.
+///
+/// `non_exhaustive`: a match in another crate needs a `_` arm.
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
+#[non_exhaustive]
 pub enum HubError {
     /// The client was given no hub key to pin.
     #[error("the hub's server key is not pinned")]
@@ -453,6 +575,66 @@ pub enum HubError {
     /// The hub is draining and takes no new session.
     #[error("the hub is shutting down")]
     Draining,
+    /// A version-2 call toward a peer that still speaks wire 1 (ADR-10378). The link stays up.
+    #[error("this call needs hub wire version 2")]
+    NeedsWireV2,
+    /// The call is on the wire. The behavior is not in this build yet.
+    #[error("the hub has not implemented this call yet")]
+    NotReady,
+    /// No live binding for this owner and server.
+    #[error("no live binding for this owner and server")]
+    BindingUnbound,
+    /// The binding's expiry is in the past.
+    #[error("the binding has expired")]
+    BindingExpired,
+    /// The binding's serial is in the revocation set.
+    #[error("the binding was revoked")]
+    BindingRevoked,
+    /// The server has owners and this key is not one, or a transfer named the server or a non-owner.
+    #[error("this key is not an owner of the server")]
+    BindingNotOwner,
+    /// The proof did not verify, the expiry is too far out, or the server cannot change owners yet.
+    #[error("the binding proof is not valid")]
+    BindingInvalid,
+    /// The dedicated server is not online.
+    #[error("the server is offline")]
+    ServerOffline,
+    /// Another link already holds this server key. Sent on the old link.
+    #[error("this server key is in use on another link")]
+    ServerInUse,
+    /// Capacity, load, or grace on a server presence is outside the allowed range.
+    #[error("the server presence is not valid")]
+    ServerInvalid,
+    /// The dedicated server has no seat left.
+    #[error("the server is full")]
+    ServerFull,
+    /// `offer_reach` or `approve` from someone other than the server session.
+    #[error("only the server session can do that")]
+    NotSession,
+    /// `CreateDelegated` from a session that is not a proven player.
+    #[error("this session is not a player")]
+    NotAPlayer,
+    /// Too many `AskReach` calls from one player key or one source address in 10 seconds.
+    #[error("ask rate limited")]
+    AskRateLimited,
+    /// Too many asks in flight for one player key, or on the hub.
+    #[error("too many asks in flight")]
+    AskInflight,
+    /// The player key is banned by the lobby owner, the dedicated server, or the hub operator.
+    #[error("banned by the server")]
+    Banned,
+    /// Lobby data, member data, or a confirm carried an address. Dedicated lobbies store none.
+    #[error("a dedicated lobby stores no session address")]
+    AddressInData,
+    /// The lobby is already closed.
+    #[error("the lobby is closed")]
+    LobbyClosed,
+    /// The dedicated lobby is full.
+    #[error("the lobby is full")]
+    LobbyFull,
+    /// The revocation set is at 4096 and nothing past its expiry can be dropped.
+    #[error("the revocation set is full")]
+    RevokeFull,
     /// A lobby rule (spec 89 codes).
     #[error(transparent)]
     Lobby(#[from] LobbyError),
@@ -490,6 +672,26 @@ impl HubError {
             Self::AddressRateLimited => "hub_address_rate_limited",
             Self::IdentityRateLimited => "hub_identity_rate_limited",
             Self::Draining => "hub_draining",
+            Self::NeedsWireV2 => "hub_needs_wire_v2",
+            Self::NotReady => "hub_not_ready",
+            Self::BindingUnbound => "hub_binding_unbound",
+            Self::BindingExpired => "hub_binding_expired",
+            Self::BindingRevoked => "hub_binding_revoked",
+            Self::BindingNotOwner => "hub_binding_not_owner",
+            Self::BindingInvalid => "hub_binding_invalid",
+            Self::ServerOffline => "hub_server_offline",
+            Self::ServerInUse => "hub_server_in_use",
+            Self::ServerInvalid => "hub_server_invalid",
+            Self::ServerFull => "hub_server_full",
+            Self::NotSession => "hub_not_session",
+            Self::NotAPlayer => "hub_not_a_player",
+            Self::AskRateLimited => "hub_ask_rate_limited",
+            Self::AskInflight => "hub_ask_inflight",
+            Self::Banned => "hub_banned",
+            Self::AddressInData => "hub_address_in_data",
+            Self::LobbyClosed => "hub_lobby_closed",
+            Self::LobbyFull => "hub_lobby_full",
+            Self::RevokeFull => "hub_revoke_full",
             Self::Lobby(e) => e.code(),
         }
     }
@@ -524,6 +726,26 @@ impl HubError {
         "hub_address_rate_limited",
         "hub_identity_rate_limited",
         "hub_draining",
+        "hub_needs_wire_v2",
+        "hub_not_ready",
+        "hub_binding_unbound",
+        "hub_binding_expired",
+        "hub_binding_revoked",
+        "hub_binding_not_owner",
+        "hub_binding_invalid",
+        "hub_server_offline",
+        "hub_server_in_use",
+        "hub_server_invalid",
+        "hub_server_full",
+        "hub_not_session",
+        "hub_not_a_player",
+        "hub_ask_rate_limited",
+        "hub_ask_inflight",
+        "hub_banned",
+        "hub_address_in_data",
+        "hub_lobby_closed",
+        "hub_lobby_full",
+        "hub_revoke_full",
     ];
 
     /// The error for a code the hub sent: a `hub_*` code, or a [`LobbyError`] code. Unknown codes
@@ -558,6 +780,26 @@ impl HubError {
             "hub_address_rate_limited" => Self::AddressRateLimited,
             "hub_identity_rate_limited" => Self::IdentityRateLimited,
             "hub_draining" => Self::Draining,
+            "hub_needs_wire_v2" => Self::NeedsWireV2,
+            "hub_not_ready" => Self::NotReady,
+            "hub_binding_unbound" => Self::BindingUnbound,
+            "hub_binding_expired" => Self::BindingExpired,
+            "hub_binding_revoked" => Self::BindingRevoked,
+            "hub_binding_not_owner" => Self::BindingNotOwner,
+            "hub_binding_invalid" => Self::BindingInvalid,
+            "hub_server_offline" => Self::ServerOffline,
+            "hub_server_in_use" => Self::ServerInUse,
+            "hub_server_invalid" => Self::ServerInvalid,
+            "hub_server_full" => Self::ServerFull,
+            "hub_not_session" => Self::NotSession,
+            "hub_not_a_player" => Self::NotAPlayer,
+            "hub_ask_rate_limited" => Self::AskRateLimited,
+            "hub_ask_inflight" => Self::AskInflight,
+            "hub_banned" => Self::Banned,
+            "hub_address_in_data" => Self::AddressInData,
+            "hub_lobby_closed" => Self::LobbyClosed,
+            "hub_lobby_full" => Self::LobbyFull,
+            "hub_revoke_full" => Self::RevokeFull,
             other => Self::Lobby(lobby_error_from_code(other)),
         }
     }
@@ -599,27 +841,111 @@ pub(crate) fn fold(handle: &str) -> String {
     handle.trim().to_lowercase()
 }
 
-/// Checks a handle against `max_bytes`; returns it trimmed.
+/// Checks a handle against `max_bytes` and returns it trimmed.
+///
+/// A handle `value_carries_address` accepts is not returned as written. The stand-in fits in
+/// `max_bytes` (it is no longer than the spelling, and at most eight bytes), is stable for that
+/// spelling, and is not itself an address. Presence, a directory card, a room member name, an
+/// invite and a chat from-handle then carry the stand-in.
 pub(crate) fn clean_handle(handle: &str, max_bytes: usize) -> Result<String, HubError> {
     let handle = handle.trim();
     if handle.is_empty() || handle.len() > max_bytes || handle.chars().any(char::is_control) {
         return Err(HubError::HandleInvalid);
     }
+    if value_carries_address(handle) {
+        return Ok(address_stand_in(handle));
+    }
     Ok(handle.to_owned())
 }
 
-/// Drops `regia.server` from lobby data (what a directory card may show).
+/// A stand-in for an address-shaped handle. No `.` or `:`, so it cannot spell a socket, and the
+/// same spelling always produces the same bytes (a reconnect and an invite of that spelling agree,
+/// on the client and on the hub).
+fn address_stand_in(handle: &str) -> String {
+    let hex = blake3::hash(handle.as_bytes()).to_hex();
+    let hex = hex.as_str();
+    let budget = handle.len().clamp(1, 8);
+    let mut out = String::with_capacity(budget);
+    out.push('h');
+    for c in hex.chars() {
+        if out.len() >= budget {
+            break;
+        }
+        out.push(c);
+    }
+    out
+}
+
+/// Drops `regia.server` and any value that is an address spelling (what a directory card, a room
+/// snapshot, or `lobby()` may show).
 pub(crate) fn public_data(data: &BTreeMap<String, String>) -> BTreeMap<String, String> {
     data.iter()
-        .filter(|(k, _)| k.as_str() != super::keys::SERVER)
+        .filter(|(k, v)| k.as_str() != super::keys::SERVER && !value_carries_address(v))
         .map(|(k, v)| (k.clone(), v.clone()))
         .collect()
 }
 
-/// A server address cannot ride in a listed lobby's data: [`LobbyServer`] lives beside the data.
-pub(crate) fn server_of(data: &BTreeMap<String, String>) -> Option<LobbyServer> {
-    data.get(super::keys::SERVER)
-        .and_then(|s| LobbyServer::from_key(s))
+/// True when `value`, as a whole, names a socket.
+///
+/// Accepted: a [`std::net::SocketAddr`] (every form that parser accepts), a bracketed IPv4 or
+/// IPv6 with a port (a zone, including an interface name, is split off before the address is
+/// parsed), `udp:` or `udp://` in any ASCII case plus one of those, and `steam:` in any ASCII
+/// case plus ASCII digits (`steam:0` too). A bare address with no port, a hostname and a port
+/// alone are not a spelling: `10.1.2.3`, `2001:db8::1`, `game.example:27015` and `:27015` stay
+/// ordinary text.
+pub(crate) fn value_carries_address(value: &str) -> bool {
+    let value = value.trim();
+    if looks_like_socket(value) {
+        return true;
+    }
+    if let Some(rest) = strip_prefix_ignore_ascii_case(value, "udp://")
+        .or_else(|| strip_prefix_ignore_ascii_case(value, "udp:"))
+    {
+        return looks_like_socket(rest.trim());
+    }
+    if let Some(rest) = strip_prefix_ignore_ascii_case(value, "steam:") {
+        let rest = rest.trim();
+        return !rest.is_empty() && rest.bytes().all(|b| b.is_ascii_digit());
+    }
+    false
+}
+
+fn strip_prefix_ignore_ascii_case<'a>(value: &'a str, prefix: &str) -> Option<&'a str> {
+    let n = prefix.len();
+    if value.len() >= n && value.as_bytes()[..n].eq_ignore_ascii_case(prefix.as_bytes()) {
+        Some(&value[n..])
+    } else {
+        None
+    }
+}
+
+/// A socket the Rust parser accepts, plus the bracketed forms it rejects: IPv4 in brackets, and
+/// an IPv6 whose zone is an interface name (`[fe80::1%eth0]:27015`) rather than a decimal scope.
+/// The zone text is not itself a spelling. It is split off so the address can be parsed.
+fn looks_like_socket(value: &str) -> bool {
+    if value.parse::<std::net::SocketAddr>().is_ok() {
+        return true;
+    }
+    let Some(rest) = value.strip_prefix('[') else {
+        return false;
+    };
+    let Some((inside, after)) = rest.split_once(']') else {
+        return false;
+    };
+    let Some(port) = after.strip_prefix(':') else {
+        return false;
+    };
+    if port.is_empty() || !port.bytes().all(|b| b.is_ascii_digit()) || port.parse::<u16>().is_err() {
+        return false;
+    }
+    let addr = inside.split_once('%').map_or(inside, |(addr, _)| addr);
+    addr.parse::<std::net::Ipv4Addr>().is_ok() || addr.parse::<std::net::Ipv6Addr>().is_ok()
+}
+
+/// True when lobby or member data holds `regia.server` or an address-shaped value.
+pub(crate) fn data_has_address(data: &BTreeMap<String, String>) -> bool {
+    data.iter()
+        .any(|(k, v)| k.as_str() == super::keys::SERVER || value_carries_address(v))
 }
 
 #[cfg(test)]
@@ -673,6 +999,25 @@ mod tests {
         assert_eq!(wild.friend_cap, FRIENDS_LIMIT);
         assert_eq!(wild.max_members, crate::lobby::MAX_LOBBY_MEMBERS);
         assert_eq!(wild.member_data_bytes, MEMBER_DATA_LIMIT_BYTES);
+        let asks = HubSettings {
+            ask_per_identity_per_10s: 0,
+            ask_per_address_per_10s: 99,
+            ask_inflight_per_identity: 2,
+            ask_inflight_hub: 2,
+            ..HubSettings::default()
+        }
+        .sanitized();
+        assert_eq!(asks.ask_per_identity_per_10s, 1);
+        assert_eq!(asks.ask_per_address_per_10s, limits::ASK_PER_ADDRESS_CAP);
+        assert_eq!(asks.ask_inflight_per_identity, 2);
+        assert_eq!(asks.ask_inflight_hub, 2);
+        assert!(value_carries_address("10.1.2.3:4000"));
+        assert!(value_carries_address("udp:10.1.2.3:4000"));
+        assert!(value_carries_address("steam:0"));
+        assert!(value_carries_address("steam:12"));
+        assert!(!value_carries_address("steam:"));
+        assert!(!value_carries_address("tcp:nope"));
+        assert!(!value_carries_address("harbor"));
     }
 
     #[test]
@@ -682,5 +1027,57 @@ mod tests {
         assert_eq!(clean_handle("a\u{7}", 24), Err(HubError::HandleInvalid));
         assert_eq!(clean_handle(&"x".repeat(25), 24), Err(HubError::HandleInvalid));
         assert_eq!(fold(" Ann "), fold("aNN"));
+    }
+
+    #[test]
+    fn address_spellings_are_refused_and_an_address_handle_is_not_stored() {
+        let refused = [
+            "[203.0.113.50]:27015",
+            "udp:[203.0.113.50]:27015",
+            "udp://203.0.113.50:27015",
+            "udp://[2001:db8::1]:27015",
+            "UDP:203.0.113.50:27015",
+            "[fe80::1%eth0]:27015",
+            "Steam:76561198000000000",
+            "[2001:db8::1]:27015",
+            "udp:[2001:db8::1]:27015",
+            "[::ffff:203.0.113.50]:27015",
+            "[fe80::1%1]:27015",
+            "10.1.2.3:4000",
+            "udp:10.1.2.3:4000",
+            "steam:0",
+            "steam:12",
+            "  Steam:1  ",
+        ];
+        for value in refused {
+            assert!(value_carries_address(value), "{value}");
+        }
+        // A bare address, a hostname and a port alone are not a socket spelling.
+        let allowed = [
+            "10.1.2.3",
+            "2001:db8::1",
+            "game.example:27015",
+            ":27015",
+            "steam:",
+            "tcp:nope",
+            "harbor",
+            "udp://game.example:27015",
+        ];
+        for value in allowed {
+            assert!(!value_carries_address(value), "{value}");
+        }
+        let handle = clean_handle("203.0.113.50:27015", 24).expect("handle");
+        assert!(!handle.contains("203.0.113.50"), "{handle}");
+        assert!(!handle.contains(':'), "{handle}");
+        assert!(!handle.contains('.'), "{handle}");
+        assert!(!value_carries_address(&handle), "{handle}");
+        assert!(handle.len() <= 8, "{handle}");
+        assert_eq!(
+            clean_handle("  203.0.113.50:27015  ", 24).as_deref(),
+            Ok(handle.as_str())
+        );
+        let steam = clean_handle("Steam:76561198000000000", 24).expect("steam handle");
+        assert!(!steam.contains("76561198000000000"), "{steam}");
+        assert!(!value_carries_address(&steam), "{steam}");
     }
 }

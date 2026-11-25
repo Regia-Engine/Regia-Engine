@@ -1,5 +1,10 @@
 # Shading models: skin, eye, fabric sheen
 
+<!-- index: Shading model -->
+<!-- index: Skin shading -->
+<!-- index: Eye shading -->
+<!-- index: Fabric sheen -->
+
 Character shading for realistic faces and garments (Tincal engine items B3, B4 and B6). A
 `MaterialShading` picks how a material lights, on top of its usual factors and maps:
 
@@ -11,6 +16,9 @@ Character shading for realistic faces and garments (Tincal engine items B3, B4 a
 
 No new pipeline is built for these materials: they draw with the standard forward pipelines,
 which branch on the material's model word. Materials without a model draw exactly as before.
+Skin runs on every quality tier: there is no screen-space pass and no lookup texture. The
+authoring steps, including when to use a `.material.ron` instead, are in
+[Materials](../how-to/picture/materials.md).
 
 ## Using it
 

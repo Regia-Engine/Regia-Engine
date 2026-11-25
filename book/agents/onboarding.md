@@ -24,9 +24,15 @@ of the install page yourself, one at a time, asking the user as you go.
 5. **Check the machine** with `<engine>/target/release/regia doctor --platform <this OS> --json` and fix each
    failed check with its `fix` ([Toolchain doctor (agents)](doctor.md)); for a release archive, also
    `regia engine verify .`.
-6. **Questions 3 to 6**, then create the project: `regia new`, a warm `cargo build -p <name>_launcher`, `regia run`
-   once, `regia editor`.
-7. **Modes 2 and 3:** write the project's MCP entry (below) and hand off to a new session in the project folder.
+6. **Questions 3 to 6**, then create the project with `regia new`. Only `blank`, `first_person`, `third_person`
+   and `top_down` have a desktop launcher crate (`<snake_case name>_launcher`): warm it with
+   `cargo build -p <snake_case name>_launcher`, `regia run` once, then `regia editor`. `quick` has no launcher:
+   warm it with plain `cargo build`, run it once with `cargo run`, and stop there. `net_game` has no launcher either: warm it with plain `cargo build` (its
+   default members are the game and the client), start the server and a client as its `README.md` says, then
+   `regia editor`.
+7. **Modes 2 and 3:** for a non-`quick` template, write the project's MCP entry (below) and hand off to a new
+   session in the project folder. For `quick`, explain that this path is cargo-only and recommend a full project
+   template when the user wants an editor-connected session.
 8. **The mode's opening**: mode 1, the editor tour ([Editor tour](../start/editor-tour.md)); mode 2, a screenshot
    of the editor through MCP and "what would you like to change?"; mode 3, "what game should we make?" and a short
    decision list.
@@ -66,7 +72,7 @@ themselves.
 | `shell_path` | adds `<engine>/target/release` to `PATH` in one shell profile file | one line; name the file |
 | `android_tools` | the Rust Android targets, `cargo-ndk`, the Android SDK, an NDK, a JDK 17+ and Gradle | about 3 GB; the SDK's licenses are the user's to accept |
 | `cross_tools` | Windows from Linux (`cargo-xwin`, the MSVC target) or Steam Deck (`cargo-zigbuild`, zig) | a few hundred MB each |
-| `warm_build` | `cargo build -p <name>_launcher` in the new project | a few more crates; minutes |
+| `warm_build` | the new project's first build: `cargo build -p <snake_case name>_launcher` for `blank`, `first_person`, `third_person` and `top_down`; plain `cargo build` for `quick` and `net_game`, which have no launcher crate | a few more crates; minutes |
 | `connect` | writes the `regia` MCP entry into the game project | one file in the project; name it |
 
 The system packages of [Installing Regia Engine](../start/install.md) § 2 (headers, the Vulkan driver), the
@@ -85,6 +91,10 @@ give the user the same command line for its MCP settings. Write nothing into the
 A client reads the project's MCP file when a session starts in that folder: ask the user to start a new session
 there and approve the `regia` server, then call `agent.hello` and take a screenshot. What the protocol may change is
 set by the permission profiles in the project's `.regia/agent.toml`.
+
+The `quick` template is outside this path: it is one Cargo crate with no editor project file, so do not tell the
+user to run `regia editor` or write the MCP project entry for it. Keep the quick template in local-first mode, or
+recommend a full project template when the user wants modes 2 or 3.
 
 ## Troubleshooting
 

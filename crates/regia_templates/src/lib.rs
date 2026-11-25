@@ -76,8 +76,102 @@ pub fn windows_build_dependencies_table() -> String {
     out
 }
 
+/// Directory-root remaps every template's `.cargo/config.toml` ships (ADR-10370).
+///
+/// The same roots as the engine workspace (ADR-10354), on the workspace rustflag
+/// targets and the other host triples that workspace names for cook determinism.
+/// The creating machine's home directory is not in this text:
+/// [`with_home_path_remap`] appends it last when `regia new` or the editor writes the
+/// project, because a home path compiled into this crate would name the build machine.
+pub const PATH_REMAP_CONFIG: &str = include_str!("../templates/path_remap.config.toml");
+
+/// The process home directory: `HOME`, otherwise `USERPROFILE`.
+///
+/// Empty values are treated as unset. This is the directory [`with_home_path_remap`]
+/// appends; it is read when the project is created, not when this crate is built.
+#[must_use]
+pub fn user_home_dir() -> Option<std::path::PathBuf> {
+    std::env::var_os("HOME")
+        .or_else(|| std::env::var_os("USERPROFILE"))
+        .filter(|value| !value.is_empty())
+        .map(std::path::PathBuf::from)
+}
+
+/// `--remap-path-prefix` flag for `home`, escaped for a TOML basic string.
+///
+/// # Errors
+///
+/// The path is relative, not Unicode, or contains a character that would break the
+/// flag or the TOML string (`"`, `=`, `]`, `{`, `}`, or a line break).
+pub fn home_remap_flag(home: &std::path::Path) -> Result<String, String> {
+    let Some(text) = home.to_str() else {
+        return Err(format!(
+            "home directory {} is not Unicode, so it cannot be written into .cargo/config.toml",
+            home.display()
+        ));
+    };
+    if text.is_empty() || !home.is_absolute() || text.contains(['"', '\n', '\r', '=', ']', '{', '}']) {
+        return Err(format!(
+            "home directory {} cannot be written into .cargo/config.toml",
+            home.display()
+        ));
+    }
+    Ok(format!(
+        "--remap-path-prefix={}=/builder",
+        escape_toml_basic(text)
+    ))
+}
+
+/// Escape `\` for a TOML basic string. The caller has already rejected `"`.
+fn escape_toml_basic(text: &str) -> String {
+    text.replace('\\', "\\\\")
+}
+
+/// Append `home` as the last `--remap-path-prefix` of every `rustflags` array in `config`.
+///
+/// rustc applies the last matching prefix, so the home directory has to follow the
+/// generic directory-root flags or the account name survives under `/builder`.
+///
+/// # Errors
+///
+/// `home` is not a path [`home_remap_flag`] accepts, or `config` has no closed
+/// `rustflags` array.
+pub fn with_home_path_remap(config: &str, home: &std::path::Path) -> Result<String, String> {
+    let flag = home_remap_flag(home)?;
+    const NEEDLE: &str = "rustflags = [";
+    if !config.contains(NEEDLE) {
+        return Err("cargo config has no rustflags array".to_string());
+    }
+    let mut out = String::with_capacity(config.len() + flag.len() * 8);
+    let mut rest = config;
+    let mut found = 0usize;
+    while let Some(at) = rest.find(NEEDLE) {
+        let after = &rest[at..];
+        let Some(end) = after.find(']') else {
+            return Err("cargo config has an unclosed rustflags array".to_string());
+        };
+        out.push_str(&rest[..at]);
+        let trimmed = after[..end].trim_end();
+        out.push_str(trimmed);
+        if !trimmed.ends_with('\n') {
+            out.push('\n');
+        }
+        out.push_str("    \"");
+        out.push_str(&flag);
+        out.push_str("\",\n]");
+        found += 1;
+        rest = &after[end + 1..];
+    }
+    out.push_str(rest);
+    if found == 0 {
+        return Err("cargo config has no rustflags array".to_string());
+    }
+    Ok(out)
+}
+
 /// Files of `templates/blank/`, path relative to the project root and the source text.
 pub const BLANK: &[(&str, &str)] = &[
+    (".cargo/config.toml", PATH_REMAP_CONFIG),
     (
         "rust-toolchain.toml",
         include_str!("../templates/rust-toolchain.toml"),
@@ -139,6 +233,7 @@ pub const BLANK: &[(&str, &str)] = &[
 
 /// Files of `templates/first_person/`, path relative to the project root and the source text.
 pub const FIRST_PERSON: &[(&str, &str)] = &[
+    (".cargo/config.toml", PATH_REMAP_CONFIG),
     (
         "rust-toolchain.toml",
         include_str!("../templates/rust-toolchain.toml"),
@@ -230,6 +325,7 @@ pub const FIRST_PERSON: &[(&str, &str)] = &[
 
 /// Files of `templates/third_person/` (the M20 sample stripped to a playable starter).
 pub const THIRD_PERSON: &[(&str, &str)] = &[
+    (".cargo/config.toml", PATH_REMAP_CONFIG),
     (
         "rust-toolchain.toml",
         include_str!("../templates/rust-toolchain.toml"),
@@ -337,6 +433,7 @@ pub const THIRD_PERSON: &[(&str, &str)] = &[
 
 /// Files of `templates/top_down/` (spec 91): overhead camera, screen-relative movement, quicksave.
 pub const TOP_DOWN: &[(&str, &str)] = &[
+    (".cargo/config.toml", PATH_REMAP_CONFIG),
     (
         "rust-toolchain.toml",
         include_str!("../templates/rust-toolchain.toml"),
@@ -421,6 +518,7 @@ pub const TOP_DOWN: &[(&str, &str)] = &[
 
 /// Files of `templates/quick/`: one crate, one `src/main.rs`.
 pub const QUICK: &[(&str, &str)] = &[
+    (".cargo/config.toml", PATH_REMAP_CONFIG),
     (
         "rust-toolchain.toml",
         include_str!("../templates/rust-toolchain-quick.toml"),
@@ -436,6 +534,7 @@ pub const QUICK: &[(&str, &str)] = &[
 /// simulation over encrypted UDP. The sources are `samples/net_game`'s, kept identical by that
 /// sample's `template_sync` test.
 pub const NET_GAME: &[(&str, &str)] = &[
+    (".cargo/config.toml", PATH_REMAP_CONFIG),
     (
         "rust-toolchain.toml",
         include_str!("../templates/rust-toolchain.toml"),
@@ -1797,5 +1896,65 @@ mod tests {
         );
         assert_eq!(std::fs::read_dir(&elsewhere).expect("read").count(), 0);
         let _ = std::fs::remove_dir_all(&parent);
+    }
+
+    /// ADR-10370: every template ships the workspace's directory-root remaps, and the
+    /// compiled-in text names no private host (it is linked into the `regia` binary).
+    /// The home directory is appended last, per target, only when a project is written.
+    #[test]
+    fn every_template_ships_root_remaps_and_home_is_appended_last() {
+        const ROOTS: [&str; 7] = ["/home", "/media", "/srv", "/models", "/root", "/mnt", "/Users"];
+        // The gate matches these with a trailing slash. The shipped flag text uses `=`.
+        for leaked in ["/home/", "/media/", "/srv/", "/models/"] {
+            assert!(
+                !PATH_REMAP_CONFIG.contains(leaked),
+                "compiled-in config contains {leaked}"
+            );
+        }
+        let targets = PATH_REMAP_CONFIG.matches("rustflags = [").count();
+        assert!(targets >= 4, "the workspace targets, got {targets}");
+        for id in TEMPLATE_IDS {
+            let files = template_files(id).unwrap_or(&[]);
+            let config = files
+                .iter()
+                .find(|(path, _)| *path == ".cargo/config.toml")
+                .map(|(_, text)| *text);
+            assert_eq!(config, Some(PATH_REMAP_CONFIG), "{id}");
+            for root in ROOTS {
+                assert!(
+                    PATH_REMAP_CONFIG.contains(&format!("--remap-path-prefix={root}=/builder")),
+                    "{id} missing {root}"
+                );
+            }
+        }
+        let home = std::path::Path::new("/home/player");
+        let written = with_home_path_remap(PATH_REMAP_CONFIG, home).expect("remap");
+        assert_eq!(written.matches("rustflags = [").count(), targets);
+        let flag = home_remap_flag(home).expect("flag");
+        for array in written.split("rustflags = [").skip(1) {
+            let body = array.split(']').next().unwrap_or("");
+            let last = body
+                .lines()
+                .rev()
+                .find(|line| line.contains("remap-path-prefix"))
+                .unwrap_or("");
+            assert!(last.contains(&flag), "last remap is {last}, want {flag}");
+            let generic = body
+                .find("--remap-path-prefix=/home=/builder")
+                .unwrap_or(usize::MAX);
+            let specific = body.find(&flag).unwrap_or(0);
+            assert!(generic < specific, "the home prefix must follow the /home root");
+        }
+        assert!(home_remap_flag(std::path::Path::new("relative")).is_err());
+        assert!(home_remap_flag(std::path::Path::new("/tmp/a\"b")).is_err());
+        assert_eq!(
+            home_remap_flag(std::path::Path::new("/tmp/player")).expect("abs"),
+            "--remap-path-prefix=/tmp/player=/builder"
+        );
+        assert_eq!(
+            escape_toml_basic(r"C:\Users\player"),
+            r"C:\\Users\\player",
+            "a Windows home is escaped for a TOML basic string"
+        );
     }
 }

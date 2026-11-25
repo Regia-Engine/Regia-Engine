@@ -1,5 +1,7 @@
 # Viewport
 
+Panel id: `viewport`.
+
 The **Viewport** tab shows the level as the game renders it, from an editor camera you fly or
 orbit, in one pane or four (perspective plus top, front and side). You select, move, rotate and
 scale entities here, frame them, keep camera bookmarks, and during play possess the game camera.

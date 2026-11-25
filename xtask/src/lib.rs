@@ -147,3 +147,5 @@ pub mod llms_txt;
 pub mod onboarding_lint;
 // `cargo xtask public-export`: the public repository's single-commit snapshot and its leak check (ADR-10229).
 pub mod public_export;
+// `cargo xtask manual` navigation pages: index, glossary and feature catalog (ADR-10418).
+pub mod manual_nav;

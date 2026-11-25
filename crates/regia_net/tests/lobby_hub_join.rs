@@ -235,13 +235,13 @@ impl World {
                 SocketAddr::from(([198, 51, 100, 7], 7777)),
             ));
         }
-        let offer = ReachOffer {
-            candidates,
-            nat: host_nat,
-            relay: Some(relay_addr()),
-            join_code: w.registrar.join_code().map(str::to_owned),
-            ticket: ticket.encode(),
-        };
+        let mut offer = ReachOffer::default();
+        offer.candidates = candidates;
+        offer.nat = host_nat;
+        offer.relay = Some(relay_addr());
+        offer.join_code = w.registrar.join_code().map(str::to_owned);
+        offer.ticket = ticket.encode();
+        offer.relay_only = false;
         w.owner.offer_reach(w.lobby, offer).expect("offer");
         w
     }
@@ -293,13 +293,11 @@ impl World {
             .set_member_data(lobby, "platform", Some(tag))
             .expect("platform tag");
         m.backend
-            .ask_reach(
-                lobby,
-                ReachOffer {
-                    nat: told,
-                    ..ReachOffer::default()
-                },
-            )
+            .ask_reach(lobby, {
+                let mut offer = ReachOffer::default();
+                offer.nat = told;
+                offer
+            })
             .expect("ask");
     }
 
@@ -551,10 +549,11 @@ fn the_owner_approves_each_join() {
     hub.offer_reach(
         owner,
         lobby,
-        ReachOffer {
-            relay: Some(relay_addr()),
-            join_code: Some("abc-def".into()),
-            ..ReachOffer::default()
+        {
+            let mut offer = ReachOffer::default();
+            offer.relay = Some(relay_addr());
+            offer.join_code = Some("abc-def".into());
+            offer
         },
         0,
     )
@@ -563,9 +562,10 @@ fn the_owner_approves_each_join() {
         hub.offer_reach(
             owner,
             lobby,
-            ReachOffer {
-                join_code: Some("not a code".into()),
-                ..ReachOffer::default()
+            {
+                let mut offer = ReachOffer::default();
+                offer.join_code = Some("not a code".into());
+                offer
             },
             0
         ),

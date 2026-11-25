@@ -1,5 +1,7 @@
 # Inspector
 
+Panel id: `inspector`.
+
 The **Inspector** tab (docked right) shows the components of the selection through reflection:
 one collapsing section per component, one row per field. Every edit is an undoable property
 change. With several entities selected, fields that agree show their value and fields that

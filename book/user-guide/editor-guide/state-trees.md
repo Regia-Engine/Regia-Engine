@@ -1,5 +1,7 @@
 # State trees
 
+Panel ids: `state_trees` and `state_tree_editor`.
+
 Two tabs work with state trees, the hierarchical decision model of the AI system (`.statetree.ron` files).
 **State Tree Editor** authors a tree: a node view of its states and transitions, a palette, an inspector for the
 selected state and a live list of problems. **State Trees** debugs the trees that run in the game: which state is

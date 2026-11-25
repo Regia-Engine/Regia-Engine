@@ -3,9 +3,15 @@
 //!
 //! 1. **Generated reference pages** — `book/reference/agent-methods.md` (from
 //!    [`regia_agent::schema::METHODS`] and the `book/COVERAGE.md` page map),
-//!    `book/reference/formats.md` (from the frozen-format registry `check-formats` uses) and
+//!    `book/reference/formats.md` (from the frozen-format registry `check-formats` uses),
 //!    `book/reference/render-profiles.md` (from [`regia_render::RenderProfile::from_preset`] and
-//!    the post/fog defaults). They are rewritten from the code, so they cannot drift from it.
+//!    the post/fog defaults), `book/manual/catalog.md` (from `docs/manual/feature-inventory.csv`)
+//!    and `book/manual/index.md` (from `<!-- index: Term -->` markers and level-2 and level-3
+//!    headings). They are rewritten from those sources, so they cannot drift. The inventory catalog
+//!    is the catalog the manual's contents point at. A short feature list, a generated glossary
+//!    and a heading index are also written under `book/reference/` from
+//!    [`crate::manual_nav`]; they do not replace the inventory catalog or the hand-written
+//!    glossary in `book/manual/glossary.md`.
 //! 2. **`docs/manual/manual.html`** — every chapter of `book/SUMMARY.md` in one self-contained HTML
 //!    file: sidebar table of contents, a search box, AMOLED Night / Paper theme, highlighted code,
 //!    embedded PiercingXX fonts, no network requests. Markdown goes through the in-house renderer
@@ -13,6 +19,9 @@
 //!    (no script library). The output depends only on the book, so two runs on the same tree write
 //!    identical bytes. `book/theme/piercing.css` is the same stylesheet, for the mdBook site.
 //! 3. **The mdBook site** — `mdbook build book` (output `book/build/`) when `mdbook` is on `PATH`.
+//!
+//! There is no PDF generator in the workspace dependency list. Open `docs/manual/manual.html` and
+//! use the browser's print dialog (the print style shows every chapter) to save a PDF.
 //!
 //! `--check` writes nothing and fails when a generated page or `manual.html` is out of date.
 
@@ -27,11 +36,22 @@ use anyhow::{Context, Result, bail};
 pub const MANUAL_HTML: &str = "docs/manual/manual.html";
 
 /// The generated reference pages, relative to `book/`.
-pub const GENERATED_PAGES: [&str; 3] = [
+///
+/// The first three are the code reference. The inventory catalog and the marker index follow
+/// them. The last three are the RON glossary, the short feature list and the heading index.
+pub const GENERATED_PAGES: [&str; 8] = [
     "reference/agent-methods.md",
     "reference/formats.md",
     "reference/render-profiles.md",
+    "manual/catalog.md",
+    "manual/index.md",
+    "reference/glossary.md",
+    "reference/feature-catalog.md",
+    "reference/index.md",
 ];
+
+/// Book path of the generated index. It is not indexed, or the next run would differ.
+const INDEX_PAGE: &str = "manual/index.md";
 
 /// What `cargo xtask manual` should do.
 #[derive(Debug, Clone, Copy, Default)]
@@ -108,12 +128,26 @@ fn write_or_check(path: &Path, text: &str, check: bool) -> Result<bool> {
         return Ok(false);
     }
     if !check {
-        if let Some(dir) = path.parent() {
-            std::fs::create_dir_all(dir).with_context(|| format!("creating {}", dir.display()))?;
-        }
-        std::fs::write(path, text).with_context(|| format!("writing {}", path.display()))?;
+        write_atomic(path, text)?;
     }
     Ok(true)
+}
+
+/// Writes `text` to `path` by writing a temp file in the same directory and renaming it over the
+/// destination, so a reader never sees a half-written page.
+fn write_atomic(path: &Path, text: &str) -> Result<()> {
+    let parent = path.parent().context("output path has no directory")?;
+    std::fs::create_dir_all(parent).with_context(|| format!("creating {}", parent.display()))?;
+    let file_name = path.file_name().context("output path has no file name")?;
+    let mut tmp_name = file_name.to_os_string();
+    tmp_name.push(format!(".{}.tmp", std::process::id()));
+    let tmp = parent.join(tmp_name);
+    std::fs::write(&tmp, text).with_context(|| format!("writing {}", tmp.display()))?;
+    if let Err(err) = std::fs::rename(&tmp, path) {
+        let _ = std::fs::remove_file(&tmp);
+        return Err(err).with_context(|| format!("renaming {} to {}", tmp.display(), path.display()));
+    }
+    Ok(())
 }
 
 /// Latin woff2 subsets under `book/theme/fonts`, both OFL-1.1.
@@ -254,15 +288,42 @@ pub fn stale_generated_pages(book: &Path) -> Result<Vec<String>> {
 /// Every generated page as `(path relative to book/, markdown)`.
 pub fn generated_pages(book: &Path) -> Result<Vec<(String, String)>> {
     let coverage = std::fs::read_to_string(book.join(crate::book::COVERAGE)).unwrap_or_default();
+    let agent = agent_methods_page(&coverage);
+    let formats = formats_page();
+    let profiles = render_profiles_page();
+    let catalog = catalog_page(book)?;
+    let mut overrides = BTreeMap::new();
+    overrides.insert(GENERATED_PAGES[0].to_string(), agent.clone());
+    overrides.insert(GENERATED_PAGES[1].to_string(), formats.clone());
+    overrides.insert(GENERATED_PAGES[2].to_string(), profiles.clone());
+    overrides.insert(GENERATED_PAGES[3].to_string(), catalog.clone());
+    let index = index_page(book, &overrides)?;
+    let glossary = crate::manual_nav::glossary_page(book)?;
+    let short_catalog = crate::manual_nav::feature_catalog_page(book)?;
+    // The heading index reads the freshly rendered code-reference pages. It does not read the
+    // navigation pages: their letter headings would index themselves.
+    let heading_index = crate::manual_nav::render_index(
+        book,
+        &[
+            (GENERATED_PAGES[0], agent.as_str()),
+            (GENERATED_PAGES[1], formats.as_str()),
+            (GENERATED_PAGES[2], profiles.as_str()),
+        ],
+    )?;
     Ok(vec![
-        (GENERATED_PAGES[0].to_string(), agent_methods_page(&coverage)),
-        (GENERATED_PAGES[1].to_string(), formats_page()),
-        (GENERATED_PAGES[2].to_string(), render_profiles_page()),
+        (GENERATED_PAGES[0].to_string(), agent),
+        (GENERATED_PAGES[1].to_string(), formats),
+        (GENERATED_PAGES[2].to_string(), profiles),
+        (GENERATED_PAGES[3].to_string(), catalog),
+        (GENERATED_PAGES[4].to_string(), index),
+        (GENERATED_PAGES[5].to_string(), glossary),
+        (GENERATED_PAGES[6].to_string(), short_catalog),
+        (GENERATED_PAGES[7].to_string(), heading_index),
     ])
 }
 
 /// The banner every generated page starts with.
-fn generated_banner(source: &str) -> String {
+pub(crate) fn generated_banner(source: &str) -> String {
     format!("<!-- Generated by `cargo xtask manual` from {source}. Do not edit by hand. -->\n\n")
 }
 
@@ -1305,6 +1366,19 @@ impl crate::markdown::Hooks for PageHooks<'_> {
         resolve_link(dest, self.page, self.pages).unwrap_or_else(|| dest.to_string())
     }
 
+    fn emit_as_link(&mut self, dest: &str) -> bool {
+        if dest.starts_with('#') || dest.contains("://") || dest.starts_with("mailto:") {
+            return true;
+        }
+        if resolve_link(dest, self.page, self.pages).is_some() {
+            return true;
+        }
+        let path = dest.split_once('#').map_or(dest, |(path, _)| path);
+        // A Markdown file that is not a chapter of this manual cannot be opened from the
+        // one-file page. Keep the label. `docs/formats` pages that were pulled in resolve above.
+        !path.ends_with(".md")
+    }
+
     fn heading_id(&mut self, level: u8, text: &str) -> Option<String> {
         let base = slug(text);
         let n = self.used_ids.entry(base.clone()).or_insert(0);
@@ -1871,18 +1945,24 @@ pub fn render_manual(book: &Path) -> Result<String> {
     // Chapters, then the included format pages, with previous/next links.
     let mut body = String::new();
     let mut seen = BTreeSet::new();
-    let order: Vec<(&str, &str)> = chapters
-        .iter()
-        .filter(|(_, p, _)| seen.insert(*p))
-        .map(|(t, p, _)| (*t, *p))
-        .chain(appendix.iter().map(|(t, k)| (t.as_str(), k.as_str())))
-        .collect();
-    for (index, (chapter_title, path)) in order.iter().enumerate() {
+    let mut order: Vec<(&str, &str, usize)> = Vec::new();
+    for (title, path, depth) in &chapters {
+        if seen.insert(*path) {
+            order.push((*title, *path, *depth));
+        }
+    }
+    for (title, key) in &appendix {
+        if seen.insert(key.as_str()) {
+            order.push((title.as_str(), key.as_str(), 0));
+        }
+    }
+    let toc = print_toc(&items);
+    for (index, (chapter_title, path, depth)) in order.iter().enumerate() {
         let id = page_id(path);
         let Some(page) = rendered.get(*path) else { continue };
         let _ = writeln!(
             body,
-            "<section class=\"chapter\" id=\"{id}\" data-title=\"{}\">\n<div class=\"crumb\">{}</div>",
+            "<section class=\"chapter\" id=\"{id}\" data-depth=\"{depth}\" data-title=\"{}\">\n<div class=\"crumb\">{}</div>",
             escape(chapter_title),
             escape(path.trim_start_matches("../"))
         );
@@ -1897,7 +1977,7 @@ pub fn render_manual(book: &Path) -> Result<String> {
         }
         body.push_str(&page.html);
         body.push_str("<nav class=\"pager\">");
-        if let Some((t, p)) = index.checked_sub(1).and_then(|i| order.get(i)) {
+        if let Some((t, p, _)) = index.checked_sub(1).and_then(|i| order.get(i)) {
             let _ = write!(
                 body,
                 "<a class=\"prev\" href=\"#{}\">← {}</a>",
@@ -1905,7 +1985,7 @@ pub fn render_manual(book: &Path) -> Result<String> {
                 escape(t)
             );
         }
-        if let Some((t, p)) = order.get(index + 1) {
+        if let Some((t, p, _)) = order.get(index + 1) {
             let _ = write!(
                 body,
                 "<a class=\"next\" href=\"#{}\">{} →</a>",
@@ -1929,11 +2009,36 @@ pub fn render_manual(book: &Path) -> Result<String> {
          <input id=\"search\" type=\"search\" placeholder=\"Search the manual  ( / )\" autocomplete=\"off\" aria-label=\"Search\">\n\
          <div id=\"results\" hidden></div>\n<nav id=\"nav\">\n{nav}</nav>\n</aside>\n\
          <button id=\"menu\" type=\"button\" aria-label=\"Table of contents\">☰</button>\n\
-         <main id=\"content\">\n{body}</main>\n<script>{JS}</script>\n</body>\n</html>\n",
+         <main id=\"content\">\n{toc}{body}</main>\n<script>{JS}</script>\n</body>\n</html>\n",
         title = escape(&title),
-        first = order.first().map(|(_, p)| page_id(p)).unwrap_or_default(),
+        first = order.first().map(|(_, p, _)| page_id(p)).unwrap_or_default(),
     );
     Ok(html)
+}
+
+/// The print-only contents. Screen CSS hides it; print CSS shows it and breaks after it.
+fn print_toc(items: &[SummaryItem]) -> String {
+    let mut out = String::from(
+        "<nav class=\"print-toc\" aria-label=\"Contents\">\n<p class=\"print-toc-title\">Contents</p>\n<ul>\n",
+    );
+    for item in items {
+        match item {
+            SummaryItem::Part(name) => {
+                let _ = writeln!(out, "<li class=\"part\">{}</li>", escape(name));
+            }
+            SummaryItem::Chapter { title, path, depth } => {
+                let id = page_id(path);
+                let _ = writeln!(
+                    out,
+                    "<li class=\"depth{}\"><a href=\"#{id}\">{}</a></li>",
+                    depth.min(&3),
+                    escape(title)
+                );
+            }
+        }
+    }
+    out.push_str("</ul>\n</nav>\n");
+    out
 }
 
 /// The `title` from `book/book.toml`, or a default.
@@ -2049,6 +2154,513 @@ pub fn chapter_paths(summary: &str) -> Vec<PathBuf> {
             SummaryItem::Part(_) => None,
         })
         .collect()
+}
+
+// ---------------------------------------------------------------------------
+// Feature catalog (`docs/manual/feature-inventory.csv`)
+// ---------------------------------------------------------------------------
+
+/// Inventory kinds the catalog prints, in section order. Modules, crates, flags, formats and
+/// agent methods stay out of the tables.
+const CATALOG_KINDS: &[(&str, &str)] = &[
+    ("feature", "Features"),
+    ("spec", "Specifications"),
+    ("cli-command", "Commands"),
+    ("editor-panel", "Editor panels"),
+    ("ladder", "Version ladder"),
+];
+
+/// Names the plan treats as partial even when a later inventory edit says `built`.
+///
+/// A name that is absent from the CSV fails `generated_pages`. WebGPU and WebGL2 are two rows.
+/// Human-check specs are not in this list: they keep the inventory status until a writing lane
+/// reports a correction.
+const TRUSTED_PARTIALS: &[&str] = &[
+    "Spec 24 \u{2014} Steam integration (`regia_steam`)",
+    "Spec 58: OpenXR (`regia_xr`)",
+    "Spec 61: Starter content, the sample game and the project templates",
+    "Vendor upscaler DLSS",
+    "Vendor upscaler XeSS",
+    "Platform macOS",
+    "Graphics backend Metal",
+    "Graphics backend WebGPU",
+    "Graphics backend WebGL2",
+    "Cursor grab and confinement",
+    "Android lifecycle",
+    "Multiple OS windows",
+    "Steam sockets",
+    "Lobbies",
+    "QUIC transport",
+    "Steam upload, input manifest and layout",
+    "Voxel terrain",
+    "Video playback",
+    "DCC scene feed",
+];
+
+/// One inventory row the catalog might print.
+struct InventoryRow {
+    name: String,
+    area: String,
+    status: String,
+    documented: String,
+    kind: String,
+}
+
+/// `book/manual/catalog.md` from the feature inventory.
+fn catalog_page(book: &Path) -> Result<String> {
+    let path = match book.parent() {
+        Some(root) => root.join("docs/manual/feature-inventory.csv"),
+        None => PathBuf::from("docs/manual/feature-inventory.csv"),
+    };
+    let text = std::fs::read_to_string(&path).with_context(|| format!("reading {}", path.display()))?;
+    let mut rows = parse_inventory_csv(&text).map_err(|err| anyhow::anyhow!("{}: {err}", path.display()))?;
+    apply_trusted_partials(&mut rows).map_err(|err| anyhow::anyhow!("{}: {err}", path.display()))?;
+    Ok(catalog_markdown(&rows))
+}
+
+/// Parses the inventory CSV (RFC 4180 quotes, including commas and newlines inside quotes).
+fn parse_inventory_csv(text: &str) -> Result<Vec<InventoryRow>, String> {
+    let records = parse_csv_records(text)?;
+    let Some(header) = records.first() else {
+        return Err("inventory csv is empty".to_string());
+    };
+    let column = |name: &str| -> Result<usize, String> {
+        header
+            .iter()
+            .position(|cell| cell == name)
+            .ok_or_else(|| format!("inventory csv is missing the {name} column"))
+    };
+    let name_at = column("name")?;
+    let area_at = column("area")?;
+    let status_at = column("status")?;
+    let documented_at = column("documented")?;
+    let kind_at = column("kind")?;
+    let width = header.len();
+    let mut rows = Vec::new();
+    for (index, record) in records.iter().skip(1).enumerate() {
+        if record.len() != width {
+            return Err(format!(
+                "inventory csv record {} has {} fields, the header has {width}",
+                index + 2,
+                record.len()
+            ));
+        }
+        rows.push(InventoryRow {
+            name: record[name_at].clone(),
+            area: record[area_at].clone(),
+            status: record[status_at].clone(),
+            documented: record[documented_at].clone(),
+            kind: record[kind_at].clone(),
+        });
+    }
+    Ok(rows)
+}
+
+/// Splits `text` into CSV records. A trailing empty line is dropped.
+fn parse_csv_records(text: &str) -> Result<Vec<Vec<String>>, String> {
+    let text = text.strip_prefix('\u{feff}').unwrap_or(text);
+    let mut records = Vec::new();
+    let mut record = Vec::new();
+    let mut field = String::new();
+    let mut quoted = false;
+    let mut chars = text.chars().peekable();
+    while let Some(ch) = chars.next() {
+        if quoted {
+            if ch == '"' {
+                if chars.peek() == Some(&'"') {
+                    chars.next();
+                    field.push('"');
+                } else {
+                    quoted = false;
+                }
+            } else {
+                field.push(ch);
+            }
+            continue;
+        }
+        match ch {
+            '"' if field.is_empty() => quoted = true,
+            ',' => record.push(std::mem::take(&mut field)),
+            '\n' | '\r' => {
+                if ch == '\r' && chars.peek() == Some(&'\n') {
+                    chars.next();
+                }
+                record.push(std::mem::take(&mut field));
+                let blank = record.iter().all(String::is_empty);
+                if blank && !records.is_empty() {
+                    record.clear();
+                } else {
+                    records.push(std::mem::take(&mut record));
+                }
+            }
+            _ => field.push(ch),
+        }
+    }
+    if quoted {
+        return Err("inventory csv has an unclosed quote".to_string());
+    }
+    if !field.is_empty() || !record.is_empty() {
+        record.push(field);
+        if record.iter().any(|cell| !cell.is_empty()) || records.is_empty() {
+            records.push(record);
+        }
+    }
+    Ok(records)
+}
+
+/// Forces every [`TRUSTED_PARTIALS`] row to `partial`. Errors when a name is missing.
+fn apply_trusted_partials(rows: &mut [InventoryRow]) -> Result<(), String> {
+    for row in rows.iter_mut() {
+        if TRUSTED_PARTIALS.contains(&row.name.as_str()) {
+            row.status = "partial".to_string();
+        }
+    }
+    let names: BTreeSet<&str> = rows.iter().map(|row| row.name.as_str()).collect();
+    let missing: Vec<&str> = TRUSTED_PARTIALS
+        .iter()
+        .copied()
+        .filter(|name| !names.contains(name))
+        .collect();
+    if missing.is_empty() {
+        Ok(())
+    } else {
+        Err(format!(
+            "trusted partial names missing from the inventory: {}",
+            missing.join("; ")
+        ))
+    }
+}
+
+/// The catalog page. Kinds outside [`CATALOG_KINDS`] are omitted.
+fn catalog_markdown(rows: &[InventoryRow]) -> String {
+    let mut out = generated_banner("`docs/manual/feature-inventory.csv`");
+    out.push_str("# Feature catalog\n\n");
+    out.push_str(
+        "The rows below are the inventory's features, specifications, commands, editor panels, \
+         and version ladder. Status is `built`, `partial`, or `deferred`. A partial row works \
+         with the limit named in [Known issues and limits](known-issues.md). Module rows, crate \
+         rows, and per-flag rows stay in the inventory and are not listed here.\n\n",
+    );
+    out.push_str(
+        "Content formats are listed in [Formats](../reference/formats.md). Agent methods are \
+         listed in [Agent methods](../reference/agent-methods.md).\n\n",
+    );
+    for (kind, title) in CATALOG_KINDS {
+        let matching: Vec<&InventoryRow> = rows.iter().filter(|row| row.kind == *kind).collect();
+        if matching.is_empty() {
+            continue;
+        }
+        let _ = writeln!(out, "## {title}\n");
+        if *kind == "ladder" {
+            out.push_str(
+                "These rows are parked. They are not part of this version. The same list, with \
+                 the reason, is on [Known issues and limits](known-issues.md).\n\n",
+            );
+        }
+        let mut groups: BTreeMap<(String, String), Vec<&InventoryRow>> = BTreeMap::new();
+        for row in matching {
+            let title = area_title(&row.area);
+            groups
+                .entry((title.to_lowercase(), row.area.clone()))
+                .or_default()
+                .push(row);
+        }
+        for ((_, area), mut group) in groups {
+            let _ = writeln!(out, "### {}\n", area_title(&area));
+            out.push_str("| Feature | Status | Guide |\n|---|---|---|\n");
+            group.sort_by(|a, b| {
+                a.name
+                    .to_lowercase()
+                    .cmp(&b.name.to_lowercase())
+                    .then(a.name.cmp(&b.name))
+            });
+            for row in group {
+                let _ = writeln!(
+                    out,
+                    "| {} | {} | {} |",
+                    cell(&row.name),
+                    cell(&row.status),
+                    guide_cell(&row.documented)
+                );
+            }
+            out.push('\n');
+        }
+    }
+    out
+}
+
+/// `platform` becomes `Platform`. An empty area becomes `General`.
+fn area_title(area: &str) -> String {
+    let mut words = Vec::new();
+    for word in area.split(|ch: char| ch == '-' || ch == '_' || ch.is_whitespace()) {
+        if word.is_empty() {
+            continue;
+        }
+        let mut chars = word.chars();
+        let Some(first) = chars.next() else { continue };
+        let mut titled = first.to_uppercase().collect::<String>();
+        titled.push_str(chars.as_str());
+        words.push(titled);
+    }
+    if words.is_empty() {
+        "General".to_string()
+    } else {
+        words.join(" ")
+    }
+}
+
+/// Up to three guide links. `NONE` and prose that does not name a `.md` file become an em dash.
+fn guide_cell(documented: &str) -> String {
+    let mut links = Vec::new();
+    for part in documented.split(';') {
+        let Some(token) = part.split_whitespace().find(|token| token.contains(".md")) else {
+            continue;
+        };
+        let token = token.trim_matches(|ch: char| matches!(ch, ',' | '(' | ')' | '`' | '"' | '\''));
+        let (path, fragment) = token.split_once('#').map_or((token, None), |(path, fragment)| {
+            if fragment.is_empty() {
+                (path, None)
+            } else {
+                (path, Some(fragment))
+            }
+        });
+        if !path.ends_with(".md") {
+            continue;
+        }
+        // `SUMMARY.md` is the table of contents, not a chapter. A link to it
+        // stays a `.md` href, which the one-file manual rejects.
+        if path == "SUMMARY.md" || path == "book/SUMMARY.md" {
+            continue;
+        }
+        links.push(guide_link(path, fragment));
+        if links.len() == 3 {
+            break;
+        }
+    }
+    if links.is_empty() {
+        "—".to_string()
+    } else {
+        links.join(", ")
+    }
+}
+
+/// A link from `book/manual/catalog.md` to a book or docs page.
+fn guide_link(path: &str, fragment: Option<&str>) -> String {
+    let path = path.strip_prefix("book/").unwrap_or(path);
+    let href = if let Some(rest) = path.strip_prefix("manual/") {
+        rest.to_string()
+    } else if path.starts_with("docs/") {
+        format!("../../{path}")
+    } else {
+        format!("../{path}")
+    };
+    let href = match fragment {
+        Some(fragment) => format!("{href}#{fragment}"),
+        None => href,
+    };
+    format!("[{}]({href})", guide_label(path))
+}
+
+/// The file stem, with hyphens and underscores written as spaces.
+fn guide_label(path: &str) -> String {
+    let file = path.rsplit('/').next().unwrap_or(path);
+    let stem = file.strip_suffix(".md").unwrap_or(file);
+    stem.replace(['-', '_'], " ")
+}
+
+// ---------------------------------------------------------------------------
+// Generated index
+// ---------------------------------------------------------------------------
+
+/// One index term after case-fold merging.
+struct IndexTerm {
+    /// Spelling to print. A marker spelling replaces a heading spelling.
+    display: String,
+    /// True once a marker has set `display`.
+    from_marker: bool,
+    /// First `see:` target. The marker that set it added no page link.
+    see: Option<String>,
+    /// Page links, keyed by href so the same target is one link.
+    links: BTreeMap<String, String>,
+}
+
+/// `book/manual/index.md`. The index page itself is not collected, so a second run matches.
+fn index_page(book: &Path, overrides: &BTreeMap<String, String>) -> Result<String> {
+    let summary_path = book.join(crate::book::SUMMARY);
+    let summary = std::fs::read_to_string(&summary_path)
+        .with_context(|| format!("reading {}", summary_path.display()))?;
+    let mut terms = BTreeMap::new();
+    for item in parse_summary(&summary) {
+        let SummaryItem::Chapter { path, .. } = item else {
+            continue;
+        };
+        if path == INDEX_PAGE {
+            continue;
+        }
+        let markdown = if let Some(text) = overrides.get(&path) {
+            text.clone()
+        } else {
+            let file = book.join(&path);
+            std::fs::read_to_string(&file).with_context(|| {
+                format!(
+                    "reading {} for the manual index (linked from SUMMARY.md)",
+                    file.display()
+                )
+            })?
+        };
+        let hits = crate::book::index_hits(&path, &markdown).map_err(anyhow::Error::msg)?;
+        for hit in hits {
+            fold_index_hit(&mut terms, hit);
+        }
+    }
+    Ok(index_markdown(&terms))
+}
+
+/// Merges one hit into `terms`. The key is the term's Unicode lowercase form.
+fn fold_index_hit(terms: &mut BTreeMap<String, IndexTerm>, hit: crate::book::IndexHit) {
+    let key = hit.term.to_lowercase();
+    let entry = terms.entry(key).or_insert_with(|| IndexTerm {
+        display: hit.term.clone(),
+        from_marker: hit.marker,
+        see: None,
+        links: BTreeMap::new(),
+    });
+    if hit.marker && !entry.from_marker {
+        entry.display.clone_from(&hit.term);
+        entry.from_marker = true;
+    }
+    if let Some(see) = hit.see {
+        if entry.see.is_none() {
+            entry.see = Some(see);
+        }
+        return;
+    }
+    let href = index_href(&hit.page, &hit.anchor);
+    let label = index_link_label(&hit.page_title, &hit.anchor, &hit.anchor_label);
+    entry.links.entry(href).or_insert(label);
+}
+
+/// A link from `book/manual/index.md` to `page` (a SUMMARY path) and an optional heading slug.
+fn index_href(page: &str, anchor: &str) -> String {
+    let rel = if let Some(rest) = page.strip_prefix("manual/") {
+        rest.to_string()
+    } else {
+        format!("../{page}")
+    };
+    if anchor.is_empty() {
+        rel
+    } else {
+        format!("{rel}#{anchor}")
+    }
+}
+
+/// Page title, or `Page title — heading` when the heading is not the page title.
+fn index_link_label(page_title: &str, anchor: &str, anchor_label: &str) -> String {
+    if anchor.is_empty() || anchor_label.eq_ignore_ascii_case(page_title) {
+        page_title.to_string()
+    } else if page_title.is_empty() {
+        anchor_label.to_string()
+    } else {
+        format!("{page_title} — {anchor_label}")
+    }
+}
+
+/// Escapes the characters that would break a bold index row or a link label.
+fn index_md(text: &str) -> String {
+    let mut out = String::with_capacity(text.len());
+    for ch in text.chars() {
+        if matches!(ch, '\\' | '[' | ']' | '*' | '`') {
+            out.push('\\');
+        }
+        out.push(ch);
+    }
+    out
+}
+
+/// `A`–`Z` for letters, `0` for digits, `#` for anything else.
+fn index_section(key: &str) -> char {
+    match key.chars().next() {
+        Some(ch) if ch.is_ascii_alphabetic() => ch.to_ascii_uppercase(),
+        Some(ch) if ch.is_ascii_digit() => '0',
+        _ => '#',
+    }
+}
+
+/// The index page. Sections are A–Z, then digits, then other first characters.
+fn index_markdown(terms: &BTreeMap<String, IndexTerm>) -> String {
+    let mut out = generated_banner("index markers and level-2 and level-3 headings");
+    out.push_str("# Index\n\n");
+    out.push_str(
+        "Terms a reader looks up. Each row links the pages whose level-2 or level-3 headings, \
+         or index markers, use that term. Sections run A to Z, then digits, then every other \
+         first character. US English case-folding (Unicode lowercase) decides the order and \
+         which spellings are the same term.\n\n",
+    );
+    out.push_str(
+        "Writers mark a term on a page they own. The marker is an HTML comment, so it does not \
+         show when the page is rendered:\n\n",
+    );
+    out.push_str(
+        "```html\n<!-- index: Lockstep -->\n<!-- index: Dedicated server | see: Listen server -->\n```\n\n",
+    );
+    out.push_str(
+        "A marker with `see` names another term and adds no page link of its own. This page is \
+         generated. Do not edit it by hand.\n\n",
+    );
+    let mut letters: BTreeMap<char, Vec<&IndexTerm>> = BTreeMap::new();
+    let mut digits = Vec::new();
+    let mut other = Vec::new();
+    for (key, term) in terms {
+        match index_section(key) {
+            '0' => digits.push(term),
+            '#' => other.push(term),
+            ch => letters.entry(ch).or_default().push(term),
+        }
+    }
+    for ch in 'A'..='Z' {
+        if let Some(rows) = letters.get(&ch) {
+            push_index_section(&mut out, &ch.to_string(), rows);
+        }
+    }
+    push_index_section(&mut out, "0–9", &digits);
+    push_index_section(&mut out, "Other", &other);
+    out
+}
+
+fn push_index_section(out: &mut String, title: &str, rows: &[&IndexTerm]) {
+    if rows.is_empty() {
+        return;
+    }
+    let _ = writeln!(out, "## {title}\n");
+    for term in rows {
+        out.push_str(&index_row(term));
+        out.push('\n');
+    }
+    out.push('\n');
+}
+
+/// One index row. Links are sorted by label, then href. A see-only term has no link.
+fn index_row(term: &IndexTerm) -> String {
+    let mut links: Vec<(&str, &str)> = term
+        .links
+        .iter()
+        .map(|(href, label)| (href.as_str(), label.as_str()))
+        .collect();
+    links.sort_by(|a, b| a.1.to_lowercase().cmp(&b.1.to_lowercase()).then(a.0.cmp(b.0)));
+    let mut listed = String::new();
+    for (index, (href, label)) in links.iter().enumerate() {
+        if index > 0 {
+            listed.push_str(", ");
+        }
+        let _ = write!(listed, "[{}]({href})", index_md(label));
+    }
+    let name = index_md(&term.display);
+    match (listed.is_empty(), term.see.as_deref()) {
+        (true, Some(see)) => format!("**{name}** — see {}", index_md(see)),
+        (false, Some(see)) => format!("**{name}** — {listed}; see {}", index_md(see)),
+        (false, None) => format!("**{name}** — {listed}"),
+        (true, None) => format!("**{name}**"),
+    }
 }
 
 #[cfg(test)]
@@ -2220,6 +2832,17 @@ mod tests {
         );
         assert!(page.html.contains("href=\"#p-b--x\""));
         assert!(page.html.contains("href=\"#p-a--part-one\""));
+        let outside = render_page(
+            "See [spec 22](../../docs/specs/22-tier2.md) and [the web](https://example.com).\n",
+            "a.md",
+            &pages,
+        );
+        assert!(
+            outside.html.contains("spec 22") && !outside.html.contains("22-tier2.md"),
+            "a spec file is named in the text and is not a markdown href: {}",
+            outside.html
+        );
+        assert!(outside.html.contains("href=\"https://example.com\""));
         assert!(page.html.contains("<span class=\"kw\">fn</span>"));
         assert!(
             page.html
@@ -2286,5 +2909,242 @@ mod tests {
         assert!(html.contains("<blockquote class=\"callout note\">"));
         assert_eq!(html.matches("class=\"status planned\"").count(), 2);
         assert!(!html.contains("<strong>planned</strong>"));
+    }
+
+    fn row(name: &str, area: &str, status: &str, documented: &str, kind: &str) -> InventoryRow {
+        InventoryRow {
+            name: name.to_string(),
+            area: area.to_string(),
+            status: status.to_string(),
+            documented: documented.to_string(),
+            kind: kind.to_string(),
+        }
+    }
+
+    #[test]
+    fn inventory_csv_keeps_quotes_commas_and_newlines() {
+        let text = "\
+name,area,status,documented,owner,kind,notes
+Plain,net,built,NONE,crates/x,feature,plain
+\"Spec 61: Starter content, the sample game and the project templates\",spec,partial,NONE,docs/x.md,spec,\"a \"\"quoted\"\" note, with a comma\"
+\"Line\nbreak\",world,built,user-guide/a.md,crates/x,feature,ok
+";
+        let rows = parse_inventory_csv(text).expect("csv");
+        assert_eq!(rows.len(), 3);
+        assert_eq!(
+            rows[1].name,
+            "Spec 61: Starter content, the sample game and the project templates"
+        );
+        assert_eq!(rows[1].kind, "spec");
+        assert!(rows[1].documented.is_empty() || rows[1].documented == "NONE");
+        assert_eq!(rows[2].name, "Line\nbreak");
+        assert_eq!(rows[2].documented, "user-guide/a.md");
+        assert!(parse_inventory_csv("name,area\n\"open\n").is_err());
+    }
+
+    #[test]
+    fn trusted_partials_override_status_and_must_exist() {
+        let mut rows = TRUSTED_PARTIALS
+            .iter()
+            .map(|name| {
+                row(
+                    name,
+                    "quality",
+                    "built",
+                    "NONE",
+                    if name.starts_with("Spec") {
+                        "spec"
+                    } else {
+                        "feature"
+                    },
+                )
+            })
+            .collect::<Vec<_>>();
+        rows.push(row(
+            "Lobby hub",
+            "net",
+            "built",
+            "user-guide/networking.md",
+            "feature",
+        ));
+        apply_trusted_partials(&mut rows).expect("every trusted name is present");
+        assert!(
+            rows.iter()
+                .filter(|row| TRUSTED_PARTIALS.contains(&row.name.as_str()))
+                .all(|row| row.status == "partial")
+        );
+        assert_eq!(rows.last().expect("lobby").status, "built");
+        let err = apply_trusted_partials(&mut [row("Only one", "net", "built", "NONE", "feature")])
+            .expect_err("missing names");
+        assert!(err.contains("Vendor upscaler DLSS"), "{err}");
+        assert!(
+            err.contains("Graphics backend WebGPU") && err.contains("Graphics backend WebGL2"),
+            "{err}"
+        );
+    }
+
+    #[test]
+    fn catalog_groups_kinds_areas_and_guide_links() {
+        let rows = vec![
+            row("QUIC transport", "net", "partial", "NONE", "feature"),
+            row(
+                "Lobbies",
+                "net",
+                "partial",
+                "user-guide/a.md; prose; user-guide/b.md; user-guide/c.md; user-guide/d.md",
+                "feature",
+            ),
+            row(
+                "Platform macOS",
+                "platform",
+                "partial",
+                "docs/specs/x.md",
+                "feature",
+            ),
+            row(
+                "Known limits",
+                "manual",
+                "built",
+                "manual/known-issues.md",
+                "feature",
+            ),
+            row("Cook page", "assets", "built", "book/user-guide/a.md", "feature"),
+            row("SKIP_ME_MODULE", "crates", "built", "NONE", "module"),
+            row("SKIP_ME_FLAG", "cli", "built", "NONE", "cli-flag"),
+            row("regia new", "project", "built", "reference/cli.md", "cli-command"),
+            row(
+                "editor panel `viewport`",
+                "editor",
+                "built",
+                "NONE",
+                "editor-panel",
+            ),
+            row("Consoles", "version-ladder", "deferred", "NONE", "ladder"),
+            row(
+                "Spec 58: OpenXR (`regia_xr`)",
+                "spec",
+                "partial",
+                "agents/xr.md",
+                "spec",
+            ),
+            row(
+                "FFT ocean (N19, ADR-1969)",
+                "water",
+                "built",
+                "COVERAGE.md; SUMMARY.md; agents/water.md",
+                "spec",
+            ),
+        ];
+        let md = catalog_markdown(&rows);
+        let features = md.find("## Features").expect("features");
+        let specs = md.find("## Specifications").expect("specs");
+        let commands = md.find("## Commands").expect("commands");
+        let panels = md.find("## Editor panels").expect("panels");
+        let ladder = md.find("## Version ladder").expect("ladder");
+        assert!(features < specs && specs < commands && commands < panels && panels < ladder);
+        let net = md.find("### Net").expect("net");
+        let platform = md.find("### Platform").expect("platform");
+        assert!(net < platform, "areas sort by title");
+        assert!(md.find("Lobbies").expect("lobbies") < md.find("QUIC transport").expect("quic"));
+        assert!(!md.contains("SKIP_ME_MODULE"));
+        assert!(!md.contains("SKIP_ME_FLAG"));
+        assert!(md.contains("[Formats](../reference/formats.md)"));
+        assert!(md.contains("[Agent methods](../reference/agent-methods.md)"));
+        assert!(md.contains("](../user-guide/a.md)"));
+        assert!(md.contains("](../user-guide/b.md)"));
+        assert!(md.contains("](../user-guide/c.md)"));
+        assert!(
+            !md.contains("user-guide/d.md"),
+            "the fourth guide link is dropped"
+        );
+        assert!(md.contains("](../../docs/specs/x.md)"));
+        assert!(md.contains("](known-issues.md)"));
+        assert!(md.contains("| — |") || md.contains("| QUIC transport | partial | — |"));
+        assert!(md.contains("parked"));
+        assert!(md.contains("`regia_xr`") || md.contains("regia\\_xr") || md.contains("OpenXR"));
+        assert!(md.contains("](../COVERAGE.md)"));
+        assert!(md.contains("](../agents/water.md)"));
+        assert!(
+            !md.contains("SUMMARY.md"),
+            "SUMMARY.md is the table of contents, not a chapter"
+        );
+    }
+
+    fn index_hit(
+        term: &str,
+        see: Option<&str>,
+        page: &str,
+        anchor: &str,
+        marker: bool,
+    ) -> crate::book::IndexHit {
+        crate::book::IndexHit {
+            term: term.to_string(),
+            see: see.map(str::to_string),
+            page: page.to_string(),
+            page_title: "Page".to_string(),
+            anchor: anchor.to_string(),
+            anchor_label: if anchor.is_empty() {
+                String::new()
+            } else {
+                term.to_string()
+            },
+            marker,
+        }
+    }
+
+    #[test]
+    fn index_merges_case_see_targets_and_section_order() {
+        assert_eq!(index_href("manual/glossary.md", ""), "glossary.md");
+        assert_eq!(
+            index_href("user-guide/networking.md", "lockstep"),
+            "../user-guide/networking.md#lockstep"
+        );
+        assert_eq!(index_href("../docs/formats/a.md", ""), "../../docs/formats/a.md");
+        assert_eq!(INDEX_PAGE, "manual/index.md");
+
+        let mut terms = BTreeMap::new();
+        fold_index_hit(
+            &mut terms,
+            index_hit("Lockstep", None, "user-guide/networking.md", "lockstep", false),
+        );
+        fold_index_hit(
+            &mut terms,
+            index_hit("lockstep", None, "manual/glossary.md", "lockstep", true),
+        );
+        fold_index_hit(
+            &mut terms,
+            index_hit(
+                "Dedicated server",
+                Some("Listen server"),
+                "user-guide/networking.md",
+                "dedicated-server",
+                true,
+            ),
+        );
+        fold_index_hit(
+            &mut terms,
+            index_hit("2D sprites", None, "user-guide/2d.md", "sprites", false),
+        );
+        fold_index_hit(
+            &mut terms,
+            index_hit(".fpak", None, "fundamentals/assets.md", "packaging", false),
+        );
+        let md = index_markdown(&terms);
+        let lockstep = md.find("**lockstep**").expect("marker spelling");
+        assert!(md[lockstep..].contains("](../user-guide/networking.md#lockstep)"));
+        assert!(md[lockstep..].contains("](glossary.md#lockstep)"));
+        let dedicated = md.find("**Dedicated server**").expect("see term");
+        let dedicated_row = md[dedicated..].lines().next().expect("row");
+        assert!(dedicated_row.contains("see Listen server"), "{dedicated_row}");
+        assert!(
+            !dedicated_row.contains("]("),
+            "a see marker adds no page link: {dedicated_row}"
+        );
+        let letters = md.find("## L").expect("letter section");
+        let digits = md.find("## 0–9").expect("digit section");
+        let other = md.find("## Other").expect("other section");
+        assert!(letters < digits && digits < other, "A–Z, then digits, then other");
+        assert!(md.contains("**2D sprites**"));
+        assert!(md.contains("**.fpak**") || md.contains("**\\.fpak**") || md.contains(".fpak"));
     }
 }

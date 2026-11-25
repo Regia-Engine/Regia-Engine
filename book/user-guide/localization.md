@@ -1,9 +1,20 @@
 # Localization
 
+<!-- index: Localization -->
+<!-- index: Fluent -->
+<!-- index: Locale -->
+<!-- index: Pseudo-localization -->
+<!-- index: Plural rules -->
+<!-- index: PO file -->
+<!-- index: XLIFF -->
+
 Regia's UI text comes from [Project Fluent](https://projectfluent.org/) files, one directory per locale. This page
 walks through the workflow: write keys in content and code, gather them into the locale files, translate, validate,
 test layout with pseudo-localization, and switch locales at runtime. The design is in
-`docs/specs/content-data.md` § 1; agents use the [localization methods](../agents/localization.md).
+[content data](../../docs/specs/content-data.md) § 1. Exchange files, dialogue recordings, and subtitle
+cues are [spec 36](../../docs/specs/36-localization-exchange-dialogue-subtitles.md). The line player
+and caption board are [spec 56](../../docs/specs/56-dialogue-and-subtitles.md) and
+[Dialogue](dialogue.md). Agents use the [localization methods](../agents/localization.md).
 
 ## Files
 

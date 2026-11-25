@@ -1,11 +1,19 @@
 # Terrain, tunnels and scatter
 
+<!-- index: Terrain -->
+<!-- index: Heightfield -->
+<!-- index: CDLOD -->
+<!-- index: Terrain collision -->
+<!-- index: Tunnel -->
+<!-- index: Scatter -->
+
 `regia_terrain` provides heightfields rendered with continuous LOD (CDLOD), material layer
 stacks, layer-driven scattering of rocks and vegetation, and mesh tunnels through the ground. It
 renders on the runtime path (`docs/specs/26-terrain-vfx-highend.md`). The photoreal material path
 and the cooked, streamed data path have their own chapters:
 [Photoreal terrain](terrain-photoreal.md) and [Terrain data: cook and stream](terrain-data.md).
 Particles, decals and trails moved to [VFX and decals](../systems/vfx.md).
+The task procedure is [Author a terrain](../how-to/world/terrain.md).
 
 ## Heightfields
 
@@ -107,8 +115,58 @@ is false. The agent calls `terrain.water` and
 `WaterPlane::probe` gives depth, distance to the shore and foam at a point, for gameplay
 queries.
 
+## Water bodies, swell, and the ocean
+
+<!-- index: Water body -->
+<!-- index: Water plane -->
+<!-- index: Swell -->
+<!-- index: FFT ocean -->
+<!-- index: Floater -->
+
+A level can carry water that is not the terrain's one shoreline plane.
+`regia_terrain::water_body` (`docs/specs/water.md`) draws through the frame's translucent layer:
+
+- `WaterShape::Plane` is a lake or a sea: a rectangle, at most 16 bodies in one frame.
+- `WaterShape::Ribbon` is a stream or a river along a centerline. Speed follows Manning's equation.
+- `WaterLook` is absorption, scattering, roughness, ripples, refraction, a wet band, foam, and glint.
+- A plane may carry a `Swell` of up to 32 waves. The Low water tier (Desktop Low, Steam Deck, and mobile) draws the first 8, High the first 16, and Ultra the first 32. The frame holds at most 128 waves across every body. Extra waves are counted and not drawn.
+- Every animated term is a function of the fixed-step `WaterClock` tick. The same tick draws the same image.
+- `WaterBody::surface` and `WaterBody::raycast` answer height, normal, velocity, and crest foam. The agent methods are `water.surface` and `water.raycast`.
+
+The terrain `WaterPlane` becomes one of those plane bodies in the runtime frame
+(`look_from_plane`). `WaterSettings::terrain_planes` (`water.set` with `terrain_planes`) turns
+that conversion on or off. The plane itself stays in the terrain format.
+
+`docs/specs/87-water-finish.md` adds the shore-distance field, shoaling and shore foam, a
+surface query over the bodies, and floating bodies (`water.floaters`).
+`docs/specs/water-ocean.md` adds an FFT ocean band a plane can ride.
+`docs/specs/100-water-extras.md` adds the underwater view, ring culling, a sea-state table
+driven by the scene wind, and a water GPU-time reading. Each of those extras is off until the
+project turns it on. A project that sets nothing keeps the frames it drew before.
+
+Not in this version: a lake whose outline is an arbitrary shape. The water GPU time is a second
+draw into a private target, not a sample inside the frame's own pass. Swell with a shore field
+shoals and caps. It does not turn toward the shore, and it does not run up the beach. Floaters
+do not leave wakes. Underwater caustics stay off unless `water.set_caustics` enables them, and
+ribbons are not fogged underwater. The recipes and the rest of the limits are on
+[Water bodies](../agents/water.md).
+
+## Weather on the ground
+
+<!-- index: Terrain weather -->
+
+Rain, snow, wetness, and the wind near the ground are not fields of the heightfield. They are
+the project weather (`docs/specs/99-weather-precipitation.md`), off until
+`assets/config/weather.ron` enables them. A layer stack answers that state: format v4 adds a per-layer `weather` block and
+the stack's `puddles`, and format v5 adds `porosity_from_orm`. See
+[Photoreal terrain](terrain-photoreal.md) and [Sky Lab](sky-lab.md).
+
 ## Cook and preview
 
 Terrain is authored as text and images and cooked like other assets; `regia preview` shows a mesh
 asset on a neutral stage, and `seeing.screenshot` with `target: "asset"` renders it headless for
-goldens.
+goldens. The procedure, including the source-inspect and cook checks, is
+[Author a terrain](../how-to/world/terrain.md). Import limits, tile sets, and overview images are
+[Terrain source import](terrain-sources.md). A signed-distance cave is
+[Volumetric terrain](volume-mesh.md). The integer voxel core in `docs/specs/122-voxel-core.md`
+is not in this version.

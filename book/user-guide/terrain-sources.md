@@ -1,7 +1,16 @@
 # Terrain source import limits
 
+<!-- index: Height source -->
+<!-- index: Terrain import -->
+<!-- index: Raster descriptor -->
+<!-- index: Terrain overview -->
+<!-- index: Terrain tiles -->
+
 Inspect a heightfield with `terrain.inspect_source`; bake its overview with
 `terrain.bake_overview`. Both accept schema-2 JSON or grayscale 8/16-bit PNG.
+The task procedure is [Author a terrain](../how-to/world/terrain.md). The cook layout is
+[Terrain data](terrain-data.md). The editor steps for **Import source** and **Overview**
+belong on the Terrain panel; this page is the limits and the file rules.
 The [agent guide](../agents/terrain-source.md) explains the fields, datum and
 placement. Import retains each count and converts heights with
 `(f32(count) - f32(zero_counts)) * meters_per_count`. It does not resample terrain.

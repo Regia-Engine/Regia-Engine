@@ -40,8 +40,29 @@ pub const CLEARANCE_M: f32 = 12.0;
 pub const MEMORY_CAP_MB: u32 = 256;
 
 /// The directory of the sample's graph and biome.
+///
+/// Resolved at runtime (ADR-10370): `env!("CARGO_MANIFEST_DIR")` would embed the
+/// build machine's path, which rustc does not remap.
 pub fn assets_dir() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("assets")
+    sample_manifest_dir("procgen_open_world").join("assets")
+}
+
+fn sample_manifest_dir(sample: &str) -> PathBuf {
+    if let Some(dir) = std::env::var_os("CARGO_MANIFEST_DIR") {
+        return PathBuf::from(dir);
+    }
+    if let Ok(exe) = std::env::current_exe()
+        && let Some(root) = exe
+            .parent()
+            .and_then(|dir| dir.parent())
+            .and_then(|dir| dir.parent())
+    {
+        let project = root.join("samples").join(sample);
+        if project.is_dir() {
+            return project;
+        }
+    }
+    std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
 }
 
 /// Flies the camera along [`WAYPOINTS`] on the game clock.

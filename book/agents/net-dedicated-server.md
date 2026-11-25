@@ -1,9 +1,15 @@
 # Net dedicated server (agents)
 
+<!-- index: Dedicated server -->
+<!-- index: Ban -->
+<!-- index: Join code -->
+<!-- index: Health endpoint | see: Dedicated server -->
+
 The dedicated-server build and host (spec 76, ADR-1663, ADR-1886): a game's simulation with nobody playing on it, run
 under a supervisor on a Linux (or Windows) box. This page covers building and packaging, `server.toml`, the host's lifecycle, the operator
 console, remote admin, the health endpoint, signals, exit codes and the agent methods. Guide topic
-`net-dedicated-server`. Sessions themselves (handshake, travel, bans, reconnect) are on [net session](net-session.md).
+`net-dedicated-server`. The task procedure is [Host a game](../how-to/online/host-a-game.md).
+Sessions themselves (handshake, travel, bans, reconnect) are on [net session](net-session.md).
 
 The host is `regia_net::server_host::ServerHost`. A game plugs in through `HostGame`: `AppHostGame` wraps a
 `regia_app::App` with `NetSessionPlugin` (one `App::update` per tick; match end and idle slowdown come from the
@@ -48,9 +54,13 @@ dist/server-linux/<slug>-server/
     content/net-manifest.ron   gameplay content manifest
     assets/                    raw gameplay data: levels, prefabs, tables, config
     server.toml  bans.ron  README-server.txt
+    regia-lobby-hub(.exe)  hub.toml
 ```
 
-archived as `<slug>-server-linux.tar.gz` or `<slug>-server-windows.zip`.
+archived as `<slug>-server-linux.tar.gz` or `<slug>-server-windows.zip`. The
+package stages the lobby hub. It does not stage a standalone relay binary. Hub
+defaults and the status port are on
+[Dedicated servers](../user-guide/dedicated-server.md#2-package-a-server).
 
 | Asset kinds | Server |
 |---|---|
@@ -95,8 +105,10 @@ and `server_rate_bytes`.
 - **Precedence:** built-in defaults < `server.toml` < environment (`REGIA_SERVER_PORT`, `REGIA_SERVER_MAX_PLAYERS`,
   `REGIA_SERVER_LEVEL`, `REGIA_SERVER_PASSWORD`) < command line (`--config PATH`, `--port N`, `--bind ADDR`,
   `--max-players N`, `--level PATH`, `--name TEXT`, `--log-dir DIR`, `--console`, `--agent`, `--relay ADDR`,
-  `--shared-port`, `--no-port-map`, `--bots N`). `--no-port-map` (N-19, ADR-10069) keeps a host with `--relay
+  `--shared-port`, `--no-port-map`, `--relay-only`, `--bots N`). `--no-port-map` (N-19, ADR-10069) keeps a host with `--relay
   HOST:PORT` from asking the router for a port mapping (`net.host_check` `mapping_error` `port_map_disabled`).
+  `--relay-only` (ADR-10399) registers with the relay and does not publish this host's address. It also
+  skips the router mapping and the host check. There is no `server.toml` key for it.
 - **`--upgrade-config`** rewrites the config file (`--config PATH`, else `server.toml`) to the current `format_version`,
   keeping comments and settings, prints what it did and exits 0 without starting; an unreadable file or an unknown version
   exits 2 (`server_host::config::upgrade_config_file`, ADR-5650).
@@ -283,7 +295,9 @@ that minted its cookie accepts it. Each layer reads at most `MAX_READS_PER_ROUND
 receive. Tests: `regia_net/tests/shared_port.rs`.
 
 `--relay local` runs a rendezvous relay inside the host on `127.0.0.1:7800` (`local:0` picks a free
-port); `--relay HOST:PORT` registers with a relay elsewhere. The host registers a join ticket (the
+port); `--relay HOST:PORT` registers with a relay elsewhere. `--relay-only` with either form hides
+this host's address: the register carries no candidates and the hide-address byte, and the relay's
+`HostInfo`, `Allocated` and `ClientJoined` name neither side. The host registers a join ticket (the
 game port and the server key) and prints
 
 ```text

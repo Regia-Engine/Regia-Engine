@@ -93,7 +93,9 @@ fn compiled_checkout() -> Option<PathBuf> {
 }
 
 /// [`engine_checkout`]'s order over explicit inputs: the override, the executable's ancestors,
-/// then the compiled-in checkout; the first directory with `crates/regia/Cargo.toml` wins.
+/// then the compiled-in checkout; the first directory with `crates/regia/Cargo.toml` wins,
+/// canonicalized without Windows' verbatim `\\?\` prefix (Cargo refuses `path = "//?/C:/…"`,
+/// ADR-10616).
 #[must_use]
 pub fn find_engine_checkout(
     override_dir: Option<PathBuf>,
@@ -112,7 +114,7 @@ pub fn find_engine_checkout(
         .chain(from_exe)
         .chain(compiled)
         .find(|dir| is_checkout(dir))
-        .map(|dir| dir.canonicalize().unwrap_or(dir))
+        .map(|dir| regia_core::project_path::canonicalize_plain(&dir).unwrap_or(dir))
 }
 
 /// The engine checkout `create` writes into the templates.
@@ -173,7 +175,10 @@ pub fn create_with_engine(
     let files = template_files(&request.template)
         .ok_or_else(|| NewProjectError::UnknownTemplate(request.template.clone()))?;
     let crate_name = crate_name_for(&request.name)?;
-    let engine_text = engine.replace('\\', "/");
+    // A verbatim `\\?\C:\…` path would reach Cargo as `//?/C:/…` ("invalid path url", ADR-10616).
+    let engine_text = regia_core::project_path::strip_verbatim(Path::new(engine))
+        .to_string_lossy()
+        .replace('\\', "/");
     if engine_text.contains('"') {
         return Err(NewProjectError::Io(format!(
             "engine path {engine} cannot be written into Cargo.toml"
@@ -187,17 +192,30 @@ pub fn create_with_engine(
     // Validate every substitution before claiming a destination or writing any files.
     let mut rendered = Vec::with_capacity(files.len());
     for (rel, text) in files {
-        let body = substitute(text, request.name.trim(), &id, &crate_name, &engine_text);
+        let mut body = substitute(text, request.name.trim(), &id, &crate_name, &engine_text);
         if body.contains("{{") {
             return Err(NewProjectError::Io(format!(
                 "template {rel} still has an unsubstituted placeholder"
             )));
+        }
+        if *rel == ".cargo/config.toml" {
+            body = home_remap_config(&body)?;
         }
         rendered.push((*rel, body));
     }
     write_project_files(&root, &rendered)?;
     tracing::info!(target: "regia_cli", "created project {} ({crate_name})", root.display());
     Ok(CreatedProject { root, crate_name, id })
+}
+
+/// Append this machine's home directory as the last path remap (ADR-10370).
+fn home_remap_config(config: &str) -> Result<String, NewProjectError> {
+    let home = regia_templates::user_home_dir().ok_or_else(|| {
+        NewProjectError::Io(
+            "HOME (or USERPROFILE) is unset, so the home path remap cannot be written (ADR-10370)".into(),
+        )
+    })?;
+    regia_templates::with_home_path_remap(config, &home).map_err(NewProjectError::Io)
 }
 
 /// Claims the target (new, or an empty directory) and writes the files; on a failure nothing this
@@ -236,7 +254,8 @@ mod tests {
         let lone = root.join("download");
         std::fs::create_dir_all(&lone).expect("download dir");
         let lone_exe = lone.join("regia");
-        let found = |dir: PathBuf| Some(dir.canonicalize().expect("canonical"));
+        let found =
+            |dir: PathBuf| Some(regia_core::project_path::canonicalize_plain(&dir).expect("canonical"));
         // A release build inside a checkout finds it from the executable.
         assert_eq!(
             find_engine_checkout(None, Some(&exe), None),
@@ -295,6 +314,90 @@ mod tests {
             Err(NewProjectError::Io(_))
         ));
         let _ = std::fs::remove_dir_all(&parent);
+    }
+
+    /// ADR-10616 (a public Windows 11 report): an engine checkout found as the verbatim
+    /// `\\?\C:\…` path `canonicalize` returns on Windows is written as `C:/…`, never as the
+    /// `//?/C:/…` Cargo refuses with "invalid path url". Every template's every manifest is checked.
+    #[test]
+    fn a_verbatim_windows_engine_path_is_written_without_its_prefix() {
+        let parent = temp_parent("verbatim");
+        for &template in regia_templates::TEMPLATE_IDS {
+            let created = create_with_engine(
+                &NewProjectRequest {
+                    name: format!("Verbatim {template}"),
+                    template: template.into(),
+                    parent: parent.clone(),
+                },
+                r"\\?\C:\Users\me\AppData\Local\Regia\e",
+            )
+            .expect("create");
+            let mut manifests = 0;
+            for entry in walk(&created.root) {
+                if entry.file_name().is_some_and(|name| name == "Cargo.toml") {
+                    let text = std::fs::read_to_string(&entry).expect("manifest");
+                    assert!(
+                        !text.contains("//?/") && !text.contains(r"\\?\"),
+                        "{}: {text}",
+                        entry.display()
+                    );
+                    manifests +=
+                        usize::from(text.contains("\"C:/Users/me/AppData/Local/Regia/e/crates/regia\""));
+                }
+            }
+            assert!(manifests >= 1, "{template}: no manifest names the engine");
+        }
+        let _ = std::fs::remove_dir_all(&parent);
+    }
+
+    /// ADR-10616 on the real filesystem: the checkout `regia new` finds is spelled without the
+    /// verbatim prefix, and the project it writes names it so. On Windows this is the reported bug
+    /// itself (`canonicalize` gives `\\?\C:\…` there, checked below); elsewhere it holds trivially.
+    #[test]
+    fn a_found_checkout_is_written_as_a_plain_path() {
+        let root = temp_parent("plain-checkout");
+        let engine = root.join("Regia").join("e");
+        std::fs::create_dir_all(engine.join("crates/regia")).expect("engine dir");
+        std::fs::write(engine.join("crates/regia/Cargo.toml"), "[package]\n").expect("manifest");
+        let exe = engine.join("target/release/regia.exe");
+        let raw = engine.canonicalize().expect("canonical");
+        if cfg!(windows) {
+            assert!(raw.to_string_lossy().starts_with(r"\\?\"), "{}", raw.display());
+        }
+        let found = find_engine_checkout(None, Some(&exe), None).expect("found");
+        let text = found.to_string_lossy().into_owned();
+        assert!(!text.starts_with(r"\\?\"), "{text}");
+        assert_eq!(found.canonicalize().expect("canonical"), raw);
+        let projects = root.join("RegiaProjects");
+        std::fs::create_dir_all(&projects).expect("projects dir");
+        let created = create_with_engine(
+            &NewProjectRequest {
+                name: "My Game".into(),
+                template: "quick".into(),
+                parent: projects,
+            },
+            // What `create` passes: the found checkout's text.
+            &raw.to_string_lossy(),
+        )
+        .expect("create");
+        let manifest = std::fs::read_to_string(created.root.join("Cargo.toml")).expect("manifest");
+        let expected = format!("path = \"{}/crates/regia\"", text.replace('\\', "/"));
+        assert!(manifest.contains(&expected), "{expected} in {manifest}");
+        assert!(!manifest.contains("//?/"), "{manifest}");
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    fn walk(dir: &Path) -> Vec<PathBuf> {
+        let mut out = Vec::new();
+        for entry in std::fs::read_dir(dir).expect("read dir").flatten() {
+            let path = entry.path();
+            if path.is_dir() {
+                out.extend(walk(&path));
+            } else {
+                out.push(path);
+            }
+        }
+        out
     }
 
     #[test]
@@ -674,6 +777,32 @@ mod tests {
             lib.contains("\"com.regiaengine.tag_yard\""),
             "the game id is the project's"
         );
+        let _ = std::fs::remove_dir_all(&parent);
+    }
+
+    /// ADR-10370: `regia new` writes the root remaps and appends this machine's home last.
+    #[test]
+    fn new_project_appends_the_home_remap_last() {
+        let parent = temp_parent("remap");
+        let created = create(&NewProjectRequest {
+            name: "Remap Check".into(),
+            template: "quick".into(),
+            parent: parent.clone(),
+        })
+        .expect("create");
+        let config = std::fs::read_to_string(created.root.join(".cargo/config.toml")).expect("config");
+        let home = regia_templates::user_home_dir().expect("HOME");
+        let flag = regia_templates::home_remap_flag(&home).expect("flag");
+        assert!(config.contains("--remap-path-prefix=/home=/builder"), "{config}");
+        for array in config.split("rustflags = [").skip(1) {
+            let body = array.split(']').next().unwrap_or("");
+            let last = body
+                .lines()
+                .rev()
+                .find(|line| line.contains("remap-path-prefix"))
+                .unwrap_or("");
+            assert!(last.contains(&flag), "{last}");
+        }
         let _ = std::fs::remove_dir_all(&parent);
     }
 }

@@ -1075,14 +1075,13 @@ fn check_outputs(project: &Path, name: &str, def: &GeneratorDef) -> Result<(), G
 }
 
 /// A path as external programs expect it: Windows' verbatim `\\?\C:\...` form (what
-/// `canonicalize` returns there) without its prefix; other paths unchanged.
+/// `canonicalize` returns there) without its prefix; other paths unchanged. The text form of
+/// `regia_core::project_path::strip_verbatim` (ADR-10616).
 #[must_use]
 pub fn plain_path(path: &Path) -> String {
-    let text = path.display().to_string();
-    match text.strip_prefix(r"\\?\") {
-        Some(rest) if rest.as_bytes().get(1) == Some(&b':') => rest.to_string(),
-        _ => text,
-    }
+    regia_core::project_path::strip_verbatim(path)
+        .display()
+        .to_string()
 }
 
 /// What one installed output file did.

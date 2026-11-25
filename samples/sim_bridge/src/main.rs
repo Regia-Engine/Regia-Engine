@@ -129,6 +129,25 @@ fn run_bench(frames: u64) -> Result<(), String> {
     Ok(())
 }
 
+/// Project directory of this sample in a dev build, resolved at runtime (ADR-10370).
+///
+/// Release builds pass `None` and do not call this. `cargo run` exports
+/// `CARGO_MANIFEST_DIR`. The compile-time `env!("CARGO_MANIFEST_DIR")` is not remapped.
+#[cfg(debug_assertions)]
+fn sample_project_dir() -> Option<std::path::PathBuf> {
+    if let Some(dir) = std::env::var_os("CARGO_MANIFEST_DIR") {
+        return Some(dir.into());
+    }
+    let root = std::env::current_exe()
+        .ok()?
+        .parent()?
+        .parent()?
+        .parent()?
+        .to_path_buf();
+    let project = root.join("samples").join("sim_bridge");
+    project.is_dir().then_some(project)
+}
+
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().collect();
     let (exit_after, bench_frames) = match (flag(&args, "--exit-after-frames"), flag(&args, "--bench-frames"))
@@ -160,7 +179,7 @@ fn main() -> ExitCode {
         // the agent at this crate so a local session can see the project.
         app.insert_resource(regia::agent::AgentSettings {
             #[cfg(debug_assertions)]
-            project_dir: Some(env!("CARGO_MANIFEST_DIR").into()),
+            project_dir: sample_project_dir(),
             #[cfg(not(debug_assertions))]
             project_dir: None,
         });

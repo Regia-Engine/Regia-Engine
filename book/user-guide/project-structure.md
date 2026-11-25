@@ -1,5 +1,9 @@
 # Project structure
 
+<!-- index: Regia.toml | see: Project -->
+<!-- index: Project -->
+<!-- index: startup_level | see: Level -->
+
 `regia new "My Game"` writes a Cargo workspace. This page describes what each part is for and the
 files you will touch.
 

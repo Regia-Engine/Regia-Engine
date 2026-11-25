@@ -1606,7 +1606,7 @@ pub(crate) fn live_formats() -> Vec<LiveFormat> {
             fingerprint: regia_framework::ruleset_file::rules_ron_schema_fingerprint(),
             migration_sources: regia_framework::ruleset_file::rules_ron_migration_sources(),
         },
-        // Lobby hub config (`hub.toml`, v1, ADR-8648).
+        // Lobby hub config (`hub.toml`, v2, ADR-8648, ADR-10397).
         LiveFormat {
             name: "hub-toml",
             version: regia_net::lobby::hub::HUB_TOML_FORMAT_VERSION,

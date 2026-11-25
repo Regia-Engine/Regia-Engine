@@ -1,5 +1,7 @@
 # Behavior tree
 
+Panel id: `behavior_tree`.
+
 The **Behavior Tree** tab edits a `.bt.ron` behavior tree: a palette of node kinds and registered leaf tasks, the
 tree as an indented outline, an inspector for the selected node and a list of validation problems. While the game
 plays it shows the last status of every node (running, success or failure) for the agent you pick. Depth: [Behavior

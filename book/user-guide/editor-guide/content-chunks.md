@@ -1,5 +1,7 @@
 # Content Chunks
 
+Panel id: `content_chunks`.
+
 The **Content Chunks** tab shows how your project's cooked assets split into content chunks
 (the base game, DLC and downloadable packs) under the `[cook.chunks.*]` rules in `Regia.toml`. It shows
 what the next cook writes, using the same functions the cook uses, so you can check a rule change

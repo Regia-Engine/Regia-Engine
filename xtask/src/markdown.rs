@@ -19,6 +19,12 @@ pub trait Hooks {
         dest.to_string()
     }
 
+    /// Whether this destination is an anchor. False means the label is kept and no `<a>` is
+    /// emitted. The one-file manual uses that for a Markdown file it does not contain.
+    fn emit_as_link(&mut self, _dest: &str) -> bool {
+        true
+    }
+
     /// The `id` of a heading, given its level and plain text. `None` emits no id.
     fn heading_id(&mut self, _level: u8, _text: &str) -> Option<String> {
         None
@@ -1035,14 +1041,18 @@ fn inline_range(chars: &[char], from: usize, to: usize, hooks: &mut dyn Hooks, o
                 if let Some(close) = matching_bracket(slice, i)
                     && let Some((end, dest, title)) = link_tail(slice, close + 1)
                 {
-                    let href = hooks.link(&dest);
-                    out.push_str(&format!("<a href=\"{}\"", escape(&href)));
-                    if let Some(t) = title {
-                        out.push_str(&format!(" title=\"{}\"", escape(&t)));
+                    if hooks.emit_as_link(&dest) {
+                        let href = hooks.link(&dest);
+                        out.push_str(&format!("<a href=\"{}\"", escape(&href)));
+                        if let Some(t) = title {
+                            out.push_str(&format!(" title=\"{}\"", escape(&t)));
+                        }
+                        out.push('>');
+                        inline_range(slice, i + 1, close, hooks, out);
+                        out.push_str("</a>");
+                    } else {
+                        inline_range(slice, i + 1, close, hooks, out);
                     }
-                    out.push('>');
-                    inline_range(slice, i + 1, close, hooks, out);
-                    out.push_str("</a>");
                     i = end;
                 } else {
                     out.push('[');

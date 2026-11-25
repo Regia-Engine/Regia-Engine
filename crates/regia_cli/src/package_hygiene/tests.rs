@@ -33,16 +33,13 @@ fn planted_host_string_refuses_project_package_by_default() -> Result {
     let project = Tree::new();
     let staging = Tree::new();
     project.write("Regia.toml", b"")?;
-    staging.write(
-        "player",
-        format!("\x7fELF\0owner bench: {}\0", private_name(0)).as_bytes(),
-    )?;
+    staging.write("player", b"\x7fELF\0owner bench: buildhost\0")?;
     let error = check_project_tree(project.root(), staging.root()).expect_err("host leak rejected");
     assert_eq!(error.code, "package_hygiene_failed");
     let report = error.report.expect("completed report");
     assert!(report.complete);
     assert!(report.findings.iter().any(|hit| hit.rule == "host_string"));
-    assert!(!error.location.contains(&private_name(0)));
+    assert!(!error.location.contains("buildhost"));
     Ok(())
 }
 
@@ -63,7 +60,7 @@ fn host_string_allowance_is_exact_and_other_strings_still_fail() -> Result {
     assert_eq!(report.allowed_findings, 1);
     staging.write(
         "player.exe",
-        format!("MZ\0public example /srv/content\0built on {}\0", private_name(1)).as_bytes(),
+        b"MZ\0public example /srv/content\0built on workstation\0",
     )?;
     assert!(check_project_tree(project.root(), staging.root()).is_err());
     staging.write("player.exe", b"MZ\0public example /srv/content-private\0")?;
@@ -91,23 +88,15 @@ fn host_string_gate_scans_every_executable_format_and_skips_data_files() -> Resu
     staging.write("game", b"\x7fELF\0owner bench, 2026-10-11 arc-sweep\0")?;
     staging.write(
         "libmix.dylib",
-        &[
-            b"\xcf\xfa\xed\xfe\0".as_slice(),
-            format!("built on {}\0", private_name(1)).as_bytes(),
-        ]
-        .concat(),
+        &[b"\xcf\xfa\xed\xfe\0".as_slice(), b"built on workstation\0"].concat(),
     )?;
     staging.write(
         "player.wasm",
-        &[
-            b"\0asm\x01\0\0\0".as_slice(),
-            format!("{} bench\0", private_name(0)).as_bytes(),
-        ]
-        .concat(),
+        &[b"\0asm\x01\0\0\0".as_slice(), b"buildhost bench\0"].concat(),
     )?;
     staging.write(
         "notes.txt",
-        format!("built on {}: a text file with the same words\0", private_name(1)).as_bytes(),
+        b"built on workstation: a text file with the same words\0",
     )?;
     let error = check_project_tree(project.root(), staging.root()).expect_err("two executables leak");
     assert_eq!(error.code, "package_hygiene_failed");
@@ -128,11 +117,6 @@ fn private_names() -> Vec<String> {
         .iter()
         .map(|(name, _)| name.iter().map(|byte| char::from(byte ^ 0xA5)).collect())
         .collect()
-}
-
-/// One private name unmasked at test time (its row in `PRIVATE`).
-fn private_name(row: usize) -> String {
-    private_names().swap_remove(row)
 }
 
 /// ADR-10354: the gate's own private names never exist as one printable string in the tool.
@@ -164,7 +148,10 @@ fn private_names_are_masked_in_the_tool_and_match_case_insensitively() {
     );
     let scanner = super::host_strings::Scanner::new(None).expect("the pattern compiles");
     for text in [
-        &b"/home/ann/game/src/main.rs"[..],
+        &b"owner bench: buildhost"[..],
+        b"built on workstation today",
+        b"built on testhost",
+        b"/home/ann/game/src/main.rs",
         b"http://192.168.1.1:5000/desc.xml",
         b"host.station.ts.net",
         b"tailscaled is running",

@@ -1,0 +1,142 @@
+// Feature catalog source for `cargo xtask manual` (ADR-10418).
+// Rendered to book/reference/feature-catalog.md. Areas and rows stay in this order.
+// The manual-audit lane appends rows. Do not reorder existing rows.
+(
+    areas: [
+        (
+            area: "World and simulation",
+            rows: [
+                (
+                    feature: "ECS world",
+                    status: "shipped",
+                    page: "fundamentals/ecs.md",
+                    crate: "regia_ecs",
+                    spec: "docs/specs/10-core.md",
+                ),
+                (
+                    feature: "Schedules and FixedUpdate",
+                    status: "shipped",
+                    page: "fundamentals/app-and-plugins.md#time-and-the-fixed-timestep",
+                    crate: "regia_app",
+                    spec: "docs/specs/10-core.md",
+                ),
+                (
+                    feature: "Lockstep simulation",
+                    status: "shipped",
+                    page: "user-guide/deterministic-simulation.md",
+                    crate: "regia_detsim",
+                    spec: "docs/specs/120-net-next-generation.md",
+                ),
+            ],
+        ),
+        (
+            area: "Assets and packaging",
+            rows: [
+                (
+                    feature: "Cook",
+                    status: "shipped",
+                    page: "fundamentals/assets.md#what-the-cook-does",
+                    crate: "regia_asset",
+                    spec: "docs/specs/12-assets.md",
+                ),
+                (
+                    feature: "Package and pak",
+                    status: "shipped",
+                    page: "user-guide/packaging.md",
+                    crate: "regia_cli",
+                    spec: "docs/specs/21-tooling-and-packaging.md",
+                ),
+            ],
+        ),
+        (
+            area: "Rendering and lighting",
+            rows: [
+                (
+                    feature: "Render profiles",
+                    status: "shipped",
+                    page: "user-guide/rendering.md#render-profiles",
+                    crate: "regia_render",
+                    spec: "docs/specs/13-renderer.md",
+                ),
+                (
+                    feature: "Visibility buffer and meshlets",
+                    status: "shipped",
+                    page: "agents/visbuffer.md",
+                    crate: "regia_render",
+                    spec: "docs/specs/27-renderer-excellence.md",
+                ),
+                (
+                    feature: "Dynamic GI",
+                    status: "shipped",
+                    page: "agents/dynamic-gi.md",
+                    crate: "regia_render",
+                    spec: "docs/specs/79-dynamic-gi.md",
+                ),
+                (
+                    feature: "Lightmaps",
+                    status: "shipped",
+                    page: "agents/lightmaps.md",
+                    crate: "regia_pt",
+                    spec: "docs/specs/lightmaps.md",
+                ),
+            ],
+        ),
+        (
+            area: "Networking",
+            rows: [
+                (
+                    feature: "Relay",
+                    status: "shipped",
+                    page: "agents/net-relay.md",
+                    crate: "regia_net",
+                    spec: "docs/specs/120-net-next-generation.md",
+                ),
+                (
+                    feature: "Lobby hub",
+                    status: "shipped",
+                    page: "agents/net-lobby-hub.md",
+                    crate: "regia_net",
+                    spec: "docs/specs/89-lobbies.md",
+                ),
+                (
+                    feature: "Rollback lockstep",
+                    status: "shipped",
+                    page: "agents/net-lockstep.md#rollback-lockstep",
+                    crate: "regia_net",
+                    spec: "docs/specs/120-net-next-generation.md",
+                ),
+            ],
+        ),
+        (
+            area: "Agents and tools",
+            rows: [
+                (
+                    feature: "Agent protocol",
+                    status: "shipped",
+                    page: "agents/protocol.md",
+                    crate: "regia_agent",
+                    spec: "docs/specs/23-agent-native.md",
+                ),
+                (
+                    feature: "Manual index, glossary and feature catalog",
+                    status: "shipped",
+                    page: "reference/index.md",
+                    crate: "xtask",
+                    spec: "docs/decisions.md",
+                ),
+            ],
+        ),
+        (
+            area: "Editor",
+            rows: [
+                (
+                    feature: "Play in editor",
+                    status: "shipped",
+                    page: "start/editor-tour.md#play-in-editor",
+                    crate: "regia_editor",
+                    spec: "docs/specs/19-editor.md",
+                ),
+            ],
+        ),
+    ],
+)

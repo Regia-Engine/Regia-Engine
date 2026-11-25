@@ -75,7 +75,14 @@ focused slider or list.
 | Sequencer | Sequence Curves, Shots | [Sequencer](sequencer.md) |
 | UI designer | UI Designer, UI Animation | [UI designer](ui-designer.md) |
 | Profiler | View ▸ Profiler, View ▸ Diagnostics (windows) | [Profiler](profiler.md) |
-| Play-in-editor | the play toolbar, Net | [Play-in-editor](play-in-editor.md) |
+| Play-in-editor | the play toolbar | [Play-in-editor](play-in-editor.md) |
+| Net | Net | [Net](net.md) |
+| 2D | 2D | [2D](mode-2d.md) |
+| Cameras | Cameras | [Cameras](cameras.md) |
+| Motion matching | Motion Matching | [Motion matching](motion-matching.md) |
+| Smart objects | Smart Objects, Smart Object Definition | [Smart objects](smart-objects.md) |
+| Match rules | Match Rules | [Match rules](match-rules.md) |
+| Keymap | Preferences ▸ Keymap | [Keymap](keymap.md) |
 | Project settings | Project Settings, Preferences | [Project settings](project-settings.md) |
 | Fracture | Fracture | [Fracture](fracture.md) |
 | Procedural graph | Procedural Graph | [Procedural graph](procgen.md) |
@@ -85,101 +92,101 @@ focused slider or list.
 
 ## Every panel
 
-Every tab of the dock has a row here, and `cargo xtask book-check` fails when a panel has none (the `Panel` enum in `crates/regia_editor/src/shell.rs` is the list). A panel that shares a page with others is documented in its own section of that page.
+Every tab of the dock has a row here, and `cargo xtask book-check` fails when a panel has none (the `Panel` enum in `crates/regia_editor/src/shell.rs` is the list). The id in parentheses is the string `editor.layout_apply` opens (`{"open": "<id>"}`). Each of those ids is listed once. A panel that shares a page with others is documented in its own section of that page, and the page names the id in its first screen.
 
 | Panel variant | Tab | Page |
 |---|---|---|
-| `Viewport` | Viewport | [Viewport](viewport.md) |
-| `Outliner` | Outliner | [Outliner](outliner.md) |
-| `Inspector` | Inspector | [Inspector](inspector.md) |
-| `Content` | Content | [Content browser](content-browser.md) |
-| `OutputLog` | Output Log | [Output log](output-log.md) |
-| `Material` | Material | [Material graph](material-graph.md) |
-| `MaterialGraph` | Material Graph | [Material graph](material-graph.md) |
-| `ProjectSettings` | Project Settings | [Project settings](project-settings.md) |
-| `Preferences` | Preferences | [Project settings](project-settings.md) |
-| `WorldSettings` | World Settings | [World settings](world-settings.md) |
-| `AssetViewer` | Asset Viewer | [Asset viewer](asset-viewer.md) |
-| `AnimGraph` | Anim Graph | [Animation panels](anim-graph.md) |
-| `AnimClip` | Clip | [Animation panels](anim-graph.md) |
-| `AnimSkeleton` | Skeleton | [Animation panels](anim-graph.md) |
-| `Montage` | Montage | [Montage](montage.md) |
-| `Ragdoll` | Ragdoll | [Ragdoll](ragdoll.md) |
-| `Cloth` | Cloth | [Cloth](cloth.md) |
-| `Kit` | Kit | [Kit](kit.md) |
-| `Bake` | Bake | [Baked lighting panels](bake.md) |
-| `BakeRunner` | Bake runner | [Baked lighting panels](bake.md) |
-| `Lightmaps` | Lightmaps | [Baked lighting panels](bake.md) |
-| `LookDev` | Look-dev | [Look-dev](lookdev.md) |
-| `Theme` | Theme | [Theme](theme.md) |
-| `Shots` | Shots | [Sequencer](sequencer.md) |
-| `SeqCurves` | Sequence Curves | [Sequencer](sequencer.md) |
-| `Net` | Net | [Play-in-editor](play-in-editor.md) |
-| `Tool` | Tools | [Tools](tools.md) |
-| `DccFeed` | DCC Feed | [DCC Feed](dcc-feed.md) |
-| `ProcGraph` | Procedural Graph | [Procedural graph](procgen.md) |
-| `ContentChunks` | Content Chunks | [Content chunks](content-chunks.md) |
-| `Extensions` | Extensions | [Extensions](extensions.md) |
-| `ExtensionPanel` | the title an extension gives it | [Extensions](extensions.md) |
-| `UiDesigner` | UI Designer | [UI designer](ui-designer.md) |
-| `UiAnim` | UI Animation | [UI designer](ui-designer.md) |
-| `Fracture` | Fracture | [Fracture](fracture.md) |
-| `Tables` | Tables | [Tables](tables.md) |
-| `Abilities` | Abilities | [Abilities](abilities.md) |
-| `Problems` | Problems | [Problems](problems.md) |
-| `ReferenceGraph` | Reference Graph | [Reference Graph](reference-graph.md) |
-| `SizeMap` | Size Map | [Size Map](size-map.md) |
-| `Layers` | Layers | [Layers](layers.md) |
-| `Tests` | Tests | [Tests](tests.md) |
-| `StateTrees` | State Trees | [State trees](state-trees.md) |
-| `StateTreeEditor` | State Tree Editor | [State trees](state-trees.md) |
-| `AudioMixer` | Audio Mixer | [Audio Mixer](audio-mixer.md) |
-| `CueEditor` | Cue Editor | [Cue Editor](cue-editor.md) |
-| `AgentChanges` | Agent Changes | [Agent Changes](agent-changes.md) |
-| `BehaviorTree` | Behavior Tree | [Behavior tree](behavior-tree.md) |
-| `UiInspector` | UI Inspector | [UI Inspector](ui-inspector.md) |
-| `VfxEditor` | VFX Editor | [VFX Editor](vfx-editor.md) |
-| `Video` | Video | [Video](video.md) |
-| `Conversation` | Conversation | [Conversation](conversation.md) |
-| `Localization` | Localization | [Localization](localization.md) |
-| `DataAsset` | Data Asset | [Data Asset](data-asset.md) |
-| `VehicleTuning` | Vehicle Tuning | [Vehicle tuning](vehicle-tuning.md) |
-| `Terrain` | Terrain | [Terrain](terrain.md) |
-| `LogicGraph` | Logic Graph | [Logic graph](logic-graph.md) |
-| `BulkEdit` | Bulk Edit | [Bulk Edit](bulk-edit.md) |
-| `GameView` | Game: server, Game: client k (one tab per separate PIE process) | [Play-in-editor](play-in-editor.md#game-tabs) |
-| `UndoHistory` | Undo History | [Undo History](undo-history.md) |
-| `Notes` | Notes | [Notes and Activity](notes-activity.md#notes) |
-| `Activity` | Activity | [Notes and Activity](notes-activity.md#activity) |
-| `SelectedDebug` | Selected Object Debug | [Selected Object Debug and Visual Log](debug-visual-log.md#selected-object-debug) |
-| `VisualLog` | Visual Log | [Selected Object Debug and Visual Log](debug-visual-log.md#visual-log) |
-| `ProjectHealth` | Project Health | [Project Health](project-health.md) |
-| `WorldMap` | World Map | [World Map](world-map.md) |
-| `Agent` | Agent | [Agent](agent-panel.md) |
-| `Retarget` | Retarget | [Retarget](retarget.md) |
-| `Biome` | Biome | [Biome](biome.md) |
+| `Viewport` (`viewport`) | Viewport | [Viewport](viewport.md) |
+| `Outliner` (`outliner`) | Outliner | [Outliner](outliner.md) |
+| `Inspector` (`inspector`) | Inspector | [Inspector](inspector.md) |
+| `Content` (`content`) | Content | [Content browser](content-browser.md) |
+| `OutputLog` (`output_log`) | Output Log | [Output log](output-log.md) |
+| `Material` (`material`) | Material | [Material graph](material-graph.md) |
+| `MaterialGraph` (`material_graph`) | Material Graph | [Material graph](material-graph.md) |
+| `ProjectSettings` (`project_settings`) | Project Settings | [Project settings](project-settings.md) |
+| `Preferences` (`preferences`) | Preferences | [Project settings](project-settings.md) |
+| `WorldSettings` (`world_settings`) | World Settings | [World settings](world-settings.md) |
+| `AssetViewer` (`asset_viewer`) | Asset Viewer | [Asset viewer](asset-viewer.md) |
+| `AnimGraph` (`anim_graph`) | Anim Graph | [Animation panels](anim-graph.md) |
+| `AnimClip` (`anim_clip`) | Clip | [Animation panels](anim-graph.md) |
+| `AnimSkeleton` (`anim_skeleton`) | Skeleton | [Animation panels](anim-graph.md) |
+| `Montage` (`montage`) | Montage | [Montage](montage.md) |
+| `Ragdoll` (`ragdoll`) | Ragdoll | [Ragdoll](ragdoll.md) |
+| `Cloth` (`cloth`) | Cloth | [Cloth](cloth.md) |
+| `Kit` (`kit`) | Kit | [Kit](kit.md) |
+| `Bake` (`bake`) | Bake | [Baked lighting panels](bake.md) |
+| `BakeRunner` (`bake_runner`) | Bake runner | [Baked lighting panels](bake.md) |
+| `Lightmaps` (`lightmaps`) | Lightmaps | [Baked lighting panels](bake.md) |
+| `LookDev` (`lookdev`) | Look-dev | [Look-dev](lookdev.md) |
+| `Theme` (`theme`) | Theme | [Theme](theme.md) |
+| `Shots` (`shots`) | Shots | [Sequencer](sequencer.md) |
+| `SeqCurves` (`seq_curves`) | Sequence Curves | [Sequencer](sequencer.md) |
+| `Net` (`net`) | Net | [Net](net.md) |
+| `Tool` (`tools`) | Tools | [Tools](tools.md) |
+| `Mode2d` (`mode2d`) | 2D | [2D](mode-2d.md) |
+| `DccFeed` (`dcc_feed`) | DCC Feed | [DCC Feed](dcc-feed.md) |
+| `ProcGraph` (`proc_graph`) | Procedural Graph | [Procedural graph](procgen.md) |
+| `ContentChunks` (`content_chunks`) | Content Chunks | [Content chunks](content-chunks.md) |
+| `Extensions` (`extensions`) | Extensions | [Extensions](extensions.md) |
+| `ExtensionPanel` (`ext`) | the title an extension gives it | [Extensions](extensions.md) |
+| `UiDesigner` (`ui_designer`) | UI Designer | [UI designer](ui-designer.md) |
+| `UiAnim` (`ui_anim`) | UI Animation | [UI designer](ui-designer.md) |
+| `Fracture` (`fracture`) | Fracture | [Fracture](fracture.md) |
+| `Tables` (`tables`) | Tables | [Tables](tables.md) |
+| `Abilities` (`abilities`) | Abilities | [Abilities](abilities.md) |
+| `Problems` (`problems`) | Problems | [Problems](problems.md) |
+| `ReferenceGraph` (`reference_graph`) | Reference Graph | [Reference Graph](reference-graph.md) |
+| `SizeMap` (`size_map`) | Size Map | [Size Map](size-map.md) |
+| `Layers` (`layers`) | Layers | [Layers](layers.md) |
+| `Tests` (`tests`) | Tests | [Tests](tests.md) |
+| `StateTrees` (`state_trees`) | State Trees | [State trees](state-trees.md) |
+| `StateTreeEditor` (`state_tree_editor`) | State Tree Editor | [State trees](state-trees.md) |
+| `SmartObjects` (`smart_objects`) | Smart Objects | [Smart objects](smart-objects.md) |
+| `SmartObjectDef` (`smart_object_def`) | Smart Object Definition | [Smart objects](smart-objects.md) |
+| `Cameras` (`cameras`) | Cameras | [Cameras](cameras.md) |
+| `AudioMixer` (`audio_mixer`) | Audio Mixer | [Audio Mixer](audio-mixer.md) |
+| `CueEditor` (`cue_editor`) | Cue Editor | [Cue Editor](cue-editor.md) |
+| `AgentChanges` (`agent_changes`) | Agent Changes | [Agent Changes](agent-changes.md) |
+| `BehaviorTree` (`behavior_tree`) | Behavior Tree | [Behavior tree](behavior-tree.md) |
+| `MotionMatching` (`motion_matching`) | Motion Matching | [Motion matching](motion-matching.md) |
+| `UiInspector` (`ui_inspector`) | UI Inspector | [UI Inspector](ui-inspector.md) |
+| `VfxEditor` (`vfx_editor`) | VFX Editor | [VFX Editor](vfx-editor.md) |
+| `Video` (`video`) | Video | [Video](video.md) |
+| `Conversation` (`conversation`) | Conversation | [Conversation](conversation.md) |
+| `Localization` (`localization`) | Localization | [Localization](localization.md) |
+| `DataAsset` (`data_asset`) | Data Asset | [Data Asset](data-asset.md) |
+| `VehicleTuning` (`vehicle_tuning`) | Vehicle Tuning | [Vehicle tuning](vehicle-tuning.md) |
+| `Terrain` (`terrain`) | Terrain | [Terrain](terrain.md) |
+| `LogicGraph` (`logic_graph`) | Logic Graph | [Logic graph](logic-graph.md) |
+| `MatchRules` (`match_rules`) | Match Rules | [Match rules](match-rules.md) |
+| `BulkEdit` (`bulk_edit`) | Bulk Edit | [Bulk Edit](bulk-edit.md) |
+| `GameView` (`game_view`) | Game: server, Game: client k (one tab per separate PIE process) | [Play-in-editor](play-in-editor.md#game-tabs) |
+| `UndoHistory` (`undo_history`) | Undo History | [Undo History](undo-history.md) |
+| `Notes` (`notes`) | Notes | [Notes and Activity](notes-activity.md#notes) |
+| `Activity` (`activity`) | Activity | [Notes and Activity](notes-activity.md#activity) |
+| `SelectedDebug` (`selected_debug`) | Selected Object Debug | [Selected Object Debug and Visual Log](debug-visual-log.md#selected-object-debug) |
+| `VisualLog` (`visual_log`) | Visual Log | [Selected Object Debug and Visual Log](debug-visual-log.md#visual-log) |
+| `ProjectHealth` (`project_health`) | Project Health | [Project Health](project-health.md) |
+| `WorldMap` (`world_map`) | World Map | [World Map](world-map.md) |
+| `Agent` (`agent`) | Agent | [Agent](agent-panel.md) |
+| `Retarget` (`retarget`) | Retarget | [Retarget](retarget.md) |
+| `Biome` (`biome`) | Biome | [Biome](biome.md) |
 
-### Panels whose page is still to come
+### Panels without a page of their own
 
-These panels have no page of their own yet. Each row says why; a page replaces the row when it lands.
+These variants are not a built-in panel id of their own. Each row says where they are documented.
 
 | Panel variant | Why it has no page of its own |
 |---|---|
-| `Cameras` | The camera rig editor is in, but its guide page is not written yet; [Gameplay panels (agents)](../../agents/editor-gameplay-panels.md) covers it |
-| `SmartObjects` | The guide page is not written yet; [Smart objects (agents)](../../agents/smart-objects.md) covers the runtime this tab inspects |
-| `SmartObjectDef` | The definition editor is in, but its guide page is not written yet; [Smart object editor (agents)](../../agents/smart-object-editor.md) covers it |
-| `MotionMatching` | The motion database editor window is in (ADR-7740), but the guide page is not written yet; [Motion database editor (agents)](../../agents/motion-database-editor.md) covers it |
-| `Mode2d` | The 2D tab and its rule editor are in, but the guide page is not written yet; [2D editing (agents)](../../agents/editor-2d.md) covers them |
-| `Instance` | A second or later copy of the Outliner, Inspector or Content Browser (Window ▸ New Inspector and the palette commands); the guide page is not written yet; [Editor layouts (agents)](../../agents/editor-layouts.md) covers `editor.panel_new_instance` |
-| `UtilityPanel` | A panel a project builds from a `.ui.ron` document and a driver (Window ▸ Utility Panels); the guide page is not written yet; [Utility panels (agents)](../../agents/utility-panels.md) covers it |
-| `MatchRules` | The Match Rules panel (rule sets, playlists and the World Settings Game Rules picker, ADR-8738) is in, but its guide page is not written yet; [Editor match rules (agents)](../../agents/editor-match-rules.md) covers it |
+| `Instance` | A further copy of the Outliner, Content Browser or Inspector (`outliner#1` through `#7`, and the same for `content` and `inspector`). The ids stay `outliner`, `content` and `inspector`. Window ▸ New Outliner, New Content Browser and New Inspector. See [Editor](../editor.md#windows) and [Editor layouts (agents)](../../agents/editor-layouts.md) |
+| `UtilityPanel` | A panel a project builds from a `.ui.ron` document and a driver (Window ▸ Utility Panels). It is not one of the built-in panel ids. [Utility panels (agents)](../../agents/utility-panels.md) covers it |
 
 ### Features with no tab of their own
 
-Four pages cover editor features that are not a tab: [Play window](play-window.md) (the separate play
+Five pages cover editor features that are not a tab: [Play window](play-window.md) (the separate play
 window), [Asset creators](asset-creators.md) (the Create menu's asset creators),
-[Autosave and recovery](autosave-recovery.md) and [Panel timings](panel-timings.md) (the dock's
-draw-time rings and the long lists of large projects).
+[Autosave and recovery](autosave-recovery.md), [Panel timings](panel-timings.md) (the dock's
+draw-time rings and the long lists of large projects) and [Keymap](keymap.md) (chords you can change).
 
 ## Coming in v0.6.0
 
@@ -193,10 +200,10 @@ Shell, search and settings:
 - Named layouts and workspaces (Level, Animation, Materials, UI, World, Cinematics, Debug): **built**
   ([Layouts, workspaces and feature profiles](layouts-workspaces.md)).
 - Maximize a panel or the viewport; add or replace a panel in any pane: planned.
-- Panels as their own operating-system windows, and several Outliners, Content browsers or Inspectors: planned.
-- A clickable status bar, content and log drawers, and a console line for commands and agent methods: planned.
+- Floated panels as operating-system windows, and further copies of the Outliner, Content Browser and Inspector: **built**, with a limit. A game `Window` component still becomes an OS window only for the primary window ([Editor](../editor.md#windows)). Editor floats follow `ui.floating_windows` (`os` or `in_window`). Extra Outliner, Content and Inspector copies use the same panel ids.
+- A clickable status bar, content and log drawers, and a console line for commands and agent methods: **built** ([Editor](../editor.md#status-bar-drawers-and-the-console)).
 - One search window for assets, entities, commands, menus, settings and agent methods: planned.
-- Keymap presets, shortcuts that depend on the focused panel, and F1 help for the focused panel or field: planned.
+- Keymap presets, shortcuts that depend on the focused panel, and F1 help for the focused panel: **built** ([Keymap](keymap.md)).
 - One Settings window with search, changed-value marks and reset per category: planned.
 
 Viewport:

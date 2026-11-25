@@ -1,14 +1,21 @@
 # Changing a content format
 
+<!-- index: Migrator -->
+<!-- index: Frozen format | see: Content format -->
+<!-- index: upgrade-project | see: Content format -->
+
+A project owner who only needs to move files forward runs
+[Content formats](how-to/create/content-formats.md): `regia upgrade-project` with no
+`--write`, then the same command with `--write`. This page is the checklist for changing a
+format's shape. Nothing in it changes the format's *current* shape.
+
 Regia Engine's game content formats (`.material.ron`, `.level.ron`, `.prefab.ron`, `.ui.ron`,
 `.vfx.ron`, `.animgraph.ron`, `.cue.ron`, `.audiopatch.ron`, `.terrain.layers.ron`, `.scatter.ron`,
 `.meta`, save files and paks) are **frozen**: DO27's artists produce assets in them in parallel with
 the engine, so a format must never change in a way that invalidates already-authored files. Every
 format carries a `version` (or `format_version`) field, and a loader rejects a *newer* version with a
 clear error and runs registered *migrators* for an older one (`docs/specs/12-assets.md` § 4a).
-
-This page is the checklist for changing a frozen format. Nothing in it changes the format's *current*
-shape; it is the procedure for the day you need a v2.
+The steps below are the procedure for the day you need a new version.
 
 ## The rule
 

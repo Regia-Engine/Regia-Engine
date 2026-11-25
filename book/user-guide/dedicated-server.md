@@ -1,10 +1,21 @@
 # Dedicated servers, lobbies and matchmaking
 
+<!-- index: Dedicated server -->
+<!-- index: Lobby -->
+<!-- index: Matchmaking -->
+<!-- index: Join code -->
+<!-- index: Relay -->
+<!-- index: Ban -->
+<!-- index: Password -->
+<!-- index: Network conditioner -->
+<!-- index: Play in editor -->
+
 A dedicated server is your game's simulation running with nobody playing on it: no window, no
 renderer, no audio. Clients connect over UDP and the server holds the authoritative world. This
 chapter takes you from a networked game to a server you can package, run, operate and test, and then
 to the lobby and matchmaking layer that gets players onto it. It assumes your game already replicates
-state; if not, start with [Networking](networking.md). Method-level detail is on the agent pages
+state; if not, start with [Networking](networking.md). The task procedure is
+[Host a game](../how-to/online/host-a-game.md). Method-level detail is on the agent pages
 [Net dedicated server](../agents/net-dedicated-server.md), [Net lobbies](../agents/net-lobbies.md),
 [Net session](../agents/net-session.md) and [PIE with several clients](../agents/pie-net.md).
 
@@ -63,9 +74,17 @@ builds a dev server. The result is an archive (`<slug>-server-linux.tar.gz` or
     content/net-manifest.ron   gameplay content manifest
     assets/                    raw gameplay data: levels, prefabs, tables, config
     server.toml  bans.ron  README-server.txt
+    regia-lobby-hub(.exe)  hub.toml
 ```
 
-The package keeps only what a simulation needs. Levels, prefabs, net profiles, data tables, config,
+The package keeps only what a simulation needs. It also stages `regia-lobby-hub`
+and `hub.toml` (the lobby hub). It does not stage a standalone relay binary. A
+relay runs inside the server process (`--relay local` or `--relay HOST:PORT`)
+or as your own `RelayServer`. The hub listens on the port in `hub.toml`
+(7810 in the packaged default). A bad `hub.toml` exits 2 with one line per
+field. `SIGHUP` does not reload it. Restart the process. `GET /health` on the
+status bind (packaged default `127.0.0.1:7811`) returns JSON, and
+`lobby.hub_status` reads the same report. Levels, prefabs, net profiles, data tables, config,
 height fields, nav meshes and collision stay. Textures, materials, shaders, audio, fonts, UI, VFX,
 video, cinematics, meshes, models, lighting and sprites are removed (a mesh a collider points at stays as
 collision). Skeletons and clips stay only when an entity with hit shapes on joints or a root-motion

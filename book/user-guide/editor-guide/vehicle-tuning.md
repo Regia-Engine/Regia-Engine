@@ -1,5 +1,7 @@
 # Vehicle tuning
 
+Panel id: `vehicle_tuning`.
+
 The **Vehicle Tuning** tab tunes a car (`.vehicle.ron`), a trailer (`.trailer.ron`), a fixed-wing
 aircraft (`.aircraft.ron`), a two-wheel bike (`.bike.ron`) and a hover hull (`.hoverhull.ron`). It shows each configuration as editable sections, plots the car with the
 runtime's own vehicle math, sends the edited car to a running play session without a respawn, and tries

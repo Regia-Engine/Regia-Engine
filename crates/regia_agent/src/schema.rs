@@ -32331,7 +32331,8 @@ pub const METHODS: &[MethodSchema] = &[
             "A report label (as given to HubHost::publish). Error `hub_unknown` for any other.",
         )],
         result: "{ hubs: [{ label, sessions, lobbies, listed, invites, generations: { directory, presence }, \
-                 state_bytes, bytes_sent: { directory, chat, other }, expired, refused, players: [{ member, handle, \
+                 state_bytes, bytes_sent: { directory, chat, other }, expired, refused, relay_allocations, \
+                 servers_online, draining, players: [{ member, handle, \
                  presence, lobby? }], games: [{ id, owner, owner_handle, visibility, max_members, member_count, \
                  joinable, data }] }] }",
         mutating: false,

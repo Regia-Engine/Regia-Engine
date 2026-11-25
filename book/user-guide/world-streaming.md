@@ -1,12 +1,24 @@
 # World streaming
 
+<!-- index: World streaming -->
+<!-- index: Streaming cell -->
+<!-- index: HLOD -->
+<!-- index: Floating origin -->
+<!-- index: Streaming source -->
+<!-- index: Stream budget -->
+
 A streamed level is cut into a grid of square cells. The cook writes each cell as its own blob, and
 at run time the engine loads the cells around your players and cameras, unloads the ones left
 behind, and draws far cells as cheap merged proxies (HLOD). Memory stays under a hard budget, and the
 game never waits on disk inside a frame. This chapter takes you from an ordinary level to a streamed
-one and shows how to check that it behaves. The agent-facing reference is
+one and shows how to check that it behaves (`docs/specs/78-world-streaming.md`). The short procedure
+is [Stream a level](../how-to/world/streaming.md). The agent-facing reference is
 [World streaming runtime](../agents/streaming-runtime.md); the data-model methods are on
 [World streaming and HLOD](../agents/world-streaming.md).
+
+Terrain height and material tiles use a different cache (`regia_terrain::stream::TileCache`).
+See [Terrain data](terrain-data.md). Procedural points around an anchor use their own cells
+(`docs/specs/66-tiled-and-runtime-generation.md`), not this grid.
 
 ## 1. Turn a level into a grid level
 

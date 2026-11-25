@@ -82,10 +82,32 @@ fn main() -> ExitCode {
     install_lab_methods(app.world_mut());
     app.add_plugins(DefaultPlugins).add_plugins(LabView { kit });
     app.insert_resource(regia::agent::AgentSettings {
-        project_dir: Some(env!("CARGO_MANIFEST_DIR").into()),
+        project_dir: sample_project_dir(),
     });
     match app.run() {
         AppExit::Success => ExitCode::SUCCESS,
         AppExit::Error(code) => ExitCode::from(code.get()),
     }
+}
+
+/// Package directory of this example, resolved at runtime (ADR-10370).
+///
+/// `cargo run --example` exports `CARGO_MANIFEST_DIR` (the package root, not
+/// `examples/`). An example binary lives at `target/<profile>/examples/<name>`,
+/// so the walk looks further up than a normal bin. The compile-time
+/// `env!("CARGO_MANIFEST_DIR")` is not remapped by rustc.
+fn sample_project_dir() -> Option<std::path::PathBuf> {
+    if let Some(dir) = std::env::var_os("CARGO_MANIFEST_DIR") {
+        return Some(dir.into());
+    }
+    let exe = std::env::current_exe().ok()?;
+    let mut dir = exe.parent()?;
+    for _ in 0..6 {
+        let project = dir.join("samples").join("destruction_lab");
+        if project.is_dir() {
+            return Some(project);
+        }
+        dir = dir.parent()?;
+    }
+    None
 }

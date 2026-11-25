@@ -3182,6 +3182,16 @@ crypto::TicketKeys::open	pub fn open(&self, _: &[u8], _: u64) -> Result<TicketCl
 crypto::TicketKeys::seal	pub fn seal(&mut self, _: &TicketClaims, _: u64) -> Result<[u8; RESUMPTION_TICKET_BYTES], CryptoError>
 crypto::accept_handshake	pub fn accept_handshake(_: &ServerIdentity, _: &[u8; 32], _: &[u8], _: u32) -> Result<(SecureLink, [u8; 100]), CryptoError>
 crypto::bind_password_nonce	pub fn bind_password_nonce(_: &[u8; 16], _: &[u8; 32]) -> [u8; 16]
+crypto::binding	pub mod binding
+crypto::binding::BINDING_PATTERN	pub const BINDING_PATTERN: &str
+crypto::binding::BINDING_PAYLOAD_BYTES	pub const BINDING_PAYLOAD_BYTES: usize
+crypto::binding::BINDING_PROLOGUE	pub const BINDING_PROLOGUE: &[u8]
+crypto::binding::BINDING_PROOF_BYTES	pub const BINDING_PROOF_BYTES: usize
+crypto::binding::PRESENCE_PROLOGUE	pub const PRESENCE_PROLOGUE: &[u8]
+crypto::binding::prove_binding	pub fn prove_binding(_: &PlayerIdentity, _: &ServerKey, _: &[u8; BINDING_PAYLOAD_BYTES]) -> Result<Vec<u8>, CryptoError>
+crypto::binding::prove_server_presence	pub fn prove_server_presence(_: &ServerIdentity, _: &ServerKey, _: &[u8; 32]) -> Result<Vec<u8>, CryptoError>
+crypto::binding::verify_binding_proof	pub fn verify_binding_proof(_: &ServerIdentity, _: &[u8]) -> Result<(PlayerKey, [u8; BINDING_PAYLOAD_BYTES]), CryptoError>
+crypto::binding::verify_server_presence_proof	pub fn verify_server_presence_proof(_: &ServerIdentity, _: &[u8; 32], _: &[u8]) -> Result<ServerKey, CryptoError>
 crypto::build_hash	pub fn build_hash(_: &str) -> u64
 crypto::derive_resume_psk	pub fn derive_resume_psk(_: &[u8; 32], _: &[u8; 32], _: &[u8; 32]) -> [u8; 32]
 crypto::fixture_link_pair	pub fn fixture_link_pair(_: &[u8; 32], _: u32) -> Result<(SecureLink, SecureLink), CryptoError>
@@ -4712,6 +4722,23 @@ lobby::hub::AdmitGate::admit	pub fn admit(&mut self, _: Option<IpAddr>, _: Optio
 lobby::hub::AdmitGate::limits	pub fn limits(&self) -> HubLimits
 lobby::hub::AdmitGate::new	pub fn new(_: HubLimits) -> Self
 lobby::hub::AdmitGate::tracked_addresses	pub fn tracked_addresses(&self) -> usize
+lobby::hub::BINDING_MAX_HORIZON_MS	pub const BINDING_MAX_HORIZON_MS: u64
+lobby::hub::BINDING_PAYLOAD_BYTES	pub const BINDING_PAYLOAD_BYTES: usize
+lobby::hub::BINDING_PROOF_BYTES	pub const BINDING_PROOF_BYTES: usize
+lobby::hub::BindingClaims	pub struct BindingClaims { pub version: u8, pub server_key: ServerKey, pub expiry_ms: u64, pub serial: u64 }
+lobby::hub::BindingClaims impl Clone	derive(Clone)
+lobby::hub::BindingClaims impl Copy	derive(Copy)
+lobby::hub::BindingClaims impl Debug	derive(Debug)
+lobby::hub::BindingClaims impl Eq	derive(Eq)
+lobby::hub::BindingClaims impl PartialEq	derive(PartialEq)
+lobby::hub::BindingState	pub enum BindingState { Live, Expired, Revoked }
+lobby::hub::BindingState impl Clone	derive(Clone)
+lobby::hub::BindingState impl Copy	derive(Copy)
+lobby::hub::BindingState impl Debug	derive(Debug)
+lobby::hub::BindingState impl Eq	derive(Eq)
+lobby::hub::BindingState impl PartialEq	derive(PartialEq)
+lobby::hub::BindingState::from_u8	pub fn from_u8(_: u8) -> Option<Self>
+lobby::hub::BindingState::to_u8	pub fn to_u8(self) -> u8
 lobby::hub::BrokerError	pub enum BrokerError { NoReach }
 lobby::hub::BrokerError impl Clone	derive(Clone)
 lobby::hub::BrokerError impl Copy	derive(Copy)
@@ -4730,20 +4757,43 @@ lobby::hub::DEFAULT_HUB_PORT	pub const DEFAULT_HUB_PORT: u16
 lobby::hub::DEFAULT_HUB_TOML	pub const DEFAULT_HUB_TOML: &str
 lobby::hub::DEFAULT_PER_ADDRESS_PER_SEC	pub const DEFAULT_PER_ADDRESS_PER_SEC: u32
 lobby::hub::DEFAULT_PER_IDENTITY_PER_SEC	pub const DEFAULT_PER_IDENTITY_PER_SEC: u32
+lobby::hub::DEFAULT_RELAY_ALLOCATION_CAP	pub const DEFAULT_RELAY_ALLOCATION_CAP: u16
+lobby::hub::DEFAULT_RELAY_PER_ADDRESS_PER_SEC	pub const DEFAULT_RELAY_PER_ADDRESS_PER_SEC: u32
+lobby::hub::DEFAULT_RELAY_PORT	pub const DEFAULT_RELAY_PORT: u16
 lobby::hub::DEFAULT_STATUS_PORT	pub const DEFAULT_STATUS_PORT: u16
-lobby::hub::DirectoryPage	pub struct DirectoryPage { pub dir_gen: u64, pub presence_gen: u64, pub reset: bool, pub done: bool, pub players: Vec<PresenceRow>, pub removed_players: Vec<MemberId>, pub lobbies: Vec<HubLobbyCard>, pub removed_lobbies: Vec<LobbyId> }
+lobby::hub::DirectoryPage	#[non_exhaustive] pub struct DirectoryPage { .. }
 lobby::hub::DirectoryPage impl Clone	derive(Clone)
 lobby::hub::DirectoryPage impl Debug	derive(Debug)
 lobby::hub::DirectoryPage impl Default	derive(Default)
 lobby::hub::DirectoryPage impl Eq	derive(Eq)
 lobby::hub::DirectoryPage impl PartialEq	derive(PartialEq)
+lobby::hub::DirectoryPage.dir_gen	pub dir_gen: u64
+lobby::hub::DirectoryPage.done	pub done: bool
+lobby::hub::DirectoryPage.lobbies	pub lobbies: Vec<HubLobbyCard>
+lobby::hub::DirectoryPage.players	pub players: Vec<PresenceRow>
+lobby::hub::DirectoryPage.presence_gen	pub presence_gen: u64
+lobby::hub::DirectoryPage.removed_lobbies	pub removed_lobbies: Vec<LobbyId>
+lobby::hub::DirectoryPage.removed_players	pub removed_players: Vec<MemberId>
+lobby::hub::DirectoryPage.reset	pub reset: bool
+lobby::hub::DirectoryPage.servers	pub servers: Vec<ServerCard>
 lobby::hub::FRIENDS_LIMIT	pub const FRIENDS_LIMIT: usize
+lobby::hub::GRACE_MS_DEFAULT	pub const GRACE_MS_DEFAULT: u32
+lobby::hub::GRACE_MS_MAX	pub const GRACE_MS_MAX: u32
 lobby::hub::HANDLE_LIMIT_BYTES	pub const HANDLE_LIMIT_BYTES: usize
 lobby::hub::HUB_GAME_ID	pub const HUB_GAME_ID: &str
+lobby::hub::HUB_RELAY_DRAIN_MS	pub const HUB_RELAY_DRAIN_MS: u64
 lobby::hub::HUB_STATUS_LABEL	pub const HUB_STATUS_LABEL: &str
 lobby::hub::HUB_TOML_FORMAT_VERSION	pub const HUB_TOML_FORMAT_VERSION: u32
 lobby::hub::HUB_TOML_KEYS	pub const HUB_TOML_KEYS: &[&str]
 lobby::hub::HUB_WIRE_VERSION	pub const HUB_WIRE_VERSION: u32
+lobby::hub::HUB_WIRE_VERSION_V1	pub const HUB_WIRE_VERSION_V1: u32
+lobby::hub::HubBansFile	#[non_exhaustive] pub struct HubBansFile { .. }
+lobby::hub::HubBansFile impl Clone	derive(Clone)
+lobby::hub::HubBansFile impl Debug	derive(Debug)
+lobby::hub::HubBansFile impl Default	impl Default for HubBansFile
+lobby::hub::HubBansFile impl Eq	derive(Eq)
+lobby::hub::HubBansFile impl PartialEq	derive(PartialEq)
+lobby::hub::HubBansFile.path	pub path: String
 lobby::hub::HubCaps	pub struct HubCaps { pub session_cap: usize, pub lobby_cap: usize, pub max_members: u32, pub chat_per_sec: usize, pub handle_max_bytes: usize, pub idle_ms: u64 }
 lobby::hub::HubCaps impl Clone	derive(Clone)
 lobby::hub::HubCaps impl Debug	derive(Debug)
@@ -4761,21 +4811,109 @@ lobby::hub::HubClock impl Default	impl Default for HubClock
 lobby::hub::HubClock::manual	pub fn manual(_: u64) -> Self
 lobby::hub::HubClock::now_ms	pub fn now_ms(&self) -> u64
 lobby::hub::HubClock::set_ms	pub fn set_ms(&self, _: u64)
-lobby::hub::HubError	pub enum HubError { KeyUnpinned, KeyMismatch, HandleInvalid, HandleTaken, SessionCap, NoSession, LobbyCap, PresenceInvalid, TooManyFriends, InviteOnly, FriendsOnly, NoSuchPlayer, ChatRateLimited, DataRateLimited, ChatInvalid, Muted, CannotMuteOwner, DataTooLarge, Disconnected, IdentityMismatch, IdentityInUse, NoReach, ReachInvalid, NoAsk, ReachDenied, AddressRateLimited, IdentityRateLimited, Draining, Lobby(LobbyError) }
+lobby::hub::HubDocument	#[non_exhaustive] pub struct HubDocument { .. }
+lobby::hub::HubDocument impl Clone	derive(Clone)
+lobby::hub::HubDocument impl Debug	derive(Debug)
+lobby::hub::HubDocument impl Default	derive(Default)
+lobby::hub::HubDocument impl Eq	derive(Eq)
+lobby::hub::HubDocument impl PartialEq	derive(PartialEq)
+lobby::hub::HubDocument.bans	pub bans: HubBansFile
+lobby::hub::HubDocument.file	pub file: HubFile
+lobby::hub::HubDocument.log	pub log: HubLogFile
+lobby::hub::HubDocument.relay	pub relay: HubRelayFile
+lobby::hub::HubDocument::from_toml	pub fn from_toml(_: &str) -> Result<Self, Vec<HubFieldError>>
+lobby::hub::HubDocument::relay_addr	pub fn relay_addr(&self) -> Result<Option<SocketAddr>, HubFieldError>
+lobby::hub::HubError	#[non_exhaustive] pub enum HubError { .. }
 lobby::hub::HubError impl Clone	derive(Clone)
 lobby::hub::HubError impl Debug	derive(Debug)
 lobby::hub::HubError impl Eq	derive(Eq)
 lobby::hub::HubError impl Error	derive(Error)
 lobby::hub::HubError impl PartialEq	derive(PartialEq)
+lobby::hub::HubError::AddressInData	AddressInData
+lobby::hub::HubError::AddressRateLimited	AddressRateLimited
+lobby::hub::HubError::AskInflight	AskInflight
+lobby::hub::HubError::AskRateLimited	AskRateLimited
+lobby::hub::HubError::Banned	Banned
+lobby::hub::HubError::BindingExpired	BindingExpired
+lobby::hub::HubError::BindingInvalid	BindingInvalid
+lobby::hub::HubError::BindingNotOwner	BindingNotOwner
+lobby::hub::HubError::BindingRevoked	BindingRevoked
+lobby::hub::HubError::BindingUnbound	BindingUnbound
+lobby::hub::HubError::CannotMuteOwner	CannotMuteOwner
+lobby::hub::HubError::ChatInvalid	ChatInvalid
+lobby::hub::HubError::ChatRateLimited	ChatRateLimited
+lobby::hub::HubError::DataRateLimited	DataRateLimited
+lobby::hub::HubError::DataTooLarge	DataTooLarge
+lobby::hub::HubError::Disconnected	Disconnected
+lobby::hub::HubError::Draining	Draining
+lobby::hub::HubError::FriendsOnly	FriendsOnly
 lobby::hub::HubError::HUB_CODES	pub const HUB_CODES: &'static[&'static str]
+lobby::hub::HubError::HandleInvalid	HandleInvalid
+lobby::hub::HubError::HandleTaken	HandleTaken
+lobby::hub::HubError::IdentityInUse	IdentityInUse
+lobby::hub::HubError::IdentityMismatch	IdentityMismatch
+lobby::hub::HubError::IdentityRateLimited	IdentityRateLimited
+lobby::hub::HubError::InviteOnly	InviteOnly
+lobby::hub::HubError::KeyMismatch	KeyMismatch
+lobby::hub::HubError::KeyUnpinned	KeyUnpinned
+lobby::hub::HubError::Lobby	Lobby(LobbyError)
+lobby::hub::HubError::LobbyCap	LobbyCap
+lobby::hub::HubError::LobbyClosed	LobbyClosed
+lobby::hub::HubError::LobbyFull	LobbyFull
+lobby::hub::HubError::Muted	Muted
+lobby::hub::HubError::NeedsWireV2	NeedsWireV2
+lobby::hub::HubError::NoAsk	NoAsk
+lobby::hub::HubError::NoReach	NoReach
+lobby::hub::HubError::NoSession	NoSession
+lobby::hub::HubError::NoSuchPlayer	NoSuchPlayer
+lobby::hub::HubError::NotAPlayer	NotAPlayer
+lobby::hub::HubError::NotReady	NotReady
+lobby::hub::HubError::NotSession	NotSession
+lobby::hub::HubError::PresenceInvalid	PresenceInvalid
+lobby::hub::HubError::ReachDenied	ReachDenied
+lobby::hub::HubError::ReachInvalid	ReachInvalid
+lobby::hub::HubError::RevokeFull	RevokeFull
+lobby::hub::HubError::ServerFull	ServerFull
+lobby::hub::HubError::ServerInUse	ServerInUse
+lobby::hub::HubError::ServerInvalid	ServerInvalid
+lobby::hub::HubError::ServerOffline	ServerOffline
+lobby::hub::HubError::SessionCap	SessionCap
+lobby::hub::HubError::TooManyFriends	TooManyFriends
 lobby::hub::HubError::code	pub fn code(&self) -> &'static str
 lobby::hub::HubError::from_code	pub fn from_code(_: &str) -> Self
 lobby::hub::HubError::to_lobby	pub fn to_lobby(&self) -> LobbyError
-lobby::hub::HubEvent	pub enum HubEvent { Welcome { member: MemberId, handle: String, idle_ms: u64, identity: PlayerKey }, Reply { request: u64, result: Result<LobbyId, String> }, ListDone { request: u64 }, Directory(DirectoryPage), Room(RoomState), MemberJoined { lobby: LobbyId, member: MemberId, handle: String }, MemberLeft { lobby: LobbyId, member: MemberId }, Data { lobby: LobbyId, key: String, value: Option<String> }, MemberData { lobby: LobbyId, member: MemberId, key: String, value: Option<String> }, Joinable { lobby: LobbyId, joinable: bool }, OwnerChanged { lobby: LobbyId, owner: MemberId }, ServerSet { lobby: LobbyId, server: Option<LobbyServer> }, Chat { scope: ChatScope, from: MemberId, from_handle: String, text: String }, Invite(InviteCard), Left { lobby: LobbyId, reason: LeaveReason }, Refused { code: String }, ReachAsk { lobby: LobbyId, member: MemberId, handle: String, identity: PlayerKey, offer: ReachOffer }, Plan(JoinPlan), ReachDenied { lobby: LobbyId }, Reached { lobby: LobbyId, member: MemberId, path: ReachKind, punch_attempts: u32 } }
+lobby::hub::HubEvent	#[non_exhaustive] pub enum HubEvent { .. }
 lobby::hub::HubEvent impl Clone	derive(Clone)
 lobby::hub::HubEvent impl Debug	derive(Debug)
 lobby::hub::HubEvent impl Eq	derive(Eq)
 lobby::hub::HubEvent impl PartialEq	derive(PartialEq)
+lobby::hub::HubEvent::BindingChanged	BindingChanged { server_key: ServerKey, serial: u64, state: BindingState }
+lobby::hub::HubEvent::Chat	Chat { scope: ChatScope, from: MemberId, from_handle: String, text: String }
+lobby::hub::HubEvent::Data	Data { lobby: LobbyId, key: String, value: Option<String> }
+lobby::hub::HubEvent::Directory	Directory(DirectoryPage)
+lobby::hub::HubEvent::GraceEnded	GraceEnded { lobby: LobbyId }
+lobby::hub::HubEvent::GraceStarted	GraceStarted { lobby: LobbyId, deadline_ms: u64 }
+lobby::hub::HubEvent::Invite	Invite(InviteCard)
+lobby::hub::HubEvent::Joinable	Joinable { lobby: LobbyId, joinable: bool }
+lobby::hub::HubEvent::Left	Left { lobby: LobbyId, reason: LeaveReason }
+lobby::hub::HubEvent::ListDone	ListDone { request: u64 }
+lobby::hub::HubEvent::LobbyAssigned	LobbyAssigned { lobby: LobbyId, owner: PlayerKey }
+lobby::hub::HubEvent::MemberData	MemberData { lobby: LobbyId, member: MemberId, key: String, value: Option<String> }
+lobby::hub::HubEvent::MemberJoined	MemberJoined { lobby: LobbyId, member: MemberId, handle: String }
+lobby::hub::HubEvent::MemberLeft	MemberLeft { lobby: LobbyId, member: MemberId }
+lobby::hub::HubEvent::OwnerChanged	OwnerChanged { lobby: LobbyId, owner: MemberId }
+lobby::hub::HubEvent::Plan	Plan(JoinPlan)
+lobby::hub::HubEvent::ReachAsk	ReachAsk { lobby: LobbyId, member: MemberId, handle: String, identity: PlayerKey, offer: ReachOffer }
+lobby::hub::HubEvent::ReachDenied	ReachDenied { lobby: LobbyId }
+lobby::hub::HubEvent::Reached	Reached { lobby: LobbyId, member: MemberId, path: ReachKind, punch_attempts: u32 }
+lobby::hub::HubEvent::Refused	Refused { code: String }
+lobby::hub::HubEvent::Reply	Reply { request: u64, result: Result<LobbyId, String> }
+lobby::hub::HubEvent::Room	Room(RoomState)
+lobby::hub::HubEvent::ServerOffline	ServerOffline(ServerNotice)
+lobby::hub::HubEvent::ServerOnline	ServerOnline(ServerNotice)
+lobby::hub::HubEvent::ServerSet	ServerSet { lobby: LobbyId, server: Option<LobbyServer> }
+lobby::hub::HubEvent::SessionConfirmed	SessionConfirmed { lobby: LobbyId, confirmed: bool }
+lobby::hub::HubEvent::Welcome	Welcome { member: MemberId, handle: String, idle_ms: u64, identity: PlayerKey }
 lobby::hub::HubEvent::to_bytes	pub fn to_bytes(&self) -> Result<Vec<u8>, WireError>
 lobby::hub::HubEvent::wire_len	pub fn wire_len(&self) -> usize
 lobby::hub::HubFieldError	pub struct HubFieldError { pub field: String, pub expected: String }
@@ -4812,7 +4950,7 @@ lobby::hub::HubHost::server_key	impl<S: DatagramSocket> HubHost<S>: pub fn serve
 lobby::hub::HubHost::set_limits	impl<S: DatagramSocket> HubHost<S>: pub fn set_limits(&mut self, _: HubLimits)
 lobby::hub::HubHost::update	impl<S: DatagramSocket> HubHost<S>: pub fn update(&mut self, _: u64)
 lobby::hub::HubHost::with_config	impl<S: DatagramSocket> HubHost<S>: pub fn with_config(_: S, _: ServerIdentity, _: HubSettings, _: ServerConfig) -> Self
-lobby::hub::HubLimits	pub struct HubLimits { pub per_address_per_sec: u32, pub per_identity_per_sec: u32 }
+lobby::hub::HubLimits	pub struct HubLimits { pub per_address_per_sec: u32, pub per_identity_per_sec: u32, pub ask_per_identity_per_10s: u32, pub ask_per_address_per_10s: u32, pub ask_inflight_per_identity: u32, pub ask_inflight_hub: u32 }
 lobby::hub::HubLimits impl Clone	derive(Clone)
 lobby::hub::HubLimits impl Copy	derive(Copy)
 lobby::hub::HubLimits impl Debug	derive(Debug)
@@ -4829,7 +4967,11 @@ lobby::hub::HubLobbyBackend impl Debug	impl<S: DatagramSocket> Debug for HubLobb
 lobby::hub::HubLobbyBackend impl LobbyBackend	impl<S: DatagramSocket + Send> LobbyBackend for HubLobbyBackend<S>
 lobby::hub::HubLobbyBackend::approve	impl<S: DatagramSocket> HubLobbyBackend<S>: pub fn approve(&self, _: LobbyId, _: MemberId, _: bool) -> Result<(), LobbyError>
 lobby::hub::HubLobbyBackend::ask_reach	impl<S: DatagramSocket> HubLobbyBackend<S>: pub fn ask_reach(&self, _: LobbyId, _: ReachOffer) -> Result<(), LobbyError>
+lobby::hub::HubLobbyBackend::bind_server	impl<S: DatagramSocket> HubLobbyBackend<S>: pub fn bind_server(&self, _: &ServerKey, _: u64, _: u64) -> Result<Vec<u8>, LobbyError>
+lobby::hub::HubLobbyBackend::bindings	impl<S: DatagramSocket> HubLobbyBackend<S>: pub fn bindings(&self) -> Vec<LocalBinding>
+lobby::hub::HubLobbyBackend::close_lobby	impl<S: DatagramSocket> HubLobbyBackend<S>: pub fn close_lobby(&self, _: LobbyId) -> Result<(), LobbyError>
 lobby::hub::HubLobbyBackend::connect	impl<S: DatagramSocket> HubLobbyBackend<S>: pub fn connect(_: S, _: SocketAddr, _: HubClientConfig) -> Result<Self, HubError>
+lobby::hub::HubLobbyBackend::create_delegated	impl<S: DatagramSocket> HubLobbyBackend<S>: pub fn create_delegated(&self, _: &LobbySpec, _: ServerKey) -> Result<RequestId, LobbyError>
 lobby::hub::HubLobbyBackend::directory	impl<S: DatagramSocket> HubLobbyBackend<S>: pub fn directory(&self) -> Vec<HubLobbyCard>
 lobby::hub::HubLobbyBackend::generations	impl<S: DatagramSocket> HubLobbyBackend<S>: pub fn generations(&self) -> (u64, u64)
 lobby::hub::HubLobbyBackend::identity	impl<S: DatagramSocket> HubLobbyBackend<S>: pub fn identity(&self) -> PlayerKey
@@ -4839,24 +4981,48 @@ lobby::hub::HubLobbyBackend::is_sealed	impl<S: DatagramSocket> HubLobbyBackend<S
 lobby::hub::HubLobbyBackend::last_error	impl<S: DatagramSocket> HubLobbyBackend<S>: pub fn last_error(&self) -> Option<String>
 lobby::hub::HubLobbyBackend::link_state	impl<S: DatagramSocket> HubLobbyBackend<S>: pub fn link_state(&self) -> HubLinkState
 lobby::hub::HubLobbyBackend::mute	impl<S: DatagramSocket> HubLobbyBackend<S>: pub fn mute(&self, _: LobbyId, _: MemberId, _: bool) -> Result<(), LobbyError>
+lobby::hub::HubLobbyBackend::note_hub_game_version	impl<S: DatagramSocket> HubLobbyBackend<S>: pub fn note_hub_game_version(&self, _: &str)
 lobby::hub::HubLobbyBackend::offer_reach	impl<S: DatagramSocket> HubLobbyBackend<S>: pub fn offer_reach(&self, _: LobbyId, _: ReachOffer) -> Result<(), LobbyError>
 lobby::hub::HubLobbyBackend::players	impl<S: DatagramSocket> HubLobbyBackend<S>: pub fn players(&self) -> Vec<PresenceRow>
 lobby::hub::HubLobbyBackend::pump	impl<S: DatagramSocket> HubLobbyBackend<S>: pub fn pump(&self, _: u64)
 lobby::hub::HubLobbyBackend::reach_asks	impl<S: DatagramSocket> HubLobbyBackend<S>: pub fn reach_asks(&self) -> Vec<ReachAsk>
+lobby::hub::HubLobbyBackend::register_server	impl<S: DatagramSocket> HubLobbyBackend<S>: pub fn register_server(&self, _: &ServerIdentity, _: &ServerRegister) -> Result<(), LobbyError>
 lobby::hub::HubLobbyBackend::report_reach	impl<S: DatagramSocket> HubLobbyBackend<S>: pub fn report_reach(&self, _: LobbyId, _: ReachKind, _: u32) -> Result<(), LobbyError>
+lobby::hub::HubLobbyBackend::revoke_binding	impl<S: DatagramSocket> HubLobbyBackend<S>: pub fn revoke_binding(&self, _: ServerKey, _: u64) -> Result<(), LobbyError>
 lobby::hub::HubLobbyBackend::send_global_chat	impl<S: DatagramSocket> HubLobbyBackend<S>: pub fn send_global_chat(&self, _: &str) -> Result<(), LobbyError>
+lobby::hub::HubLobbyBackend::servers	impl<S: DatagramSocket> HubLobbyBackend<S>: pub fn servers(&self) -> Vec<ServerCard>
 lobby::hub::HubLobbyBackend::set_friends	impl<S: DatagramSocket> HubLobbyBackend<S>: pub fn set_friends(&self, _: &[crate::crypto::PlayerKey]) -> Result<(), LobbyError>
 lobby::hub::HubLobbyBackend::set_presence	impl<S: DatagramSocket> HubLobbyBackend<S>: pub fn set_presence(&self, _: HubPresence) -> Result<(), LobbyError>
 lobby::hub::HubLobbyBackend::take_global_chat	impl<S: DatagramSocket> HubLobbyBackend<S>: pub fn take_global_chat(&self) -> Vec<(MemberId, String, String)>
+lobby::hub::HubLobbyBackend::take_notices	impl<S: DatagramSocket> HubLobbyBackend<S>: pub fn take_notices(&self) -> Vec<HubNotice>
 lobby::hub::HubLobbyBackend::take_plans	impl<S: DatagramSocket> HubLobbyBackend<S>: pub fn take_plans(&self) -> Vec<JoinPlan>
-lobby::hub::HubLobbyCard	pub struct HubLobbyCard { pub id: LobbyId, pub owner: MemberId, pub owner_handle: String, pub visibility: LobbyVisibility, pub max_members: u32, pub member_count: u32, pub joinable: bool, pub data: BTreeMap<String, String> }
+lobby::hub::HubLobbyCard	#[non_exhaustive] pub struct HubLobbyCard { .. }
 lobby::hub::HubLobbyCard impl Clone	derive(Clone)
 lobby::hub::HubLobbyCard impl Debug	derive(Debug)
 lobby::hub::HubLobbyCard impl Deserialize	derive(Deserialize)
 lobby::hub::HubLobbyCard impl Eq	derive(Eq)
 lobby::hub::HubLobbyCard impl PartialEq	derive(PartialEq)
 lobby::hub::HubLobbyCard impl Serialize	derive(Serialize)
+lobby::hub::HubLobbyCard.capacity	pub capacity: u16
+lobby::hub::HubLobbyCard.data	pub data: BTreeMap<String, String>
+lobby::hub::HubLobbyCard.id	pub id: LobbyId
+lobby::hub::HubLobbyCard.joinable	pub joinable: bool
+lobby::hub::HubLobbyCard.kind	pub kind: wire::LobbyKind
+lobby::hub::HubLobbyCard.load	pub load: u16
+lobby::hub::HubLobbyCard.max_members	pub max_members: u32
+lobby::hub::HubLobbyCard.member_count	pub member_count: u32
+lobby::hub::HubLobbyCard.owner	pub owner: MemberId
+lobby::hub::HubLobbyCard.owner_handle	pub owner_handle: String
+lobby::hub::HubLobbyCard.relay_only	pub relay_only: bool
+lobby::hub::HubLobbyCard.visibility	pub visibility: LobbyVisibility
 lobby::hub::HubLobbyCard::to_info	pub fn to_info(&self) -> super::LobbyInfo
+lobby::hub::HubLogFile	#[non_exhaustive] pub struct HubLogFile { .. }
+lobby::hub::HubLogFile impl Clone	derive(Clone)
+lobby::hub::HubLogFile impl Debug	derive(Debug)
+lobby::hub::HubLogFile impl Default	impl Default for HubLogFile
+lobby::hub::HubLogFile impl Eq	derive(Eq)
+lobby::hub::HubLogFile impl PartialEq	derive(PartialEq)
+lobby::hub::HubLogFile.dir	pub dir: String
 lobby::hub::HubMessage	pub enum HubMessage { Request(HubRequest), Event(HubEvent) }
 lobby::hub::HubMessage impl Clone	derive(Clone)
 lobby::hub::HubMessage impl Debug	derive(Debug)
@@ -4864,6 +5030,11 @@ lobby::hub::HubMessage impl Eq	derive(Eq)
 lobby::hub::HubMessage impl NetCodec	impl NetCodec for HubMessage
 lobby::hub::HubMessage impl PartialEq	derive(PartialEq)
 lobby::hub::HubMessage::decode_bounded	pub fn decode_bounded(_: &[u8]) -> Result<Self, WireError>
+lobby::hub::HubNotice	pub enum HubNotice { ServerOnline(ServerNotice), ServerOffline(ServerNotice), LobbyAssigned { lobby: LobbyId, owner: PlayerKey }, GraceStarted { lobby: LobbyId, deadline_ms: u64 }, GraceEnded { lobby: LobbyId }, BindingChanged { server_key: ServerKey, serial: u64, state: BindingState }, SessionConfirmed { lobby: LobbyId, confirmed: bool } }
+lobby::hub::HubNotice impl Clone	derive(Clone)
+lobby::hub::HubNotice impl Debug	derive(Debug)
+lobby::hub::HubNotice impl Eq	derive(Eq)
+lobby::hub::HubNotice impl PartialEq	derive(PartialEq)
 lobby::hub::HubPresence	pub enum HubPresence { Menu, Lobby, InGame }
 lobby::hub::HubPresence impl Clone	derive(Clone)
 lobby::hub::HubPresence impl Copy	derive(Copy)
@@ -4877,6 +5048,7 @@ lobby::hub::HubPresence::from_u8	pub fn from_u8(_: u8) -> Option<Self>
 lobby::hub::HubPresence::name	pub fn name(self) -> &'static str
 lobby::hub::HubPresence::to_u8	pub fn to_u8(self) -> u8
 lobby::hub::HubProcess	pub struct HubProcess<S: DatagramSocket> { .. }
+lobby::hub::HubProcess::attach_relay	impl<S: DatagramSocket> HubProcess<S>: pub fn attach_relay(&mut self, _: RelayServer<S>)
 lobby::hub::HubProcess::begin_drain	impl<S: DatagramSocket> HubProcess<S>: pub fn begin_drain(&mut self)
 lobby::hub::HubProcess::drain_reason	impl<S: DatagramSocket> HubProcess<S>: pub fn drain_reason() -> DisconnectReason
 lobby::hub::HubProcess::finished_draining	impl<S: DatagramSocket> HubProcess<S>: pub fn finished_draining(&self) -> bool
@@ -4886,19 +5058,41 @@ lobby::hub::HubProcess::host	impl<S: DatagramSocket> HubProcess<S>: pub fn host(
 lobby::hub::HubProcess::host_mut	impl<S: DatagramSocket> HubProcess<S>: pub fn host_mut(&mut self) -> &mut HubHost<S>
 lobby::hub::HubProcess::is_draining	impl<S: DatagramSocket> HubProcess<S>: pub fn is_draining(&self) -> bool
 lobby::hub::HubProcess::new	impl<S: DatagramSocket> HubProcess<S>: pub fn new(_: S, _: ServerIdentity, _: &HubFile) -> Self
+lobby::hub::HubProcess::note_shutdown	impl<S: DatagramSocket> HubProcess<S>: pub fn note_shutdown(&mut self) -> bool
 lobby::hub::HubProcess::publish	impl<S: DatagramSocket> HubProcess<S>: pub fn publish(&self, _: &mut NetAgentState)
+lobby::hub::HubProcess::relay	impl<S: DatagramSocket> HubProcess<S>: pub fn relay(&self) -> Option<&RelayServer<S>>
 lobby::hub::HubProcess::report	impl<S: DatagramSocket> HubProcess<S>: pub fn report(&self) -> HubReport
 lobby::hub::HubProcess::update	impl<S: DatagramSocket> HubProcess<S>: pub fn update(&mut self, _: u64)
 lobby::hub::HubReach	#[cfg(feature = "ecs")] pub struct HubReach<S> { .. }
+lobby::hub::HubReach	#[cfg(not(feature = "ecs"))] pub struct HubReach<S> { .. }
 lobby::hub::HubReach impl Debug	#[cfg(feature = "ecs")] impl<S> Debug for HubReach<S>
+lobby::hub::HubReach impl Debug	#[cfg(not(feature = "ecs"))] impl<S> Debug for HubReach<S>
 lobby::hub::HubReach::join_path	#[cfg(feature = "ecs")] impl<S: DatagramSocket> HubReach<S>: pub fn join_path(&self) -> Option<&JoinPath<S>>
+lobby::hub::HubReach::join_path	#[cfg(not(feature = "ecs"))] impl<S: DatagramSocket> HubReach<S>: pub fn join_path(&self) -> Option<&JoinPath<S>>
 lobby::hub::HubReach::new	#[cfg(feature = "ecs")] impl<S: DatagramSocket> HubReach<S>: pub fn new(_: S, _: &JoinPlan, _: [u8; crate::relay::RELAY_ALLOCATION_KEY_BYTES]) -> Result<Self, HubError>
+lobby::hub::HubReach::new	#[cfg(not(feature = "ecs"))] impl<S: DatagramSocket> HubReach<S>: pub fn new(_: S, _: &JoinPlan, _: [u8; crate::relay::RELAY_ALLOCATION_KEY_BYTES]) -> Result<Self, HubError>
 lobby::hub::HubReach::outcome	#[cfg(feature = "ecs")] impl<S: DatagramSocket> HubReach<S>: pub fn outcome(&self) -> Option<(ReachKind, u32)>
+lobby::hub::HubReach::outcome	#[cfg(not(feature = "ecs"))] impl<S: DatagramSocket> HubReach<S>: pub fn outcome(&self) -> Option<(ReachKind, u32)>
 lobby::hub::HubReach::plan	#[cfg(feature = "ecs")] impl<S: DatagramSocket> HubReach<S>: pub fn plan(&self) -> &JoinPlan
+lobby::hub::HubReach::plan	#[cfg(not(feature = "ecs"))] impl<S: DatagramSocket> HubReach<S>: pub fn plan(&self) -> &JoinPlan
 lobby::hub::HubReach::state	#[cfg(feature = "ecs")] impl<S: DatagramSocket> HubReach<S>: pub fn state(&self) -> &ReachState
+lobby::hub::HubReach::state	#[cfg(not(feature = "ecs"))] impl<S: DatagramSocket> HubReach<S>: pub fn state(&self) -> &ReachState
 lobby::hub::HubReach::take_socket	#[cfg(feature = "ecs")] impl<S: DatagramSocket> HubReach<S>: pub fn take_socket(&mut self) -> Option<(ReachSocket<S>, SocketAddr, Option<ServerKey>)>
+lobby::hub::HubReach::take_socket	#[cfg(not(feature = "ecs"))] impl<S: DatagramSocket> HubReach<S>: pub fn take_socket(&mut self) -> Option<(ReachSocket<S>, SocketAddr, Option<ServerKey>)>
 lobby::hub::HubReach::update	#[cfg(feature = "ecs")] impl<S: DatagramSocket> HubReach<S>: pub fn update(&mut self, _: u64) -> &ReachState
-lobby::hub::HubReport	pub struct HubReport { pub sessions: usize, pub lobbies: usize, pub listed: usize, pub invites: usize, pub directory_generation: u64, pub presence_generation: u64, pub state_bytes: usize, pub directory_bytes: u64, pub chat_bytes: u64, pub other_bytes: u64, pub expired: u64, pub refused: BTreeMap<String, u64>, pub players: Vec<PresenceRow>, pub games: Vec<HubLobbyCard>, pub joins: Vec<JoinRow> }
+lobby::hub::HubReach::update	#[cfg(not(feature = "ecs"))] impl<S: DatagramSocket> HubReach<S>: pub fn update(&mut self, _: u64) -> &ReachState
+lobby::hub::HubRelayFile	#[non_exhaustive] pub struct HubRelayFile { .. }
+lobby::hub::HubRelayFile impl Clone	derive(Clone)
+lobby::hub::HubRelayFile impl Debug	derive(Debug)
+lobby::hub::HubRelayFile impl Default	impl Default for HubRelayFile
+lobby::hub::HubRelayFile impl Eq	derive(Eq)
+lobby::hub::HubRelayFile impl PartialEq	derive(PartialEq)
+lobby::hub::HubRelayFile.allocation_cap	pub allocation_cap: u16
+lobby::hub::HubRelayFile.bind	pub bind: String
+lobby::hub::HubRelayFile.enabled	pub enabled: bool
+lobby::hub::HubRelayFile.per_address_per_sec	pub per_address_per_sec: u32
+lobby::hub::HubRelayFile.port	pub port: u16
+lobby::hub::HubReport	#[non_exhaustive] pub struct HubReport { .. }
 lobby::hub::HubReport impl Clone	derive(Clone)
 lobby::hub::HubReport impl Debug	derive(Debug)
 lobby::hub::HubReport impl Default	derive(Default)
@@ -4906,11 +5100,56 @@ lobby::hub::HubReport impl Deserialize	derive(Deserialize)
 lobby::hub::HubReport impl Eq	derive(Eq)
 lobby::hub::HubReport impl PartialEq	derive(PartialEq)
 lobby::hub::HubReport impl Serialize	derive(Serialize)
-lobby::hub::HubRequest	pub enum HubRequest { Hello { handle: String, proof: Vec<u8> }, Heartbeat, List { request: u64, dir_gen: u64, presence_gen: u64 }, SetPresence(HubPresence), SetFriends(Vec<PlayerKey>), Create { request: u64, visibility: LobbyVisibility, max_members: u32, joinable: bool, data: BTreeMap<String, String> }, Join { request: u64, lobby: LobbyId, token: Option<InviteToken> }, Leave { lobby: LobbyId }, SetData { lobby: LobbyId, key: String, value: Option<String> }, SetMemberData { lobby: LobbyId, key: String, value: Option<String> }, SetJoinable { lobby: LobbyId, joinable: bool }, SetServer { lobby: LobbyId, server: Option<LobbyServer> }, Invite { lobby: LobbyId, handle: String }, Mute { lobby: LobbyId, member: MemberId, muted: bool }, Chat { scope: ChatScope, text: String }, Offer { lobby: LobbyId, offer: ReachOffer }, AskReach { lobby: LobbyId, offer: ReachOffer }, Approve { lobby: LobbyId, member: MemberId, approve: bool }, ReachDone { lobby: LobbyId, path: ReachKind, punch_attempts: u32 } }
+lobby::hub::HubReport.chat_bytes	pub chat_bytes: u64
+lobby::hub::HubReport.directory_bytes	pub directory_bytes: u64
+lobby::hub::HubReport.directory_generation	pub directory_generation: u64
+lobby::hub::HubReport.draining	pub draining: bool
+lobby::hub::HubReport.expired	pub expired: u64
+lobby::hub::HubReport.games	pub games: Vec<HubLobbyCard>
+lobby::hub::HubReport.invites	pub invites: usize
+lobby::hub::HubReport.joins	pub joins: Vec<JoinRow>
+lobby::hub::HubReport.listed	pub listed: usize
+lobby::hub::HubReport.lobbies	pub lobbies: usize
+lobby::hub::HubReport.other_bytes	pub other_bytes: u64
+lobby::hub::HubReport.players	pub players: Vec<PresenceRow>
+lobby::hub::HubReport.presence_generation	pub presence_generation: u64
+lobby::hub::HubReport.refused	pub refused: BTreeMap<String, u64>
+lobby::hub::HubReport.relay_allocations	pub relay_allocations: usize
+lobby::hub::HubReport.servers	pub servers: Vec<HubServerCard>
+lobby::hub::HubReport.servers_online	pub servers_online: usize
+lobby::hub::HubReport.sessions	pub sessions: usize
+lobby::hub::HubReport.state_bytes	pub state_bytes: usize
+lobby::hub::HubRequest	#[non_exhaustive] pub enum HubRequest { .. }
 lobby::hub::HubRequest impl Clone	derive(Clone)
 lobby::hub::HubRequest impl Debug	derive(Debug)
 lobby::hub::HubRequest impl Eq	derive(Eq)
 lobby::hub::HubRequest impl PartialEq	derive(PartialEq)
+lobby::hub::HubRequest::AnnounceWire	AnnounceWire { version: u8 }
+lobby::hub::HubRequest::Approve	Approve { lobby: LobbyId, member: MemberId, approve: bool }
+lobby::hub::HubRequest::AskReach	AskReach { lobby: LobbyId, offer: ReachOffer }
+lobby::hub::HubRequest::Chat	Chat { scope: ChatScope, text: String }
+lobby::hub::HubRequest::CloseLobby	CloseLobby { lobby: LobbyId }
+lobby::hub::HubRequest::Create	Create { request: u64, visibility: LobbyVisibility, max_members: u32, joinable: bool, data: BTreeMap<String, String> }
+lobby::hub::HubRequest::CreateDelegated	CreateDelegated { request: u64, visibility: LobbyVisibility, max_members: u32, joinable: bool, data: BTreeMap<String, String>, server_key: ServerKey }
+lobby::hub::HubRequest::Heartbeat	Heartbeat
+lobby::hub::HubRequest::Hello	Hello { handle: String, proof: Vec<u8> }
+lobby::hub::HubRequest::Invite	Invite { lobby: LobbyId, handle: String }
+lobby::hub::HubRequest::Join	Join { request: u64, lobby: LobbyId, token: Option<InviteToken> }
+lobby::hub::HubRequest::Leave	Leave { lobby: LobbyId }
+lobby::hub::HubRequest::List	List { request: u64, dir_gen: u64, presence_gen: u64 }
+lobby::hub::HubRequest::Mute	Mute { lobby: LobbyId, member: MemberId, muted: bool }
+lobby::hub::HubRequest::Offer	Offer { lobby: LobbyId, offer: ReachOffer }
+lobby::hub::HubRequest::ReachDone	ReachDone { lobby: LobbyId, path: ReachKind, punch_attempts: u32 }
+lobby::hub::HubRequest::RegisterServer	RegisterServer { presence: ServerPresence }
+lobby::hub::HubRequest::RevokeBinding	RevokeBinding { server_key: ServerKey, serial: u64 }
+lobby::hub::HubRequest::SetBans	SetBans { lobby: LobbyId, keys: Vec<PlayerKey> }
+lobby::hub::HubRequest::SetData	SetData { lobby: LobbyId, key: String, value: Option<String> }
+lobby::hub::HubRequest::SetFriends	SetFriends(Vec<PlayerKey>)
+lobby::hub::HubRequest::SetJoinable	SetJoinable { lobby: LobbyId, joinable: bool }
+lobby::hub::HubRequest::SetMemberData	SetMemberData { lobby: LobbyId, key: String, value: Option<String> }
+lobby::hub::HubRequest::SetPresence	SetPresence(HubPresence)
+lobby::hub::HubRequest::SetReachMode	SetReachMode { lobby: LobbyId, relay_only: bool }
+lobby::hub::HubRequest::SetServer	SetServer { lobby: LobbyId, server: Option<LobbyServer> }
 lobby::hub::HubRequest::to_bytes	pub fn to_bytes(&self) -> Result<Vec<u8>, WireError>
 lobby::hub::HubServer	pub struct HubServer { .. }
 lobby::hub::HubServer impl Debug	impl Debug for HubServer
@@ -4918,10 +5157,12 @@ lobby::hub::HubServer::approve	pub fn approve(&mut self, _: MemberId, _: LobbyId
 lobby::hub::HubServer::ask_reach	pub fn ask_reach(&mut self, _: MemberId, _: LobbyId, _: ReachOffer, _: u64) -> Result<(), HubError>
 lobby::hub::HubServer::chat	pub fn chat(&mut self, _: MemberId, _: ChatScope, _: &str, _: u64) -> Result<(), HubError>
 lobby::hub::HubServer::chat_history	pub fn chat_history(&self, _: LobbyId) -> Vec<(MemberId, String)>
+lobby::hub::HubServer::close_lobby	pub fn close_lobby(&mut self, _: MemberId, _: LobbyId, _: u64) -> Result<(), HubError>
 lobby::hub::HubServer::confirm_session	pub fn confirm_session(&mut self, _: MemberId, _: LobbyId, _: Option<LobbyServer>, _: u64) -> Result<(), HubError>
 lobby::hub::HubServer::connect	pub fn connect(&mut self, _: &str, _: u64) -> Result<MemberId, HubError>
 lobby::hub::HubServer::connect_player	pub fn connect_player(&mut self, _: PlayerKey, _: &str, _: u64) -> Result<MemberId, HubError>
 lobby::hub::HubServer::create	pub fn create(&mut self, _: MemberId, _: &LobbySpec, _: u64) -> Result<LobbyId, HubError>
+lobby::hub::HubServer::create_delegated	pub fn create_delegated(&mut self, _: MemberId, _: &LobbySpec, _: ServerKey, _: u64) -> Result<LobbyId, HubError>
 lobby::hub::HubServer::disconnect	pub fn disconnect(&mut self, _: MemberId)
 lobby::hub::HubServer::expire	pub fn expire(&mut self, _: u64) -> Vec<MemberId>
 lobby::hub::HubServer::flush	pub fn flush(&mut self)
@@ -4932,29 +5173,52 @@ lobby::hub::HubServer::identity	pub fn identity(&self, _: MemberId) -> Option<Pl
 lobby::hub::HubServer::invite	pub fn invite(&mut self, _: MemberId, _: LobbyId, _: &str, _: u64) -> Result<InviteCard, HubError>
 lobby::hub::HubServer::join	pub fn join(&mut self, _: MemberId, _: LobbyId, _: Option<InviteToken>, _: u64) -> Result<(), HubError>
 lobby::hub::HubServer::joins	pub fn joins(&self) -> Vec<JoinRow>
+lobby::hub::HubServer::kick	pub fn kick(&mut self, _: MemberId, _: LobbyId, _: MemberId, _: u64) -> Result<(), HubError>
 lobby::hub::HubServer::leave	pub fn leave(&mut self, _: MemberId, _: LobbyId, _: u64)
+lobby::hub::HubServer::load_revocations	pub fn load_revocations(&mut self) -> Result<(), String>
 lobby::hub::HubServer::lobbies	pub fn lobbies(&self) -> Vec<HubLobbyCard>
 lobby::hub::HubServer::lobby_info	pub fn lobby_info(&self, _: LobbyId) -> Option<LobbyInfo>
 lobby::hub::HubServer::member_by_handle	pub fn member_by_handle(&self, _: &str) -> Option<MemberId>
 lobby::hub::HubServer::mute	pub fn mute(&mut self, _: MemberId, _: LobbyId, _: MemberId, _: bool, _: u64) -> Result<(), HubError>
 lobby::hub::HubServer::new	pub fn new(_: HubSettings) -> Self
 lobby::hub::HubServer::note_cursor	pub fn note_cursor(&mut self, _: MemberId, _: u64, _: u64)
+lobby::hub::HubServer::note_link_hash	pub fn note_link_hash(&mut self, _: MemberId, _: [u8; 32])
 lobby::hub::HubServer::note_refused	pub fn note_refused(&mut self, _: &str)
+lobby::hub::HubServer::note_source	pub fn note_source(&mut self, _: MemberId, _: Option<IpAddr>)
 lobby::hub::HubServer::offer_reach	pub fn offer_reach(&mut self, _: MemberId, _: LobbyId, _: ReachOffer, _: u64) -> Result<(), HubError>
 lobby::hub::HubServer::players	pub fn players(&self) -> Vec<PresenceRow>
 lobby::hub::HubServer::reach_done	pub fn reach_done(&mut self, _: MemberId, _: LobbyId, _: ReachKind, _: u32, _: u64) -> Result<(), HubError>
+lobby::hub::HubServer::register_server	pub fn register_server(&mut self, _: MemberId, _: &ServerPresence, _: u64) -> Result<(), HubError>
 lobby::hub::HubServer::report	pub fn report(&self) -> HubReport
 lobby::hub::HubServer::resync	pub fn resync(&mut self, _: MemberId)
+lobby::hub::HubServer::revoke_binding	pub fn revoke_binding(&mut self, _: MemberId, _: ServerKey, _: u64, _: u64) -> Result<(), HubError>
+lobby::hub::HubServer::set_bans	pub fn set_bans(&mut self, _: MemberId, _: LobbyId, _: &[PlayerKey], _: u64) -> Result<(), HubError>
 lobby::hub::HubServer::set_data	pub fn set_data(&mut self, _: MemberId, _: LobbyId, _: &str, _: Option<&str>, _: u64) -> Result<(), HubError>
+lobby::hub::HubServer::set_draining	pub fn set_draining(&mut self, _: bool)
 lobby::hub::HubServer::set_friends	pub fn set_friends(&mut self, _: MemberId, _: &[PlayerKey], _: u64) -> Result<(), HubError>
+lobby::hub::HubServer::set_hub_identity	pub fn set_hub_identity(&mut self, _: ServerIdentity)
 lobby::hub::HubServer::set_joinable	pub fn set_joinable(&mut self, _: MemberId, _: LobbyId, _: bool, _: u64) -> Result<(), HubError>
 lobby::hub::HubServer::set_member_data	pub fn set_member_data(&mut self, _: MemberId, _: LobbyId, _: &str, _: Option<&str>, _: u64) -> Result<(), HubError>
+lobby::hub::HubServer::set_operator_bans	pub fn set_operator_bans(&mut self, _: &[PlayerKey]) -> Result<(), HubError>
 lobby::hub::HubServer::set_presence	pub fn set_presence(&mut self, _: MemberId, _: HubPresence, _: u64) -> Result<(), HubError>
+lobby::hub::HubServer::set_reach_mode	pub fn set_reach_mode(&mut self, _: MemberId, _: LobbyId, _: bool, _: u64) -> Result<(), HubError>
+lobby::hub::HubServer::set_revocation_dir	pub fn set_revocation_dir(&mut self, _: PathBuf) -> Result<(), String>
+lobby::hub::HubServer::set_wire	pub fn set_wire(&mut self, _: MemberId, _: u32)
 lobby::hub::HubServer::settings	pub fn settings(&self) -> &HubSettings
 lobby::hub::HubServer::state_bytes	pub fn state_bytes(&self) -> usize
 lobby::hub::HubServer::take_events	pub fn take_events(&mut self, _: MemberId) -> Vec<HubEvent>
+lobby::hub::HubServer::take_replaced_servers	pub fn take_replaced_servers(&mut self) -> Vec<MemberId>
+lobby::hub::HubServer::transfer_delegated	pub fn transfer_delegated(&mut self, _: MemberId, _: LobbyId, _: PlayerKey, _: u64) -> Result<(), HubError>
+lobby::hub::HubServer::wire	pub fn wire(&self, _: MemberId) -> u32
 lobby::hub::HubServer::with_secret	pub fn with_secret(_: HubSettings, _: [u8; 32]) -> Self
-lobby::hub::HubSettings	pub struct HubSettings { pub handle_max_bytes: usize, pub chat_max_chars: usize, pub chat_per_sec: usize, pub chat_history: usize, pub lobby_cap: usize, pub session_cap: usize, pub friend_cap: usize, pub idle_ms: u64, pub invite_ttl_ms: u64, pub invite_cap: usize, pub changelog: usize, pub max_members: u32, pub lobby_data_bytes: usize, pub member_data_bytes: usize, pub outbox_cap: usize, pub data_per_sec: usize, pub lobby_data_per_sec: usize, pub global_chat_per_sec: usize, pub list_rewind_ms: u64, pub reliable_msgs_per_s: u32 }
+lobby::hub::HubServerCard	pub struct HubServerCard { pub server_key: ServerKey, pub capacity: u16, pub load: u16, pub protocol: u32, pub game_version: String, pub relay_only: bool, pub owner_count: u8, pub grace_ms: u32 }
+lobby::hub::HubServerCard impl Clone	derive(Clone)
+lobby::hub::HubServerCard impl Debug	derive(Debug)
+lobby::hub::HubServerCard impl Deserialize	derive(Deserialize)
+lobby::hub::HubServerCard impl Eq	derive(Eq)
+lobby::hub::HubServerCard impl PartialEq	derive(PartialEq)
+lobby::hub::HubServerCard impl Serialize	derive(Serialize)
+lobby::hub::HubSettings	pub struct HubSettings { pub handle_max_bytes: usize, pub chat_max_chars: usize, pub chat_per_sec: usize, pub chat_history: usize, pub lobby_cap: usize, pub session_cap: usize, pub friend_cap: usize, pub idle_ms: u64, pub invite_ttl_ms: u64, pub invite_cap: usize, pub changelog: usize, pub max_members: u32, pub lobby_data_bytes: usize, pub member_data_bytes: usize, pub outbox_cap: usize, pub data_per_sec: usize, pub lobby_data_per_sec: usize, pub global_chat_per_sec: usize, pub list_rewind_ms: u64, pub reliable_msgs_per_s: u32, pub ask_per_identity_per_10s: u32, pub ask_per_address_per_10s: u32, pub ask_inflight_per_identity: u32, pub ask_inflight_hub: u32 }
 lobby::hub::HubSettings impl Clone	derive(Clone)
 lobby::hub::HubSettings impl Debug	derive(Debug)
 lobby::hub::HubSettings impl Default	impl Default for HubSettings
@@ -4996,6 +5260,18 @@ lobby::hub::JoinPlan impl Eq	derive(Eq)
 lobby::hub::JoinPlan impl PartialEq	derive(PartialEq)
 lobby::hub::JoinPlan::server_key	pub fn server_key(&self) -> Option<ServerKey>
 lobby::hub::JoinPlan::ticket_parts	pub fn ticket_parts(&self) -> Option<(SocketAddr, Option<ServerKey>)>
+lobby::hub::JoinPlanDriver	pub struct JoinPlanDriver { .. }
+lobby::hub::JoinPlanDriver impl Debug	impl Debug for JoinPlanDriver
+lobby::hub::JoinPlanDriver::advance	pub fn advance(&mut self, _: u64) -> &ReachState
+lobby::hub::JoinPlanDriver::dropped	pub fn dropped(&self) -> u64
+lobby::hub::JoinPlanDriver::join_path	pub fn join_path(&self) -> Option<&JoinPath<PlanSocket>>
+lobby::hub::JoinPlanDriver::outcome	pub fn outcome(&self) -> Option<(ReachKind, u32)>
+lobby::hub::JoinPlanDriver::plan	pub fn plan(&self) -> &JoinPlan
+lobby::hub::JoinPlanDriver::poll_send	pub fn poll_send(&self) -> Option<(Vec<u8>, SocketAddr)>
+lobby::hub::JoinPlanDriver::push_datagram	pub fn push_datagram(&self, _: SocketAddr, _: &[u8]) -> bool
+lobby::hub::JoinPlanDriver::start	pub fn start(_: SocketAddr, _: &JoinPlan, _: [u8; crate::relay::RELAY_ALLOCATION_KEY_BYTES]) -> Result<Self, HubError>
+lobby::hub::JoinPlanDriver::state	pub fn state(&self) -> &ReachState
+lobby::hub::JoinPlanDriver::take_endpoint	pub fn take_endpoint(&mut self) -> Option<(PlanEndpoint, SocketAddr, Option<ServerKey>)>
 lobby::hub::JoinRow	pub struct JoinRow { pub lobby: LobbyId, pub member: MemberId, pub handle: String, pub identity: String, pub platform: Option<String>, pub nat: Option<String>, pub state: String, pub planned: Option<ReachKind>, pub chosen: Option<ReachKind>, pub punch_attempts: u32, pub relayed: bool }
 lobby::hub::JoinRow impl Clone	derive(Clone)
 lobby::hub::JoinRow impl Debug	derive(Debug)
@@ -5004,10 +5280,30 @@ lobby::hub::JoinRow impl Eq	derive(Eq)
 lobby::hub::JoinRow impl PartialEq	derive(PartialEq)
 lobby::hub::JoinRow impl Serialize	derive(Serialize)
 lobby::hub::LOBBY_DATA_LIMIT_BYTES	pub const LOBBY_DATA_LIMIT_BYTES: usize
+lobby::hub::LobbyKind	pub enum LobbyKind { Listen, Dedicated }
+lobby::hub::LobbyKind impl Clone	derive(Clone)
+lobby::hub::LobbyKind impl Copy	derive(Copy)
+lobby::hub::LobbyKind impl Debug	derive(Debug)
+lobby::hub::LobbyKind impl Default	derive(Default)
+lobby::hub::LobbyKind impl Deserialize	derive(Deserialize)
+lobby::hub::LobbyKind impl Eq	derive(Eq)
+lobby::hub::LobbyKind impl PartialEq	derive(PartialEq)
+lobby::hub::LobbyKind impl Serialize	derive(Serialize)
+lobby::hub::LobbyKind::from_u8	pub fn from_u8(_: u8) -> Option<Self>
+lobby::hub::LobbyKind::to_u8	pub fn to_u8(self) -> u8
+lobby::hub::LocalBinding	pub struct LocalBinding { pub server_key: ServerKey, pub serial: u64, pub expiry_ms: u64, pub proof: Vec<u8> }
+lobby::hub::LocalBinding impl Clone	derive(Clone)
+lobby::hub::LocalBinding impl Debug	derive(Debug)
+lobby::hub::LocalBinding impl Eq	derive(Eq)
+lobby::hub::LocalBinding impl PartialEq	derive(PartialEq)
+lobby::hub::MAX_BINDING_OWNERS	pub const MAX_BINDING_OWNERS: usize
 lobby::hub::MAX_CODE_BYTES	pub const MAX_CODE_BYTES: usize
+lobby::hub::MAX_HUB_GAME_VERSION_BYTES	pub const MAX_HUB_GAME_VERSION_BYTES: usize
 lobby::hub::MAX_HUB_MESSAGE_BYTES	pub const MAX_HUB_MESSAGE_BYTES: usize
+lobby::hub::MAX_LOBBY_BANS	pub const MAX_LOBBY_BANS: usize
 lobby::hub::MAX_PAGE_LOBBIES	pub const MAX_PAGE_LOBBIES: usize
 lobby::hub::MAX_PAGE_ROWS	pub const MAX_PAGE_ROWS: usize
+lobby::hub::MAX_SERVER_BANS	pub const MAX_SERVER_BANS: usize
 lobby::hub::MEMBER_DATA_LIMIT_BYTES	pub const MEMBER_DATA_LIMIT_BYTES: usize
 lobby::hub::NatClass	pub struct NatClass { pub mapping: NatMapping, pub filtering: NatFiltering }
 lobby::hub::NatClass impl Clone	derive(Clone)
@@ -5021,7 +5317,12 @@ lobby::hub::NatClass::SYMMETRIC	pub const SYMMETRIC: Self
 lobby::hub::NatClass::from_u8	pub fn from_u8(_: u8) -> Option<Self>
 lobby::hub::NatClass::name	pub fn name(self) -> String
 lobby::hub::NatClass::to_u8	pub fn to_u8(self) -> u8
+lobby::hub::PLAN_QUEUE	pub const PLAN_QUEUE: usize
 lobby::hub::PROOF_FAILURE_LIMIT	pub const PROOF_FAILURE_LIMIT: u8
+lobby::hub::PlanEndpoint	pub type PlanEndpoint = ReachSocket<PlanSocket>
+lobby::hub::PlanSocket	pub struct PlanSocket { .. }
+lobby::hub::PlanSocket impl DatagramSocket	impl DatagramSocket for PlanSocket
+lobby::hub::PlanSocket impl Debug	impl Debug for PlanSocket
 lobby::hub::PresenceRow	pub struct PresenceRow { pub member: MemberId, pub handle: String, pub presence: HubPresence, pub lobby: Option<LobbyId> }
 lobby::hub::PresenceRow impl Clone	derive(Clone)
 lobby::hub::PresenceRow impl Debug	derive(Debug)
@@ -5048,40 +5349,96 @@ lobby::hub::ReachKind impl Serialize	derive(Serialize)
 lobby::hub::ReachKind::as_str	pub fn as_str(self) -> &'static str
 lobby::hub::ReachKind::from_u8	pub fn from_u8(_: u8) -> Option<Self>
 lobby::hub::ReachKind::to_u8	pub fn to_u8(self) -> u8
-lobby::hub::ReachOffer	pub struct ReachOffer { pub candidates: Vec<Candidate>, pub nat: Option<NatClass>, pub relay: Option<SocketAddr>, pub join_code: Option<String>, pub ticket: Vec<u8> }
+lobby::hub::ReachOffer	#[non_exhaustive] pub struct ReachOffer { .. }
 lobby::hub::ReachOffer impl Clone	derive(Clone)
 lobby::hub::ReachOffer impl Debug	derive(Debug)
 lobby::hub::ReachOffer impl Default	derive(Default)
 lobby::hub::ReachOffer impl Eq	derive(Eq)
 lobby::hub::ReachOffer impl PartialEq	derive(PartialEq)
+lobby::hub::ReachOffer.candidates	pub candidates: Vec<Candidate>
+lobby::hub::ReachOffer.join_code	pub join_code: Option<String>
+lobby::hub::ReachOffer.nat	pub nat: Option<NatClass>
+lobby::hub::ReachOffer.relay	pub relay: Option<SocketAddr>
+lobby::hub::ReachOffer.relay_only	pub relay_only: bool
+lobby::hub::ReachOffer.ticket	pub ticket: Vec<u8>
 lobby::hub::ReachOffer::mapped	pub fn mapped(&self) -> Option<SocketAddr>
 lobby::hub::ReachSocket	#[cfg(feature = "ecs")] pub enum ReachSocket<S> { Direct(S), Path(JoinSocket<S>) }
+lobby::hub::ReachSocket	#[cfg(not(feature = "ecs"))] pub enum ReachSocket<S> { Direct(S), Path(JoinSocket<S>) }
 lobby::hub::ReachSocket impl DatagramSocket	#[cfg(feature = "ecs")] impl<S: DatagramSocket> DatagramSocket for ReachSocket<S>
+lobby::hub::ReachSocket impl DatagramSocket	#[cfg(not(feature = "ecs"))] impl<S: DatagramSocket> DatagramSocket for ReachSocket<S>
 lobby::hub::ReachSocket impl Debug	#[cfg(feature = "ecs")] impl<S> Debug for ReachSocket<S>
+lobby::hub::ReachSocket impl Debug	#[cfg(not(feature = "ecs"))] impl<S> Debug for ReachSocket<S>
 lobby::hub::ReachState	#[cfg(feature = "ecs")] pub enum ReachState { Dialing, Ready, Failed(String) }
+lobby::hub::ReachState	#[cfg(not(feature = "ecs"))] pub enum ReachState { Dialing, Ready, Failed(String) }
 lobby::hub::ReachState impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+lobby::hub::ReachState impl Clone	#[cfg(not(feature = "ecs"))] derive(Clone)
 lobby::hub::ReachState impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+lobby::hub::ReachState impl Debug	#[cfg(not(feature = "ecs"))] derive(Debug)
 lobby::hub::ReachState impl Eq	#[cfg(feature = "ecs")] derive(Eq)
+lobby::hub::ReachState impl Eq	#[cfg(not(feature = "ecs"))] derive(Eq)
 lobby::hub::ReachState impl PartialEq	#[cfg(feature = "ecs")] derive(PartialEq)
-lobby::hub::RoomState	pub struct RoomState { pub lobby: LobbyId, pub owner: MemberId, pub visibility: LobbyVisibility, pub max_members: u32, pub joinable: bool, pub data: BTreeMap<String, String>, pub members: Vec<(MemberId, String, BTreeMap<String, String>)>, pub server: Option<LobbyServer> }
+lobby::hub::ReachState impl PartialEq	#[cfg(not(feature = "ecs"))] derive(PartialEq)
+lobby::hub::RoomState	#[non_exhaustive] pub struct RoomState { .. }
 lobby::hub::RoomState impl Clone	derive(Clone)
 lobby::hub::RoomState impl Debug	derive(Debug)
 lobby::hub::RoomState impl Eq	derive(Eq)
 lobby::hub::RoomState impl PartialEq	derive(PartialEq)
+lobby::hub::RoomState.capacity	pub capacity: u16
+lobby::hub::RoomState.data	pub data: BTreeMap<String, String>
+lobby::hub::RoomState.joinable	pub joinable: bool
+lobby::hub::RoomState.kind	pub kind: LobbyKind
+lobby::hub::RoomState.load	pub load: u16
+lobby::hub::RoomState.lobby	pub lobby: LobbyId
+lobby::hub::RoomState.max_members	pub max_members: u32
+lobby::hub::RoomState.members	pub members: Vec<(MemberId, String, BTreeMap<String, String>)>
+lobby::hub::RoomState.owner	pub owner: MemberId
+lobby::hub::RoomState.relay_only	pub relay_only: bool
+lobby::hub::RoomState.server	pub server: Option<LobbyServer>
+lobby::hub::RoomState.visibility	pub visibility: LobbyVisibility
+lobby::hub::SERVER_BINDING_PROLOGUE	pub const SERVER_BINDING_PROLOGUE: &[u8]
+lobby::hub::SERVER_PRESENCE_PROLOGUE	pub const SERVER_PRESENCE_PROLOGUE: &[u8]
 lobby::hub::SOAK_ALLOC_BOUND	pub const SOAK_ALLOC_BOUND: usize
 lobby::hub::SOAK_CYCLES	pub const SOAK_CYCLES: u32
 lobby::hub::SOAK_PRESENCES	pub const SOAK_PRESENCES: usize
 lobby::hub::SOAK_SIMULATED_MS	pub const SOAK_SIMULATED_MS: u64
 lobby::hub::SOAK_STATE_BOUND	pub const SOAK_STATE_BOUND: usize
+lobby::hub::ServerCard	pub struct ServerCard { pub server_key: ServerKey, pub capacity: u16, pub load: u16, pub protocol: u32, pub game_version: String, pub relay_only: bool, pub owner_count: u8 }
+lobby::hub::ServerCard impl Clone	derive(Clone)
+lobby::hub::ServerCard impl Debug	derive(Debug)
+lobby::hub::ServerCard impl Eq	derive(Eq)
+lobby::hub::ServerCard impl PartialEq	derive(PartialEq)
+lobby::hub::ServerNotice	pub struct ServerNotice { pub server_key: ServerKey, pub capacity: u16, pub load: u16, pub protocol: u32, pub game_version: String, pub relay_only: bool, pub grace_ms: u32, pub owner_count: u8 }
+lobby::hub::ServerNotice impl Clone	derive(Clone)
+lobby::hub::ServerNotice impl Debug	derive(Debug)
+lobby::hub::ServerNotice impl Eq	derive(Eq)
+lobby::hub::ServerNotice impl PartialEq	derive(PartialEq)
+lobby::hub::ServerPresence	pub struct ServerPresence { pub server_proof: Vec<u8>, pub proofs: Vec<Vec<u8>>, pub capacity: u16, pub load: u16, pub protocol: u32, pub game_version: String, pub relay_only: bool, pub grace_ms: u32, pub bans: Vec<PlayerKey> }
+lobby::hub::ServerPresence impl Clone	derive(Clone)
+lobby::hub::ServerPresence impl Debug	derive(Debug)
+lobby::hub::ServerPresence impl Eq	derive(Eq)
+lobby::hub::ServerPresence impl PartialEq	derive(PartialEq)
+lobby::hub::ServerRegister	pub struct ServerRegister { pub capacity: u16, pub load: u16, pub protocol: u32, pub game_version: String, pub relay_only: bool, pub grace: Option<u32>, pub bans: Vec<PlayerKey>, pub owner_proofs: Vec<Vec<u8>> }
+lobby::hub::ServerRegister impl Clone	derive(Clone)
+lobby::hub::ServerRegister impl Debug	derive(Debug)
+lobby::hub::ServerRegister impl Default	impl Default for ServerRegister
+lobby::hub::ServerRegister impl Eq	derive(Eq)
+lobby::hub::ServerRegister impl PartialEq	derive(PartialEq)
 lobby::hub::SoakReport	pub struct SoakReport { pub cycles: u32, pub simulated_ms: u64, pub state_after_first_cycle: usize, pub state_at_end: usize, pub peak_state_bytes: usize, pub alloc_at_start: usize, pub alloc_after_first_cycle: usize, pub alloc_at_end: usize, pub peak_alloc_bytes: usize }
 lobby::hub::SoakReport impl Clone	derive(Clone)
 lobby::hub::SoakReport impl Debug	derive(Debug)
 lobby::hub::SoakReport impl Eq	derive(Eq)
 lobby::hub::SoakReport impl PartialEq	derive(PartialEq)
 lobby::hub::broker_reach	pub fn broker_reach(_: &ReachOffer, _: Option<NatClass>) -> Result<ReachKind, BrokerError>
+lobby::hub::close_lobby	pub fn close_lobby(_: &mut HubServer, _: MemberId, _: LobbyId, _: u64) -> Result<(), HubError>
+lobby::hub::create_delegated	pub fn create_delegated(_: &mut HubServer, _: MemberId, _: &LobbySpec, _: ServerKey, _: u64) -> Result<LobbyId, HubError>
+lobby::hub::decode_binding_payload	pub fn decode_binding_payload(_: &[u8]) -> Result<BindingClaims, WireError>
 lobby::hub::default_key_path	pub fn default_key_path() -> PathBuf
+lobby::hub::encode_binding_payload	pub fn encode_binding_payload(_: &BindingClaims) -> Result<[u8; BINDING_PAYLOAD_BYTES], WireError>
+lobby::hub::gate_request	pub fn gate_request(_: u32, _: &HubRequest) -> Result<(), HubError>
+lobby::hub::grace_in_range	pub fn grace_in_range(_: u32) -> bool
 lobby::hub::hub_toml_migration_sources	pub fn hub_toml_migration_sources() -> Vec<u32>
 lobby::hub::hub_toml_schema_fingerprint	pub fn hub_toml_schema_fingerprint() -> String
+lobby::hub::hub_wire_from_game_version	pub fn hub_wire_from_game_version(_: &str) -> u32
 lobby::hub::join	pub mod join
 lobby::hub::join::BrokerError	pub use lobby::hub::BrokerError
 lobby::hub::join::JoinPlan	pub use lobby::hub::JoinPlan
@@ -5091,11 +5448,29 @@ lobby::hub::join::NatClass	pub use lobby::hub::NatClass
 lobby::hub::join::ReachKind	pub use lobby::hub::ReachKind
 lobby::hub::join::ReachOffer	pub use lobby::hub::ReachOffer
 lobby::hub::join::broker_reach	pub use lobby::hub::broker_reach
+lobby::hub::join::close_lobby	pub use lobby::hub::close_lobby
+lobby::hub::join::create_delegated	pub use lobby::hub::create_delegated
+lobby::hub::join::plans_for	pub use lobby::hub::plans_for
 lobby::hub::join::predict	pub fn predict(_: NatClass, _: NatClass) -> PunchResult
+lobby::hub::join::register_server	pub use lobby::hub::register_server
+lobby::hub::join::revoke_binding	pub use lobby::hub::revoke_binding
+lobby::hub::join::set_bans	pub use lobby::hub::set_bans
+lobby::hub::join::set_reach_mode	pub use lobby::hub::set_reach_mode
 lobby::hub::key_path_is_inside_project	pub fn key_path_is_inside_project(_: &Path) -> bool
+lobby::hub::load_ban_keys	pub fn load_ban_keys(_: &Path) -> Result<Vec<PlayerKey>, HubFieldError>
+lobby::hub::migrate_hub_toml	pub fn migrate_hub_toml(_: &str) -> Result<String, String>
+lobby::hub::plans_for	pub fn plans_for(_: &ReachOffer, _: &ReachOffer, _: bool, _: LobbyId, _: MemberId, _: PlayerKey, _: MemberId, _: PlayerKey) -> Result<(JoinPlan, JoinPlan), BrokerError>
+lobby::hub::register_server	pub fn register_server(_: &mut HubServer, _: MemberId, _: &ServerPresence, _: u64) -> Result<(), HubError>
+lobby::hub::request_is_v2_only	pub fn request_is_v2_only(_: &HubRequest) -> bool
+lobby::hub::revoke_binding	pub fn revoke_binding(_: &mut HubServer, _: MemberId, _: ServerKey, _: u64, _: u64) -> Result<(), HubError>
 lobby::hub::run_hub_soak_1000	pub fn run_hub_soak_1000(_: &dyn Fn() -> usize) -> Result<SoakReport, HubError>
 lobby::hub::sample_messages	pub fn sample_messages() -> Vec<HubMessage>
+lobby::hub::set_bans	pub fn set_bans(_: &mut HubServer, _: MemberId, _: LobbyId, _: &[PlayerKey], _: u64) -> Result<(), HubError>
+lobby::hub::set_reach_mode	pub fn set_reach_mode(_: &mut HubServer, _: MemberId, _: LobbyId, _: bool, _: u64) -> Result<(), HubError>
+lobby::hub::v2_call_allowed	pub fn v2_call_allowed(_: u32) -> Result<(), HubError>
 lobby::hub::validate_key_path	pub fn validate_key_path(_: &Path) -> Result<(), HubFieldError>
+lobby::hub::verify_binding	pub fn verify_binding(_: &ServerIdentity, _: &[u8], _: u64) -> Result<(PlayerKey, BindingClaims), HubError>
+lobby::hub::verify_server_presence	pub fn verify_server_presence(_: &ServerIdentity, _: &[u8; 32], _: &[u8]) -> Result<ServerKey, HubError>
 lobby::keys	pub mod keys
 lobby::keys::ALL	pub const ALL: &[&str]
 lobby::keys::CONTENT	pub const CONTENT: &str
@@ -6999,6 +7374,7 @@ relay::RELAY_DIRECTORY_CAP	pub const RELAY_DIRECTORY_CAP: usize
 relay::RELAY_DIRECTORY_PAGE_BYTES	pub const RELAY_DIRECTORY_PAGE_BYTES: usize
 relay::RELAY_FLOW_IDLE_MS	pub const RELAY_FLOW_IDLE_MS: u64
 relay::RELAY_FORWARD_BYTES_PER_SECOND	pub const RELAY_FORWARD_BYTES_PER_SECOND: u64
+relay::RELAY_HIDE_ADDR_EXT	pub const RELAY_HIDE_ADDR_EXT: u8
 relay::RELAY_HOST_BYTES_PER_SECOND	pub const RELAY_HOST_BYTES_PER_SECOND: u64
 relay::RELAY_HOST_CHECK_MIN_VERSION	pub const RELAY_HOST_CHECK_MIN_VERSION: u8
 relay::RELAY_INTRO_MIN_VERSION	pub const RELAY_INTRO_MIN_VERSION: u8
@@ -7071,7 +7447,9 @@ relay::RelayCore::new	pub fn new(_: u64) -> Self
 relay::RelayCore::probe_responder	pub fn probe_responder(&self) -> &ProbeResponder
 relay::RelayCore::relay_config	pub fn relay_config(&self) -> &RelayConfig
 relay::RelayCore::set_probe_capable	pub fn set_probe_capable(&mut self, _: bool)
+relay::RelayCore::set_source_rate	pub fn set_source_rate(&mut self, _: u32)
 relay::RelayCore::status	pub fn status(&self) -> RelayStatus
+relay::RelayCore::stop_new_allocations	pub fn stop_new_allocations(&mut self)
 relay::RelayCore::take_probes	pub fn take_probes(&mut self) -> Vec<(Vec<u8>, SocketAddr)>
 relay::RelayCore::with_config	pub fn with_config(_: u64, _: [u8; 32], _: RelayConfig) -> Self
 relay::RelayCore::with_secret	pub fn with_secret(_: u64, _: [u8; 32]) -> Self
@@ -7099,11 +7477,14 @@ relay::RelayServer	pub struct RelayServer<S: DatagramSocket> { .. }
 relay::RelayServer impl Debug	derive(Debug)
 relay::RelayServer::bind	pub fn bind(_: SocketAddr, _: RelayConfig, _: u64) -> std::io::Result<Self>
 relay::RelayServer::core	impl<S: DatagramSocket> RelayServer<S>: pub fn core(&self) -> &RelayCore
+relay::RelayServer::core_mut	impl<S: DatagramSocket> RelayServer<S>: pub fn core_mut(&mut self) -> &mut RelayCore
 relay::RelayServer::from_core	impl<S: DatagramSocket> RelayServer<S>: pub fn from_core(_: S, _: Vec<S>, _: RelayCore) -> Self
 relay::RelayServer::local_addr	impl<S: DatagramSocket> RelayServer<S>: pub fn local_addr(&self) -> std::io::Result<SocketAddr>
 relay::RelayServer::new	impl<S: DatagramSocket> RelayServer<S>: pub fn new(_: S, _: u64) -> Self
 relay::RelayServer::report	impl<S: DatagramSocket> RelayServer<S>: pub fn report(&self) -> RelayReport
+relay::RelayServer::set_source_rate	impl<S: DatagramSocket> RelayServer<S>: pub fn set_source_rate(&mut self, _: u32)
 relay::RelayServer::status	impl<S: DatagramSocket> RelayServer<S>: pub fn status(&self) -> RelayStatus
+relay::RelayServer::stop_new_allocations	impl<S: DatagramSocket> RelayServer<S>: pub fn stop_new_allocations(&mut self)
 relay::RelayServer::update	impl<S: DatagramSocket> RelayServer<S>: pub fn update(&mut self, _: u64)
 relay::RelayServer::with_allocation_sockets	impl<S: DatagramSocket> RelayServer<S>: pub fn with_allocation_sockets(_: S, _: Vec<S>, _: u64, _: RelayConfig) -> Self
 relay::RelayServer::with_probe_socket	impl<S: DatagramSocket> RelayServer<S>: pub fn with_probe_socket(mut self, _: S) -> Self
@@ -7141,6 +7522,7 @@ relay::encode_publish	pub fn encode_publish(_: &[u8]) -> Result<Vec<u8>, WireErr
 relay::encode_punch_intro	pub fn encode_punch_intro(_: SocketAddr) -> Vec<u8>
 relay::encode_refresh	pub fn encode_refresh(_: &[u8; RELAY_ALLOCATION_KEY_BYTES], _: Option<&[u8; RELAY_COOKIE_BYTES]>) -> Vec<u8>
 relay::encode_register	pub fn encode_register(_: u16, _: &[u8]) -> Result<Vec<u8>, WireError>
+relay::encode_register_hidden	pub fn encode_register_hidden(_: u16, _: &[u8], _: Option<&[u8; RELAY_COOKIE_BYTES]>) -> Result<Vec<u8>, WireError>
 relay::encode_register_with_candidates	pub fn encode_register_with_candidates(_: u16, _: &[u8], _: Option<&[u8; RELAY_COOKIE_BYTES]>, _: &[Candidate]) -> Result<Vec<u8>, WireError>
 relay::encode_register_with_cookie	pub fn encode_register_with_cookie(_: u16, _: &[u8], _: &[u8; RELAY_COOKIE_BYTES]) -> Result<Vec<u8>, WireError>
 relay::relay_version	pub fn relay_version(_: &[u8]) -> Option<u8>
@@ -7802,599 +8184,1197 @@ server::SERVER_BUFFER_BYTES_PER_PEER	pub const SERVER_BUFFER_BYTES_PER_PEER: usi
 server::ServerConfig	pub use ServerConfig
 server::ServerEvent	pub use ServerEvent
 server_host	#[cfg(feature = "ecs")] pub mod server_host
+server_host	#[cfg(not(feature = "ecs"))] pub mod server_host
 server_host::AppHostGame	#[cfg(feature = "ecs")] pub struct AppHostGame { pub app: App, pub level_exists: Option<LevelCheck>, pub load_level: Option<LevelHook> }
+server_host::AppHostGame	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub struct AppHostGame { pub app: App, pub level_exists: Option<LevelCheck>, pub load_level: Option<LevelHook> }
 server_host::AppHostGame impl HostGame	#[cfg(feature = "ecs")] impl HostGame for AppHostGame
+server_host::AppHostGame impl HostGame	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] impl HostGame for AppHostGame
 server_host::AppHostGame::new	#[cfg(feature = "ecs")] pub fn new(_: App) -> Self
+server_host::AppHostGame::new	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn new(_: App) -> Self
 server_host::CONSOLE_HELP	#[cfg(feature = "ecs")] pub const CONSOLE_HELP: &[&str]
-server_host::CliOverrides	#[cfg(feature = "ecs")] pub struct CliOverrides { pub config: Option<PathBuf>, pub port: Option<String>, pub bind: Option<String>, pub max_players: Option<String>, pub level: Option<String>, pub name: Option<String>, pub log_dir: Option<String>, pub console: bool, pub agent: bool, pub relay: Option<String>, pub shared_port: bool, pub no_port_map: bool, pub bots: Option<String>, pub upgrade_config: bool }
+server_host::CONSOLE_HELP	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub const CONSOLE_HELP: &[&str]
+server_host::CliOverrides	#[cfg(feature = "ecs")] pub struct CliOverrides { pub config: Option<PathBuf>, pub port: Option<String>, pub bind: Option<String>, pub max_players: Option<String>, pub level: Option<String>, pub name: Option<String>, pub log_dir: Option<String>, pub console: bool, pub agent: bool, pub relay: Option<String>, pub shared_port: bool, pub no_port_map: bool, pub relay_only: bool, pub bots: Option<String>, pub upgrade_config: bool }
+server_host::CliOverrides	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub struct CliOverrides { pub config: Option<PathBuf>, pub port: Option<String>, pub bind: Option<String>, pub max_players: Option<String>, pub level: Option<String>, pub name: Option<String>, pub log_dir: Option<String>, pub console: bool, pub agent: bool, pub relay: Option<String>, pub shared_port: bool, pub no_port_map: bool, pub relay_only: bool, pub bots: Option<String>, pub upgrade_config: bool }
 server_host::CliOverrides impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::CliOverrides impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::CliOverrides impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::CliOverrides impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::CliOverrides impl Default	#[cfg(feature = "ecs")] derive(Default)
+server_host::CliOverrides impl Default	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Default)
 server_host::CliOverrides impl Eq	#[cfg(feature = "ecs")] derive(Eq)
+server_host::CliOverrides impl Eq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Eq)
 server_host::CliOverrides impl PartialEq	#[cfg(feature = "ecs")] derive(PartialEq)
+server_host::CliOverrides impl PartialEq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(PartialEq)
 server_host::CliOverrides::parse	#[cfg(feature = "ecs")] pub fn parse(_: &[String]) -> Result<Self, Vec<FieldError>>
+server_host::CliOverrides::parse	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn parse(_: &[String]) -> Result<Self, Vec<FieldError>>
 server_host::CrashCause	#[cfg(feature = "ecs")] pub enum CrashCause { Panic, NativeSignal(i32), WindowsException(u32) }
+server_host::CrashCause	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub enum CrashCause { Panic, NativeSignal(i32), WindowsException(u32) }
 server_host::CrashCause impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::CrashCause impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::CrashCause impl Copy	#[cfg(feature = "ecs")] derive(Copy)
+server_host::CrashCause impl Copy	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Copy)
 server_host::CrashCause impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::CrashCause impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::CrashCause impl Eq	#[cfg(feature = "ecs")] derive(Eq)
+server_host::CrashCause impl Eq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Eq)
 server_host::CrashCause impl PartialEq	#[cfg(feature = "ecs")] derive(PartialEq)
+server_host::CrashCause impl PartialEq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(PartialEq)
 server_host::DEFAULT_DRAIN_GRACE_S	#[cfg(feature = "ecs")] pub const DEFAULT_DRAIN_GRACE_S: f64
+server_host::DEFAULT_DRAIN_GRACE_S	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub const DEFAULT_DRAIN_GRACE_S: f64
 server_host::EnvReader	#[cfg(feature = "ecs")] pub type EnvReader = Box<dyn Fn(&str) -> Option<String> + Send>
+server_host::EnvReader	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub type EnvReader = Box<dyn Fn(&str) -> Option<String> + Send>
 server_host::ExitCode	#[cfg(feature = "ecs")] pub enum ExitCode { Ok = 0, Config = 2, Bind = 3, Content = 4, Crash = 70 }
+server_host::ExitCode	#[cfg(not(feature = "ecs"))] pub enum ExitCode { Ok = 0, Config = 2, Bind = 3, Content = 4, Crash = 70 }
 server_host::ExitCode impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::ExitCode impl Clone	#[cfg(not(feature = "ecs"))] derive(Clone)
 server_host::ExitCode impl Copy	#[cfg(feature = "ecs")] derive(Copy)
+server_host::ExitCode impl Copy	#[cfg(not(feature = "ecs"))] derive(Copy)
 server_host::ExitCode impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::ExitCode impl Debug	#[cfg(not(feature = "ecs"))] derive(Debug)
 server_host::ExitCode impl Eq	#[cfg(feature = "ecs")] derive(Eq)
+server_host::ExitCode impl Eq	#[cfg(not(feature = "ecs"))] derive(Eq)
 server_host::ExitCode impl PartialEq	#[cfg(feature = "ecs")] derive(PartialEq)
+server_host::ExitCode impl PartialEq	#[cfg(not(feature = "ecs"))] derive(PartialEq)
 server_host::ExitCode::code	#[cfg(feature = "ecs")] pub fn code(self) -> i32
+server_host::ExitCode::code	#[cfg(not(feature = "ecs"))] pub fn code(self) -> i32
 server_host::FieldError	#[cfg(feature = "ecs")] pub struct FieldError { pub field: String, pub expected: String }
+server_host::FieldError	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub struct FieldError { pub field: String, pub expected: String }
 server_host::FieldError impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::FieldError impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::FieldError impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::FieldError impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::FieldError impl Display	#[cfg(feature = "ecs")] impl Display for FieldError
+server_host::FieldError impl Display	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] impl Display for FieldError
 server_host::FieldError impl Eq	#[cfg(feature = "ecs")] derive(Eq)
+server_host::FieldError impl Eq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Eq)
 server_host::FieldError impl PartialEq	#[cfg(feature = "ecs")] derive(PartialEq)
+server_host::FieldError impl PartialEq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(PartialEq)
 server_host::FieldError impl Serialize	#[cfg(feature = "ecs")] derive(Serialize)
+server_host::FieldError impl Serialize	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Serialize)
 server_host::GamePort	#[cfg(feature = "ecs")] pub struct GamePort { pub timeout: crate::session::TimeoutPolicy, pub addr: SocketAddr, pub crypto: CryptoMode, pub identity: Option<ServerIdentity>, pub max_players: u32, pub password: Option<String>, pub tick_hz: u32, pub mtu_probing: bool }
+server_host::GamePort	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub struct GamePort { pub timeout: crate::session::TimeoutPolicy, pub addr: SocketAddr, pub crypto: CryptoMode, pub identity: Option<ServerIdentity>, pub max_players: u32, pub password: Option<String>, pub tick_hz: u32, pub mtu_probing: bool }
 server_host::GamePort impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::GamePort impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::GamePort impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::GamePort impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::HealthServer	#[cfg(feature = "ecs")] pub struct HealthServer { .. }
+server_host::HealthServer	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub struct HealthServer { .. }
 server_host::HealthServer impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::HealthServer impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::HealthServer impl Drop	#[cfg(feature = "ecs")] impl Drop for HealthServer
+server_host::HealthServer impl Drop	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] impl Drop for HealthServer
 server_host::HealthServer::addr	#[cfg(feature = "ecs")] pub fn addr(&self) -> SocketAddr
+server_host::HealthServer::addr	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn addr(&self) -> SocketAddr
 server_host::HealthServer::publish	#[cfg(feature = "ecs")] pub fn publish(&self, _: HealthSnapshot)
+server_host::HealthServer::publish	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn publish(&self, _: HealthSnapshot)
 server_host::HealthServer::start	#[cfg(feature = "ecs")] pub fn start(_: SocketAddr) -> std::io::Result<Self>
+server_host::HealthServer::start	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn start(_: SocketAddr) -> std::io::Result<Self>
 server_host::HealthSnapshot	#[cfg(feature = "ecs")] pub struct HealthSnapshot { pub json: String, pub draining: bool }
+server_host::HealthSnapshot	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub struct HealthSnapshot { pub json: String, pub draining: bool }
 server_host::HealthSnapshot impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::HealthSnapshot impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::HealthSnapshot impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::HealthSnapshot impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::HealthSnapshot impl Default	#[cfg(feature = "ecs")] derive(Default)
+server_host::HealthSnapshot impl Default	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Default)
 server_host::HostClock	#[cfg(feature = "ecs")] pub trait HostClock: Send { fn now(&self) -> Duration; fn sleep_until(&mut self, _: Duration); .. }
+server_host::HostClock	#[cfg(not(feature = "ecs"))] pub trait HostClock: Send { fn now(&self) -> Duration; fn sleep_until(&mut self, _: Duration); .. }
 server_host::HostConsoleFn	#[cfg(feature = "ecs")] pub type HostConsoleFn = fn(&mut World, &str) -> Vec<String>
+server_host::HostConsoleFn	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub type HostConsoleFn = fn(&mut World, &str) -> Vec<String>
 server_host::HostError	#[cfg(feature = "ecs")] pub struct HostError { pub exit: ExitCode, pub lines: Vec<String> }
+server_host::HostError	#[cfg(not(feature = "ecs"))] pub struct HostError { pub exit: ExitCode, pub lines: Vec<String> }
 server_host::HostError impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::HostError impl Clone	#[cfg(not(feature = "ecs"))] derive(Clone)
 server_host::HostError impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::HostError impl Debug	#[cfg(not(feature = "ecs"))] derive(Debug)
 server_host::HostError impl Display	#[cfg(feature = "ecs")] impl Display for HostError
+server_host::HostError impl Display	#[cfg(not(feature = "ecs"))] impl Display for HostError
 server_host::HostError impl Eq	#[cfg(feature = "ecs")] derive(Eq)
+server_host::HostError impl Eq	#[cfg(not(feature = "ecs"))] derive(Eq)
 server_host::HostError impl PartialEq	#[cfg(feature = "ecs")] derive(PartialEq)
+server_host::HostError impl PartialEq	#[cfg(not(feature = "ecs"))] derive(PartialEq)
 server_host::HostEvent	#[cfg(feature = "ecs")] #[non_exhaustive] pub enum HostEvent<'a> { .. }
+server_host::HostEvent	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] #[non_exhaustive] pub enum HostEvent<'a> { .. }
 server_host::HostEvent impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::HostEvent impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::HostEvent impl Copy	#[cfg(feature = "ecs")] derive(Copy)
+server_host::HostEvent impl Copy	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Copy)
 server_host::HostEvent impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::HostEvent impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::HostEvent::LevelLeaving	#[cfg(feature = "ecs")] LevelLeaving { from: &'a str, to: &'a str }
+server_host::HostEvent::LevelLeaving	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] LevelLeaving { from: &'a str, to: &'a str }
 server_host::HostEvent::LevelLoaded	#[cfg(feature = "ecs")] LevelLoaded { level: &'a str }
+server_host::HostEvent::LevelLoaded	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] LevelLoaded { level: &'a str }
 server_host::HostEvent::NextLevelFailed	#[cfg(feature = "ecs")] NextLevelFailed { map_id: &'a str, mode: &'a str, error: &'a str }
+server_host::HostEvent::NextLevelFailed	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] NextLevelFailed { map_id: &'a str, mode: &'a str, error: &'a str }
 server_host::HostEvent::RotationRow	#[cfg(feature = "ecs")] RotationRow { map_id: &'a str, mode: &'a str, options: &'a[(&'a str, &'a str)] }
+server_host::HostEvent::RotationRow	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] RotationRow { map_id: &'a str, mode: &'a str, options: &'a[(&'a str, &'a str)] }
 server_host::HostEvent::Started	#[cfg(feature = "ecs")] Started { level: &'a str, base_dir: &'a Path, settings: &'a ServerSettings }
+server_host::HostEvent::Started	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] Started { level: &'a str, base_dir: &'a Path, settings: &'a ServerSettings }
 server_host::HostEvent::Stopping	#[cfg(feature = "ecs")] Stopping { tick: u64 }
+server_host::HostEvent::Stopping	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] Stopping { tick: u64 }
 server_host::HostEvent::Ticked	#[cfg(feature = "ecs")] Ticked { tick: u64 }
+server_host::HostEvent::Ticked	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] Ticked { tick: u64 }
 server_host::HostEventHook	#[cfg(feature = "ecs")] pub type HostEventHook = fn(&mut World, &HostEvent<'_>) -> Result<(), String>
+server_host::HostEventHook	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub type HostEventHook = fn(&mut World, &HostEvent<'_>) -> Result<(), String>
 server_host::HostGame	#[cfg(feature = "ecs")] pub trait HostGame { fn session(&mut self) -> &mut NetSession; fn step(&mut self); .. }
+server_host::HostGame	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub trait HostGame { fn session(&mut self) -> &mut NetSession; fn step(&mut self); .. }
 server_host::HostGame::add_game_port_relay_ip	#[cfg(feature = "ecs")] fn add_game_port_relay_ip(&mut self, _: std::net::IpAddr) { .. }
+server_host::HostGame::add_game_port_relay_ip	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn add_game_port_relay_ip(&mut self, _: std::net::IpAddr) { .. }
 server_host::HostGame::allow_idle_slowdown	#[cfg(feature = "ecs")] fn allow_idle_slowdown(&mut self) -> bool { .. }
+server_host::HostGame::allow_idle_slowdown	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn allow_idle_slowdown(&mut self) -> bool { .. }
 server_host::HostGame::ban_game_peer	#[cfg(feature = "ecs")] fn ban_game_peer(&mut self, _: &str, _: Option<u64>, _: &str) -> Option<Result<BanId, HostOpError>> { .. }
+server_host::HostGame::ban_game_peer	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn ban_game_peer(&mut self, _: &str, _: Option<u64>, _: &str) -> Option<Result<BanId, HostOpError>> { .. }
 server_host::HostGame::close_game_port	#[cfg(feature = "ecs")] fn close_game_port(&mut self) { .. }
+server_host::HostGame::close_game_port	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn close_game_port(&mut self) { .. }
 server_host::HostGame::console_command	#[cfg(feature = "ecs")] fn console_command(&mut self, _: &str, _: &str) -> Option<Vec<String>> { .. }
+server_host::HostGame::console_command	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn console_command(&mut self, _: &str, _: &str) -> Option<Vec<String>> { .. }
 server_host::HostGame::console_help	#[cfg(feature = "ecs")] fn console_help(&mut self) -> Vec<String> { .. }
+server_host::HostGame::console_help	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn console_help(&mut self) -> Vec<String> { .. }
 server_host::HostGame::enforce_game_port_bans	#[cfg(feature = "ecs")] fn enforce_game_port_bans(&mut self) { .. }
+server_host::HostGame::enforce_game_port_bans	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn enforce_game_port_bans(&mut self) { .. }
 server_host::HostGame::game_port_key	#[cfg(feature = "ecs")] fn game_port_key(&mut self) -> Option<ServerKey> { .. }
+server_host::HostGame::game_port_key	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn game_port_key(&mut self) -> Option<ServerKey> { .. }
 server_host::HostGame::game_port_peers	#[cfg(feature = "ecs")] fn game_port_peers(&mut self) -> Option<Vec<PeerId>> { .. }
+server_host::HostGame::game_port_peers	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn game_port_peers(&mut self) -> Option<Vec<PeerId>> { .. }
 server_host::HostGame::game_port_protocol	#[cfg(feature = "ecs")] fn game_port_protocol(&mut self) -> Option<u64> { .. }
+server_host::HostGame::game_port_protocol	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn game_port_protocol(&mut self) -> Option<u64> { .. }
 server_host::HostGame::host_event	#[cfg(feature = "ecs")] fn host_event(&mut self, _: &HostEvent<'_>) -> Result<(), String> { .. }
+server_host::HostGame::host_event	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn host_event(&mut self, _: &HostEvent<'_>) -> Result<(), String> { .. }
 server_host::HostGame::host_game_port	#[cfg(feature = "ecs")] fn host_game_port(&mut self, _: &GamePort) -> Option<Result<SocketAddr, (&'static str, String)>> { .. }
+server_host::HostGame::host_game_port	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn host_game_port(&mut self, _: &GamePort) -> Option<Result<SocketAddr, (&'static str, String)>> { .. }
 server_host::HostGame::host_game_port_on	#[cfg(feature = "ecs")] fn host_game_port_on(&mut self, _: &GamePort, _: crate::link::LinkSocket) -> Option<Result<SocketAddr, (&'static str, String)>> { .. }
+server_host::HostGame::host_game_port_on	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn host_game_port_on(&mut self, _: &GamePort, _: crate::link::LinkSocket) -> Option<Result<SocketAddr, (&'static str, String)>> { .. }
 server_host::HostGame::host_game_port_relayed	#[cfg(feature = "ecs")] fn host_game_port_relayed(&mut self, _: &GamePort, _: crate::link::LinkSocket) -> Option<Result<SocketAddr, (&'static str, String)>> { .. }
+server_host::HostGame::host_game_port_relayed	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn host_game_port_relayed(&mut self, _: &GamePort, _: crate::link::LinkSocket) -> Option<Result<SocketAddr, (&'static str, String)>> { .. }
 server_host::HostGame::host_stopped	#[cfg(feature = "ecs")] fn host_stopped(&mut self) { .. }
+server_host::HostGame::host_stopped	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn host_stopped(&mut self) { .. }
 server_host::HostGame::install_link	#[cfg(feature = "ecs")] fn install_link(&mut self, _: ServerHostLink) { .. }
+server_host::HostGame::install_link	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn install_link(&mut self, _: ServerHostLink) { .. }
 server_host::HostGame::kick_game_peer	#[cfg(feature = "ecs")] fn kick_game_peer(&mut self, _: PeerId) -> bool { .. }
+server_host::HostGame::kick_game_peer	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn kick_game_peer(&mut self, _: PeerId) -> bool { .. }
 server_host::HostGame::level_exists	#[cfg(feature = "ecs")] fn level_exists(&mut self, _: &str) -> bool { .. }
+server_host::HostGame::level_exists	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn level_exists(&mut self, _: &str) -> bool { .. }
 server_host::HostGame::load_level	#[cfg(feature = "ecs")] fn load_level(&mut self, _: &str) -> Result<(), String> { .. }
+server_host::HostGame::load_level	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn load_level(&mut self, _: &str) -> Result<(), String> { .. }
 server_host::HostGame::lockstep_status	#[cfg(feature = "ecs")] fn lockstep_status(&mut self) -> Option<crate::lockstep::server::LockstepServerStatus> { .. }
+server_host::HostGame::lockstep_status	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn lockstep_status(&mut self) -> Option<crate::lockstep::server::LockstepServerStatus> { .. }
 server_host::HostGame::match_over	#[cfg(feature = "ecs")] fn match_over(&mut self) -> bool { .. }
+server_host::HostGame::match_over	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn match_over(&mut self) -> bool { .. }
 server_host::HostGame::max_substeps	#[cfg(feature = "ecs")] fn max_substeps(&mut self) -> u32 { .. }
+server_host::HostGame::max_substeps	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn max_substeps(&mut self) -> u32 { .. }
 server_host::HostGame::net_rates_in_use	#[cfg(feature = "ecs")] fn net_rates_in_use(&mut self) -> HostNetRates { .. }
+server_host::HostGame::net_rates_in_use	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn net_rates_in_use(&mut self) -> HostNetRates { .. }
 server_host::HostGame::publish_relay	#[cfg(feature = "ecs")] fn publish_relay(&mut self, _: &crate::relay::RelayReport) { .. }
+server_host::HostGame::publish_relay	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn publish_relay(&mut self, _: &crate::relay::RelayReport) { .. }
 server_host::HostGame::rule_sets	#[cfg(feature = "ecs")] fn rule_sets(&mut self) -> Option<regia_rules::ruleset::RuleSetLibrary> { .. }
+server_host::HostGame::rule_sets	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn rule_sets(&mut self) -> Option<regia_rules::ruleset::RuleSetLibrary> { .. }
 server_host::HostGame::rules_in_manifest	#[cfg(feature = "ecs")] fn rules_in_manifest(&mut self) -> bool { .. }
+server_host::HostGame::rules_in_manifest	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn rules_in_manifest(&mut self) -> bool { .. }
 server_host::HostGame::say	#[cfg(feature = "ecs")] fn say(&mut self, _: &str) -> bool { .. }
+server_host::HostGame::say	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn say(&mut self, _: &str) -> bool { .. }
 server_host::HostGame::set_net_rates	#[cfg(feature = "ecs")] fn set_net_rates(&mut self, _: &HostNetRates) { .. }
+server_host::HostGame::set_net_rates	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn set_net_rates(&mut self, _: &HostNetRates) { .. }
 server_host::HostGame::set_tick_hz	#[cfg(feature = "ecs")] fn set_tick_hz(&mut self, _: u32) { .. }
+server_host::HostGame::set_tick_hz	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn set_tick_hz(&mut self, _: u32) { .. }
 server_host::HostGame::unban_game_entry	#[cfg(feature = "ecs")] fn unban_game_entry(&mut self, _: u64) -> Option<Result<(), HostOpError>> { .. }
+server_host::HostGame::unban_game_entry	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn unban_game_entry(&mut self, _: u64) -> Option<Result<(), HostOpError>> { .. }
 server_host::HostGameHooks	#[cfg(feature = "ecs")] pub struct HostGameHooks { .. }
+server_host::HostGameHooks	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub struct HostGameHooks { .. }
 server_host::HostGameHooks impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::HostGameHooks impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::HostGameHooks impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::HostGameHooks impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::HostGameHooks impl Default	#[cfg(feature = "ecs")] derive(Default)
+server_host::HostGameHooks impl Default	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Default)
 server_host::HostGameHooks impl Resource	#[cfg(feature = "ecs")] derive(Resource)
+server_host::HostGameHooks impl Resource	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Resource)
 server_host::HostGameHooks::add_command	#[cfg(feature = "ecs")] pub fn add_command(&mut self, _: &'static str, _: &'static str, _: HostConsoleFn)
+server_host::HostGameHooks::add_command	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn add_command(&mut self, _: &'static str, _: &'static str, _: HostConsoleFn)
 server_host::HostGameHooks::add_event_hook	#[cfg(feature = "ecs")] pub fn add_event_hook(&mut self, _: HostEventHook)
+server_host::HostGameHooks::add_event_hook	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn add_event_hook(&mut self, _: HostEventHook)
 server_host::HostGameHooks::command	#[cfg(feature = "ecs")] pub fn command(&self, _: &str) -> Option<HostConsoleFn>
+server_host::HostGameHooks::command	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn command(&self, _: &str) -> Option<HostConsoleFn>
 server_host::HostGameHooks::command_help	#[cfg(feature = "ecs")] pub fn command_help(&self) -> impl Iterator<Item = &'static str> + '_
+server_host::HostGameHooks::command_help	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn command_help(&self) -> impl Iterator<Item = &'static str> + '_
 server_host::HostGameHooks::event_hooks	#[cfg(feature = "ecs")] pub fn event_hooks(&self) -> &[HostEventHook]
+server_host::HostGameHooks::event_hooks	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn event_hooks(&self) -> &[HostEventHook]
 server_host::HostGameHooks::manifest_rules	#[cfg(feature = "ecs")] pub fn manifest_rules(&self) -> bool
+server_host::HostGameHooks::manifest_rules	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn manifest_rules(&self) -> bool
 server_host::HostGameHooks::rule_sets	#[cfg(feature = "ecs")] pub fn rule_sets(&self) -> Option<HostRuleSetsFn>
+server_host::HostGameHooks::rule_sets	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn rule_sets(&self) -> Option<HostRuleSetsFn>
 server_host::HostGameHooks::set_manifest_rules	#[cfg(feature = "ecs")] pub fn set_manifest_rules(&mut self, _: bool)
+server_host::HostGameHooks::set_manifest_rules	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn set_manifest_rules(&mut self, _: bool)
 server_host::HostGameHooks::set_rule_sets	#[cfg(feature = "ecs")] pub fn set_rule_sets(&mut self, _: HostRuleSetsFn)
+server_host::HostGameHooks::set_rule_sets	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn set_rule_sets(&mut self, _: HostRuleSetsFn)
 server_host::HostNetRates	#[cfg(feature = "ecs")] pub struct HostNetRates { pub client_rate_bytes: Option<u32>, pub server_rate_bytes: Option<u32>, pub send_every_ticks: Option<u32> }
+server_host::HostNetRates	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub struct HostNetRates { pub client_rate_bytes: Option<u32>, pub server_rate_bytes: Option<u32>, pub send_every_ticks: Option<u32> }
 server_host::HostNetRates impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::HostNetRates impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::HostNetRates impl Copy	#[cfg(feature = "ecs")] derive(Copy)
+server_host::HostNetRates impl Copy	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Copy)
 server_host::HostNetRates impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::HostNetRates impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::HostNetRates impl Default	#[cfg(feature = "ecs")] derive(Default)
+server_host::HostNetRates impl Default	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Default)
 server_host::HostNetRates impl Eq	#[cfg(feature = "ecs")] derive(Eq)
+server_host::HostNetRates impl Eq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Eq)
 server_host::HostNetRates impl PartialEq	#[cfg(feature = "ecs")] derive(PartialEq)
+server_host::HostNetRates impl PartialEq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(PartialEq)
 server_host::HostOpError	#[cfg(feature = "ecs")] pub struct HostOpError { pub code: &'static str, pub message: String }
+server_host::HostOpError	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub struct HostOpError { pub code: &'static str, pub message: String }
 server_host::HostOpError impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::HostOpError impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::HostOpError impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::HostOpError impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::HostOpError impl Display	#[cfg(feature = "ecs")] impl Display for HostOpError
+server_host::HostOpError impl Display	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] impl Display for HostOpError
 server_host::HostOpError impl Eq	#[cfg(feature = "ecs")] derive(Eq)
+server_host::HostOpError impl Eq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Eq)
 server_host::HostOpError impl PartialEq	#[cfg(feature = "ecs")] derive(PartialEq)
+server_host::HostOpError impl PartialEq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(PartialEq)
 server_host::HostRuleSetsFn	#[cfg(feature = "ecs")] pub type HostRuleSetsFn = fn(&World) -> Option<regia_rules::ruleset::RuleSetLibrary>
+server_host::HostRuleSetsFn	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub type HostRuleSetsFn = fn(&World) -> Option<regia_rules::ruleset::RuleSetLibrary>
 server_host::HostShared	#[cfg(feature = "ecs")] pub struct HostShared { pub health_json: String, pub state: HostState, pub settings: ServerSettings, pub base_dir: PathBuf, pub cli: CliOverrides, pub drain_grace_s: Option<f64>, pub rotation: RotationView }
+server_host::HostShared	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub struct HostShared { pub health_json: String, pub state: HostState, pub settings: ServerSettings, pub base_dir: PathBuf, pub cli: CliOverrides, pub drain_grace_s: Option<f64>, pub rotation: RotationView }
 server_host::HostShared impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::HostShared impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::HostShared impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::HostShared impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::HostSignals	#[cfg(feature = "ecs")] pub struct HostSignals { .. }
+server_host::HostSignals	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub struct HostSignals { .. }
 server_host::HostSignals impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::HostSignals impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::HostSignals impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::HostSignals impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::HostSignals impl Default	#[cfg(feature = "ecs")] derive(Default)
+server_host::HostSignals impl Default	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Default)
 server_host::HostSignals::install_os_handlers	#[cfg(feature = "ecs")] pub fn install_os_handlers(&self) -> std::io::Result<Vec<&'static str>>
+server_host::HostSignals::install_os_handlers	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn install_os_handlers(&self) -> std::io::Result<Vec<&'static str>>
 server_host::HostSignals::is_draining	#[cfg(feature = "ecs")] pub fn is_draining(&self) -> bool
+server_host::HostSignals::is_draining	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn is_draining(&self) -> bool
 server_host::HostSignals::is_stopped	#[cfg(feature = "ecs")] pub fn is_stopped(&self) -> bool
+server_host::HostSignals::is_stopped	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn is_stopped(&self) -> bool
 server_host::HostSignals::mark_draining	#[cfg(feature = "ecs")] pub fn mark_draining(&self)
+server_host::HostSignals::mark_draining	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn mark_draining(&self)
 server_host::HostSignals::mark_stopped	#[cfg(feature = "ecs")] pub fn mark_stopped(&self)
+server_host::HostSignals::mark_stopped	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn mark_stopped(&self)
 server_host::HostSignals::new	#[cfg(feature = "ecs")] pub fn new() -> Self
+server_host::HostSignals::new	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn new() -> Self
 server_host::HostSignals::request_reload	#[cfg(feature = "ecs")] pub fn request_reload(&self)
+server_host::HostSignals::request_reload	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn request_reload(&self)
 server_host::HostSignals::request_rotation_skip	#[cfg(feature = "ecs")] pub fn request_rotation_skip(&self)
+server_host::HostSignals::request_rotation_skip	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn request_rotation_skip(&self)
 server_host::HostSignals::request_shutdown	#[cfg(feature = "ecs")] pub fn request_shutdown(&self)
+server_host::HostSignals::request_shutdown	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn request_shutdown(&self)
 server_host::HostSignals::take_reload	#[cfg(feature = "ecs")] pub fn take_reload(&self) -> bool
+server_host::HostSignals::take_reload	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn take_reload(&self) -> bool
 server_host::HostSignals::take_rotation_skip	#[cfg(feature = "ecs")] pub fn take_rotation_skip(&self) -> bool
+server_host::HostSignals::take_rotation_skip	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn take_rotation_skip(&self) -> bool
 server_host::HostSignals::take_shutdown	#[cfg(feature = "ecs")] pub fn take_shutdown(&self) -> bool
+server_host::HostSignals::take_shutdown	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn take_shutdown(&self) -> bool
 server_host::HostState	#[cfg(feature = "ecs")] pub enum HostState { Starting, Loading, Running, Draining, Stopped }
+server_host::HostState	#[cfg(not(feature = "ecs"))] pub enum HostState { Starting, Loading, Running, Draining, Stopped }
 server_host::HostState impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::HostState impl Clone	#[cfg(not(feature = "ecs"))] derive(Clone)
 server_host::HostState impl Copy	#[cfg(feature = "ecs")] derive(Copy)
+server_host::HostState impl Copy	#[cfg(not(feature = "ecs"))] derive(Copy)
 server_host::HostState impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::HostState impl Debug	#[cfg(not(feature = "ecs"))] derive(Debug)
 server_host::HostState impl Eq	#[cfg(feature = "ecs")] derive(Eq)
+server_host::HostState impl Eq	#[cfg(not(feature = "ecs"))] derive(Eq)
 server_host::HostState impl PartialEq	#[cfg(feature = "ecs")] derive(PartialEq)
+server_host::HostState impl PartialEq	#[cfg(not(feature = "ecs"))] derive(PartialEq)
 server_host::HostState::as_str	#[cfg(feature = "ecs")] pub fn as_str(self) -> &'static str
+server_host::HostState::as_str	#[cfg(not(feature = "ecs"))] pub fn as_str(self) -> &'static str
 server_host::HostTransport	#[cfg(feature = "ecs")] pub enum HostTransport { Udp, UdpAnyPort, Local }
+server_host::HostTransport	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub enum HostTransport { Udp, UdpAnyPort, Local }
 server_host::HostTransport impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::HostTransport impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::HostTransport impl Copy	#[cfg(feature = "ecs")] derive(Copy)
+server_host::HostTransport impl Copy	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Copy)
 server_host::HostTransport impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::HostTransport impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::HostTransport impl Eq	#[cfg(feature = "ecs")] derive(Eq)
+server_host::HostTransport impl Eq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Eq)
 server_host::HostTransport impl PartialEq	#[cfg(feature = "ecs")] derive(PartialEq)
+server_host::HostTransport impl PartialEq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(PartialEq)
 server_host::HostedLink	#[cfg(feature = "ecs")] pub struct HostedLink { .. }
+server_host::HostedLink	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub struct HostedLink { .. }
 server_host::HostedLink impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::HostedLink impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::HostedLink impl Debug	#[cfg(feature = "ecs")] impl Debug for HostedLink
+server_host::HostedLink impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] impl Debug for HostedLink
 server_host::HostedLink impl Resource	#[cfg(feature = "ecs")] derive(Resource)
+server_host::HostedLink impl Resource	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Resource)
 server_host::HostedLink::bind	#[cfg(feature = "ecs")] pub fn bind(&self, _: &mut NetLink, _: &GamePort) -> Result<SocketAddr, LinkError>
+server_host::HostedLink::bind	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn bind(&self, _: &mut NetLink, _: &GamePort) -> Result<SocketAddr, LinkError>
 server_host::HostedLink::bind_on	#[cfg(feature = "ecs")] pub fn bind_on(&self, _: &mut NetLink, _: LinkSocket, _: &GamePort) -> Result<SocketAddr, LinkError>
+server_host::HostedLink::bind_on	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn bind_on(&self, _: &mut NetLink, _: LinkSocket, _: &GamePort) -> Result<SocketAddr, LinkError>
 server_host::HostedLink::final_status	#[cfg(feature = "ecs")] pub fn final_status(&self) -> Option<&NetStatus>
+server_host::HostedLink::final_status	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn final_status(&self) -> Option<&NetStatus>
 server_host::HostedLink::hosted_options	#[cfg(feature = "ecs")] pub fn hosted_options(&self, _: &GamePort) -> LinkOptions
+server_host::HostedLink::hosted_options	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn hosted_options(&self, _: &GamePort) -> LinkOptions
 server_host::HostedLink::new	#[cfg(feature = "ecs")] pub fn new<G: NetGame<Message = NetFrame>>(_: LinkOptions) -> Self
+server_host::HostedLink::new	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn new<G: NetGame<Message = NetFrame>>(_: LinkOptions) -> Self
 server_host::HostedLink::on_stop	#[cfg(feature = "ecs")] pub fn on_stop(&self) -> Option<StopHook>
+server_host::HostedLink::on_stop	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn on_stop(&self) -> Option<StopHook>
 server_host::HostedLink::options	#[cfg(feature = "ecs")] pub fn options(&self) -> &LinkOptions
+server_host::HostedLink::options	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn options(&self) -> &LinkOptions
 server_host::HostedLink::protocol	#[cfg(feature = "ecs")] pub fn protocol(&self) -> u64
+server_host::HostedLink::protocol	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn protocol(&self) -> u64
 server_host::HostedLink::set_final_status	#[cfg(feature = "ecs")] pub fn set_final_status(&mut self, _: Option<NetStatus>)
+server_host::HostedLink::set_final_status	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn set_final_status(&mut self, _: Option<NetStatus>)
 server_host::HostedLink::with_on_stop	#[cfg(feature = "ecs")] pub fn with_on_stop(mut self, _: StopHook) -> Self
+server_host::HostedLink::with_on_stop	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn with_on_stop(mut self, _: StopHook) -> Self
 server_host::JoinError	#[cfg(feature = "ecs")] pub enum JoinError { BadCode(String), BadRelay(String), Bind(String), Refused(&'static str), BadTicket(String), Timeout, RelayTooOld, RelayFull(u16), RelayNoAllocation }
+server_host::JoinError	#[cfg(not(feature = "ecs"))] pub enum JoinError { BadCode(String), BadRelay(String), Bind(String), Refused(&'static str), BadTicket(String), Timeout, RelayTooOld, RelayFull(u16), RelayNoAllocation }
 server_host::JoinError impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::JoinError impl Clone	#[cfg(not(feature = "ecs"))] derive(Clone)
 server_host::JoinError impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::JoinError impl Debug	#[cfg(not(feature = "ecs"))] derive(Debug)
 server_host::JoinError impl Eq	#[cfg(feature = "ecs")] derive(Eq)
+server_host::JoinError impl Eq	#[cfg(not(feature = "ecs"))] derive(Eq)
 server_host::JoinError impl Error	#[cfg(feature = "ecs")] derive(Error)
+server_host::JoinError impl Error	#[cfg(not(feature = "ecs"))] derive(Error)
 server_host::JoinError impl PartialEq	#[cfg(feature = "ecs")] derive(PartialEq)
+server_host::JoinError impl PartialEq	#[cfg(not(feature = "ecs"))] derive(PartialEq)
 server_host::JoinError::code	#[cfg(feature = "ecs")] pub fn code(&self) -> &'static str
+server_host::JoinError::code	#[cfg(not(feature = "ecs"))] pub fn code(&self) -> &'static str
 server_host::JoinPath	#[cfg(feature = "ecs")] pub struct JoinPath<S> { .. }
+server_host::JoinPath	#[cfg(not(feature = "ecs"))] pub struct JoinPath<S> { .. }
 server_host::JoinPath impl Debug	#[cfg(feature = "ecs")] impl<S> Debug for JoinPath<S>
+server_host::JoinPath impl Debug	#[cfg(not(feature = "ecs"))] impl<S> Debug for JoinPath<S>
 server_host::JoinPath::add_candidate_source	#[cfg(feature = "ecs")] impl<S: DatagramSocket> JoinPath<S>: pub fn add_candidate_source(&mut self, _: Box<dyn CandidateSource>)
+server_host::JoinPath::add_candidate_source	#[cfg(not(feature = "ecs"))] impl<S: DatagramSocket> JoinPath<S>: pub fn add_candidate_source(&mut self, _: Box<dyn CandidateSource>)
 server_host::JoinPath::candidates	#[cfg(feature = "ecs")] impl<S: DatagramSocket> JoinPath<S>: pub fn candidates(&self) -> &[Candidate]
+server_host::JoinPath::candidates	#[cfg(not(feature = "ecs"))] impl<S: DatagramSocket> JoinPath<S>: pub fn candidates(&self) -> &[Candidate]
 server_host::JoinPath::checks	#[cfg(feature = "ecs")] impl<S: DatagramSocket> JoinPath<S>: pub fn checks(&self) -> Option<&CheckAgent>
+server_host::JoinPath::checks	#[cfg(not(feature = "ecs"))] impl<S: DatagramSocket> JoinPath<S>: pub fn checks(&self) -> Option<&CheckAgent>
 server_host::JoinPath::direct_remote	#[cfg(feature = "ecs")] impl<S: DatagramSocket> JoinPath<S>: pub fn direct_remote(&self) -> Option<SocketAddr>
+server_host::JoinPath::direct_remote	#[cfg(not(feature = "ecs"))] impl<S: DatagramSocket> JoinPath<S>: pub fn direct_remote(&self) -> Option<SocketAddr>
 server_host::JoinPath::error	#[cfg(feature = "ecs")] impl<S: DatagramSocket> JoinPath<S>: pub fn error(&self) -> Option<&JoinError>
+server_host::JoinPath::error	#[cfg(not(feature = "ecs"))] impl<S: DatagramSocket> JoinPath<S>: pub fn error(&self) -> Option<&JoinError>
 server_host::JoinPath::new	#[cfg(feature = "ecs")] impl<S: DatagramSocket> JoinPath<S>: pub fn new(_: S, _: SocketAddr, _: &str, _: [u8; RELAY_ALLOCATION_KEY_BYTES]) -> Result<Self, JoinError>
+server_host::JoinPath::new	#[cfg(not(feature = "ecs"))] impl<S: DatagramSocket> JoinPath<S>: pub fn new(_: S, _: SocketAddr, _: &str, _: [u8; RELAY_ALLOCATION_KEY_BYTES]) -> Result<Self, JoinError>
 server_host::JoinPath::observed	#[cfg(feature = "ecs")] impl<S: DatagramSocket> JoinPath<S>: pub fn observed(&self) -> Option<SocketAddr>
+server_host::JoinPath::observed	#[cfg(not(feature = "ecs"))] impl<S: DatagramSocket> JoinPath<S>: pub fn observed(&self) -> Option<SocketAddr>
 server_host::JoinPath::relay	#[cfg(feature = "ecs")] impl<S: DatagramSocket> JoinPath<S>: pub fn relay(&self) -> SocketAddr
+server_host::JoinPath::relay	#[cfg(not(feature = "ecs"))] impl<S: DatagramSocket> JoinPath<S>: pub fn relay(&self) -> SocketAddr
 server_host::JoinPath::relay_first	#[cfg(feature = "ecs")] impl<S: DatagramSocket> JoinPath<S>: pub fn relay_first(mut self) -> Self
+server_host::JoinPath::relay_first	#[cfg(not(feature = "ecs"))] impl<S: DatagramSocket> JoinPath<S>: pub fn relay_first(mut self) -> Self
 server_host::JoinPath::relay_protocol	#[cfg(feature = "ecs")] impl<S: DatagramSocket> JoinPath<S>: pub fn relay_protocol(&self) -> Option<u8>
+server_host::JoinPath::relay_protocol	#[cfg(not(feature = "ecs"))] impl<S: DatagramSocket> JoinPath<S>: pub fn relay_protocol(&self) -> Option<u8>
 server_host::JoinPath::route	#[cfg(feature = "ecs")] impl<S: DatagramSocket> JoinPath<S>: pub fn route(&self) -> JoinRoute
+server_host::JoinPath::route	#[cfg(not(feature = "ecs"))] impl<S: DatagramSocket> JoinPath<S>: pub fn route(&self) -> JoinRoute
 server_host::JoinPath::take_socket	#[cfg(feature = "ecs")] impl<S: DatagramSocket> JoinPath<S>: pub fn take_socket(&mut self) -> Option<JoinSocket<S>>
+server_host::JoinPath::take_socket	#[cfg(not(feature = "ecs"))] impl<S: DatagramSocket> JoinPath<S>: pub fn take_socket(&mut self) -> Option<JoinSocket<S>>
 server_host::JoinPath::ticket	#[cfg(feature = "ecs")] impl<S: DatagramSocket> JoinPath<S>: pub fn ticket(&self) -> Option<&JoinTicket>
+server_host::JoinPath::ticket	#[cfg(not(feature = "ecs"))] impl<S: DatagramSocket> JoinPath<S>: pub fn ticket(&self) -> Option<&JoinTicket>
 server_host::JoinPath::update	#[cfg(feature = "ecs")] impl<S: DatagramSocket> JoinPath<S>: pub fn update(&mut self, _: u64) -> JoinRoute
+server_host::JoinPath::update	#[cfg(not(feature = "ecs"))] impl<S: DatagramSocket> JoinPath<S>: pub fn update(&mut self, _: u64) -> JoinRoute
 server_host::JoinResolver	#[cfg(feature = "ecs")] pub struct JoinResolver { .. }
+server_host::JoinResolver	#[cfg(not(feature = "ecs"))] pub struct JoinResolver { .. }
 server_host::JoinResolver impl Debug	#[cfg(feature = "ecs")] impl Debug for JoinResolver
+server_host::JoinResolver impl Debug	#[cfg(not(feature = "ecs"))] impl Debug for JoinResolver
 server_host::JoinResolver::attempts	#[cfg(feature = "ecs")] pub fn attempts(&self) -> u32
+server_host::JoinResolver::attempts	#[cfg(not(feature = "ecs"))] pub fn attempts(&self) -> u32
 server_host::JoinResolver::new	#[cfg(feature = "ecs")] pub fn new(_: LinkSocket, _: SocketAddr, _: &str) -> Result<Self, JoinError>
+server_host::JoinResolver::new	#[cfg(not(feature = "ecs"))] pub fn new(_: LinkSocket, _: SocketAddr, _: &str) -> Result<Self, JoinError>
 server_host::JoinResolver::udp	#[cfg(feature = "ecs")] pub fn udp(_: SocketAddr, _: &str) -> Result<Self, JoinError>
+server_host::JoinResolver::udp	#[cfg(not(feature = "ecs"))] pub fn udp(_: SocketAddr, _: &str) -> Result<Self, JoinError>
 server_host::JoinResolver::update	#[cfg(feature = "ecs")] pub fn update(&mut self, _: u64) -> Option<Result<JoinTicket, JoinError>>
+server_host::JoinResolver::update	#[cfg(not(feature = "ecs"))] pub fn update(&mut self, _: u64) -> Option<Result<JoinTicket, JoinError>>
 server_host::JoinRoute	#[cfg(feature = "ecs")] pub enum JoinRoute { Resolving, Direct, DirectChosen, Relayed(u16), Failed }
+server_host::JoinRoute	#[cfg(not(feature = "ecs"))] pub enum JoinRoute { Resolving, Direct, DirectChosen, Relayed(u16), Failed }
 server_host::JoinRoute impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::JoinRoute impl Clone	#[cfg(not(feature = "ecs"))] derive(Clone)
 server_host::JoinRoute impl Copy	#[cfg(feature = "ecs")] derive(Copy)
+server_host::JoinRoute impl Copy	#[cfg(not(feature = "ecs"))] derive(Copy)
 server_host::JoinRoute impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::JoinRoute impl Debug	#[cfg(not(feature = "ecs"))] derive(Debug)
 server_host::JoinRoute impl Eq	#[cfg(feature = "ecs")] derive(Eq)
+server_host::JoinRoute impl Eq	#[cfg(not(feature = "ecs"))] derive(Eq)
 server_host::JoinRoute impl PartialEq	#[cfg(feature = "ecs")] derive(PartialEq)
+server_host::JoinRoute impl PartialEq	#[cfg(not(feature = "ecs"))] derive(PartialEq)
 server_host::JoinRoute::as_str	#[cfg(feature = "ecs")] pub fn as_str(self) -> &'static str
+server_host::JoinRoute::as_str	#[cfg(not(feature = "ecs"))] pub fn as_str(self) -> &'static str
 server_host::JoinSocket	#[cfg(feature = "ecs")] pub struct JoinSocket<S> { .. }
+server_host::JoinSocket	#[cfg(not(feature = "ecs"))] pub struct JoinSocket<S> { .. }
 server_host::JoinSocket impl DatagramSocket	#[cfg(feature = "ecs")] impl<S: DatagramSocket> DatagramSocket for JoinSocket<S>
+server_host::JoinSocket impl DatagramSocket	#[cfg(not(feature = "ecs"))] impl<S: DatagramSocket> DatagramSocket for JoinSocket<S>
 server_host::JoinSocket impl Debug	#[cfg(feature = "ecs")] impl<S> Debug for JoinSocket<S>
+server_host::JoinSocket impl Debug	#[cfg(not(feature = "ecs"))] impl<S> Debug for JoinSocket<S>
 server_host::JoinTicket	#[cfg(feature = "ecs")] pub struct JoinTicket { pub addr: SocketAddr, pub server_key: Option<ServerKey> }
+server_host::JoinTicket	#[cfg(not(feature = "ecs"))] pub struct JoinTicket { pub addr: SocketAddr, pub server_key: Option<ServerKey> }
 server_host::JoinTicket impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::JoinTicket impl Clone	#[cfg(not(feature = "ecs"))] derive(Clone)
 server_host::JoinTicket impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::JoinTicket impl Debug	#[cfg(not(feature = "ecs"))] derive(Debug)
 server_host::JoinTicket impl Eq	#[cfg(feature = "ecs")] derive(Eq)
+server_host::JoinTicket impl Eq	#[cfg(not(feature = "ecs"))] derive(Eq)
 server_host::JoinTicket impl PartialEq	#[cfg(feature = "ecs")] derive(PartialEq)
+server_host::JoinTicket impl PartialEq	#[cfg(not(feature = "ecs"))] derive(PartialEq)
 server_host::JoinTicket::connect_addr	#[cfg(feature = "ecs")] pub fn connect_addr(&self, _: SocketAddr) -> SocketAddr
+server_host::JoinTicket::connect_addr	#[cfg(not(feature = "ecs"))] pub fn connect_addr(&self, _: SocketAddr) -> SocketAddr
 server_host::JoinTicket::decode	#[cfg(feature = "ecs")] pub fn decode(_: &[u8]) -> Result<Self, WireError>
+server_host::JoinTicket::decode	#[cfg(not(feature = "ecs"))] pub fn decode(_: &[u8]) -> Result<Self, WireError>
 server_host::JoinTicket::encode	#[cfg(feature = "ecs")] pub fn encode(&self) -> Vec<u8>
+server_host::JoinTicket::encode	#[cfg(not(feature = "ecs"))] pub fn encode(&self) -> Vec<u8>
 server_host::JoinTicket::from_game_socket	#[cfg(feature = "ecs")] pub fn from_game_socket(_: Option<ServerKey>) -> Self
+server_host::JoinTicket::from_game_socket	#[cfg(not(feature = "ecs"))] pub fn from_game_socket(_: Option<ServerKey>) -> Self
 server_host::LOCAL_RELAY_ALLOCATION_PORTS	#[cfg(feature = "ecs")] pub const LOCAL_RELAY_ALLOCATION_PORTS: u16
+server_host::LOCAL_RELAY_ALLOCATION_PORTS	#[cfg(not(feature = "ecs"))] pub const LOCAL_RELAY_ALLOCATION_PORTS: u16
 server_host::LevelCheck	#[cfg(feature = "ecs")] pub type LevelCheck = Box<dyn FnMut(&mut App, &str) -> bool>
+server_host::LevelCheck	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub type LevelCheck = Box<dyn FnMut(&mut App, &str) -> bool>
 server_host::LevelHook	#[cfg(feature = "ecs")] pub type LevelHook = Box<dyn FnMut(&mut App, &str) -> Result<(), String>>
+server_host::LevelHook	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub type LevelHook = Box<dyn FnMut(&mut App, &str) -> Result<(), String>>
 server_host::LinkBanMirror	#[cfg(feature = "ecs")] pub struct LinkBanMirror { .. }
+server_host::LinkBanMirror	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub struct LinkBanMirror { .. }
 server_host::LinkBanMirror impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::LinkBanMirror impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::LinkBanMirror impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::LinkBanMirror impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::LinkBanMirror impl Default	#[cfg(feature = "ecs")] derive(Default)
+server_host::LinkBanMirror impl Default	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Default)
 server_host::LinkBanMirror impl Resource	#[cfg(feature = "ecs")] derive(Resource)
+server_host::LinkBanMirror impl Resource	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Resource)
 server_host::LinkBanMirror.refused	#[cfg(feature = "ecs")] pub refused: Vec<(IpAddr, BanId)>
+server_host::LinkBanMirror.refused	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub refused: Vec<(IpAddr, BanId)>
 server_host::LocalRelay	#[cfg(feature = "ecs")] pub struct LocalRelay { .. }
+server_host::LocalRelay	#[cfg(not(feature = "ecs"))] pub struct LocalRelay { .. }
 server_host::LocalRelay impl Debug	#[cfg(feature = "ecs")] impl Debug for LocalRelay
+server_host::LocalRelay impl Debug	#[cfg(not(feature = "ecs"))] impl Debug for LocalRelay
 server_host::LocalRelay::addr	#[cfg(feature = "ecs")] pub fn addr(&self) -> SocketAddr
+server_host::LocalRelay::addr	#[cfg(not(feature = "ecs"))] pub fn addr(&self) -> SocketAddr
 server_host::LocalRelay::bind	#[cfg(feature = "ecs")] pub fn bind(_: u16, _: u64) -> Result<Self, JoinError>
+server_host::LocalRelay::bind	#[cfg(not(feature = "ecs"))] pub fn bind(_: u16, _: u64) -> Result<Self, JoinError>
 server_host::LocalRelay::lobby_count	#[cfg(feature = "ecs")] pub fn lobby_count(&self) -> usize
+server_host::LocalRelay::lobby_count	#[cfg(not(feature = "ecs"))] pub fn lobby_count(&self) -> usize
 server_host::LocalRelay::report	#[cfg(feature = "ecs")] pub fn report(&self) -> crate::relay::RelayReport
+server_host::LocalRelay::report	#[cfg(not(feature = "ecs"))] pub fn report(&self) -> crate::relay::RelayReport
 server_host::LocalRelay::status	#[cfg(feature = "ecs")] pub fn status(&self) -> RelayStatus
+server_host::LocalRelay::status	#[cfg(not(feature = "ecs"))] pub fn status(&self) -> RelayStatus
 server_host::LocalRelay::update	#[cfg(feature = "ecs")] pub fn update(&mut self, _: u64)
+server_host::LocalRelay::update	#[cfg(not(feature = "ecs"))] pub fn update(&mut self, _: u64)
 server_host::LockstepHostGame	#[cfg(feature = "ecs")] pub struct LockstepHostGame<G: NetGame> { .. }
+server_host::LockstepHostGame	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub struct LockstepHostGame<G: NetGame> { .. }
 server_host::LockstepHostGame impl Debug	#[cfg(feature = "ecs")] impl<G: NetGame> Debug for LockstepHostGame<G>
+server_host::LockstepHostGame impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] impl<G: NetGame> Debug for LockstepHostGame<G>
 server_host::LockstepHostGame impl HostGame	#[cfg(feature = "ecs")] impl<G: NetGame> HostGame for LockstepHostGame<G>
+server_host::LockstepHostGame impl HostGame	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] impl<G: NetGame> HostGame for LockstepHostGame<G>
 server_host::LockstepHostGame.clock	#[cfg(feature = "ecs")] pub clock: Option<TestClock>
+server_host::LockstepHostGame.clock	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub clock: Option<TestClock>
 server_host::LockstepHostGame.events	#[cfg(feature = "ecs")] pub events: std::collections::VecDeque<HostEvent>
+server_host::LockstepHostGame.events	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub events: std::collections::VecDeque<HostEvent>
 server_host::LockstepHostGame.link	#[cfg(feature = "ecs")] pub link: Option<Box<dyn LockstepSeatLink<G>>>
+server_host::LockstepHostGame.link	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub link: Option<Box<dyn LockstepSeatLink<G>>>
 server_host::LockstepHostGame.payloads_refused	#[cfg(feature = "ecs")] pub payloads_refused: u64
+server_host::LockstepHostGame.payloads_refused	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub payloads_refused: u64
 server_host::LockstepHostGame.seats_refused	#[cfg(feature = "ecs")] pub seats_refused: u64
+server_host::LockstepHostGame.seats_refused	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub seats_refused: u64
 server_host::LockstepHostGame.seats_removed	#[cfg(feature = "ecs")] pub seats_removed: u64
+server_host::LockstepHostGame.seats_removed	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub seats_removed: u64
 server_host::LockstepHostGame.server	#[cfg(feature = "ecs")] pub server: LockstepServer<G>
+server_host::LockstepHostGame.server	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub server: LockstepServer<G>
 server_host::LockstepHostGame.session	#[cfg(feature = "ecs")] pub session: NetSession
+server_host::LockstepHostGame.session	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub session: NetSession
 server_host::LockstepHostGame::new	#[cfg(feature = "ecs")] impl<G: NetGame> LockstepHostGame<G>: pub fn new(_: NetSession, _: &LockstepServerSettings, _: u32, _: Option<Box<dyn LockstepObserver<G::Input>>>) -> Result<Self, LockstepServerError>
+server_host::LockstepHostGame::new	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] impl<G: NetGame> LockstepHostGame<G>: pub fn new(_: NetSession, _: &LockstepServerSettings, _: u32, _: Option<Box<dyn LockstepObserver<G::Input>>>) -> Result<Self, LockstepServerError>
 server_host::LockstepHostGame::status	#[cfg(feature = "ecs")] impl<G: NetGame> LockstepHostGame<G>: pub fn status(&mut self) -> LockstepServerStatus
+server_host::LockstepHostGame::status	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] impl<G: NetGame> LockstepHostGame<G>: pub fn status(&mut self) -> LockstepServerStatus
 server_host::LockstepSeatLink	#[cfg(feature = "ecs")] pub trait LockstepSeatLink<G: NetGame> { fn receive(&mut self, _: u64) -> Vec<(SeatId, Lane, Vec<u8>)>; fn send(&mut self, _: SeatId, _: Outgoing, _: u64); .. }
+server_host::LockstepSeatLink	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub trait LockstepSeatLink<G: NetGame> { fn receive(&mut self, _: u64) -> Vec<(SeatId, Lane, Vec<u8>)>; fn send(&mut self, _: SeatId, _: Outgoing, _: u64); .. }
 server_host::LockstepSeatLink::membership	#[cfg(feature = "ecs")] fn membership(&mut self) -> Vec<(SeatId, bool)> { .. }
+server_host::LockstepSeatLink::membership	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn membership(&mut self) -> Vec<(SeatId, bool)> { .. }
 server_host::LockstepSeatLink::observer_state	#[cfg(feature = "ecs")] fn observer_state(&mut self, _: u64) -> Option<Vec<u8>> { .. }
+server_host::LockstepSeatLink::observer_state	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn observer_state(&mut self, _: u64) -> Option<Vec<u8>> { .. }
 server_host::LockstepSeatLink::refuse	#[cfg(feature = "ecs")] fn refuse(&mut self, _: SeatId, _: &'static str) { .. }
+server_host::LockstepSeatLink::refuse	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] fn refuse(&mut self, _: SeatId, _: &'static str) { .. }
 server_host::MAX_SUBSTEPS	#[cfg(feature = "ecs")] pub const MAX_SUBSTEPS: u32
+server_host::MAX_SUBSTEPS	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub const MAX_SUBSTEPS: u32
 server_host::MappedCandidates	#[cfg(feature = "ecs")] pub struct MappedCandidates { .. }
+server_host::MappedCandidates	#[cfg(not(feature = "ecs"))] pub struct MappedCandidates { .. }
 server_host::MappedCandidates impl CandidateSource	#[cfg(feature = "ecs")] impl CandidateSource for MappedCandidates
+server_host::MappedCandidates impl CandidateSource	#[cfg(not(feature = "ecs"))] impl CandidateSource for MappedCandidates
 server_host::MappedCandidates impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::MappedCandidates impl Clone	#[cfg(not(feature = "ecs"))] derive(Clone)
 server_host::MappedCandidates impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::MappedCandidates impl Debug	#[cfg(not(feature = "ecs"))] derive(Debug)
 server_host::MappedCandidates impl Default	#[cfg(feature = "ecs")] derive(Default)
+server_host::MappedCandidates impl Default	#[cfg(not(feature = "ecs"))] derive(Default)
 server_host::MappedCandidates::get	#[cfg(feature = "ecs")] pub fn get(&self) -> Option<SocketAddr>
+server_host::MappedCandidates::get	#[cfg(not(feature = "ecs"))] pub fn get(&self) -> Option<SocketAddr>
 server_host::MappedCandidates::new	#[cfg(feature = "ecs")] pub fn new() -> Self
+server_host::MappedCandidates::new	#[cfg(not(feature = "ecs"))] pub fn new() -> Self
 server_host::MappedCandidates::set	#[cfg(feature = "ecs")] pub fn set(&self, _: Option<SocketAddr>)
+server_host::MappedCandidates::set	#[cfg(not(feature = "ecs"))] pub fn set(&self, _: Option<SocketAddr>)
 server_host::MappedCandidates::slot	#[cfg(feature = "ecs")] pub fn slot(&self) -> Self
+server_host::MappedCandidates::slot	#[cfg(not(feature = "ecs"))] pub fn slot(&self) -> Self
 server_host::MonotonicClock	#[cfg(feature = "ecs")] pub struct MonotonicClock { .. }
+server_host::MonotonicClock	#[cfg(not(feature = "ecs"))] pub struct MonotonicClock { .. }
 server_host::MonotonicClock impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::MonotonicClock impl Clone	#[cfg(not(feature = "ecs"))] derive(Clone)
 server_host::MonotonicClock impl Copy	#[cfg(feature = "ecs")] derive(Copy)
+server_host::MonotonicClock impl Copy	#[cfg(not(feature = "ecs"))] derive(Copy)
 server_host::MonotonicClock impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::MonotonicClock impl Debug	#[cfg(not(feature = "ecs"))] derive(Debug)
 server_host::MonotonicClock impl Default	#[cfg(feature = "ecs")] impl Default for MonotonicClock
+server_host::MonotonicClock impl Default	#[cfg(not(feature = "ecs"))] impl Default for MonotonicClock
 server_host::MonotonicClock impl HostClock	#[cfg(feature = "ecs")] impl HostClock for MonotonicClock
+server_host::MonotonicClock impl HostClock	#[cfg(not(feature = "ecs"))] impl HostClock for MonotonicClock
 server_host::PersistenceSettings	#[cfg(feature = "ecs")] pub struct PersistenceSettings { pub enabled: bool, pub dir: String, pub autosave_ticks: u32, pub keep: u32, pub save_on_shutdown: bool, pub save_on_level_change: bool, pub player_identity: PlayerIdentityMode }
+server_host::PersistenceSettings	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub struct PersistenceSettings { pub enabled: bool, pub dir: String, pub autosave_ticks: u32, pub keep: u32, pub save_on_shutdown: bool, pub save_on_level_change: bool, pub player_identity: PlayerIdentityMode }
 server_host::PersistenceSettings impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::PersistenceSettings impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::PersistenceSettings impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::PersistenceSettings impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::PersistenceSettings impl Default	#[cfg(feature = "ecs")] impl Default for PersistenceSettings
+server_host::PersistenceSettings impl Default	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] impl Default for PersistenceSettings
 server_host::PersistenceSettings impl Eq	#[cfg(feature = "ecs")] derive(Eq)
+server_host::PersistenceSettings impl Eq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Eq)
 server_host::PersistenceSettings impl PartialEq	#[cfg(feature = "ecs")] derive(PartialEq)
+server_host::PersistenceSettings impl PartialEq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(PartialEq)
 server_host::PersistenceSettings impl Serialize	#[cfg(feature = "ecs")] derive(Serialize)
+server_host::PersistenceSettings impl Serialize	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Serialize)
 server_host::PlayerIdentityMode	#[cfg(feature = "ecs")] pub enum PlayerIdentityMode { Platform, PlatformOrName }
+server_host::PlayerIdentityMode	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub enum PlayerIdentityMode { Platform, PlatformOrName }
 server_host::PlayerIdentityMode impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::PlayerIdentityMode impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::PlayerIdentityMode impl Copy	#[cfg(feature = "ecs")] derive(Copy)
+server_host::PlayerIdentityMode impl Copy	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Copy)
 server_host::PlayerIdentityMode impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::PlayerIdentityMode impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::PlayerIdentityMode impl Default	#[cfg(feature = "ecs")] derive(Default)
+server_host::PlayerIdentityMode impl Default	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Default)
 server_host::PlayerIdentityMode impl Eq	#[cfg(feature = "ecs")] derive(Eq)
+server_host::PlayerIdentityMode impl Eq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Eq)
 server_host::PlayerIdentityMode impl PartialEq	#[cfg(feature = "ecs")] derive(PartialEq)
+server_host::PlayerIdentityMode impl PartialEq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(PartialEq)
 server_host::PlayerIdentityMode impl Serialize	#[cfg(feature = "ecs")] derive(Serialize)
+server_host::PlayerIdentityMode impl Serialize	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Serialize)
 server_host::PlayerIdentityMode::as_str	#[cfg(feature = "ecs")] pub fn as_str(self) -> &'static str
+server_host::PlayerIdentityMode::as_str	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn as_str(self) -> &'static str
 server_host::PlayerIdentityMode::parse	#[cfg(feature = "ecs")] pub fn parse(_: &str) -> Option<Self>
+server_host::PlayerIdentityMode::parse	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn parse(_: &str) -> Option<Self>
 server_host::PlayerLayer	#[cfg(feature = "ecs")] pub enum PlayerLayer { Link, Session }
+server_host::PlayerLayer	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub enum PlayerLayer { Link, Session }
 server_host::PlayerLayer impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::PlayerLayer impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::PlayerLayer impl Copy	#[cfg(feature = "ecs")] derive(Copy)
+server_host::PlayerLayer impl Copy	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Copy)
 server_host::PlayerLayer impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::PlayerLayer impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::PlayerLayer impl Eq	#[cfg(feature = "ecs")] derive(Eq)
+server_host::PlayerLayer impl Eq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Eq)
 server_host::PlayerLayer impl PartialEq	#[cfg(feature = "ecs")] derive(PartialEq)
+server_host::PlayerLayer impl PartialEq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(PartialEq)
 server_host::PortHalf	#[cfg(feature = "ecs")] pub struct PortHalf { .. }
+server_host::PortHalf	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub struct PortHalf { .. }
 server_host::PortHalf impl DatagramSocket	#[cfg(feature = "ecs")] impl DatagramSocket for PortHalf
+server_host::PortHalf impl DatagramSocket	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] impl DatagramSocket for PortHalf
 server_host::PortHalf impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::PortHalf impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::PortHalf::layer	#[cfg(feature = "ecs")] pub fn layer(&self) -> PortLayer
+server_host::PortHalf::layer	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn layer(&self) -> PortLayer
 server_host::PortLayer	#[cfg(feature = "ecs")] pub enum PortLayer { Session, Link }
+server_host::PortLayer	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub enum PortLayer { Session, Link }
 server_host::PortLayer impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::PortLayer impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::PortLayer impl Copy	#[cfg(feature = "ecs")] derive(Copy)
+server_host::PortLayer impl Copy	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Copy)
 server_host::PortLayer impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::PortLayer impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::PortLayer impl Eq	#[cfg(feature = "ecs")] derive(Eq)
+server_host::PortLayer impl Eq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Eq)
 server_host::PortLayer impl Hash	#[cfg(feature = "ecs")] derive(Hash)
+server_host::PortLayer impl Hash	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Hash)
 server_host::PortLayer impl PartialEq	#[cfg(feature = "ecs")] derive(PartialEq)
+server_host::PortLayer impl PartialEq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(PartialEq)
 server_host::RELAY_FALLBACK_MS	#[cfg(feature = "ecs")] pub const RELAY_FALLBACK_MS: u64
+server_host::RELAY_FALLBACK_MS	#[cfg(not(feature = "ecs"))] pub const RELAY_FALLBACK_MS: u64
 server_host::RELAY_RACE_START_MS	#[cfg(feature = "ecs")] pub const RELAY_RACE_START_MS: u64
+server_host::RELAY_RACE_START_MS	#[cfg(not(feature = "ecs"))] pub const RELAY_RACE_START_MS: u64
 server_host::RelayControlPort	#[cfg(feature = "ecs")] pub struct RelayControlPort<S> { .. }
+server_host::RelayControlPort	#[cfg(not(feature = "ecs"))] pub struct RelayControlPort<S> { .. }
 server_host::RelayControlPort impl DatagramSocket	#[cfg(feature = "ecs")] impl<S: DatagramSocket> DatagramSocket for RelayControlPort<S>
+server_host::RelayControlPort impl DatagramSocket	#[cfg(not(feature = "ecs"))] impl<S: DatagramSocket> DatagramSocket for RelayControlPort<S>
 server_host::RelayControlPort impl Debug	#[cfg(feature = "ecs")] impl<S> Debug for RelayControlPort<S>
+server_host::RelayControlPort impl Debug	#[cfg(not(feature = "ecs"))] impl<S> Debug for RelayControlPort<S>
 server_host::RelayControlPort::stats	#[cfg(feature = "ecs")] impl<S: DatagramSocket> RelayControlPort<S>: pub fn stats(&self) -> RelaySplitStats
+server_host::RelayControlPort::stats	#[cfg(not(feature = "ecs"))] impl<S: DatagramSocket> RelayControlPort<S>: pub fn stats(&self) -> RelaySplitStats
 server_host::RelayGamePort	#[cfg(feature = "ecs")] pub struct RelayGamePort<S> { .. }
+server_host::RelayGamePort	#[cfg(not(feature = "ecs"))] pub struct RelayGamePort<S> { .. }
 server_host::RelayGamePort impl DatagramSocket	#[cfg(feature = "ecs")] impl<S: DatagramSocket> DatagramSocket for RelayGamePort<S>
+server_host::RelayGamePort impl DatagramSocket	#[cfg(not(feature = "ecs"))] impl<S: DatagramSocket> DatagramSocket for RelayGamePort<S>
 server_host::RelayGamePort impl Debug	#[cfg(feature = "ecs")] impl<S> Debug for RelayGamePort<S>
+server_host::RelayGamePort impl Debug	#[cfg(not(feature = "ecs"))] impl<S> Debug for RelayGamePort<S>
 server_host::RelayRegistrar	#[cfg(feature = "ecs")] pub struct RelayRegistrar { .. }
+server_host::RelayRegistrar	#[cfg(not(feature = "ecs"))] pub struct RelayRegistrar { .. }
 server_host::RelayRegistrar impl Debug	#[cfg(feature = "ecs")] impl Debug for RelayRegistrar
+server_host::RelayRegistrar impl Debug	#[cfg(not(feature = "ecs"))] impl Debug for RelayRegistrar
 server_host::RelayRegistrar::add_candidate_source	#[cfg(feature = "ecs")] pub fn add_candidate_source(&mut self, _: Box<dyn CandidateSource>)
+server_host::RelayRegistrar::add_candidate_source	#[cfg(not(feature = "ecs"))] pub fn add_candidate_source(&mut self, _: Box<dyn CandidateSource>)
 server_host::RelayRegistrar::candidates	#[cfg(feature = "ecs")] pub fn candidates(&self) -> &[Candidate]
+server_host::RelayRegistrar::candidates	#[cfg(not(feature = "ecs"))] pub fn candidates(&self) -> &[Candidate]
 server_host::RelayRegistrar::clear_port_mapping	#[cfg(feature = "ecs")] pub fn clear_port_mapping(&mut self, _: &str, _: u64)
+server_host::RelayRegistrar::clear_port_mapping	#[cfg(not(feature = "ecs"))] pub fn clear_port_mapping(&mut self, _: &str, _: u64)
 server_host::RelayRegistrar::code_revoked	#[cfg(feature = "ecs")] pub fn code_revoked(&self) -> bool
+server_host::RelayRegistrar::code_revoked	#[cfg(not(feature = "ecs"))] pub fn code_revoked(&self) -> bool
 server_host::RelayRegistrar::confirmed_allocations	#[cfg(feature = "ecs")] pub fn confirmed_allocations(&self) -> u64
+server_host::RelayRegistrar::confirmed_allocations	#[cfg(not(feature = "ecs"))] pub fn confirmed_allocations(&self) -> u64
 server_host::RelayRegistrar::host_check	#[cfg(feature = "ecs")] pub fn host_check(&self) -> Option<HostCheckReport>
+server_host::RelayRegistrar::host_check	#[cfg(not(feature = "ecs"))] pub fn host_check(&self) -> Option<HostCheckReport>
 server_host::RelayRegistrar::join_code	#[cfg(feature = "ecs")] pub fn join_code(&self) -> Option<&str>
+server_host::RelayRegistrar::join_code	#[cfg(not(feature = "ecs"))] pub fn join_code(&self) -> Option<&str>
 server_host::RelayRegistrar::last_refusal	#[cfg(feature = "ecs")] pub fn last_refusal(&self) -> Option<&'static str>
+server_host::RelayRegistrar::last_refusal	#[cfg(not(feature = "ecs"))] pub fn last_refusal(&self) -> Option<&'static str>
 server_host::RelayRegistrar::nat_report	#[cfg(feature = "ecs")] pub fn nat_report(&self) -> NatReport
+server_host::RelayRegistrar::nat_report	#[cfg(not(feature = "ecs"))] pub fn nat_report(&self) -> NatReport
 server_host::RelayRegistrar::new	#[cfg(feature = "ecs")] pub fn new(_: LinkSocket, _: SocketAddr, _: &JoinTicket) -> Result<Self, JoinError>
+server_host::RelayRegistrar::new	#[cfg(not(feature = "ecs"))] pub fn new(_: LinkSocket, _: SocketAddr, _: &JoinTicket) -> Result<Self, JoinError>
 server_host::RelayRegistrar::relay	#[cfg(feature = "ecs")] pub fn relay(&self) -> SocketAddr
+server_host::RelayRegistrar::relay	#[cfg(not(feature = "ecs"))] pub fn relay(&self) -> SocketAddr
+server_host::RelayRegistrar::relay_only	#[cfg(feature = "ecs")] pub fn relay_only(mut self) -> Self
+server_host::RelayRegistrar::relay_only	#[cfg(not(feature = "ecs"))] pub fn relay_only(mut self) -> Self
 server_host::RelayRegistrar::relayed_clients	#[cfg(feature = "ecs")] pub fn relayed_clients(&self) -> u64
+server_host::RelayRegistrar::relayed_clients	#[cfg(not(feature = "ecs"))] pub fn relayed_clients(&self) -> u64
 server_host::RelayRegistrar::report	#[cfg(feature = "ecs")] pub fn report(&self) -> crate::relay::RelayReport
+server_host::RelayRegistrar::report	#[cfg(not(feature = "ecs"))] pub fn report(&self) -> crate::relay::RelayReport
 server_host::RelayRegistrar::revoke_code	#[cfg(feature = "ecs")] pub fn revoke_code(&mut self, _: u64)
+server_host::RelayRegistrar::revoke_code	#[cfg(not(feature = "ecs"))] pub fn revoke_code(&mut self, _: u64)
 server_host::RelayRegistrar::sent	#[cfg(feature = "ecs")] pub fn sent(&self) -> u64
+server_host::RelayRegistrar::sent	#[cfg(not(feature = "ecs"))] pub fn sent(&self) -> u64
 server_host::RelayRegistrar::set_port_mapping	#[cfg(feature = "ecs")] pub fn set_port_mapping(&mut self, _: &str, _: &PortMapping, _: u64, _: u64)
+server_host::RelayRegistrar::set_port_mapping	#[cfg(not(feature = "ecs"))] pub fn set_port_mapping(&mut self, _: &str, _: &PortMapping, _: u64, _: u64)
 server_host::RelayRegistrar::start_host_check	#[cfg(feature = "ecs")] pub fn start_host_check(&mut self, _: HostCheckConfig, _: u64)
+server_host::RelayRegistrar::start_host_check	#[cfg(not(feature = "ecs"))] pub fn start_host_check(&mut self, _: HostCheckConfig, _: u64)
 server_host::RelayRegistrar::udp	#[cfg(feature = "ecs")] pub fn udp(_: SocketAddr, _: &JoinTicket) -> Result<Self, JoinError>
+server_host::RelayRegistrar::udp	#[cfg(not(feature = "ecs"))] pub fn udp(_: SocketAddr, _: &JoinTicket) -> Result<Self, JoinError>
 server_host::RelayRegistrar::update	#[cfg(feature = "ecs")] pub fn update(&mut self, _: u64) -> bool
+server_host::RelayRegistrar::update	#[cfg(not(feature = "ecs"))] pub fn update(&mut self, _: u64) -> bool
 server_host::RelaySpec	#[cfg(feature = "ecs")] pub enum RelaySpec { Local(u16), Remote(SocketAddr) }
+server_host::RelaySpec	#[cfg(not(feature = "ecs"))] pub enum RelaySpec { Local(u16), Remote(SocketAddr) }
 server_host::RelaySpec impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::RelaySpec impl Clone	#[cfg(not(feature = "ecs"))] derive(Clone)
 server_host::RelaySpec impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::RelaySpec impl Debug	#[cfg(not(feature = "ecs"))] derive(Debug)
 server_host::RelaySpec impl Eq	#[cfg(feature = "ecs")] derive(Eq)
+server_host::RelaySpec impl Eq	#[cfg(not(feature = "ecs"))] derive(Eq)
 server_host::RelaySpec impl PartialEq	#[cfg(feature = "ecs")] derive(PartialEq)
+server_host::RelaySpec impl PartialEq	#[cfg(not(feature = "ecs"))] derive(PartialEq)
 server_host::RelaySpec::parse	#[cfg(feature = "ecs")] pub fn parse(_: &str) -> Result<Self, JoinError>
+server_host::RelaySpec::parse	#[cfg(not(feature = "ecs"))] pub fn parse(_: &str) -> Result<Self, JoinError>
 server_host::RelaySplitStats	#[cfg(feature = "ecs")] pub struct RelaySplitStats { pub control_in: u64, pub game_in: u64, pub dropped: u64 }
+server_host::RelaySplitStats	#[cfg(not(feature = "ecs"))] pub struct RelaySplitStats { pub control_in: u64, pub game_in: u64, pub dropped: u64 }
 server_host::RelaySplitStats impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::RelaySplitStats impl Clone	#[cfg(not(feature = "ecs"))] derive(Clone)
 server_host::RelaySplitStats impl Copy	#[cfg(feature = "ecs")] derive(Copy)
+server_host::RelaySplitStats impl Copy	#[cfg(not(feature = "ecs"))] derive(Copy)
 server_host::RelaySplitStats impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::RelaySplitStats impl Debug	#[cfg(not(feature = "ecs"))] derive(Debug)
 server_host::RelaySplitStats impl Default	#[cfg(feature = "ecs")] derive(Default)
+server_host::RelaySplitStats impl Default	#[cfg(not(feature = "ecs"))] derive(Default)
 server_host::RelaySplitStats impl Eq	#[cfg(feature = "ecs")] derive(Eq)
+server_host::RelaySplitStats impl Eq	#[cfg(not(feature = "ecs"))] derive(Eq)
 server_host::RelaySplitStats impl PartialEq	#[cfg(feature = "ecs")] derive(PartialEq)
+server_host::RelaySplitStats impl PartialEq	#[cfg(not(feature = "ecs"))] derive(PartialEq)
 server_host::ReloadReport	#[cfg(feature = "ecs")] pub struct ReloadReport { pub applied: Vec<String>, pub needs_restart: Vec<String> }
+server_host::ReloadReport	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub struct ReloadReport { pub applied: Vec<String>, pub needs_restart: Vec<String> }
 server_host::ReloadReport impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::ReloadReport impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::ReloadReport impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::ReloadReport impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::ReloadReport impl Default	#[cfg(feature = "ecs")] derive(Default)
+server_host::ReloadReport impl Default	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Default)
 server_host::ReloadReport impl Eq	#[cfg(feature = "ecs")] derive(Eq)
+server_host::ReloadReport impl Eq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Eq)
 server_host::ReloadReport impl PartialEq	#[cfg(feature = "ecs")] derive(PartialEq)
+server_host::ReloadReport impl PartialEq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(PartialEq)
 server_host::ResolvedConfig	#[cfg(feature = "ecs")] pub struct ResolvedConfig { pub settings: ServerSettings, pub path: Option<PathBuf>, pub warnings: Vec<String> }
+server_host::ResolvedConfig	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub struct ResolvedConfig { pub settings: ServerSettings, pub path: Option<PathBuf>, pub warnings: Vec<String> }
 server_host::ResolvedConfig impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::ResolvedConfig impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::ResolvedConfig impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::ResolvedConfig impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::ResolvedConfig impl PartialEq	#[cfg(feature = "ecs")] derive(PartialEq)
+server_host::ResolvedConfig impl PartialEq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(PartialEq)
 server_host::RotationFailure	#[cfg(feature = "ecs")] pub struct RotationFailure { pub map_id: String, pub mode: String, pub error: String }
+server_host::RotationFailure	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub struct RotationFailure { pub map_id: String, pub mode: String, pub error: String }
 server_host::RotationFailure impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::RotationFailure impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::RotationFailure impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::RotationFailure impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::RotationFailure impl Eq	#[cfg(feature = "ecs")] derive(Eq)
+server_host::RotationFailure impl Eq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Eq)
 server_host::RotationFailure impl PartialEq	#[cfg(feature = "ecs")] derive(PartialEq)
+server_host::RotationFailure impl PartialEq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(PartialEq)
 server_host::RotationRowView	#[cfg(feature = "ecs")] pub struct RotationRowView { pub map_id: String, pub mode: String, pub options: Vec<(String, String)> }
+server_host::RotationRowView	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub struct RotationRowView { pub map_id: String, pub mode: String, pub options: Vec<(String, String)> }
 server_host::RotationRowView impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::RotationRowView impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::RotationRowView impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::RotationRowView impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::RotationRowView impl Eq	#[cfg(feature = "ecs")] derive(Eq)
+server_host::RotationRowView impl Eq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Eq)
 server_host::RotationRowView impl PartialEq	#[cfg(feature = "ecs")] derive(PartialEq)
+server_host::RotationRowView impl PartialEq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(PartialEq)
 server_host::RotationSkip	#[cfg(feature = "ecs")] pub struct RotationSkip { pub index: u32, pub map_id: String, pub mode: String, pub reason: String }
+server_host::RotationSkip	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub struct RotationSkip { pub index: u32, pub map_id: String, pub mode: String, pub reason: String }
 server_host::RotationSkip impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::RotationSkip impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::RotationSkip impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::RotationSkip impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::RotationSkip impl Eq	#[cfg(feature = "ecs")] derive(Eq)
+server_host::RotationSkip impl Eq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Eq)
 server_host::RotationSkip impl PartialEq	#[cfg(feature = "ecs")] derive(PartialEq)
+server_host::RotationSkip impl PartialEq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(PartialEq)
 server_host::RotationView	#[cfg(feature = "ecs")] pub struct RotationView { pub rows: Vec<RotationRowView>, pub index: u32, pub looping: bool, pub last_failure: Option<RotationFailure>, pub order: String, pub skipped: Vec<RotationSkip>, pub rules_hash: Option<u64>, pub rules_in_manifest: bool }
+server_host::RotationView	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub struct RotationView { pub rows: Vec<RotationRowView>, pub index: u32, pub looping: bool, pub last_failure: Option<RotationFailure>, pub order: String, pub skipped: Vec<RotationSkip>, pub rules_hash: Option<u64>, pub rules_in_manifest: bool }
 server_host::RotationView impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::RotationView impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::RotationView impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::RotationView impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::RotationView impl Default	#[cfg(feature = "ecs")] derive(Default)
+server_host::RotationView impl Default	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Default)
 server_host::RotationView impl Eq	#[cfg(feature = "ecs")] derive(Eq)
+server_host::RotationView impl Eq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Eq)
 server_host::RotationView impl PartialEq	#[cfg(feature = "ecs")] derive(PartialEq)
+server_host::RotationView impl PartialEq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(PartialEq)
 server_host::ServerBotSettings	#[cfg(feature = "ecs")] pub struct ServerBotSettings { pub min_players: u32, pub max_bots: u32, pub join_delay_ticks: u32, pub leave_delay_ticks: u32, pub seed: u64, pub reaction_ticks: u32, pub aim_error_radians: f32, pub perception_radius: f32 }
+server_host::ServerBotSettings	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub struct ServerBotSettings { pub min_players: u32, pub max_bots: u32, pub join_delay_ticks: u32, pub leave_delay_ticks: u32, pub seed: u64, pub reaction_ticks: u32, pub aim_error_radians: f32, pub perception_radius: f32 }
 server_host::ServerBotSettings impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::ServerBotSettings impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::ServerBotSettings impl Copy	#[cfg(feature = "ecs")] derive(Copy)
+server_host::ServerBotSettings impl Copy	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Copy)
 server_host::ServerBotSettings impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::ServerBotSettings impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::ServerBotSettings impl Default	#[cfg(feature = "ecs")] impl Default for ServerBotSettings
+server_host::ServerBotSettings impl Default	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] impl Default for ServerBotSettings
 server_host::ServerBotSettings impl PartialEq	#[cfg(feature = "ecs")] derive(PartialEq)
+server_host::ServerBotSettings impl PartialEq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(PartialEq)
 server_host::ServerBotSettings impl Serialize	#[cfg(feature = "ecs")] derive(Serialize)
+server_host::ServerBotSettings impl Serialize	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Serialize)
 server_host::ServerHost	#[cfg(feature = "ecs")] pub struct ServerHost { .. }
+server_host::ServerHost	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub struct ServerHost { .. }
 server_host::ServerHost impl Debug	#[cfg(feature = "ecs")] impl Debug for ServerHost
+server_host::ServerHost impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] impl Debug for ServerHost
 server_host::ServerHost.allow_unencrypted_admin	#[cfg(feature = "ecs")] pub allow_unencrypted_admin: bool
+server_host::ServerHost.allow_unencrypted_admin	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub allow_unencrypted_admin: bool
 server_host::ServerHost::ban	#[cfg(feature = "ecs")] pub fn ban(&mut self, _: &mut dyn HostGame, _: &str, _: Option<u64>, _: &str) -> Result<BanId, String>
+server_host::ServerHost::ban	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn ban(&mut self, _: &mut dyn HostGame, _: &str, _: Option<u64>, _: &str) -> Result<BanId, String>
 server_host::ServerHost::begin_drain	#[cfg(feature = "ecs")] pub fn begin_drain(&mut self, _: &mut dyn HostGame, _: f64)
+server_host::ServerHost::begin_drain	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn begin_drain(&mut self, _: &mut dyn HostGame, _: f64)
 server_host::ServerHost::change_level	#[cfg(feature = "ecs")] pub fn change_level(&mut self, _: &mut dyn HostGame, _: &str) -> Result<u32, String>
+server_host::ServerHost::change_level	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn change_level(&mut self, _: &mut dyn HostGame, _: &str) -> Result<u32, String>
 server_host::ServerHost::config_warnings	#[cfg(feature = "ecs")] pub fn config_warnings(&self) -> &[String]
+server_host::ServerHost::config_warnings	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn config_warnings(&self) -> &[String]
 server_host::ServerHost::console_sender	#[cfg(feature = "ecs")] pub fn console_sender(&self) -> Sender<String>
+server_host::ServerHost::console_sender	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn console_sender(&self) -> Sender<String>
 server_host::ServerHost::execute	#[cfg(feature = "ecs")] pub fn execute(&mut self, _: &mut dyn HostGame, _: &str) -> Vec<String>
+server_host::ServerHost::execute	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn execute(&mut self, _: &mut dyn HostGame, _: &str) -> Vec<String>
 server_host::ServerHost::game_addr	#[cfg(feature = "ecs")] pub fn game_addr(&self) -> Option<SocketAddr>
+server_host::ServerHost::game_addr	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn game_addr(&self) -> Option<SocketAddr>
 server_host::ServerHost::game_owns_port	#[cfg(feature = "ecs")] pub fn game_owns_port(&self) -> bool
+server_host::ServerHost::game_owns_port	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn game_owns_port(&self) -> bool
 server_host::ServerHost::health_addr	#[cfg(feature = "ecs")] pub fn health_addr(&self) -> Option<std::net::SocketAddr>
+server_host::ServerHost::health_addr	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn health_addr(&self) -> Option<std::net::SocketAddr>
 server_host::ServerHost::health_json	#[cfg(feature = "ecs")] pub fn health_json(&self, _: &mut dyn HostGame) -> String
+server_host::ServerHost::health_json	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn health_json(&self, _: &mut dyn HostGame) -> String
 server_host::ServerHost::join_code	#[cfg(feature = "ecs")] pub fn join_code(&self) -> Option<&str>
+server_host::ServerHost::join_code	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn join_code(&self) -> Option<&str>
 server_host::ServerHost::join_code_revoked	#[cfg(feature = "ecs")] pub fn join_code_revoked(&self) -> bool
+server_host::ServerHost::join_code_revoked	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn join_code_revoked(&self) -> bool
 server_host::ServerHost::kick	#[cfg(feature = "ecs")] pub fn kick(&mut self, _: &mut dyn HostGame, _: &str, _: &str) -> Result<(), String>
+server_host::ServerHost::kick	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn kick(&mut self, _: &mut dyn HostGame, _: &str, _: &str) -> Result<(), String>
 server_host::ServerHost::level	#[cfg(feature = "ecs")] pub fn level(&self) -> &str
+server_host::ServerHost::level	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn level(&self) -> &str
 server_host::ServerHost::link	#[cfg(feature = "ecs")] pub fn link(&self) -> &ServerHostLink
+server_host::ServerHost::link	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn link(&self) -> &ServerHostLink
 server_host::ServerHost::net_stats_mut	#[cfg(feature = "ecs")] pub fn net_stats_mut(&mut self) -> &mut crate::stats::StatsReporter
+server_host::ServerHost::net_stats_mut	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn net_stats_mut(&mut self) -> &mut crate::stats::StatsReporter
 server_host::ServerHost::new	#[cfg(feature = "ecs")] pub fn new(_: &Path, _: CliOverrides, _: EnvReader, _: Box<dyn HostClock>) -> Result<Self, HostError>
+server_host::ServerHost::new	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn new(_: &Path, _: CliOverrides, _: EnvReader, _: Box<dyn HostClock>) -> Result<Self, HostError>
 server_host::ServerHost::next_level	#[cfg(feature = "ecs")] pub fn next_level(&mut self, _: &mut dyn HostGame) -> Result<u32, String>
+server_host::ServerHost::next_level	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn next_level(&mut self, _: &mut dyn HostGame) -> Result<u32, String>
 server_host::ServerHost::relay_addr	#[cfg(feature = "ecs")] pub fn relay_addr(&self) -> Option<SocketAddr>
+server_host::ServerHost::relay_addr	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn relay_addr(&self) -> Option<SocketAddr>
 server_host::ServerHost::relay_report	#[cfg(feature = "ecs")] pub fn relay_report(&self) -> crate::relay::RelayReport
+server_host::ServerHost::relay_report	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn relay_report(&self) -> crate::relay::RelayReport
 server_host::ServerHost::relay_status	#[cfg(feature = "ecs")] pub fn relay_status(&self) -> Option<crate::relay::RelayStatus>
+server_host::ServerHost::relay_status	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn relay_status(&self) -> Option<crate::relay::RelayStatus>
 server_host::ServerHost::reload	#[cfg(feature = "ecs")] pub fn reload(&mut self, _: &mut dyn HostGame) -> ReloadReport
+server_host::ServerHost::reload	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn reload(&mut self, _: &mut dyn HostGame) -> ReloadReport
 server_host::ServerHost::remote_admin	#[cfg(feature = "ecs")] pub fn remote_admin(&self) -> bool
+server_host::ServerHost::remote_admin	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn remote_admin(&self) -> bool
 server_host::ServerHost::revoke_join_code	#[cfg(feature = "ecs")] pub fn revoke_join_code(&mut self) -> bool
+server_host::ServerHost::revoke_join_code	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn revoke_join_code(&mut self) -> bool
 server_host::ServerHost::run	#[cfg(feature = "ecs")] pub fn run(&mut self, _: &mut dyn HostGame) -> ExitCode
+server_host::ServerHost::run	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn run(&mut self, _: &mut dyn HostGame) -> ExitCode
 server_host::ServerHost::run_once	#[cfg(feature = "ecs")] pub fn run_once(&mut self, _: &mut dyn HostGame) -> Option<ExitCode>
+server_host::ServerHost::run_once	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn run_once(&mut self, _: &mut dyn HostGame) -> Option<ExitCode>
 server_host::ServerHost::set_join_ticket_check	#[cfg(feature = "ecs")] pub fn set_join_ticket_check(&mut self, _: std::sync::Arc<dyn crate::ticket::JoinTicketCheck>)
+server_host::ServerHost::set_join_ticket_check	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn set_join_ticket_check(&mut self, _: std::sync::Arc<dyn crate::ticket::JoinTicketCheck>)
 server_host::ServerHost::settings	#[cfg(feature = "ecs")] pub fn settings(&self) -> &ServerSettings
+server_host::ServerHost::settings	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn settings(&self) -> &ServerSettings
 server_host::ServerHost::shared_port	#[cfg(feature = "ecs")] pub fn shared_port(&self) -> Option<&SharedPort>
+server_host::ServerHost::shared_port	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn shared_port(&self) -> Option<&SharedPort>
 server_host::ServerHost::signals	#[cfg(feature = "ecs")] pub fn signals(&self) -> &HostSignals
+server_host::ServerHost::signals	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn signals(&self) -> &HostSignals
 server_host::ServerHost::spawn_stdin_console	#[cfg(feature = "ecs")] pub fn spawn_stdin_console(&self)
+server_host::ServerHost::spawn_stdin_console	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn spawn_stdin_console(&self)
 server_host::ServerHost::start	#[cfg(feature = "ecs")] pub fn start(&mut self, _: &mut dyn HostGame, _: HostTransport) -> Result<(), HostError>
+server_host::ServerHost::start	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn start(&mut self, _: &mut dyn HostGame, _: HostTransport) -> Result<(), HostError>
 server_host::ServerHost::state	#[cfg(feature = "ecs")] pub fn state(&self) -> HostState
+server_host::ServerHost::state	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn state(&self) -> HostState
 server_host::ServerHost::stats	#[cfg(feature = "ecs")] pub fn stats(&self) -> &TickStats
+server_host::ServerHost::stats	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn stats(&self) -> &TickStats
 server_host::ServerHost::take_console_output	#[cfg(feature = "ecs")] pub fn take_console_output(&mut self) -> Vec<String>
+server_host::ServerHost::take_console_output	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn take_console_output(&mut self) -> Vec<String>
 server_host::ServerHost::tick	#[cfg(feature = "ecs")] pub fn tick(&self) -> u64
+server_host::ServerHost::tick	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn tick(&self) -> u64
 server_host::ServerHost::unban	#[cfg(feature = "ecs")] pub fn unban(&mut self, _: &mut dyn HostGame, _: u64) -> Result<(), String>
+server_host::ServerHost::unban	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn unban(&mut self, _: &mut dyn HostGame, _: u64) -> Result<(), String>
 server_host::ServerHostLink	#[cfg(feature = "ecs")] pub struct ServerHostLink { pub signals: HostSignals, pub shared: Arc<Mutex<HostShared>> }
+server_host::ServerHostLink	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub struct ServerHostLink { pub signals: HostSignals, pub shared: Arc<Mutex<HostShared>> }
 server_host::ServerHostLink impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::ServerHostLink impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::ServerHostLink impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::ServerHostLink impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::ServerHostLink impl Resource	#[cfg(feature = "ecs")] derive(Resource)
+server_host::ServerHostLink impl Resource	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Resource)
 server_host::ServerHostLink::snapshot	#[cfg(feature = "ecs")] pub fn snapshot(&self) -> HostShared
+server_host::ServerHostLink::snapshot	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn snapshot(&self) -> HostShared
 server_host::ServerSettings	#[cfg(feature = "ecs")] pub struct ServerSettings { pub timeout: crate::session::TimeoutPolicy, pub mtu_probing: bool, pub format_version: u32, pub name: String, pub bind: IpAddr, pub port: u32, pub max_players: u32, pub password: String, pub tick_hz: u32, pub motd: String, pub idle_tick_hz: u32, pub rotation: Vec<String>, pub playlist: String, pub start_index: usize, pub match_end_delay_s: f64, pub client_rate_bytes: Option<u32>, pub server_rate_bytes: Option<u32>, pub send_every_ticks: Option<u32>, pub entropy: Option<crate::entropy::EntropyMode>, pub encryption: crate::crypto::CryptoMode, pub identity_file: String, pub shared_port: bool, pub admin_token_file: String, pub status_enabled: bool, pub status_bind: IpAddr, pub status_port: u32, pub log_dir: String, pub keep_log_files: u32, pub console: bool, pub persistence: PersistenceSettings, pub bots: ServerBotSettings, pub lockstep: crate::lockstep::server::LockstepServerSettings }
+server_host::ServerSettings	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub struct ServerSettings { pub timeout: crate::session::TimeoutPolicy, pub mtu_probing: bool, pub format_version: u32, pub name: String, pub bind: IpAddr, pub port: u32, pub max_players: u32, pub password: String, pub tick_hz: u32, pub motd: String, pub idle_tick_hz: u32, pub rotation: Vec<String>, pub playlist: String, pub start_index: usize, pub match_end_delay_s: f64, pub client_rate_bytes: Option<u32>, pub server_rate_bytes: Option<u32>, pub send_every_ticks: Option<u32>, pub entropy: Option<crate::entropy::EntropyMode>, pub encryption: crate::crypto::CryptoMode, pub identity_file: String, pub shared_port: bool, pub admin_token_file: String, pub status_enabled: bool, pub status_bind: IpAddr, pub status_port: u32, pub log_dir: String, pub keep_log_files: u32, pub console: bool, pub persistence: PersistenceSettings, pub bots: ServerBotSettings, pub lockstep: crate::lockstep::server::LockstepServerSettings }
 server_host::ServerSettings impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::ServerSettings impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::ServerSettings impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::ServerSettings impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::ServerSettings impl Default	#[cfg(feature = "ecs")] impl Default for ServerSettings
+server_host::ServerSettings impl Default	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] impl Default for ServerSettings
 server_host::ServerSettings impl PartialEq	#[cfg(feature = "ecs")] derive(PartialEq)
+server_host::ServerSettings impl PartialEq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(PartialEq)
 server_host::ServerSettings impl Resource	#[cfg(feature = "ecs")] derive(Resource)
+server_host::ServerSettings impl Resource	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Resource)
 server_host::ServerSettings impl Serialize	#[cfg(feature = "ecs")] derive(Serialize)
+server_host::ServerSettings impl Serialize	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Serialize)
 server_host::ServerSettings::from_toml	#[cfg(feature = "ecs")] pub fn from_toml(_: &str) -> Result<Self, Vec<FieldError>>
+server_host::ServerSettings::from_toml	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn from_toml(_: &str) -> Result<Self, Vec<FieldError>>
 server_host::ServerSettings::game_addr	#[cfg(feature = "ecs")] pub fn game_addr(&self) -> std::net::SocketAddr
+server_host::ServerSettings::game_addr	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn game_addr(&self) -> std::net::SocketAddr
 server_host::ServerSettings::hot_changes	#[cfg(feature = "ecs")] pub fn hot_changes(&self, _: &ServerSettings) -> Vec<&'static str>
+server_host::ServerSettings::hot_changes	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn hot_changes(&self, _: &ServerSettings) -> Vec<&'static str>
 server_host::ServerSettings::restart_only_changes	#[cfg(feature = "ecs")] pub fn restart_only_changes(&self, _: &ServerSettings) -> Vec<&'static str>
+server_host::ServerSettings::restart_only_changes	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn restart_only_changes(&self, _: &ServerSettings) -> Vec<&'static str>
 server_host::ServerSettings::status_addr	#[cfg(feature = "ecs")] pub fn status_addr(&self) -> std::net::SocketAddr
+server_host::ServerSettings::status_addr	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn status_addr(&self) -> std::net::SocketAddr
 server_host::ServerSettings::validate	#[cfg(feature = "ecs")] pub fn validate(&self) -> Vec<FieldError>
+server_host::ServerSettings::validate	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn validate(&self) -> Vec<FieldError>
 server_host::SessionOnlyGame	#[cfg(feature = "ecs")] pub struct SessionOnlyGame { pub session: NetSession, pub levels: Vec<String>, pub match_over: bool, pub idle_slowdown: bool, pub chat: Option<Vec<String>>, pub on_step: Option<StepHook>, pub clock: Option<TestClock>, pub tick_hz: u32 }
+server_host::SessionOnlyGame	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub struct SessionOnlyGame { pub session: NetSession, pub levels: Vec<String>, pub match_over: bool, pub idle_slowdown: bool, pub chat: Option<Vec<String>>, pub on_step: Option<StepHook>, pub clock: Option<TestClock>, pub tick_hz: u32 }
 server_host::SessionOnlyGame impl Debug	#[cfg(feature = "ecs")] impl Debug for SessionOnlyGame
+server_host::SessionOnlyGame impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] impl Debug for SessionOnlyGame
 server_host::SessionOnlyGame impl HostGame	#[cfg(feature = "ecs")] impl HostGame for SessionOnlyGame
+server_host::SessionOnlyGame impl HostGame	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] impl HostGame for SessionOnlyGame
 server_host::SessionOnlyGame::new	#[cfg(feature = "ecs")] pub fn new(_: NetSession) -> Self
+server_host::SessionOnlyGame::new	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn new(_: NetSession) -> Self
 server_host::SharedPort	#[cfg(feature = "ecs")] pub struct SharedPort { .. }
+server_host::SharedPort	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub struct SharedPort { .. }
 server_host::SharedPort impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::SharedPort impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::SharedPort impl Debug	#[cfg(feature = "ecs")] impl Debug for SharedPort
+server_host::SharedPort impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] impl Debug for SharedPort
 server_host::SharedPort::drops_by_source	#[cfg(feature = "ecs")] pub fn drops_by_source(&self) -> Vec<(SocketAddr, u64)>
+server_host::SharedPort::drops_by_source	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn drops_by_source(&self) -> Vec<(SocketAddr, u64)>
 server_host::SharedPort::route_of	#[cfg(feature = "ecs")] pub fn route_of(&self, _: SocketAddr) -> Option<PortLayer>
+server_host::SharedPort::route_of	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn route_of(&self, _: SocketAddr) -> Option<PortLayer>
 server_host::SharedPort::split	#[cfg(feature = "ecs")] pub fn split(_: Box<dyn DatagramSocket + Send>, _: u64) -> (Self, PortHalf, PortHalf)
+server_host::SharedPort::split	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn split(_: Box<dyn DatagramSocket + Send>, _: u64) -> (Self, PortHalf, PortHalf)
 server_host::SharedPort::stats	#[cfg(feature = "ecs")] pub fn stats(&self) -> SharedPortStats
+server_host::SharedPort::stats	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn stats(&self) -> SharedPortStats
 server_host::SharedPortStats	#[cfg(feature = "ecs")] pub struct SharedPortStats { pub routed: [u64; 2], pub dropped_full: u64, pub dropped_oversize: u64, pub queued_bytes: [usize; 2], pub dropped_foreign: u64, pub routes: usize }
+server_host::SharedPortStats	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub struct SharedPortStats { pub routed: [u64; 2], pub dropped_full: u64, pub dropped_oversize: u64, pub queued_bytes: [usize; 2], pub dropped_foreign: u64, pub routes: usize }
 server_host::SharedPortStats impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::SharedPortStats impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::SharedPortStats impl Copy	#[cfg(feature = "ecs")] derive(Copy)
+server_host::SharedPortStats impl Copy	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Copy)
 server_host::SharedPortStats impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::SharedPortStats impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::SharedPortStats impl Default	#[cfg(feature = "ecs")] derive(Default)
+server_host::SharedPortStats impl Default	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Default)
 server_host::SharedPortStats impl Eq	#[cfg(feature = "ecs")] derive(Eq)
+server_host::SharedPortStats impl Eq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Eq)
 server_host::SharedPortStats impl PartialEq	#[cfg(feature = "ecs")] derive(PartialEq)
+server_host::SharedPortStats impl PartialEq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(PartialEq)
 server_host::StepHook	#[cfg(feature = "ecs")] pub type StepHook = Box<dyn FnMut(&mut NetSession) + Send>
+server_host::StepHook	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub type StepHook = Box<dyn FnMut(&mut NetSession) + Send>
 server_host::TestClock	#[cfg(feature = "ecs")] pub struct TestClock { .. }
+server_host::TestClock	#[cfg(not(feature = "ecs"))] pub struct TestClock { .. }
 server_host::TestClock impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::TestClock impl Clone	#[cfg(not(feature = "ecs"))] derive(Clone)
 server_host::TestClock impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::TestClock impl Debug	#[cfg(not(feature = "ecs"))] derive(Debug)
 server_host::TestClock impl Default	#[cfg(feature = "ecs")] derive(Default)
+server_host::TestClock impl Default	#[cfg(not(feature = "ecs"))] derive(Default)
 server_host::TestClock impl HostClock	#[cfg(feature = "ecs")] impl HostClock for TestClock
+server_host::TestClock impl HostClock	#[cfg(not(feature = "ecs"))] impl HostClock for TestClock
 server_host::TestClock::advance	#[cfg(feature = "ecs")] pub fn advance(&self, _: Duration)
+server_host::TestClock::advance	#[cfg(not(feature = "ecs"))] pub fn advance(&self, _: Duration)
 server_host::TestClock::new	#[cfg(feature = "ecs")] pub fn new() -> Self
+server_host::TestClock::new	#[cfg(not(feature = "ecs"))] pub fn new() -> Self
 server_host::TickStats	#[cfg(feature = "ecs")] pub struct TickStats { .. }
+server_host::TickStats	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub struct TickStats { .. }
 server_host::TickStats impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::TickStats impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::TickStats impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::TickStats impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::TickStats impl Default	#[cfg(feature = "ecs")] derive(Default)
+server_host::TickStats impl Default	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Default)
 server_host::TickStats.overruns_total	#[cfg(feature = "ecs")] pub overruns_total: u64
+server_host::TickStats.overruns_total	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub overruns_total: u64
 server_host::TickStats.worst_ms	#[cfg(feature = "ecs")] pub worst_ms: f64
+server_host::TickStats.worst_ms	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub worst_ms: f64
 server_host::TickStats::overruns_last_min	#[cfg(feature = "ecs")] pub fn overruns_last_min(&self) -> usize
+server_host::TickStats::overruns_last_min	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn overruns_last_min(&self) -> usize
 server_host::TickStats::percentile_ms	#[cfg(feature = "ecs")] pub fn percentile_ms(&self, _: f64) -> f64
+server_host::TickStats::percentile_ms	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn percentile_ms(&self, _: f64) -> f64
 server_host::ban_link_peer	#[cfg(feature = "ecs")] pub fn ban_link_peer(_: &mut World, _: &str, _: Option<u64>, _: &str) -> Result<BanId, HostOpError>
+server_host::ban_link_peer	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn ban_link_peer(_: &mut World, _: &str, _: Option<u64>, _: &str) -> Result<BanId, HostOpError>
 server_host::ban_player	#[cfg(feature = "ecs")] pub fn ban_player(_: &mut NetSession, _: &str, _: Option<u64>, _: &str) -> Result<BanId, HostOpError>
+server_host::ban_player	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn ban_player(_: &mut NetSession, _: &str, _: Option<u64>, _: &str) -> Result<BanId, HostOpError>
 server_host::config	#[cfg(feature = "ecs")] pub mod config
+server_host::config	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub mod config
 server_host::config::CliOverrides	#[cfg(feature = "ecs")] pub use server_host::CliOverrides
+server_host::config::CliOverrides	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::CliOverrides
 server_host::config::ConfigUpgrade	#[cfg(feature = "ecs")] pub enum ConfigUpgrade { Upgraded { path: PathBuf, from: u32 }, Current { path: PathBuf } }
+server_host::config::ConfigUpgrade	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub enum ConfigUpgrade { Upgraded { path: PathBuf, from: u32 }, Current { path: PathBuf } }
 server_host::config::ConfigUpgrade impl Clone	#[cfg(feature = "ecs")] derive(Clone)
+server_host::config::ConfigUpgrade impl Clone	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Clone)
 server_host::config::ConfigUpgrade impl Debug	#[cfg(feature = "ecs")] derive(Debug)
+server_host::config::ConfigUpgrade impl Debug	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Debug)
 server_host::config::ConfigUpgrade impl Eq	#[cfg(feature = "ecs")] derive(Eq)
+server_host::config::ConfigUpgrade impl Eq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(Eq)
 server_host::config::ConfigUpgrade impl PartialEq	#[cfg(feature = "ecs")] derive(PartialEq)
+server_host::config::ConfigUpgrade impl PartialEq	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] derive(PartialEq)
 server_host::config::DEFAULT_SERVER_TOML	#[cfg(feature = "ecs")] pub const DEFAULT_SERVER_TOML: &str
+server_host::config::DEFAULT_SERVER_TOML	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub const DEFAULT_SERVER_TOML: &str
 server_host::config::FieldError	#[cfg(feature = "ecs")] pub use server_host::FieldError
+server_host::config::FieldError	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::FieldError
 server_host::config::MAX_PERSISTENCE_KEEP	#[cfg(feature = "ecs")] pub const MAX_PERSISTENCE_KEEP: u32
+server_host::config::MAX_PERSISTENCE_KEEP	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub const MAX_PERSISTENCE_KEEP: u32
 server_host::config::PersistenceSettings	#[cfg(feature = "ecs")] pub use server_host::PersistenceSettings
+server_host::config::PersistenceSettings	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::PersistenceSettings
 server_host::config::PlayerIdentityMode	#[cfg(feature = "ecs")] pub use server_host::PlayerIdentityMode
+server_host::config::PlayerIdentityMode	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::PlayerIdentityMode
 server_host::config::ResolvedConfig	#[cfg(feature = "ecs")] pub use server_host::ResolvedConfig
+server_host::config::ResolvedConfig	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::ResolvedConfig
 server_host::config::SERVER_ENV_VARS	#[cfg(feature = "ecs")] pub const SERVER_ENV_VARS: &[&str]
+server_host::config::SERVER_ENV_VARS	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub const SERVER_ENV_VARS: &[&str]
 server_host::config::SERVER_TOML_FORMAT_VERSION	#[cfg(feature = "ecs")] pub const SERVER_TOML_FORMAT_VERSION: u32
+server_host::config::SERVER_TOML_FORMAT_VERSION	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub const SERVER_TOML_FORMAT_VERSION: u32
 server_host::config::SERVER_TOML_MIN_FORMAT_VERSION	#[cfg(feature = "ecs")] pub const SERVER_TOML_MIN_FORMAT_VERSION: u32
+server_host::config::SERVER_TOML_MIN_FORMAT_VERSION	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub const SERVER_TOML_MIN_FORMAT_VERSION: u32
 server_host::config::ServerBotSettings	#[cfg(feature = "ecs")] pub use server_host::ServerBotSettings
+server_host::config::ServerBotSettings	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::ServerBotSettings
 server_host::config::ServerSettings	#[cfg(feature = "ecs")] pub use server_host::ServerSettings
+server_host::config::ServerSettings	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::ServerSettings
 server_host::config::migrate_server_toml	#[cfg(feature = "ecs")] pub fn migrate_server_toml(_: &str) -> Result<String, String>
+server_host::config::migrate_server_toml	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn migrate_server_toml(_: &str) -> Result<String, String>
 server_host::config::resolve_config	#[cfg(feature = "ecs")] pub use server_host::resolve_config
+server_host::config::resolve_config	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::resolve_config
 server_host::config::resolve_from_process	#[cfg(feature = "ecs")] pub fn resolve_from_process(_: &Path, _: &CliOverrides) -> Result<ResolvedConfig, Vec<FieldError>>
+server_host::config::resolve_from_process	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn resolve_from_process(_: &Path, _: &CliOverrides) -> Result<ResolvedConfig, Vec<FieldError>>
 server_host::config::upgrade_config_file	#[cfg(feature = "ecs")] pub fn upgrade_config_file(_: &Path, _: &CliOverrides) -> Result<ConfigUpgrade, String>
+server_host::config::upgrade_config_file	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn upgrade_config_file(_: &Path, _: &CliOverrides) -> Result<ConfigUpgrade, String>
 server_host::crash	#[cfg(feature = "ecs")] pub mod crash
+server_host::crash	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub mod crash
 server_host::crash::CrashCause	#[cfg(feature = "ecs")] pub use server_host::CrashCause
+server_host::crash::CrashCause	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::CrashCause
 server_host::crash::crash_exit_code	#[cfg(feature = "ecs")] pub use server_host::crash_exit_code
+server_host::crash::crash_exit_code	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::crash_exit_code
 server_host::crash::install_native_crash_exit	#[cfg(feature = "ecs")] pub use server_host::install_native_crash_exit
+server_host::crash::install_native_crash_exit	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::install_native_crash_exit
 server_host::crash_exit_code	#[cfg(feature = "ecs")] pub fn crash_exit_code(_: CrashCause) -> ExitCode
+server_host::crash_exit_code	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn crash_exit_code(_: CrashCause) -> ExitCode
 server_host::enforce_link_bans	#[cfg(feature = "ecs")] pub fn enforce_link_bans(_: &mut World) -> usize
+server_host::enforce_link_bans	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn enforce_link_bans(_: &mut World) -> usize
 server_host::fresh_allocation_key	#[cfg(feature = "ecs")] pub fn fresh_allocation_key() -> [u8; RELAY_ALLOCATION_KEY_BYTES]
+server_host::fresh_allocation_key	#[cfg(not(feature = "ecs"))] pub fn fresh_allocation_key() -> [u8; RELAY_ALLOCATION_KEY_BYTES]
 server_host::health	#[cfg(feature = "ecs")] pub mod health
+server_host::health	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub mod health
 server_host::health::HealthServer	#[cfg(feature = "ecs")] pub use server_host::HealthServer
+server_host::health::HealthServer	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::HealthServer
 server_host::health::HealthSnapshot	#[cfg(feature = "ecs")] pub use server_host::HealthSnapshot
+server_host::health::HealthSnapshot	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::HealthSnapshot
 server_host::health::MAX_REQUEST_BYTES	#[cfg(feature = "ecs")] pub const MAX_REQUEST_BYTES: usize
+server_host::health::MAX_REQUEST_BYTES	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub const MAX_REQUEST_BYTES: usize
 server_host::health::READ_TIMEOUT	#[cfg(feature = "ecs")] pub const READ_TIMEOUT: Duration
+server_host::health::READ_TIMEOUT	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub const READ_TIMEOUT: Duration
 server_host::health::respond	#[cfg(feature = "ecs")] pub fn respond(_: &[u8], _: &HealthSnapshot) -> (&'static str, String)
+server_host::health::respond	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn respond(_: &[u8], _: &HealthSnapshot) -> (&'static str, String)
 server_host::install_native_crash_exit	#[cfg(feature = "ecs")] pub fn install_native_crash_exit() -> Result<(), String>
+server_host::install_native_crash_exit	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn install_native_crash_exit() -> Result<(), String>
 server_host::join	#[cfg(feature = "ecs")] pub mod join
+server_host::join	#[cfg(not(feature = "ecs"))] pub mod join
 server_host::join::JOIN_ALLOCATION_ATTEMPTS	#[cfg(feature = "ecs")] pub const JOIN_ALLOCATION_ATTEMPTS: u32
+server_host::join::JOIN_ALLOCATION_ATTEMPTS	#[cfg(not(feature = "ecs"))] pub const JOIN_ALLOCATION_ATTEMPTS: u32
 server_host::join::JOIN_KEEPALIVE_MS	#[cfg(feature = "ecs")] pub const JOIN_KEEPALIVE_MS: u64
+server_host::join::JOIN_KEEPALIVE_MS	#[cfg(not(feature = "ecs"))] pub const JOIN_KEEPALIVE_MS: u64
 server_host::join::JOIN_LOBBY_LIFETIME_S	#[cfg(feature = "ecs")] pub const JOIN_LOBBY_LIFETIME_S: u16
+server_host::join::JOIN_LOBBY_LIFETIME_S	#[cfg(not(feature = "ecs"))] pub const JOIN_LOBBY_LIFETIME_S: u16
 server_host::join::JOIN_LOOKUP_ATTEMPTS	#[cfg(feature = "ecs")] pub const JOIN_LOOKUP_ATTEMPTS: u32
+server_host::join::JOIN_LOOKUP_ATTEMPTS	#[cfg(not(feature = "ecs"))] pub const JOIN_LOOKUP_ATTEMPTS: u32
 server_host::join::JOIN_MAX_PENDING_ALLOCATIONS	#[cfg(feature = "ecs")] pub const JOIN_MAX_PENDING_ALLOCATIONS: usize
+server_host::join::JOIN_MAX_PENDING_ALLOCATIONS	#[cfg(not(feature = "ecs"))] pub const JOIN_MAX_PENDING_ALLOCATIONS: usize
 server_host::join::JOIN_RETRY_MS	#[cfg(feature = "ecs")] pub const JOIN_RETRY_MS: u64
+server_host::join::JOIN_RETRY_MS	#[cfg(not(feature = "ecs"))] pub const JOIN_RETRY_MS: u64
 server_host::join::JOIN_TICKET_MAGIC	#[cfg(feature = "ecs")] pub const JOIN_TICKET_MAGIC: [u8; 4]
+server_host::join::JOIN_TICKET_MAGIC	#[cfg(not(feature = "ecs"))] pub const JOIN_TICKET_MAGIC: [u8; 4]
 server_host::join::JOIN_TICKET_VERSION	#[cfg(feature = "ecs")] pub const JOIN_TICKET_VERSION: u8
+server_host::join::JOIN_TICKET_VERSION	#[cfg(not(feature = "ecs"))] pub const JOIN_TICKET_VERSION: u8
 server_host::join::JoinError	#[cfg(feature = "ecs")] pub use server_host::JoinError
+server_host::join::JoinError	#[cfg(not(feature = "ecs"))] pub use server_host::JoinError
 server_host::join::JoinResolver	#[cfg(feature = "ecs")] pub use server_host::JoinResolver
+server_host::join::JoinResolver	#[cfg(not(feature = "ecs"))] pub use server_host::JoinResolver
 server_host::join::JoinTicket	#[cfg(feature = "ecs")] pub use server_host::JoinTicket
+server_host::join::JoinTicket	#[cfg(not(feature = "ecs"))] pub use server_host::JoinTicket
 server_host::join::LOCAL_RELAY_ALLOCATION_PORTS	#[cfg(feature = "ecs")] pub use server_host::LOCAL_RELAY_ALLOCATION_PORTS
+server_host::join::LOCAL_RELAY_ALLOCATION_PORTS	#[cfg(not(feature = "ecs"))] pub use server_host::LOCAL_RELAY_ALLOCATION_PORTS
+server_host::join::LinkSocket	#[cfg(feature = "ecs")] #[cfg(not(feature = "ecs"))] pub type LinkSocket = Box<dyn crate::socket::DatagramSocket + Send>
+server_host::join::LinkSocket	#[cfg(not(feature = "ecs"))] pub type LinkSocket = Box<dyn crate::socket::DatagramSocket + Send>
 server_host::join::LocalRelay	#[cfg(feature = "ecs")] pub use server_host::LocalRelay
+server_host::join::LocalRelay	#[cfg(not(feature = "ecs"))] pub use server_host::LocalRelay
 server_host::join::MappedCandidates	#[cfg(feature = "ecs")] pub use server_host::MappedCandidates
+server_host::join::MappedCandidates	#[cfg(not(feature = "ecs"))] pub use server_host::MappedCandidates
 server_host::join::RelayRegistrar	#[cfg(feature = "ecs")] pub use server_host::RelayRegistrar
+server_host::join::RelayRegistrar	#[cfg(not(feature = "ecs"))] pub use server_host::RelayRegistrar
 server_host::join::RelaySpec	#[cfg(feature = "ecs")] pub use server_host::RelaySpec
+server_host::join::RelaySpec	#[cfg(not(feature = "ecs"))] pub use server_host::RelaySpec
 server_host::join::registrar_bind	#[cfg(feature = "ecs")] pub fn registrar_bind(_: SocketAddr) -> SocketAddr
+server_host::join::registrar_bind	#[cfg(not(feature = "ecs"))] pub fn registrar_bind(_: SocketAddr) -> SocketAddr
 server_host::join::relay_error_name	#[cfg(feature = "ecs")] pub fn relay_error_name(_: RelayError) -> &'static str
+server_host::join::relay_error_name	#[cfg(not(feature = "ecs"))] pub fn relay_error_name(_: RelayError) -> &'static str
 server_host::join::resolve_join_code	#[cfg(feature = "ecs")] pub use server_host::resolve_join_code
+server_host::join::resolve_join_code	#[cfg(not(feature = "ecs"))] pub use server_host::resolve_join_code
 server_host::kick_link_peer	#[cfg(feature = "ecs")] pub fn kick_link_peer(_: &mut World, _: &str, _: &str) -> Result<(), HostOpError>
+server_host::kick_link_peer	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn kick_link_peer(_: &mut World, _: &str, _: &str) -> Result<(), HostOpError>
 server_host::kick_player	#[cfg(feature = "ecs")] pub fn kick_player(_: &mut NetSession, _: &str, _: &str) -> Result<(), HostOpError>
+server_host::kick_player	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn kick_player(_: &mut NetSession, _: &str, _: &str) -> Result<(), HostOpError>
 server_host::link_admin	#[cfg(feature = "ecs")] pub mod link_admin
+server_host::link_admin	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub mod link_admin
 server_host::link_admin::LinkBanMirror	#[cfg(feature = "ecs")] pub use server_host::LinkBanMirror
+server_host::link_admin::LinkBanMirror	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::LinkBanMirror
 server_host::link_admin::PlayerLayer	#[cfg(feature = "ecs")] pub use server_host::PlayerLayer
+server_host::link_admin::PlayerLayer	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::PlayerLayer
 server_host::link_admin::ban_link_peer	#[cfg(feature = "ecs")] pub use server_host::ban_link_peer
+server_host::link_admin::ban_link_peer	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::ban_link_peer
 server_host::link_admin::enforce_link_bans	#[cfg(feature = "ecs")] pub use server_host::enforce_link_bans
+server_host::link_admin::enforce_link_bans	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::enforce_link_bans
 server_host::link_admin::kick_link_peer	#[cfg(feature = "ecs")] pub use server_host::kick_link_peer
+server_host::link_admin::kick_link_peer	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::kick_link_peer
 server_host::link_admin::link_hosts_game_port	#[cfg(feature = "ecs")] pub use server_host::link_hosts_game_port
+server_host::link_admin::link_hosts_game_port	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::link_hosts_game_port
 server_host::link_admin::player_layer	#[cfg(feature = "ecs")] pub use server_host::player_layer
+server_host::link_admin::player_layer	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::player_layer
 server_host::link_admin::player_layer_in_world	#[cfg(feature = "ecs")] pub use server_host::player_layer_in_world
+server_host::link_admin::player_layer_in_world	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::player_layer_in_world
 server_host::link_admin::unban_link_entry	#[cfg(feature = "ecs")] pub use server_host::unban_link_entry
+server_host::link_admin::unban_link_entry	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::unban_link_entry
 server_host::link_game	#[cfg(feature = "ecs")] pub mod link_game
+server_host::link_game	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub mod link_game
 server_host::link_game::GamePort	#[cfg(feature = "ecs")] pub use server_host::GamePort
+server_host::link_game::GamePort	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::GamePort
 server_host::link_game::HostedLink	#[cfg(feature = "ecs")] pub use server_host::HostedLink
+server_host::link_game::HostedLink	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::HostedLink
 server_host::link_game::LinkBinder	#[cfg(feature = "ecs")] pub type LinkBinder = fn(&mut NetLink, SocketAddr, &LinkOptions) -> Result<(), LinkError>
+server_host::link_game::LinkBinder	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub type LinkBinder = fn(&mut NetLink, SocketAddr, &LinkOptions) -> Result<(), LinkError>
 server_host::link_game::LinkSocketBinder	#[cfg(feature = "ecs")] pub type LinkSocketBinder = fn(&mut NetLink, LinkSocket, &LinkOptions) -> Result<(), LinkError>
+server_host::link_game::LinkSocketBinder	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub type LinkSocketBinder = fn(&mut NetLink, LinkSocket, &LinkOptions) -> Result<(), LinkError>
 server_host::link_game::StopHook	#[cfg(feature = "ecs")] pub type StopHook = fn(&mut World)
+server_host::link_game::StopHook	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub type StopHook = fn(&mut World)
 server_host::link_hosts_game_port	#[cfg(feature = "ecs")] pub fn link_hosts_game_port(_: &World) -> bool
+server_host::link_hosts_game_port	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn link_hosts_game_port(_: &World) -> bool
 server_host::lockstep_game	#[cfg(feature = "ecs")] pub mod lockstep_game
+server_host::lockstep_game	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub mod lockstep_game
 server_host::lockstep_game::LockstepHostGame	#[cfg(feature = "ecs")] pub use server_host::LockstepHostGame
+server_host::lockstep_game::LockstepHostGame	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::LockstepHostGame
 server_host::lockstep_game::LockstepSeatLink	#[cfg(feature = "ecs")] pub use server_host::LockstepSeatLink
+server_host::lockstep_game::LockstepSeatLink	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::LockstepSeatLink
 server_host::parse_duration_s	#[cfg(feature = "ecs")] pub fn parse_duration_s(_: &str) -> Option<u64>
+server_host::parse_duration_s	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn parse_duration_s(_: &str) -> Option<u64>
 server_host::parse_player_id	#[cfg(feature = "ecs")] pub fn parse_player_id(_: &str) -> Option<(PeerId, Option<u8>)>
+server_host::parse_player_id	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn parse_player_id(_: &str) -> Option<(PeerId, Option<u8>)>
 server_host::player_layer	#[cfg(feature = "ecs")] pub fn player_layer<'a>(_: &'a str, _: &[PeerId], _: Option<&NetSession>) -> Result<(PlayerLayer, &'a str), HostOpError>
+server_host::player_layer	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn player_layer<'a>(_: &'a str, _: &[PeerId], _: Option<&NetSession>) -> Result<(PlayerLayer, &'a str), HostOpError>
 server_host::player_layer_in_world	#[cfg(feature = "ecs")] pub fn player_layer_in_world<'a>(_: &World, _: &'a str) -> Result<(PlayerLayer, &'a str), HostOpError>
+server_host::player_layer_in_world	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn player_layer_in_world<'a>(_: &World, _: &'a str) -> Result<(PlayerLayer, &'a str), HostOpError>
 server_host::relay_path	#[cfg(feature = "ecs")] pub mod relay_path
+server_host::relay_path	#[cfg(not(feature = "ecs"))] pub mod relay_path
 server_host::relay_path::JoinPath	#[cfg(feature = "ecs")] pub use server_host::JoinPath
+server_host::relay_path::JoinPath	#[cfg(not(feature = "ecs"))] pub use server_host::JoinPath
 server_host::relay_path::JoinRoute	#[cfg(feature = "ecs")] pub use server_host::JoinRoute
+server_host::relay_path::JoinRoute	#[cfg(not(feature = "ecs"))] pub use server_host::JoinRoute
 server_host::relay_path::JoinSocket	#[cfg(feature = "ecs")] pub use server_host::JoinSocket
+server_host::relay_path::JoinSocket	#[cfg(not(feature = "ecs"))] pub use server_host::JoinSocket
 server_host::relay_path::RELAY_ALLOCATE_ATTEMPTS	#[cfg(feature = "ecs")] pub const RELAY_ALLOCATE_ATTEMPTS: u32
+server_host::relay_path::RELAY_ALLOCATE_ATTEMPTS	#[cfg(not(feature = "ecs"))] pub const RELAY_ALLOCATE_ATTEMPTS: u32
 server_host::relay_path::RELAY_FALLBACK_MS	#[cfg(feature = "ecs")] pub use server_host::RELAY_FALLBACK_MS
+server_host::relay_path::RELAY_FALLBACK_MS	#[cfg(not(feature = "ecs"))] pub use server_host::RELAY_FALLBACK_MS
 server_host::relay_path::RELAY_RACE_START_MS	#[cfg(feature = "ecs")] pub use server_host::RELAY_RACE_START_MS
+server_host::relay_path::RELAY_RACE_START_MS	#[cfg(not(feature = "ecs"))] pub use server_host::RELAY_RACE_START_MS
 server_host::relay_path::RELAY_REFRESH_INTERVAL_MS	#[cfg(feature = "ecs")] pub const RELAY_REFRESH_INTERVAL_MS: u64
+server_host::relay_path::RELAY_REFRESH_INTERVAL_MS	#[cfg(not(feature = "ecs"))] pub const RELAY_REFRESH_INTERVAL_MS: u64
 server_host::relay_path::RELAY_SPLIT_QUEUE	#[cfg(feature = "ecs")] pub const RELAY_SPLIT_QUEUE: usize
+server_host::relay_path::RELAY_SPLIT_QUEUE	#[cfg(not(feature = "ecs"))] pub const RELAY_SPLIT_QUEUE: usize
 server_host::relay_path::RelayControlPort	#[cfg(feature = "ecs")] pub use server_host::RelayControlPort
+server_host::relay_path::RelayControlPort	#[cfg(not(feature = "ecs"))] pub use server_host::RelayControlPort
 server_host::relay_path::RelayGamePort	#[cfg(feature = "ecs")] pub use server_host::RelayGamePort
+server_host::relay_path::RelayGamePort	#[cfg(not(feature = "ecs"))] pub use server_host::RelayGamePort
 server_host::relay_path::RelaySplitStats	#[cfg(feature = "ecs")] pub use server_host::RelaySplitStats
+server_host::relay_path::RelaySplitStats	#[cfg(not(feature = "ecs"))] pub use server_host::RelaySplitStats
 server_host::relay_path::fresh_allocation_key	#[cfg(feature = "ecs")] pub use server_host::fresh_allocation_key
+server_host::relay_path::fresh_allocation_key	#[cfg(not(feature = "ecs"))] pub use server_host::fresh_allocation_key
 server_host::relay_path::relay_split	#[cfg(feature = "ecs")] pub use server_host::relay_split
+server_host::relay_path::relay_split	#[cfg(not(feature = "ecs"))] pub use server_host::relay_split
 server_host::relay_split	#[cfg(feature = "ecs")] pub fn relay_split<S: DatagramSocket>(_: S, _: SocketAddr) -> (RelayGamePort<S>, RelayControlPort<S>)
+server_host::relay_split	#[cfg(not(feature = "ecs"))] pub fn relay_split<S: DatagramSocket>(_: S, _: SocketAddr) -> (RelayGamePort<S>, RelayControlPort<S>)
 server_host::resolve_config	#[cfg(feature = "ecs")] pub fn resolve_config(_: &Path, _: &CliOverrides, _: &dyn Fn(&str) -> Option<String>) -> Result<ResolvedConfig, Vec<FieldError>>
+server_host::resolve_config	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn resolve_config(_: &Path, _: &CliOverrides, _: &dyn Fn(&str) -> Option<String>) -> Result<ResolvedConfig, Vec<FieldError>>
 server_host::resolve_join_code	#[cfg(feature = "ecs")] pub fn resolve_join_code(_: SocketAddr, _: &str) -> Result<JoinTicket, JoinError>
+server_host::resolve_join_code	#[cfg(not(feature = "ecs"))] pub fn resolve_join_code(_: SocketAddr, _: &str) -> Result<JoinTicket, JoinError>
 server_host::shared_port	#[cfg(feature = "ecs")] pub mod shared_port
+server_host::shared_port	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub mod shared_port
 server_host::shared_port::MAX_DROP_SOURCES	#[cfg(feature = "ecs")] pub const MAX_DROP_SOURCES: usize
+server_host::shared_port::MAX_DROP_SOURCES	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub const MAX_DROP_SOURCES: usize
 server_host::shared_port::MAX_PENDING_CHALLENGES	#[cfg(feature = "ecs")] pub const MAX_PENDING_CHALLENGES: usize
+server_host::shared_port::MAX_PENDING_CHALLENGES	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub const MAX_PENDING_CHALLENGES: usize
 server_host::shared_port::MAX_QUEUED_BYTES	#[cfg(feature = "ecs")] pub const MAX_QUEUED_BYTES: usize
+server_host::shared_port::MAX_QUEUED_BYTES	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub const MAX_QUEUED_BYTES: usize
 server_host::shared_port::MAX_QUEUED_DATAGRAMS	#[cfg(feature = "ecs")] pub const MAX_QUEUED_DATAGRAMS: usize
+server_host::shared_port::MAX_QUEUED_DATAGRAMS	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub const MAX_QUEUED_DATAGRAMS: usize
 server_host::shared_port::MAX_READS_PER_ROUND	#[cfg(feature = "ecs")] pub const MAX_READS_PER_ROUND: usize
+server_host::shared_port::MAX_READS_PER_ROUND	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub const MAX_READS_PER_ROUND: usize
 server_host::shared_port::MAX_ROUTES	#[cfg(feature = "ecs")] pub const MAX_ROUTES: usize
+server_host::shared_port::MAX_ROUTES	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub const MAX_ROUTES: usize
 server_host::shared_port::MAX_TOKENS	#[cfg(feature = "ecs")] pub const MAX_TOKENS: usize
+server_host::shared_port::MAX_TOKENS	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub const MAX_TOKENS: usize
 server_host::shared_port::PortHalf	#[cfg(feature = "ecs")] pub use server_host::PortHalf
+server_host::shared_port::PortHalf	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::PortHalf
 server_host::shared_port::PortLayer	#[cfg(feature = "ecs")] pub use server_host::PortLayer
+server_host::shared_port::PortLayer	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::PortLayer
 server_host::shared_port::SharedPort	#[cfg(feature = "ecs")] pub use server_host::SharedPort
+server_host::shared_port::SharedPort	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::SharedPort
 server_host::shared_port::SharedPortStats	#[cfg(feature = "ecs")] pub use server_host::SharedPortStats
+server_host::shared_port::SharedPortStats	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::SharedPortStats
 server_host::signals	#[cfg(feature = "ecs")] pub mod signals
+server_host::signals	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub mod signals
 server_host::signals::HostSignals	#[cfg(feature = "ecs")] pub use server_host::HostSignals
+server_host::signals::HostSignals	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub use server_host::HostSignals
 server_host::unban_entry	#[cfg(feature = "ecs")] pub fn unban_entry(_: &mut NetSession, _: u64) -> Result<(), HostOpError>
+server_host::unban_entry	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn unban_entry(_: &mut NetSession, _: u64) -> Result<(), HostOpError>
 server_host::unban_link_entry	#[cfg(feature = "ecs")] pub fn unban_link_entry(_: &mut World, _: u64) -> Result<(), HostOpError>
+server_host::unban_link_entry	#[cfg(not(feature = "ecs"))] #[cfg(feature = "ecs")] pub fn unban_link_entry(_: &mut World, _: u64) -> Result<(), HostOpError>
 session	pub mod session
 session::AuthRequestId	pub struct AuthRequestId(pub u64);
 session::AuthRequestId impl Clone	derive(Clone)

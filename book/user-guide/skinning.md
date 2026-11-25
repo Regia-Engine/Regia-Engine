@@ -1,5 +1,9 @@
 # Skinning: compute path, dual quaternions, eight influences
 
+<!-- index: Skinning -->
+<!-- index: Dual quaternion -->
+<!-- index: Eight influences -->
+
 By default Regia Engine skins a mesh in each pass's vertex shader (`specs/13` § 8): four joint
 influences per vertex, linear blending. Every pass that draws a character skins it again: the
 sun shadow cascades, the depth prepass, the motion-vector pass and the colour pass.
@@ -16,6 +20,10 @@ path adds two things the vertex-shader path lacks:
   collapses a joint that twists (the "candy wrapper": a forearm turned 160° pinches to a sixth
   of its width). Dual quaternions keep the volume. Joint scale and shear are applied first, so
   scaled skeletons still work.
+
+The quality tier does not switch this path. VeryLow uses Low's content budgets and still skins
+in the vertex shader until `SkinningConfig.compute` is set. The surface the skeleton draws is a
+material: see [Materials](../how-to/picture/materials.md).
 
 ## Turning it on
 

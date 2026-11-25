@@ -1,5 +1,7 @@
 # Retarget
 
+Panel id: `retarget`.
+
 The **Retarget** tab maps one rig's bones onto another's, so animations made for one character play on another. You
 open a source and a target rig, map their bones chain by chain (automatically, then by hand where needed), line the
 chains up with a reference pose, watch a clip play on both rigs side by side, save the map as a `.retarget.ron` file

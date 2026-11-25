@@ -241,6 +241,196 @@ fn heading_anchors(text: &str) -> BTreeMap<String, usize> {
     anchors
 }
 
+/// One index hit on a page `SUMMARY.md` reaches.
+///
+/// A marker hit with [`IndexHit::see`] set is a cross-reference and carries no page link.
+/// A heading hit is a level-2 or level-3 heading outside a fence.
+pub(crate) struct IndexHit {
+    /// The term as written.
+    pub term: String,
+    /// The `see:` target, when the marker is only a cross-reference.
+    pub see: Option<String>,
+    /// Book-relative page path.
+    pub page: String,
+    /// The page's level-1 title, or its file name.
+    pub page_title: String,
+    /// Heading slug to link. Empty links the page itself.
+    pub anchor: String,
+    /// Visible label of `anchor`. Empty when `anchor` is empty.
+    pub anchor_label: String,
+    /// True when the hit came from an `<!-- index: -->` marker.
+    pub marker: bool,
+}
+
+/// Collects `<!-- index: Term -->` markers and level-2 and level-3 headings from `markdown`.
+///
+/// Markers and headings inside fenced code blocks are ignored. A marker is one HTML comment on
+/// one line: `<!-- index: Term -->` or `<!-- index: Term | see: Other -->`.
+pub(crate) fn index_hits(page: &str, markdown: &str) -> Result<Vec<IndexHit>, String> {
+    let mut hits = Vec::new();
+    let mut fence: Option<(char, usize)> = None;
+    let mut page_title = String::new();
+    let mut last_anchor = String::new();
+    let mut last_label = String::new();
+    let mut slug_counts: BTreeMap<String, usize> = BTreeMap::new();
+    for line in markdown.lines() {
+        let heading = line.trim_start();
+        let indentation = line.len() - heading.len();
+        let marker = heading.chars().next();
+        let marker_len = marker.map_or(0, |ch| heading.chars().take_while(|c| *c == ch).count());
+        if let Some((fence_marker, fence_len)) = fence {
+            if marker == Some(fence_marker)
+                && marker_len >= fence_len
+                && heading[marker_len..].trim().is_empty()
+            {
+                fence = None;
+            }
+            continue;
+        }
+        if indentation <= 3
+            && marker_len >= 3
+            && let Some(marker @ ('`' | '~')) = marker
+        {
+            fence = Some((marker, marker_len));
+            continue;
+        }
+        if indentation <= 3 && heading.starts_with('#') {
+            let rest = heading.trim_start_matches('#');
+            let level = heading.len() - rest.len();
+            if (1..=6).contains(&level) && rest.starts_with(char::is_whitespace) {
+                let title = rest.trim().trim_end_matches('#').trim();
+                if !title.is_empty() {
+                    let label = index_label(title);
+                    let slug = crate::manual::slug(title);
+                    *slug_counts.entry(slug.clone()).or_insert(0) += 1;
+                    if level == 1 && page_title.is_empty() {
+                        page_title.clone_from(&label);
+                    }
+                    last_anchor = slug;
+                    last_label.clone_from(&label);
+                    if (level == 2 || level == 3) && !label.is_empty() {
+                        hits.push(IndexHit {
+                            term: label,
+                            see: None,
+                            page: page.to_string(),
+                            page_title: String::new(),
+                            anchor: last_anchor.clone(),
+                            anchor_label: last_label.clone(),
+                            marker: false,
+                        });
+                    }
+                }
+            }
+        }
+        for (term, see) in index_markers(line).map_err(|err| format!("{page}: {err}"))? {
+            let term = index_label(&term);
+            if term.is_empty() {
+                return Err(format!("{page}: index marker has an empty term"));
+            }
+            let see = see
+                .map(|target| index_label(&target))
+                .filter(|target| !target.is_empty());
+            if see.is_none() && index_label_was_see_empty(line) {
+                return Err(format!("{page}: index marker has an empty see target"));
+            }
+            hits.push(IndexHit {
+                term,
+                see,
+                page: page.to_string(),
+                page_title: String::new(),
+                anchor: last_anchor.clone(),
+                anchor_label: last_label.clone(),
+                marker: true,
+            });
+        }
+    }
+    if page_title.is_empty() {
+        page_title = page.rsplit('/').next().unwrap_or(page).to_string();
+    }
+    for hit in &mut hits {
+        hit.page_title.clone_from(&page_title);
+        // A slug shared by two headings is not a legal fragment. Link the page.
+        if !hit.anchor.is_empty() && slug_counts.get(&hit.anchor).copied() != Some(1) {
+            hit.anchor.clear();
+        }
+    }
+    Ok(hits)
+}
+
+/// Drops backticks so a heading can sit in a markdown table or a bold index row.
+fn index_label(title: &str) -> String {
+    let mut out = String::new();
+    let mut space = false;
+    for ch in title.chars() {
+        if ch == '`' {
+            continue;
+        }
+        if ch.is_whitespace() {
+            space = true;
+            continue;
+        }
+        if space && !out.is_empty() {
+            out.push(' ');
+        }
+        space = false;
+        out.push(ch);
+    }
+    out
+}
+
+/// True when `line` has an index marker whose `see:` target is empty.
+fn index_label_was_see_empty(line: &str) -> bool {
+    index_markers(line).is_ok_and(|markers| {
+        markers
+            .iter()
+            .any(|(_, see)| see.as_ref().is_some_and(|target| index_label(target).is_empty()))
+    })
+}
+
+/// Every `<!-- index: ... -->` comment on `line`. Other comments are skipped.
+fn index_markers(line: &str) -> Result<Vec<(String, Option<String>)>, String> {
+    let mut out = Vec::new();
+    let mut rest = line;
+    while let Some(start) = rest.find("<!--") {
+        let after = &rest[start + 4..];
+        let Some(end) = after.find("-->") else {
+            if after.trim_start().starts_with("index:") {
+                return Err("index marker is missing -->".to_string());
+            }
+            break;
+        };
+        let body = after[..end].trim();
+        if let Some(parsed) = parse_index_body(body)? {
+            out.push(parsed);
+        }
+        rest = &after[end + 3..];
+    }
+    Ok(out)
+}
+
+/// Parses the inside of an index comment. `None` when it is some other comment.
+fn parse_index_body(body: &str) -> Result<Option<(String, Option<String>)>, String> {
+    let Some(rest) = body.trim().strip_prefix("index:") else {
+        return Ok(None);
+    };
+    let rest = rest.trim();
+    if rest.is_empty() {
+        return Err("index marker has an empty term".to_string());
+    }
+    if let Some((term, tail)) = rest.split_once('|') {
+        let tail = tail.trim();
+        let Some(target) = tail.strip_prefix("see:") else {
+            return Err(format!("index marker has {tail:?} where `see:` was expected"));
+        };
+        let target = target.trim();
+        if target.is_empty() || term.trim().is_empty() {
+            return Err("index marker has an empty term or see target".to_string());
+        }
+        return Ok(Some((term.trim().to_string(), Some(target.to_string()))));
+    }
+    Ok(Some((rest.to_string(), None)))
+}
+
 /// A row of the `book/COVERAGE.md` method table: a method name and the agent page that documents
 /// it (a path relative to `book/`).
 pub(crate) struct CoverageRow {
@@ -978,9 +1168,22 @@ pub fn run(root: &Path) -> Result<std::process::ExitCode> {
     errors.extend(crate::agent_examples::book_check_errors(root));
 
     // Generated reference pages lag the code until `cargo xtask manual` runs; say so, without
-    // failing lanes that changed the code but not the book.
-    for page in crate::manual::stale_generated_pages(&book)? {
-        eprintln!("warning: book/{page} is out of date; run `cargo xtask manual`");
+    // failing lanes that changed the code but not the book. The comparison renders the pages
+    // from workspace sources (the feature inventory, glossary and catalog files). A book without
+    // one of them, such as a test fixture, gets a warning (ADR-10723): only an error whose chain
+    // holds `io::ErrorKind::NotFound` is a warning. A source that is present and fails to render
+    // (a malformed inventory, a glossary that fails its checks, a bad index marker) is an error,
+    // because the gate runs book-check and not `cargo xtask manual --check`.
+    match crate::manual::stale_generated_pages(&book) {
+        Ok(pages) => {
+            for page in pages {
+                eprintln!("warning: book/{page} is out of date; run `cargo xtask manual`");
+            }
+        }
+        Err(err) if is_not_found(&err) => eprintln!(
+            "warning: the generated reference pages were not compared ({err:#}); run `cargo xtask manual`"
+        ),
+        Err(err) => errors.push(format!("generated reference pages: {err:#}")),
     }
 
     if errors.is_empty() {
@@ -996,6 +1199,16 @@ pub fn run(root: &Path) -> Result<std::process::ExitCode> {
         eprintln!("book-check: {} problem(s)", errors.len());
         Ok(std::process::ExitCode::FAILURE)
     }
+}
+
+/// Whether `err`'s chain holds an IO error of kind `NotFound`: a generated page's source file is
+/// missing (ADR-10723), as opposed to present and broken.
+fn is_not_found(err: &anyhow::Error) -> bool {
+    err.chain().any(|cause| {
+        cause
+            .downcast_ref::<std::io::Error>()
+            .is_some_and(|io| io.kind() == std::io::ErrorKind::NotFound)
+    })
 }
 
 #[cfg(test)]
@@ -1069,6 +1282,27 @@ mod tests {
             !fixture_errors(&[("a.md", "~~~markdown\n# Code Example\n~~~\n[x](#code-example)\n",)])
                 .is_empty()
         );
+    }
+
+    #[test]
+    fn index_hits_skip_fences_and_keep_see_targets() {
+        let markdown = "# Page\n\n## Lockstep\n\n<!-- index: Dedicated server | see: Listen server -->\n\n\
+```html\n<!-- index: Hidden -->\n```\n\n### Join code\n";
+        let hits = index_hits("user-guide/networking.md", markdown).expect("markers");
+        let terms: Vec<&str> = hits.iter().map(|hit| hit.term.as_str()).collect();
+        assert_eq!(terms, ["Lockstep", "Dedicated server", "Join code"]);
+        assert_eq!(hits[1].see.as_deref(), Some("Listen server"));
+        assert!(hits[1].marker);
+        assert!(!hits[0].marker);
+        assert_eq!(hits[0].anchor, "lockstep");
+        assert_eq!(hits[0].page_title, "Page");
+        let duplicated = index_hits("a.md", "# Page\n\n## Actions\n\n### Actions\n").expect("dup");
+        assert!(
+            duplicated.iter().all(|hit| hit.anchor.is_empty()),
+            "an ambiguous heading slug is not used as a fragment"
+        );
+        assert!(index_hits("a.md", "<!-- index:  -->\n").is_err());
+        assert!(index_hits("a.md", "<!-- index: Term | other: X -->\n").is_err());
     }
 
     /// integ-v049a (ADR-5923): every heading level makes an anchor. Only `# ` headings were

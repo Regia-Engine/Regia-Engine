@@ -11,8 +11,11 @@ $ regia run --dev      # the same, re-cooking saved assets and reloading them wh
 $ cargo run -p my_game_launcher   # just build and run (cook with `regia cook` first)
 ```
 
-`regia run` and `regia run --dev` need the `launcher/` crate of the workspace templates; in a
-[quick app](../user-guide/quick-start.md) use `cargo run`. To cook without running (after you
+`regia run` and `regia run --dev` need the `launcher/` crate (`<name>_launcher`) that the `blank`,
+`first_person`, `third_person` and `top_down` templates have; in a [quick app](../user-guide/quick-start.md)
+use plain `cargo build` and `cargo run`, and in a `net_game` project plain `cargo build`, then
+`cargo run -p <name>_server` and `cargo run -p <name>_client` as its `README.md` says. Run in either kind of
+project, `regia run` says so and prints what to run instead. To cook without running (after you
 change assets, before a `cargo run`), from the project folder:
 
 ```sh,walkthrough=cook

@@ -1,11 +1,13 @@
 # Procedural graph
 
+Panel id: `proc_graph`.
+
 The **Procedural Graph** tab edits a `.pgraph.ron` as a node canvas: generators, filters and
 spawners wired together, previewed live on a bound generator, with per-node visualization in the
 viewport, a data table per node, and Paint and Box tools for masks. Double-click a `.pgraph.ron`
 or `.pgvar.ron` in the [Content browser](content-browser.md) to open it. Edits go on the shared
 undo stack. Depth: [Procedural graph editor](../../agents/procgen-editor.md), [Procedural
-generators](../../agents/procgen.md).
+generators](../../agents/procgen.md). Spec: `docs/specs/67-procedural-graph-editor.md`.
 
 The node keys act on the selected nodes while no text field has focus.
 

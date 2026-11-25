@@ -1,5 +1,8 @@
 # Replay playback (ReplaySim)
 
+<!-- index: Replay -->
+<!-- index: ReplaySim -->
+
 `regia_framework::replay_sim::ReplaySim` plays a Direct Order 27 `.do27replay` (version 2, 3 or 4)
 for rendering, camera and VFX work. Playback never re-simulates: between two recorded full
 snapshots the entity set is the last full's, unless sub-tick blending is on (below). It is an `ExternalSim`, so the
@@ -8,6 +11,10 @@ that the agent protocol drives without a window ([agent page](../agents/replay.m
 
 No DO27 data is in this repository. The test helper `replay_sim::SyntheticReplay` builds replay bytes
 record by record for tests and tools.
+
+This file is presentation playback. It does not re-simulate a match. A lockstep match recorded for
+a bit-for-bit audit is a `.lsreplay`, checked with `regia net replay-audit`. A desync bundle is a
+`.desync.ron`. Both are in [Lockstep and rollback](../how-to/online/lockstep-and-rollback.md).
 
 V4 files load directly, including their extra header labels and the map-extent/training
 records that presentation does not use. The labels are validated and discarded; those two

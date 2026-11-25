@@ -28,7 +28,7 @@ pub mod quality;
 pub mod sun;
 pub mod ui;
 
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::sync::Arc;
 
 use regia::prelude::*;
@@ -804,8 +804,20 @@ pub fn find_default_scene() -> Option<PathBuf> {
     let beside_exe = std::env::current_exe()
         .ok()
         .and_then(|exe| exe.parent().map(|dir| dir.join("example_scene")));
-    let source = Path::new(env!("CARGO_MANIFEST_DIR")).join("example_scene");
-    [beside_exe, Some(source)]
+    // Runtime path (ADR-10370): the compile-time manifest dir would embed the build machine.
+    let source = std::env::var_os("CARGO_MANIFEST_DIR")
+        .map(|dir| PathBuf::from(dir).join("example_scene"))
+        .or_else(|| {
+            let root = std::env::current_exe()
+                .ok()?
+                .parent()?
+                .parent()?
+                .parent()?
+                .to_path_buf();
+            let scene = root.join("samples").join("showcase").join("example_scene");
+            scene.is_dir().then_some(scene)
+        });
+    [beside_exe, source]
         .into_iter()
         .flatten()
         .find(|dir| dir.join("scene.ron").is_file())

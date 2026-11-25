@@ -1,5 +1,8 @@
 # Data tables
 
+<!-- index: Data table -->
+<!-- index: .table.ron | see: Data table -->
+
 A data table holds rows of one Rust struct, each row named by a key: weapons, enemy waves, level-up costs, shop
 prices. Designers edit the table in a text editor or a spreadsheet, the game reads typed rows, and agents can read
 and change it while the game runs. Spec: `docs/specs/content-data.md` § 3; format: `docs/formats/data-table-ron.md`;

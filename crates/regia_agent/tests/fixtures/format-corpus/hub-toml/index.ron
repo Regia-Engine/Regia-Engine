@@ -5,7 +5,13 @@
             version: 1,
             file: "v1.toml",
             origin: "hand-written from the v1 contract, ADR-8648",
-            exercises: "the current version: the default hub.toml the package stages",
+            exercises: "version 1 still loads; upgrade-project migrates it to version 2 with relay.enabled false",
+        ),
+        (
+            version: 2,
+            file: "v2.toml",
+            origin: "the default hub.toml a fresh package stages, ADR-10397",
+            exercises: "the current version: relay enabled, port 7812, ban file and log dir",
         ),
     ],
 )

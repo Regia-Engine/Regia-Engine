@@ -1,5 +1,7 @@
 # Asset Viewer
 
+Panel id: `asset_viewer`.
+
 The **Asset Viewer** tab previews a mesh, a texture or a sound from the project without putting it in
 the level. A mesh is drawn in an orbit render with its LOD chain, parts and materials, and optional
 overlays; a texture shows its mip chain and one channel at a time; a sound shows its waveform and

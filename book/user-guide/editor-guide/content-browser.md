@@ -1,5 +1,7 @@
 # Content browser
 
+Panel id: `content`.
+
 The **Content** tab (first tab under the viewport) is the project's `assets/` folder: a folder
 tree and a list or thumbnail grid of assets, with search, create, import, validate, rename,
 move, delete (after a check of what refers to the asset) and reimport. Drag an asset into the

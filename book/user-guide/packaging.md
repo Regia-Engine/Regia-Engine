@@ -1,7 +1,19 @@
 # Packaging
 
+<!-- index: Package -->
+<!-- index: Cook -->
+<!-- index: pak -->
+<!-- index: AppImage -->
+<!-- index: Dedicated server -->
+<!-- index: Build container -->
+<!-- index: Container image | see: Build container -->
+<!-- index: sbom.json -->
+<!-- index: Engine credit -->
+
 Packaging cooks your assets, builds the launcher and assembles a distributable. The pipeline is
-`docs/specs/21-tooling-and-packaging.md`.
+`docs/specs/21-tooling-and-packaging.md`. The step-by-step with a finished check is
+[Package a game](../how-to/platforms/package-a-game.md). Platforms are Linux, Windows, and Android.
+macOS is testing-only and is not a package target ([macOS](macos.md)).
 
 ## Cook
 
@@ -98,6 +110,10 @@ $ regia package --platform android --format apk --profile shipping  # → dist/a
 $ regia package --platform android --format aab               # → dist/android/<slug>.aab (Play Store)
 ```
 
+`--format dir` on Linux leaves the staged directory and does not write an archive. `--format app`
+is rejected on every platform (the macOS app bundle is not built, ADR-264). An AAB is a store
+bundle of the game. It does not include Google Play services; those services are parked.
+
 Linux also builds an AppImage (`--format appimage`, or `formats = ["tar", "appimage"]` under
 `[platforms.linux]` in `Regia.toml`; see [Linux AppImage](#linux-appimage)). `[platforms.<p>]
 render_profile = "MobileHigh"` (any render profile preset: `MobileLow`, `MobileHigh`, `DesktopLow`,
@@ -184,11 +200,61 @@ Every shipping package (built-in `shipping` or a profile) is checked: it fails w
 server, editor code or the dev asset watcher in the binary, or those features in the game's `Cargo.toml`. A playtest profile can keep the agent
 with `allow_agent = true`.
 
+## Compare a dev run with the package (`regia package parity`)
+
+<!-- index: Package parity -->
+<!-- index: regia package parity -->
+
+`regia package parity` (ADR-8428) compares asset opens from a development run with asset opens from
+an extracted package. It is not a clap subcommand of `regia package`: the binary handles the two
+words before clap, so `regia package --help` does not list it. `regia package parity --help` prints
+the usage.
+
+Two traces you already recorded:
+
+```console
+$ regia package parity --dev-trace dev.log --dev-root . --package-trace pkg.log --package-root out/pkg
+```
+
+Or two programs. The tool sets `REGIA_ASSET_TRACE` and `REGIA_PARITY_ROOT` on each child and runs it. There is no `regia play` subcommand. Pass the dev launcher and the packaged binary:
+
+```console
+$ regia package parity --dev-command 'regia run' --package-command './my_game' \
+    --dev-root . --package-root out/pkg --json
+```
+
+`regia run` opens a window. `--script FILE` checks that the file exists and sets `REGIA_PARITY_SCRIPT` on the child. No engine system reads that variable, so the file does not drive input by itself.
+
+| Exit | Meaning |
+|---|---|
+| 0 | The package accounts for every dev open |
+| 1 | A dev open is missing. Drift is listed and does not fail the run unless `--strict-drift` |
+| 2 | A usage error, `parity_script_missing` (the `--script` path is not a file), or `parity_run_failed` |
+
+`parity_script_missing` and `parity_run_failed` are exits of this command. They are not
+agent-protocol error codes. `--report-md PATH` and `--report-json PATH` write the report beside
+the terminal. `--json` prints one JSON object on stdout instead of the markdown. The object has
+`ok`, `missing`, `drift`, `dieted`, `cooked`, `never_touched`, and `exit_code`. `never_touched`
+does not fail the run.
+
+`--classify` reads strace open traces instead (`--trace FILE`, repeatable, or a directory;
+`--root DIR`; optional `--manifest`; `--json` or `--markdown`). Exit 0 prints the classification.
+Exit 2 is a usage error or an unreadable trace, root, or manifest. `regia package parity
+--classify --help` prints that form.
+
+The line format of `REGIA_ASSET_TRACE` is [Asset access trace](../agents/asset-access-trace.md).
+The agent method `package.parity` reads the same four paths and does not launch a process. Its
+error codes (`parity_bad_params`, `parity_not_a_directory`, `parity_trace_missing`) are on
+[Package parity (agents)](../agents/package-parity.md). It does not accept `--strict-drift`.
+Hygiene, which rejects bytes inside staged files, is a different check
+([Package hygiene](package-hygiene.md)).
+
 ## Dedicated servers
 
 `regia package --server --platform linux` (or `windows`) packages the game with no window, renderer or audio: the
 game's `server` feature, a content filter that removes presentation assets, a default `server.toml`, an empty `bans.ron`
-and a `README-server.txt`. The game declares the feature and builds `regia` without its defaults:
+and a `README-server.txt`. Any other platform, including Android, exits 2 with
+`server_platform_unsupported`. macOS is not a package platform. The game declares the feature and builds `regia` without its defaults:
 
 ```toml
 [dependencies]
@@ -424,6 +490,12 @@ lacks are reported as warnings: bundle them next to the binary (shipping builds 
 rpath, which is also how `libsteam_api.so` is found).
 
 ### Build containers
+
+<!-- index: steam-sniper -->
+<!-- index: debian12 -->
+
+This builds the game binary inside a toolchain image. It does not write an image of the game.
+The artifact is still the tar, the directory, or the AppImage from the format you asked for.
 
 cargo-zigbuild relinks the game against an older glibc's symbol list, but C and C++ dependencies
 still compile with this machine's headers and `libstdc++`. `--container` builds the whole binary

@@ -1,5 +1,13 @@
 # Input
 
+<!-- index: Input action -->
+<!-- index: Input binding -->
+<!-- index: Input rebinding -->
+<!-- index: Input context -->
+<!-- index: Cursor grab -->
+<!-- index: Virtual stick -->
+<!-- index: Touch controls -->
+
 `regia_input` turns platform input into two things you use: **messages** (raw events) and
 **actions** (named, mapped inputs). Actions are the portable form: the same gameplay code runs on
 keyboard and mouse, gamepads and touch, and the bindings can be changed by the player at runtime.
@@ -164,9 +172,34 @@ hands the action back to its device bindings. While a finger rests on the stick,
 over the keyboard for that action. `TouchControls` (screen zones and gestures without widgets) uses
 the same path.
 
+## Cursor grab
+
+A look-driven game writes `cursor_grab` on the `Window` component: `CursorGrab::Locked` while
+playing, `CursorGrab::None` while a menu is open, `CursorGrab::Confined` when the cursor should
+stay inside the window and remain visible. Apply the change on the main thread. A system that
+calls the OS setter from a worker pool deadlocks the frame on Windows. Take `NonSendMarker` so
+the system stays on the main thread. The same rule covers `set_title` and `request_inner_size`.
+
+winit 0.30 does not implement every grab on every backend. Regia rewrites the request before it
+is sent, and logs the rewrite once per process:
+
+| Request | Windows | X11 and Xwayland | Wayland | macOS |
+|---|---|---|---|---|
+| `Locked` | requested as `Confined` | requested as `Confined` | `Locked` | `Locked` |
+| `Confined` | `Confined` | `Confined` | `Confined` | requested as `Locked` |
+| `None` | `None` | `None` | `None` | `None` |
+
+A grab the OS still rejects is retried on a later frame. The component keeps the mode you asked
+for. The fallback is only the mode sent to the window. Tell players who read a settings label
+that "locked" on Windows and X11 confines the cursor to the window. On macOS, "confined" hides
+and locks it, because that platform has no confine.
+
+The behavior is [spec 11](../../docs/specs/11-platform-and-input.md) §§ 5–7, implemented in
+`regia_platform::window_os`.
+
 ## Testing input
 
 The agent protocol can inject raw events and scheduled action values (`play.inject_input`), and
 `InputInjection` does the same from a test, so input-driven behavior runs deterministically in
 CI. See the [agent guide's testing page](../agents/testing.md). Input specification:
-`docs/specs/11-platform-and-input.md` §§ 5–7.
+[spec 11](../../docs/specs/11-platform-and-input.md) §§ 5–7.

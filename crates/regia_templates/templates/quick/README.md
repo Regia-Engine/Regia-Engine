@@ -9,12 +9,14 @@ cargo run
 The first build compiles the engine through the path dependency written by `regia new`
 (`{{engine}}`). Move the project and that path must be updated.
 
-A release binary should not name the machine that built it. The engine's own data and the
-packaging gate keep private build-machine strings out; if your code needs the project
-directory at runtime, read the `CARGO_MANIFEST_DIR` environment variable instead of
-`env!("CARGO_MANIFEST_DIR")` (the compile-time form embeds this machine's absolute path in
-the binary), and if you set `RUSTFLAGS`, put your build machine's home directory last among
-your `--remap-path-prefix` flags (rustc applies the last matching one; see ADR-10354).
+A release binary should not name the machine that built it. `regia new` writes
+`.cargo/config.toml` with directory-root remaps and appends this machine's home
+directory as the last `--remap-path-prefix` (ADR-10370). Copying the template by hand
+does not append that line. If your code needs the project directory at runtime, read
+the `CARGO_MANIFEST_DIR` environment variable instead of `env!("CARGO_MANIFEST_DIR")`
+(the compile-time form embeds this machine's absolute path in the binary). If you set
+`RUSTFLAGS`, restate the remap flags there and put the home directory last (rustc
+applies the last matching one; see ADR-10354).
 
 `src/main.rs` has three functions:
 

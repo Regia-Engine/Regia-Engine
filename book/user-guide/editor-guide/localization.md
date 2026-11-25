@@ -1,5 +1,7 @@
 # Localization
 
+Panel id: `localization`.
+
 The **Localization** tab shows the project's Fluent translation files as a table: one row per key, one column per
 locale (the source locale first), each cell colored by its state. Edit a translation in place, gather the keys the
 content and code use, find where a key is used, preview pseudo-localization in the viewport, and hand a locale to a

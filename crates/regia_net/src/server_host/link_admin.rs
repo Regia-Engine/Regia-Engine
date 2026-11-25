@@ -38,7 +38,8 @@ use std::net::{IpAddr, SocketAddr};
 
 use regia_ecs::prelude::*;
 
-use super::{HostOpError, HostedLink, op_err, parse_player_id, resolve_target, unban_entry};
+use super::ecs_host::{op_err, resolve_target};
+use super::{HostOpError, HostedLink, parse_player_id, unban_entry};
 use crate::model::PeerId;
 use crate::session::NetSession;
 use crate::session::bans::{BanId, BanKind, BanSubject};

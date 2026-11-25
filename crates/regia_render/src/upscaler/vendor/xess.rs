@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MPL-2.0
 //! Intel XeSS SR adapter for the vendor slot (ADR-4656).
 //!
 //! The `xess` feature uses an external Windows SDK. Missing SDKs and runtimes keep the

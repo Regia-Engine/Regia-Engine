@@ -1,5 +1,9 @@
 # Checking your machine with `regia doctor`
 
+<!-- index: regia doctor -->
+<!-- index: Doctor -->
+<!-- index: verify-paks -->
+
 `regia doctor` looks for everything a build needs and prints, for each problem, the command that fixes it.
 
 ```console
@@ -35,4 +39,17 @@ larger volume.
 `0` nothing failed (warnings are fine), `1` a check failed, `2` bad arguments. `--json` prints the same checks for
 tools; the schema, every code and the pak-verification form are in [Toolchain doctor (agents)](../agents/doctor.md).
 
-Related: [Installing Regia Engine](../start/install.md), [Android](android.md).
+## Pak integrity (`--verify-paks`)
+
+```console
+$ regia doctor --verify-paks dist/linux/<slug>/content
+$ regia doctor --verify-paks dist/linux/<slug>/content --json
+```
+
+This checks the whole-file content hash of every `.fpak` in that directory and runs no other doctor
+check. A matching hash is `[ok]`. A pak with no content hash is `[--]` (unhashed) and is not a
+failure. A mismatch is `[FAIL]`. One or more corrupt paks is a non-zero exit, with a count. `--json`
+prints schema 1, `kind` `regia_doctor_paks`, `ok`, `corrupt`, and `paks`.
+
+Related: [Installing Regia Engine](../start/install.md), [Linux](linux.md), [Android](android.md),
+[Package a game](../how-to/platforms/package-a-game.md).

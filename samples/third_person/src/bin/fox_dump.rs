@@ -5,7 +5,12 @@ use regia_asset::AssetManifest;
 use std::path::PathBuf;
 
 fn main() {
-    let cache = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join(".regia/cooked/linux");
+    // Runtime path: `env!("CARGO_MANIFEST_DIR")` would embed the build machine (ADR-10370).
+    let manifest = std::env::var_os("CARGO_MANIFEST_DIR").map_or_else(
+        || std::env::current_dir().unwrap_or_else(|_| PathBuf::from(".")),
+        PathBuf::from,
+    );
+    let cache = manifest.join(".regia/cooked/linux");
     let manifest =
         AssetManifest::from_postcard(&std::fs::read(cache.join("asset_manifest.bin")).expect("manifest"))
             .expect("parse");

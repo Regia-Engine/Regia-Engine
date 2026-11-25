@@ -84565,6 +84565,616 @@ Consequences: `engine_scenarios` stays red at the freeze head until the lead's
 re-record; every other det scenario passes. No bar, tolerance or golden file is changed
 by this lane.
 
+## ADR-10375: Delegated hub sessions, relay-only reach, and an ECS-free join surface (spec 89 NL-07..NL-11)
+Date: 2026-11-22   Status: proposed
+Context: BZ-28 (pinned to v0.6.1, request R23, relayed 2026-11-22) wants players to browse one community hub
+and never see an IP, with a listen session or a dedicated server the player owns, and with the relay as a
+fallback or as the only path when the host hides its address. The v0.7 freeze already has the hub (NL-04,
+ADR-8559), join brokering (NL-05, ADR-8607) and the packaged hub process (NL-06, ADR-8648). Spec 10's
+"v0.6 NL-07" is peer logging (ADR-8149), so the lobby rows continue at NL-07 inside spec 89 and do not
+reuse that id. `PlayerKey` and `ServerKey` are X25519 (`crypto`). `server_host` is behind the `ecs`
+feature because the module imports `regia_app` and `regia_ecs`, which also hides `relay_split`,
+`JoinTicket`, `JoinPath`, `JoinSocket` and `RelayRegistrar` even where those files do not use the ECS.
+`RelayRegistrar` additionally names `LinkSocket`, an alias in the ecs-only `link` module. `HubReach` is
+ecs-only because it calls `JoinPath`. A measured reading of the freeze (spec 89 § 16.1) shows: `server_host`
+never opens a hub lobby; `broker_reach` still plans a punch when the only offer is a relay, and `approve`
+copies both sides' candidates; members receive `ServerSet` with the session address; `regia-lobby-hub`
+does not run `RelayServer`.
+Decision: (1) **Binding.** An owner binds a server by a Noise `X` message to the hub's `ServerKey`
+(prologue `regia.lobby_hub.server_binding v1`, payload `version || server_key || expiry_ms || serial`),
+verified by the hub with the same `snow` path as `verify_player_proof`, including the RFC 7748 low-order
+check. No Ed25519 key is added. RFC 8032 is not the construction. Empty proof list = ownerless public
+server, which may create its own public lobby (request 1.7, absent today). Up to 8 owners per server.
+Revocation is a hub-side set of `(player_key, server_key, serial)`, persisted in `revocations.ron`, and it
+refuses that owner's next `CreateDelegated` in the same call. Existing lobbies stay up. (2) **Delegated
+lobby.** The bound server, not the owner, sends `ReachOffer` and `Approve`, using capacity, `bans.ron`,
+the password gate and `JoinTicketCheck`. The owner keeps kick, close, settings and explicit transfer to
+another bound owner. Owner disconnect starts a grace (`grace_ms`, default 600_000, cap 86_400_000, `0` =
+indefinite) and does not emit `OwnerChanged` and does not assign the server as owner. Listen lobbies keep
+the ADR-8633 hand-off. This amends ADR-8559 and ADR-8633 for delegated lobbies only. (3) **Relay-only.**
+A flag on the server, the lobby or one offer. Empty candidates are not the flag: today's `broker_reach`
+still returns `Punch`. When the flag is set the path is `Relay` or `NoReach`, both plans carry no
+candidates, and the member's ticket is rewritten to an unspecified address so the ticket bytes leak
+nothing. `JoinPath::relay_first` and a registrar that does not introduce that member enforce it on the
+relay socket. Checked on wire bytes. (4) **Addresses.** Version-2 rooms and directory cards carry no
+`SocketAddr`. `ServerSet` becomes `SessionConfirmed { confirmed: bool }`. `regia.server` and any lobby or
+member value that parses as an address is `hub_address_in_data`. The only address channel is one member's
+plan and that session's plan, and only when relay-only is clear. AskReach adds 4/10 s per key, 16/10 s per
+address, 2 in-flight per key, 64 in-flight on the hub, on top of `AdmitGate`'s 30/s and 20/s. A banned
+player key (owner, server or hub file) is refused before any candidate is copied. (5) **Admin** stays on
+`server_host`'s `admin.token`. The hub does not carry it. Named out in spec 89 § 16.6. (6) **ECS-free.**
+Move `relay_split`, `JoinPath`, `JoinSocket`, `JoinTicket` and a generic `RelayRegistrar<S: DatagramSocket>`
+into `regia_net::join_exec` (always compiled). `HubReach` follows. `server_host` re-exports the old paths
+and stays `ecs`. (7) **Process.** Extend `regia-lobby-hub`; do not add a binary. `hub.toml` format 2 adds
+relay port 7812, the AskReach numbers, a ban file and a log dir. v1 migrates with `relay.enabled = false`.
+Key rotation is a second process and a client pin list (new, then old), because one Noise handshake holds
+one static key. Overlap is an operator window, not a wire field. (8) **Wire.** `HUB_WIRE_VERSION` 2.
+Every new count and string is capped before allocation (spec 89 § 16.2). The hub socket drops `RGN1` and
+`RGNR`. (9) **This lane is the spec.** No runtime code. Build lanes and the acceptance rows are in the
+lane report. `docs/formats/hub-toml.md` is not edited here; the build lane bumps it with the migrator.
+Consequences: games can pin a hub and a dedicated `ServerKey` without learning the owner's address, and can
+run the join on a socket they own without linking the ECS. Host-visible breaks, landed by the build lanes,
+are listed in `docs/releases/v0.1.28-v08-spec-net-delegated-sessions.md` (wire 2, `ServerSet` removed,
+`ReachOffer.relay_only`, `hub.toml` v2, new `HubError` codes, `HubReach` available without `ecs`). No new
+crate dependency. No golden. Listen-lobby owner hand-off is unchanged. Remote admin is unchanged.
+
+## ADR-10378: Hub wire generation 2 stays compatible with a v0.7.0 client
+Date: 2026-11-22   Status: proposed
+Context: BZ-28 request R23 ships in v0.7.1 as an additive patch on the v0.7 line (spec 89 § 16.2,
+NL-07..NL-11, ADR-10375). ADR-10375 (8) and acceptance row 10 say a version-1 peer and a version-2
+hub refuse each other at the handshake with `protocol_mismatch`. The lead's patch-compatibility
+ruling overrides that: a v0.7.0 client must keep working against a v0.7.1 hub, and a v0.7.1 client
+must keep working against a v0.7.0 hub. This lane is encode and decode only. Binding checks, grace
+behavior, relay-only planning and the AskReach rate limits are later lanes. `hub.toml` v2 and its
+migrator are NL-11.
+Decision: (1) `HUB_WIRE_VERSION` is the codec generation and is 2. `HubWire::PROTOCOL_VERSION` stays
+`HUB_WIRE_VERSION_V1` (1), so `protocol_id` does not change and the handshake still completes.
+`HubWire::GAME_VERSION` is `"2"`, which the version probe reports and which is not part of
+`protocol_id`. A client treats game version `"2"` as codec generation 2 and every other text,
+including empty and `"2.0"`, as generation 1. (2) A missing tail is the version-1 message. `Offer`,
+`AskReach` and the plan's synthetic offer append one byte `1` only when `relay_only` is true. A
+trailing `0` stays an error. Directory and room tails, when any extra is non-default, start with
+marker `0xA2`. `ServerSet` and `RoomState.server` stay, so a v0.7.0 member still receives the
+session address. `SessionConfirmed` is added beside them and carries no address. (3) A version-2-only
+request (`RegisterServer`, `RevokeBinding`, `CreateDelegated`, `SetReachMode`, `SetBans`,
+`CloseLobby`) from a peer that has not announced generation 2 is `HubError::NeedsWireV2`
+(`hub_needs_wire_v2`). The hub replies `Refused` and does not disconnect. `AnnounceWire` with any
+byte other than 2 is the same refusal and does not raise the dialect. A v0.7.1 client that has
+recorded a v0.7.0 hub (game version other than `"2"`) returns `hub_needs_wire_v2` locally and sends
+nothing. (4) The new calls decode and the host arms are exhaustive. Their behavior returns
+`HubError::NotReady` (`hub_not_ready`) until the next lane. `plans_for` is the exception: it returns
+today's mapped, punch or relay plans and ignores `relay_only`. (5) Caps are checked before any
+`Vec::with_capacity` from an untrusted count: 8 owner proofs, each proof a fixed 145-byte array,
+game version 32 bytes, 256 server bans, 64 lobby bans. A grace `u32` outside `0` or
+`1..=86_400_000` is `WireError::Invalid("hub grace")`. Spec 89 § 16.2 says `RegisterServer` clamps
+a larger grace to 24 h. This codec rejects it. The behavior lane clamps only a value the codec
+already accepted. `GraceStarted.deadline_ms` is an absolute timestamp and is not range-checked.
+(6) The 49-byte binding payload encodes and decodes. `verify_binding` and `verify_server_presence`
+return `hub_not_ready` and do not run Noise.
+Consequences: v0.7.0 listen lobbies and today's brokering still work against a v0.7.1 hub, and the
+reverse. Exhaustive matches on `HubRequest`, `HubEvent` and `HubError` gain arms. Struct literals of
+`ReachOffer`, `HubLobbyCard`, `RoomState` and `DirectoryPage` that name every field gain
+`relay_only`, the lobby extras, and `servers`. `HubLobbyCard`'s new fields are `#[serde(default)]`.
+No `hub.toml` change. No new agent method. `hub_needs_wire_v2` and `hub_not_ready` show up in
+`lobby.hub_status`'s `refused` map. The api snapshot for `regia_net` records the break. No new
+dependency. No golden. `plans_for` keeps eight arguments, the signature the later lanes call.
+`#[allow(clippy::too_many_arguments)]` on that function records the freeze. Clippy's limit is 7.
+
+## ADR-10384: Delegated hub sessions run on the v0.7.1 hub
+Date: 2026-11-22   Status: proposed
+Context: BZ-28 request R23, spec 89 § 16.3 and § 16.7 (NL-07), on top of ADR-10375 and the wire
+codec of ADR-10378. A v0.7.0 client must keep working against a v0.7.1 hub. This lane runs binding
+verify, server presence, ownerless create, grace, the server's offer and approve, and revocation.
+Relay-only planning (NL-08), AskReach windows (NL-09), the ECS-free move (NL-10) and `hub.toml`
+format 2 (NL-11) stay later lanes. `wire.rs` is not edited.
+Decision: (1) Binding and presence are Noise pattern `X` (`Noise_X_25519_ChaChaPoly_BLAKE2s`) in
+`regia_net::crypto::binding`. Prologues are `regia.lobby_hub.server_binding v1` and
+`regia.lobby_hub.server_presence v1`. The binding payload is the fixed 49 bytes. The low-order
+check is the all-zero X25519 output, copied from `verify_player_proof`, and it runs after the
+constant-time payload compare (ADR-8734). Crypto failure is `hub_binding_invalid`. Expiry `0` does
+not expire. Any other expiry must be at most 366 days ahead (`31_622_400_000` ms) or the proof is
+`hub_binding_invalid`. A past expiry is `hub_binding_expired`. More than 8 owner proofs is
+`hub_binding_invalid`. (2) `CreateDelegated` needs a proven player, an online server and a live
+binding. The lobby kind is dedicated, the stored address is empty, and `regia.server` in that spec
+data is `hub_address_in_data`. Listen create still stores the session address and still emits
+`ServerSet`. An ownerless register (no proofs) may `create` a public lobby; the displayed owner is
+the server handle. A later register that adds owners while an ownerless lobby exists is
+`hub_binding_invalid` and changes nothing. (3) The server session is the only caller of
+`offer_reach` and `approve` for a delegated lobby. The owner's offer or confirm is
+`hub_not_session` or `hub_address_in_data`. The member plan's ticket is the server's `ReachOffer`
+ticket, so the joiner's handshake pins that `ServerKey`. The owner's candidates are not copied.
+`relay_only` stays ignored (`plans_for` is unchanged). A published ban or `load >= capacity` makes
+`approve(true)` send `ReachDenied` and return `Ok(None)`. The password gate, `bans.ron` and
+`JoinTicketCheck` stay the game server's job before `Approve`. (4) When the owning player leaves,
+a delegated lobby enters grace and does not emit `OwnerChanged`. `grace_ms` of `0` is indefinite
+and is not remapped to 600_000. The client API's `None` is 600_000. The same player key reconnects
+into the lobby without `OwnerChanged`. Listen hand-off is unchanged. Close, server offline, or a
+nonzero grace deadline closes the lobby. The hub does not stop the game process and does not make
+the server the owner. (5) `RevokeBinding` inserts `(player key, server key, serial)` before it
+returns. The next create is `hub_binding_revoked`. Existing lobbies stay. The cap is 4096
+(`hub_revoke_full`). The set is also `revocations.ron` format 1, written by a temp file plus
+rename. A missing file is empty. A corrupt file is an error and does not panic. This is not a
+frozen content format. (6) A wire-1 directory page drops dedicated lobbies and server cards. A
+wire-1 join of a dedicated lobby is `hub_needs_wire_v2` and does not disconnect. `set_reach_mode`
+and `set_bans` still return `hub_not_ready`.
+Consequences: exhaustive matches on `HubError` gain the § 16.9 variants. `verify_binding` takes
+`now_ms`. `HubReport` gains `servers` (`#[serde(default)]`). New public types include
+`HubServerCard`, `HubNotice`, `LocalBinding` and `ServerRegister`. `HubServer` and
+`HubLobbyBackend` gain register, revoke, create, close and binding methods. `#[doc(hidden)]`
+`forge_low_order_binding` and `forge_low_order_presence` are test helpers. No new dependency. No
+golden. No `hub.toml` change. `ServerSet` stays for listen lobbies. `lobby.hub_servers` and
+`lobby.hub_bindings` are report and client data, not new agent methods. The api snapshot for
+`regia_net` records the break.
+
+## ADR-10376: ECS-free hub join on a caller-owned socket
+Date: 2026-11-22   Status: proposed
+Context: BZ-28 runs its own simulation and depends on `regia_net` without the ECS
+(ADR-8032, ADR-8501). The hub (`lobby::hub`), join brokering (NL-05, ADR-8607), NAT
+checks and the relay already compile that way. The pieces it still had to turn `ecs` on
+for were the dedicated-server host's relay helpers (`relay_split`, `RelayRegistrar`,
+`JoinTicket`, `JoinPath`, `JoinSocket`) and `HubReach`, which owned the member's game
+socket. A game that already owns that socket could not run a member's `JoinPlan` without
+linking `regia_ecs`, `regia_app`, `regia_scene`, `regia_asset` and `regia_platform`.
+The spec lane v08-spec-net-delegated-sessions is writing NL-06..NL-10 in
+`docs/specs/89-lobbies.md`; this lane does not edit that file. The notes below are the
+design for the ECS-free path only (request R23 item 4). Delegated sessions, relay-only
+hosting, address-scraping limits and the deployable hub binary are other lanes.
+Decision:
+1. Keep one `server_host` implementation. `join`, `relay_path`, `ExitCode`, `HostError`,
+   `HostState`, `HostClock`, `MonotonicClock` and `TestClock` compile with or without
+   `ecs`. The ECS runtime (`ServerHost`, `HostGame`, config, crash, health, link admin,
+   link game, lockstep game, platform, shared port, signals) moves into a private
+   `ecs_host` module that the parent re-exports only with `ecs`. The ECS host calls the
+   same helpers; their behavior does not change.
+2. Declare `server_host` twice in the crate root, once `#[cfg(feature = "ecs")]` and once
+   `#[cfg(not(feature = "ecs"))]`, and re-export `HubReach`, `ReachSocket` and
+   `ReachState` the same way. The API snapshot keeps every existing `ecs` signature and
+   records the ecs-free signatures as additions. One declaration would drop
+   `#[cfg(feature = "ecs")]` from those lines. `mod reach` is no longer cfg-gated; the
+   reach code did not use the ECS.
+3. `RelayRegistrar::new` keeps the parameter type name `LinkSocket`, so the ecs snapshot
+   line does not change. With `ecs` that name is still `crate::link::LinkSocket`. Without
+   `ecs`, `server_host::join::LinkSocket` is the same `Box<dyn DatagramSocket + Send>`,
+   public so the signature does not name a private type. `link` stays ecs-only.
+4. `JoinPlanDriver` runs a member's `JoinPlan` on queues the caller owns. The game binds
+   `local`, pushes each received datagram (`push_datagram`), calls `advance(now_ms)` with
+   its own clock, and sends what `poll_send` returns. `take_endpoint` returns the same
+   socket `HubReach::take_socket` would, on those queues, plus the plan's `ServerKey`.
+   After that, push and poll keep feeding both the endpoint and a relay control half that
+   is still running. Each direction holds at most `PLAN_QUEUE` (4096) datagrams. A longer
+   datagram than `MAX_DATAGRAM_BYTES` is refused whole. A full send queue returns
+   `WouldBlock` and counts a drop. Empty datagrams are delivered. The driver adds no wire
+   format, no `JoinPlan` field and no error code: `hub_key_mismatch`, `hub_reach_invalid`
+   and the existing `JoinError` codes.
+5. No new agent method. Without `ecs`, read `NetServer::status` and `peer_rows`. The hub's
+   existing methods are unchanged.
+Consequences: `cargo test -p regia_net_soak --no-default-features --test ecs_free_join`
+runs a `JoinPlan` on `SimNat` and `TestClock` for the mapped, punch and relay paths and
+checks the sealed handshake pinned the owner's `ServerKey`. That package depends on
+`regia_net` with `default-features = false` and turns `regia_net/ecs` on only through its
+own `ecs` feature. A const assert fails the build when `ecs` is off and
+`regia_net::ECS_FEATURE` is still set. `cargo test -p regia_net --no-default-features`
+does not prove this: that crate's dev-dependencies unify `ecs` (and `voice`) back on.
+`cargo tree -p regia_net --no-default-features -e normal,build` must not link
+`regia_ecs`, `regia_app`, `regia_scene`, `regia_asset`, `regia_platform`, `regia_audio`
+or `bevy_ecs`. ECS callers of `HubReach` and the host helpers keep their tests unchanged.
+Snapshot additions are not breaking; no public struct field or enum variant was added.
+The forbidden-crate list in `xtask` `NET_CORE_FORBIDDEN` is unchanged.
+
+## ADR-10395: Delegated hub resync and server-link replacement
+Date: 2026-11-22   Status: proposed
+Context: Security review of NL-07 (spec 89 § 16.3, ADR-10384) found three breaks. The review's
+tests stay as written. This lane does not pick a new design (no ADR-10393). A parallel lane edits
+`lobby/hub/server.rs` for ask limits; these edits stay in `resync`, `owned` and `register_inner`.
+Decision: (1) A resync, including the one `take_events` appends after an outbox overflow, sends
+pending `ReachAsk` events and a dropped approver plan to the session that approves. That is the
+listen owner, or the dedicated server session even when its `lobby` is `None`. The owning player
+of a delegated lobby is not that session, so the member's candidates are not replayed to them.
+(2) A second link that takes a server key moves the server seat only. On a delegated lobby it
+does not write the new member in as `room.owner` and does not rewrite player member ids. The old
+link keeps its lobby. When the host disconnects that link, the owning player's drop enters Grace
+with no `OwnerChanged`. `grace_ms` 0 holds the lobby, and the same player key reconnects as owner.
+The new server session is not the owner: an owner-only call from it is `not_owner`. An ownerless
+lobby still moves with the server seat. (3) A listen lobby is not a server seat. Replacing a
+server link does not clear that lobby on the old session, so the host's disconnect runs listen
+hand-off: a solo lobby is deleted, and a lobby with a guest goes to that guest with `OwnerChanged`.
+Consequences: no new public type, field, enum variant, error code or dependency. No `hub.toml`
+change. No golden. `not_owner` is now returned where a delegated server session that is not a
+lobby member previously received `not_in_lobby` from an owner-only method. The three
+`review_` tests in `lobby_hub_delegated` pass. Listen hand-off and the ordinary two-session
+delegated path are unchanged.
+
+## ADR-10391: Relay-only hub plans hide both addresses
+Date: 2026-11-22   Status: proposed
+Context: BZ-28 request R23 (NL-08, spec 89 § 16.4) ships in v0.7.1 as an additive patch.
+`ReachOffer.relay_only` is already on the wire (ADR-10378) and was ignored.
+`broker_reach` returned `Mapped` whenever a mapped candidate existed, and `Punch`
+when a relay or any candidate existed. `plans_for` copied each side's candidates
+onto the other's plan. `JoinPath::relay_first` skipped the introduction only after
+the path was already `Relay`, and an empty candidate list still planned a punch.
+The other side's address bytes still traveled. v0.7.0 clients must keep working
+against a v0.7.1 hub. This lane does not edit `server.rs` or `wire.rs`.
+Decision:
+1. `plans_for` hides the exchange when its `relay_only` argument is set, or when
+   either offer's `relay_only` is set. The only success path is `ReachKind::Relay`,
+   and only when the owner's offer has a relay and a join code. Otherwise
+   `BrokerError::NoReach`. Neither plan carries a candidate or a mapped address.
+   The member's ticket is rewritten with `JoinTicket::from_game_socket` (unspecified
+   address, port 0, the same server key). The relay address and the join code stay.
+   The owner's ticket stays empty. A listen lobby with every flag clear keeps today's
+   order: mapped, then punch, then relay.
+2. `broker_reach` honors `owner.relay_only` without a signature change. A mapped
+   candidate does not win. The member's flag and the lobby argument are applied in
+   `plans_for`, because `broker_reach` does not take them.
+3. `JoinPath::relay_first` is the member path (`HubReach` already calls it for
+   `ReachKind::Relay`). It gathers and sends no local candidates, sends no
+   `PunchIntro`, and does not start or answer connectivity checks.
+4. `RelayRegistrar::relay_only` is called before the first `update`. It rewrites
+   the token the same way, sends `Register` with no candidates, ignores an
+   introduction, and does not answer or send connectivity checks. It still renews
+   the join code and confirms allocations. `from_game_socket` alone is not
+   relay-only: that ticket is the normal punch-capable host path.
+   `server_host` does not call `relay_only` yet.
+5. `set_reach_mode` and `set_bans` still return `hub_not_ready`. `approve` still
+   passes the lobby flag as `false`, so a room's stored `relay_only` does not apply
+   until that call passes the flag. An offer that sets the field does apply.
+   No new agent method. No new public field or enum variant. `#[non_exhaustive]`
+   is not added here: the delegated public types live in files this lane does not
+   own, and adding it is a snapshot break.
+Consequences: `cargo test -p regia_net --test lobby_hub_relay_only` captures
+`HubEvent::Plan` bytes and the `Register`, `PunchIntro` and check datagrams.
+A flag-clear run must show the host octets in `Register` and the member octets in
+`PunchIntro`. `Allocate`, `HostInfo` and `ClientJoined` may still name the address
+the relay observed. `cargo test -p regia_net --test lobby_hub_join` keeps the
+mapped, punch and relay paths for a listen lobby with the flag clear. No new
+dependency. No golden. No `hub.toml` change.
+
+## ADR-10396: Relay-only hide review — replies and the lobby flag still name the other side
+Date: 2026-11-22   Status: proposed
+Context: Review of NL-08 at `cc34070dc3` (ADR-10391) against the owner-facing promise
+that no address of the other side appears in any byte either party receives on the
+relay-only path. The plan-byte and `Register` / `PunchIntro` / check coverage in
+`lobby_hub_relay_only` holds. A completed relay join, a stored server or lobby flag,
+and `ReachAsk` do not.
+Decision: Verdict is FIX FIRST. This review adds failing tests and does not change
+the planner, the relay, or `approve`.
+1. `HostInfo` and `Allocated` deliver the host address to the member. `Allocate`
+   repeats that address. `ClientJoined` delivers the member address to the host.
+   `relay_only_replies_must_not_name_either_side` fails on all four.
+2. `approve_inner` still passes the lobby flag as `false`. A server presence with
+   `relay_only` is stored on the room, and the plan is still `Mapped`.
+   `server_flag_hides_both_plan_directions` fails at `assert_rewritten`.
+3. `set_reach_mode` still returns `hub_not_ready`, so a listen lobby cannot set or
+   clear the lobby flag. `listen_lobby_flag_hides_the_exchange` fails on `NotReady`.
+   Clearing `ReachOffer.relay_only` does restore mapped, then punch, then relay.
+4. `ask_inner` still sends the member's candidates in `ReachAsk` when either offer
+   sets `relay_only`. `relay_only_ask_must_not_name_the_member` fails for both pairs.
+5. `ecs_host::start_relay` never calls `RelayRegistrar::relay_only`. No new test:
+   the call site is private, and a reconstruction would stay red after the one-line
+   fix. `relay_only_register_omits_the_host` already shows that `from_game_socket`
+   without `relay_only` puts the host octets in `Register`.
+Consequences: `cargo test -p regia_net --test lobby_hub_relay_only` is red on those
+four tests and green on the other eight, including the offer-flag clear and
+`ReachDone`. Bounded decoding is unchanged (`wire.rs` hostile-count, cap, and
+relay-only tail tests). No new public item, no snapshot edit, no dependency.
+
+## ADR-10399: Relay-only replies and the stored flag hide both addresses
+Date: 2026-11-22   Status: proposed
+Context: ADR-10396 (review of ADR-10391) is FIX FIRST. On the relay-only path the
+owner's promise is that no address of the other side appears in any byte either
+party receives, in both directions, for a host-set flag and a member-set flag.
+Plan bytes, `Register`, `PunchIntro` and connectivity checks already hold when
+`RelayRegistrar::relay_only` and `JoinPath::relay_first` are used. The completed
+join, the stored lobby flag and `ReachAsk` do not. `ecs_host::start_relay` never
+calls `relay_only`.
+Decision:
+1. A `Register` may carry `RELAY_HIDE_ADDR_EXT` (`0xA1`) after its cookie.
+   `RelayRegistrar::relay_only` sends that byte and no candidates. The relay
+   stores the flag on the lobby (a renewal that omits it clears the flag) and
+   publishes `0.0.0.0:0` in `HostInfo`. `Allocate` with an unspecified address
+   resolves the lobby by comparing every lobby's bind key and accepting a hidden
+   match. `Allocated` and `ClientJoined`, including a `Refresh` reply, name
+   neither side. Forwarding still uses the real UDP endpoints. A hidden lobby
+   sends no punch introduction. A register without the byte is unchanged.
+2. `approve` passes the room's stored `relay_only` into `plans_for`. The
+   signature of `plans_for` is unchanged.
+3. `set_reach_mode` stores the flag. The listen owner, a delegated lobby's
+   owning player or its bound server, or an ownerless lobby's server session
+   may set or clear it. Members are sent the room. `set_bans` stays
+   `hub_not_ready`.
+4. `ReachAsk` omits the asker's candidates when the lobby flag, the asker's
+   offer flag or the owner's offer flag is set. The stored ask keeps the
+   candidates, so a later clear still has them.
+5. `--relay-only` on the dedicated host calls `RelayRegistrar::relay_only` and
+   does not start the router mapping or the host check. There is no `server.toml`
+   key. The default remains a punch-capable host.
+Consequences: `encode_register_hidden`, `RELAY_HIDE_ADDR_EXT`,
+`CliOverrides.relay_only` and `HubServer::set_reach_mode` are public additions.
+No new type, so no new `#[non_exhaustive]`. No new agent method. No new
+dependency. No golden. The lead runs `cargo xtask api-snapshot --check`.
+
+## ADR-10392: AskReach windows, bans before candidates, and a confirmed-session flag
+Date: 2026-11-22   Status: proposed
+Context: NL-09 (spec 89 § 16.5, request R23) on the v0.7.1 hub. `AskReach` had no
+10-second window and no in-flight cap. A ban was not checked before a candidate list
+could be copied into an event. `confirm_session` stored a `LobbyServer` and pushed
+`HubEvent::ServerSet` with that address to every member. Directory cards and presence
+rows already hid `regia.server`; member data, room snapshots and `lobby()` did not.
+The delegated lane changed the public hub protocol types `HubRequest`, `HubEvent`,
+`HubError`, `HubReport`, `ReachOffer`, `RoomState`, `DirectoryPage` and
+`HubLobbyCard`. The lead accepts that break for v0.7.1 only if each of those types
+is `#[non_exhaustive]` and the release note names the one-line downstream fix.
+`AdmitGate` (30 per second per address, 20 per second per identity) stays in front
+of the core. This lane does not change `broker_reach`, `wire.rs` message layout, or
+`join::set_bans` (that free function still returns `hub_not_ready`).
+Decision:
+1. `HubServer::ask_reach` checks, before any candidate is cloned into an event or a
+   join map: missing lobby (`lobby_not_found`, before bans), hub-operator ban, lobby
+   ban, server ban (`hub_banned`), dedicated `load >= capacity` when `capacity > 0`
+   (`hub_server_full`, including members), then for a non-member visibility
+   (`lobby_not_found` unless Public), closed (`hub_lobby_closed`) before full
+   (`hub_lobby_full`), then `not_in_lobby`. A member of a listen lobby that later
+   closed or filled may still ask. Then the listen owner (`not_owner`), a dedicated
+   server with no session (`hub_server_offline`), and no offer (`hub_no_reach`).
+   `check_offer` runs before the stamp. In-flight caps, then the 10-second windows.
+   The address window is checked first. A refusal stamps neither window. A missing
+   address skips the address window. A keyless session skips the key window and is
+   still counted against the per-identity in-flight cap on its own member id.
+   Replacing an `Asked` or `Planned` join credits one slot and still stamps the
+   window when the ask is admitted. Caps, clamped by `HubSettings::sanitized` into
+   `1..=` the wire cap and never raised: 4 asks per key per 10 s, 16 per address
+   per 10 s, 2 in flight per key, 64 in flight on the hub.
+2. Bans are player-key sets. The hub operator set is at most 4,096
+   (`HubServer::set_operator_bans`). A lobby set is at most `MAX_LOBBY_BANS` (64),
+   owner only, via `HubServer::set_bans` and the host's `SetBans`. A server set is
+   the existing `RegisterServer` list (`MAX_SERVER_BANS`). Over cap is
+   `hub_reach_invalid` and the previous set stays. Address bans stay on the
+   dedicated host's `bans.ron`. `hub.toml` does not grow a `[bans]` table.
+3. `set_data` and `set_member_data` refuse a value that parses as a `SocketAddr`,
+   or `udp:` plus one, or `steam:` plus ASCII digits, with `hub_address_in_data`.
+   The check is after ownership or membership, so a non-owner still gets
+   `not_owner`. Any `Some` on `regia.server` is the same refusal. `set_data` of
+   `None` on that key withdraws the confirmed flag. `confirm_session` stores only
+   that flag. The `Option<LobbyServer>` argument is ignored as bytes. The same flag
+   is a no-op. A dedicated confirm is `hub_address_in_data`. Members are told
+   `HubEvent::SessionConfirmed` only. `RoomState.server` stays on the wire for a
+   version-1 decoder and is always `None`. A wire-1 peer is sent `ServerSet` of
+   `None` instead of `SessionConfirmed`. Wire 2 receives the flag. Neither carries
+   an address. Directory, query, presence, room, `lobby()` and member data drop
+   `regia.server` and any address-shaped value.
+4. The eight public protocol types above are `#[non_exhaustive]`. No other public
+   type gains that attribute. `HubSettings` and `HubLimits` gain the four AskReach
+   fields. Under `[limits]` in `hub.toml` the keys `ask_per_identity_per_10s`,
+   `ask_per_address_per_10s`, `ask_inflight_per_identity` and `ask_inflight_hub`
+   are optional. Format version stays 1. A value above the wire cap is stored and
+   clamped by `settings().sanitized()`. Zero is refused. No new agent method:
+   `lobby.hub_status` `refused` already counts `HubError::code()`.
+Consequences: `cargo test -p regia_net --test lobby_hub_ask_guard` covers rows 4,
+5, 11 and 12 (one key, many keys on one address, bans before candidates, full /
+closed / invisible asks, and an `RGN1` plus an `RGNR` datagram dropped on the hub
+socket). A struct pattern over one of the eight types adds `..`. An exhaustive
+match adds `_ =>`. Another crate builds a `ReachOffer` with
+`ReachOffer::default()` and then field assignment. `HubSettings` and `HubLimits`
+literals add `..HubSettings::default()` or `..HubLimits::default()`. The lead runs
+`cargo xtask api-snapshot --check` (and `--update` if `non_exhaustive` must be
+recorded), `cargo xtask check-formats --update` for the optional hub.toml keys,
+and `cargo xtask manual`. `join::set_bans` and `set_reach_mode` still return
+`hub_not_ready`.
+
+## ADR-10400: Address spellings and a ban that lands during an ask
+Date: 2026-11-22   Status: proposed
+Context: ADR-10392 (spec 89 § 16.5) promised that a listing, a query, a presence
+event or a lobby-data read contains no address, and that a banned key gets no
+candidates. The predicate behind that promise accepted a Rust `SocketAddr`, a
+case-sensitive `udp:` plus one, and a case-sensitive `steam:` plus digits.
+Bracketed IPv4, a `udp://` URL, an uppercase prefix, an IPv6 named zone and
+`Steam:` plus digits were stored by `set_data`, `set_member_data` and create,
+and they showed on `lobby()` and on directory cards. `approve_inner` rechecked a
+dedicated server-seat ban and `load >= capacity`, and did not recheck the
+operator set or the lobby set, so a ban that landed while the ask was open still
+copied the owner's candidates into a `Plan`. `clean_handle` accepted a handle
+that is a socket address, and that handle was published on the presence row, the
+directory card, the room member name and the invite.
+Decision:
+1. `value_carries_address` is a whole-value spelling. It is true for a
+   `SocketAddr`, for a bracketed IPv4 or IPv6 with a port (a zone is split off
+   before the address is parsed, so a named interface zone counts), for `udp:`
+   or `udp://` in any ASCII case plus one of those, and for `steam:` in any
+   ASCII case plus ASCII digits. A bare address with no port, a hostname and a
+   port alone are not that spelling. `set_data`, `set_member_data` and create
+   refuse it with `hub_address_in_data`. The forms `SocketAddr` already accepts
+   stay refused.
+2. `approve_inner` treats an operator ban and a lobby ban like the dedicated
+   server-seat ban. The member is sent `ReachDenied`, the call returns
+   `Ok(None)`, and no `Plan` is built. A keyless session still matches none of
+   the three ban lists. Ask-time bans stay `hub_banned` and still copy no
+   candidate.
+3. A handle that the spelling accepts is not stored. The session opens under a
+   stand-in of at most eight bytes, no longer than the spelling, with no `.`
+   or `:`. The same spelling always maps to the same stand-in, so a reconnect
+   and an invite of that spelling find the session. Presence, directory cards,
+   room member names, invites and chat from-handles carry the stand-in.
+Consequences: No new public type, field, variant or error code. No
+`#[non_exhaustive]` change. A host that put one of these spellings in lobby
+data now gets `hub_address_in_data`. A host that used a socket address as a
+handle sees the stand-in on the directory. The lead runs
+`cargo xtask api-snapshot --check`, `cargo xtask check-formats --update` and
+`cargo xtask manual`. This lane edits no format and no generated book page.
+
+## ADR-10397: The lobby hub process also runs the relay
+Date: 2026-11-22   Status: proposed
+Context: NL-11 (spec 89 § 16.8, request R23) on the v0.7.1 hub. `regia-lobby-hub`
+constructs a `HubProcess` and never a `RelayServer`, so a packaged hub cannot
+hand out a relay allocation. v0.7.0 clients must keep working against a v0.7.1
+hub. `hub.toml` is format 1. ADR-10392 said the format version stays 1 and that
+`hub.toml` does not grow a `[bans]` table. This decision supersedes those two
+sentences for the relay, the ban file and the log directory only. The optional
+AskReach keys and the `AdmitGate` limits stay as ADR-10392 left them. The
+systemd unit is not rewritten: its `ExecStart` is the binary plus `--config`
+and `--key-file`, and the relay port comes from `hub.toml`.
+Decision:
+1. `hub.toml` `format_version` is 2. A version-1 file still loads. A missing
+   `format_version` is 1. With no `relay.enabled` key, version 1 leaves the
+   relay off and version 2 turns it on. An explicit value wins.
+   `migrate_hub_toml` rewrites the top-level version line and appends `[relay]`
+   with `enabled = false`, plus `[bans]` and `[log]`, only when those tables
+   are absent. It does not insert the AskReach keys (a second `[limits]` would
+   duplicate the table). A file that is already version 2 is returned
+   unchanged. A fresh package writes `enabled = true`, port 7812,
+   `allocation_cap` 256 and `per_address_per_sec` 30. The ban file is one
+   player key per line, at most 4,096. A missing file is an empty set. The
+   process logs the count, not the keys. `log.dir` is created at start.
+2. When the relay is enabled, `HubProcess` polls a `RelayServer` on the same
+   `update(now_ms)` as the hub. `begin_drain` stops new allocations. An
+   `Allocate` for a client key the relay does not already hold is the existing
+   full reply. Refresh of an allocation already issued continues. No new wire
+   code. `finished_draining` is true when the hub sessions are gone and either
+   the relay holds no allocation or `HUB_RELAY_DRAIN_MS` (30_000) of the
+   process clock have passed since the first `update` after the drain started.
+   The clock is `now_ms`, not the wall clock. A second shutdown exits at once.
+   With no relay, the existing drain test still finishes before that update.
+3. `GET /health` and `lobby.hub_status` gain `relay_allocations` and
+   `servers_online`. `draining` was already on the health body.
+   `servers_online` is the full server map, not the 64-card page.
+   `relay_allocations` is the attached relay's allocation count, or 0.
+   `HubReport` was already `#[non_exhaustive]`. The three fields are
+   `#[serde(default)]`. `HubDocument`, `HubRelayFile`, `HubBansFile` and
+   `HubLogFile` are new and `#[non_exhaustive]`. `HubFile` gains no field.
+4. Key rotation is the spec's two-process story, written into the packaged
+   README and `book/agents/net-delegated-sessions.md`. This process holds one
+   Noise static key. A client that pins another key ends the link with
+   `hub_key_mismatch` and allocates no session. There is no second static key
+   inside one handshake.
+Consequences: `cargo test -p regia_net --test lobby_hub_binary` covers the
+shared process clock (a hub session and a relay allocation on two ports),
+health against `lobby.hub_status`, the SIGTERM drain, a migrated v1 file and
+`hub_key_mismatch`. `cargo test -p regia_cli --bin regia server_package` checks
+the staged v2 file. `cargo test -p regia_cli --bin regia upgrade_project`
+migrates the corpus. Corpus `hub-toml/v1.toml` is unchanged. `hub-toml/v2.toml`
+is the fresh default. Fuzz `net.hub_toml` reports version 2 and still loads
+version 1. The lead's `cargo xtask api-snapshot --check` may still report the
+pre-existing `HubReport` and `HubLimits` drift from ADR-10392. New public
+types are additions. Do not pass `--update --breaking`.
+
+## ADR-10354: no private build-machine strings in shipped binaries
+Date: 2026-11-22   Status: proposed
+Context: a downstream app built on the engine failed its privacy gate: `strings` on its release binary showed engine
+runtime data naming a private bench machine (the `gpu_tiers.ron` measured-evidence string "(the build server, 2026-10-11
+arc-sweep)", embedded in every game binary through `include_str!`). A release build of `hello_window` on the build
+farm carried 1290 more matching strings: dependency and standard-library panic locations under
+`/home/<user>/.cargo` and `/home/<user>/.rustup`, the sample's own `env!("CARGO_MANIFEST_DIR")` literal (the
+absolute workspace path of the build machine), and RFC1918 addresses in the agent fuzz corpus. Cargo's `trim-paths`
+profile option is still unstable on the gate toolchain (1.99), so profile-scoped trimming is not available.
+Decision:
+1. Engine runtime data names no private host or private layout. The `gpu_tiers.ron` BMG G31 evidence reads "owner bench" instead of
+   the bench host (GPU model, driver and numbers are unchanged), and the `configurator.open_product`
+   contract example names a neutral content root instead of the build machines's output directory.
+2. The workspace `.cargo/config.toml` remaps the generic directory roots `/home`, `/media`, `/srv`, `/models`,
+   `/root`, `/mnt` and `/Users` to `/builder` for the x86_64-linux, windows-msvc, windows-gnu and wasm32 targets,
+   so `file!()` and panic locations of workspace crates, dependencies and monomorphized standard-library code in
+   any profile built from this workspace carry no build-machine path. `env!`-expanded values are not remapped by
+   rustc: `env!("CARGO_MANIFEST_DIR")` stays out of runtime code (hello_window now resolves its agent project
+   directory at runtime from `CARGO_MANIFEST_DIR` in the environment or the executable's workspace layout).
+3. `regia package`'s shipping remapper maps the home directory to `/builder` (was `/home`, which itself matched
+   the gate's patterns); the registry, workspace and target remaps are unchanged.
+4. The agent fuzz corpus seeds use `10.0.0.1` (still RFC1918, still parsed by the same UPnP code paths);
+   `regia_net`'s private-range detection logic is untouched.
+5. `regia package` refuses a staged executable whose printable strings match the private-host pattern list
+   (build-farm hostnames, the directory roots above, `192.168.`, `.ts.net`, `tailscale`): rule `host_string`,
+   error `package_hygiene_failed`. Reviewed exceptions are exact (path, exact printable run, reason) in an
+   optional `[package] host_strings_allow` TOML file; the allow-list is empty by default. The tool
+   keeps the private names XOR-masked and assembles the pattern at runtime: `strings` on the shipped
+   `regia` tool must not list what it looks for. The plain compound of "main" and "rig" matches at
+   token boundaries only: `strings` joins adjacent literals, and the Windows PE of `hello_window`
+   stores the channel labels "left main" and "right main" back to back (`mainright` at file offset
+   0x8e60a34), which the bare substring flags without naming any host. Every other name, the
+   directory roots and the LAN and tailnet patterns keep substring matching (`tailscaled` is caught).
+   `cargo xtask host-strings` runs the same gate over
+   any built executable (default: the release `hello_window` sample, built on demand) and CI runs it
+   after the sample smokes.
+Consequences: every artifact built from this workspace (any profile) carries `/builder/...` panic paths; a debugger
+restores the real paths per session with `set substitute-path /builder <root>`. The rustflags change rebuilds every
+dependency once. The generic remaps erase the directory roots on every machine; the account name stays a path
+component under them (`/builder/<account>/.cargo/...`), which the gate flags only when the account name itself is
+private: a build on such an account restates the root remaps in `RUSTFLAGS` and adds
+`--remap-path-prefix=<home>=/builder` LAST (rustc applies the last matching prefix; `RUSTFLAGS` replaces the
+config flags), or uses `regia package`, which does this automatically for shipping builds. A downstream project built outside
+this workspace gets none of the config remaps: its release build is its own responsibility, and the packaging
+gate still refuses a leaking staged binary. Specs updated: 21 (stage preparation); book package-hygiene page;
+release notes v0.6.2.
+
+## ADR-10370: project templates ship path remaps; regia new appends the home prefix last
+Date: 2026-11-22   Status: proposed
+Context: ADR-10354 remaps directory roots for the engine workspace and for `regia package`, and its
+consequence is that a downstream project built outside this workspace gets none of those config remaps.
+Projects created by `regia new` (and the editor scaffold, which copies the same templates) were in that
+set: their `.cargo/config.toml` had no `--remap-path-prefix` flags, so a plain `cargo build` embedded
+`/home/<account>/.cargo/...` dependency paths. The generic root remap `/home=/builder` is not enough on
+an account whose name is itself private: rustc applies the last matching prefix, and `/builder/<account>/.cargo`
+still contains the account name. `env!("CARGO_MANIFEST_DIR")` is not remapped at all.
+Decision:
+1. Every project template includes the workspace directory-root remaps (`/home`, `/media`, `/srv`,
+   `/models`, `/root`, `/mnt`, `/Users` to `/builder`) in `.cargo/config.toml`, compiled in with
+   `include_str!`. That text names no account. The targets are the workspace rustflag triples plus the
+   other host triples the workspace already names for cook determinism. Stack size and split-debuginfo
+   stay in the templates' build scripts; this file is remaps only.
+2. `regia new` and the editor scaffold append `--remap-path-prefix=<home>=/builder` as the last
+   `rustflags` entry of every target, read from `HOME` or else `USERPROFILE` on the creating machine.
+   If that variable is unset, or the path is relative, not Unicode, or cannot be written as a TOML
+   basic string, project creation fails before any file is written. Copying a template by hand does
+   not append the line.
+3. Sample and template runtime code that needs its own directory reads `CARGO_MANIFEST_DIR` from the
+   environment (which `cargo run` and `cargo test` export) or walks up from the executable. It does
+   not use `env!("CARGO_MANIFEST_DIR")`.
+Consequences: a plain `cargo build` of a project created by `regia new` or the editor passes the
+host-string gate on an account whose name is private. This narrows ADR-10354's "downstream projects
+get none of the config remaps" consequence to projects not created by those tools, and to template
+copies made by hand. `RUSTFLAGS` still replaces the config flags; restating them requires the home
+directory last. Panic locations in a new project read `/builder/...`. No public type in a stable crate
+gains a field or a variant. Specs updated: 21 (host-string gate); book package-hygiene page; release
+notes v0.6.2 template remaps.
+
+## ADR-10377: the SPDX check exempts only the repository-root vendor/ tree
+Date: 2026-11-22   Status: proposed
+Context: `cargo xtask spdx` skipped any directory named `vendor` at any depth (`SKIP_DIRS`). The
+exemption existed for the repository-root `vendor/` third-party tree (`kira`, `lewton`), which is not
+under an engine root and is walked separately. The blanket rule also silently exempted first-party
+code: five Regia-authored files under `crates/regia_render/src/upscaler/vendor/` (the DLSS NGX
+adapter, the XeSS adapter, the scripted test binding and its compute shader, and the vendor-seam
+tests) carried no `// SPDX-License-Identifier` line and were never checked.
+Decision: a path is exempt from the SPDX check when its first segment is the repository-root `vendor/`
+(i.e. `rel.split('/').next() == Some("vendor")`). A `vendor` directory nested under an engine root is
+first-party Regia code and must carry its SPDX line. `SKIP_DIRS` now holds only `target` and
+`node_modules` (any depth). Add MPL-2.0 headers to the five Regia-authored upscaler files and a unit
+test proving a nested `crates/x/src/vendor/foo.rs` without a header is reported.
+Consequences: the checker now enforces licence lines on first-party code in nested `vendor` subtrees.
+The repository-root `vendor/` third-party tree and any nested third-party origin carrying its own
+licence file remain out of scope; today none exists under an engine root, so nothing else changes.
+
+## ADR-10419: NL-11 review fixes and the gate GPU pass disk floor (v0.7.1 integration)
+Date: 2026-11-22   Status: proposed
+Context: the review of the hub-plus-relay process (v071-net-hub-relay-review-g, ADR-10397) left five
+failing tests: the hub's systemd unit stopped the process after 10 s inside the 30 s relay drain;
+`relay.per_address_per_sec = 0` (documented as no limit) was a parse error; migrating a version-1
+`hub.toml` whose `[relay]` table omitted `enabled` turned the relay on (version 2 defaults it on);
+`format_version = +1` and `0x1` (TOML integers equal to 1) did not migrate; and a link refused during the
+drain held `HubProcess::finished_draining` false until the idle timeout. Separately, the gate's GPU pass
+staged a `.ferrite`-only checkout's samples under `.ferrite/test-assets`, where the rig's runner does not
+look, and started with no free-space check on the rig's `/models`.
+Decision: (1) the generated hub unit uses `TimeoutStopSec` = drain window + 15 s (45 s); the dedicated
+server unit stays at 10 s. (2) `relay.per_address_per_sec = 0` is accepted (no limit). (3) The migrator
+writes `enabled = false` under an existing `[relay]` header that lacks it, refuses (with a message) an
+inline or dotted relay table it cannot edit, and fails unless the migrated file has the same relay
+on/off state as the version-1 file. (4) The version line's whole integer token is rewritten, whatever
+its TOML spelling. (5) `finished_draining` requires the hub sessions (live and dormant) to be gone; it
+still waits for refused, unconfirmed links, but never past the 30 s drain window, which is now the upper
+bound of the drain. (6) `tools/gaterig` always stages the Khronos samples as `.regia/test-assets` (either
+source spelling) and the GPU pass refuses to start below `GATERIG_MIN_FREE_GB` (300) free on
+`GATERIG_FREE_PATH` (`/models`), printing the free space, target size and stage size.
+Consequences: the review tests pass unchanged. Spec 89 § 16.8 and ADR-10397 hold as written (the drain
+bound now matches their wording). An operator unit generated before v0.7.1 keeps 10 s until the package
+is rebuilt. The gate needs `tools/gaterig/deploy.sh` (lead) to pick up the staging and floor changes.
+
 ## ADR-10356: Runtime crates do not link the pipeline layer: `release.*` agent methods are editor-host methods, and the editor's desktop-only dependencies are target-gated
 Date: 2026-11-22   Status: proposed
 Context: two reds of the v0.7 freeze had one root cause. `cargo xtask check-layers` reported 33 runtime-to-pipeline
@@ -84810,6 +85420,218 @@ web-release carry no debuginfo; `shipping` (line-tables-only) now keeps its DWAR
 binary is stripped as before. The `.cargo/config.toml` change rebuilds every crate once. Specs untouched.
 Release fragment `docs/releases/v0.1.28-v07-gate-reds-rc2.md`.
 
+## ADR-10417: The user manual keeps one mdBook, and gains a generated catalog and index
+Date: 2026-11-22   Status: proposed
+Context: the owner asked for a full user manual for any person or agent who wants to use Regia Engine, with every feature, a table of contents, an index, and whatever else that manual needs. The v0.7.0 candidate `425b388676` already has an mdBook (`book/`, 989 markdown files, `book/SUMMARY.md` as the contents), a generated reference (`cargo xtask manual` writes `book/reference/` and the single-file `docs/manual/manual.html`), and generated assistant files (`cargo xtask llms-txt` writes `dist/public-root/llms.txt` and `llms-full.txt`). An audit (`docs/manual/feature-inventory.md`, `docs/manual/PLAN.md`) found the book linked and free of dead links, and found it missing a feature catalog, a glossary, an A–Z index, task quickstarts, troubleshooting, a FAQ, known limits, and upgrade notes. Adding a second site, a second wiki, or a hand-maintained copy of the 2342 agent methods would drift from `book/COVERAGE.md` and from the generator. A PDF crate would be a new dependency for a file the HTML generator can already print.
+Decision:
+1. The mdBook remains the only manual source. v0.7.1 adds `book/manual/` (catalog, glossary, index, FAQ, troubleshooting, known issues, upgrade, print) and `book/how-to/`, plus two quickstarts under `book/start/`. `book/COVERAGE.md` stays the machine map. The catalog is the human map and is generated from `docs/manual/feature-inventory.csv`. It lists features, specs, CLI commands, editor panels, and the version ladder. It links the generated method and format references instead of copying them. Module rows and per-flag rows stay in the CSV.
+2. Writers mark index terms with HTML comments, which the mdBook renderer passes through: `<!-- index: Term -->` and `<!-- index: Term | see: Other -->`. `cargo xtask manual` collects those markers and the level-2 and level-3 headings from pages `SUMMARY.md` reaches, and writes `book/manual/index.md`. `cargo xtask manual --check` fails when that file is stale. The glossary stays hand-written. One lane owns `SUMMARY.md`, the catalog, the glossary, the index, and the xtask collector. Other lanes add markers on their own pages and send terms and SUMMARY lines in their reports.
+3. The printable manual is the existing single-file HTML (`docs/manual/manual.html`) plus print CSS in that generator (contents, a page break before each top-level chapter). No PDF crate. A later PDF dependency needs its own approval and a row in `docs/03-workspace-and-dependencies.md`.
+4. Generated files stay generated: `book/reference/*`, `book/manual/catalog.md`, `book/manual/index.md`, `docs/manual/manual.html`, and `dist/public-root/llms.txt` and `llms-full.txt`. The llms generator includes `book/manual/` and `book/how-to/`. No engine behavior, format shape, or agent-protocol change ships with this decision.
+Consequences: writing lanes follow `docs/manual/PLAN.md` and do not edit one another's files. The lead runs `cargo xtask book-check`, `cargo xtask manual`, `cargo xtask llms-txt`, and `cargo xtask check-formats --update` after the collector lands. The audit lane's local link check is not a substitute for `book-check`.
+Release fragment `docs/releases/v0.1.28-manual-audit.md`.
+
+## ADR-10420: How the manual catalog, index and print layout are built
+Date: 2026-11-22   Status: proposed
+Context: ADR-10417 keeps one mdBook and adds a generated catalog, a generated index and print CSS. It leaves the collector's rules open: which inventory rows are forced to partial, whether the index page is collected into itself, what a `see` marker links, where page breaks go, and whether this pass emits an error-code page. `docs/manual/PLAN.md` is the brief. The inventory CSV has 5,631 rows. WebGPU and WebGL2 are two rows. The Fundamentals line that called `user-guide/index.md` "Crates and imports" pointed at the user-guide introduction, and `manual-create` is the lane that adds a real crates page.
+Decision:
+1. `cargo xtask manual` writes `book/manual/catalog.md` and `book/manual/index.md` after the three reference pages. `--check` fails when either file, `book/theme/piercing.css`, or `docs/manual/manual.html` is stale. The catalog tables are features, specifications, CLI commands, editor panels, and the version ladder, one table per area. Formats and agent methods stay one paragraph plus a link to the generated reference. Modules, crates and per-flag rows stay in the CSV. A guide token whose path is `SUMMARY.md` is skipped: that file is the table of contents, not a chapter, so the one-file manual cannot turn the link into an anchor. `COVERAGE.md` stays, because the summary lists it as a chapter.
+2. The trusted-partial names in `docs/manual/PLAN.md` are forced to status `partial` when the catalog is generated. A name on that list that is missing from the CSV fails the command. Human-check specs keep the inventory status until a writing lane reports a correction. Lobby hub is not on the list.
+3. The index collects `<!-- index: Term -->` and `<!-- index: Term | see: Other -->`, plus level-2 and level-3 headings, from every `SUMMARY.md` page except `book/manual/index.md`. Generated pages are read from the in-memory text so the index is not built from a stale file. A `see` marker adds no page link. A marker spelling replaces a heading spelling. Order is Unicode lowercase, sections A–Z, then digits, then other first characters. A malformed marker is an error. Markers inside fenced code are ignored.
+4. Print CSS is scoped to `html.pxx-manual`. The HTML file gains a print-only contents nav and `data-depth` on each chapter. A page break comes before each top-level chapter, not before nested ones, and not before the first chapter. There is no PDF crate.
+5. There is no generated error-code page. The FAQ points at `book/agents/protocol.md` and `book/reference/agent-methods.md`. Codes are not invented.
+6. The duplicate SUMMARY paths are removed, including the "v0.6 stub" labels. Getting started keeps the introduction link to `user-guide/index.md`. No `book/fundamentals/crates-and-imports.md` is created here.
+Consequences: docs only. No engine behavior, format shape, CLI flag, or agent-protocol change. Writing lanes send SUMMARY lines, glossary terms and known-issue lines for a second pass. `dist/public-root/llms.txt` does not yet include `book/manual/` or `book/how-to/`; the lead runs `cargo xtask llms-txt`. The lead also runs `cargo xtask check-formats --update` only if a format hash is in play; this ADR changes none.
+Release fragment `docs/releases/v0.1.28-manual-map.md`.
+
+## ADR-10422: The picture chapter names every backend, tier, and upscaler limit
+Date: 2026-11-22   Status: proposed
+Context: the v0.7.1 manual plan (`docs/manual/PLAN.md`, ADR-10417) assigns the picture lane the rendering, lighting, and materials pages. The rendering chapter opened as a Vulkan-only forward+ renderer. This tree also opens DX12 on Windows, Metal on macOS testing builds, and WebGPU and WebGL2 in the product viewer. Quality detection has eight tiers, including VeryLow, and an offline Cinematic profile. DLSS and XeSS are optional link crates. The generated render-profile table still lists the six real-time presets.
+Decision:
+1. The rendering chapter names Vulkan, DX12, Metal (macOS testing), and the product viewer's WebGPU and WebGL2, and states the DLSS and XeSS limits (external SDK, not bundled, fallback to the built-in upscalers). It documents the eight quality tiers, the Cinematic gate, the five upscale qualities, TAAU, TSR, FSR 3, frame generation, and the three present modes.
+2. The generated `book/reference/render-profiles.md` stays generated. `xtask/src/manual.rs` `profile_rows` lists `RenderProfilePreset::ALL` (six presets) and omits `Cinematic`. VeryLow is a `QualityTier`, not a preset. Regenerating the table with the current generator will not add either row. The picture pages say so. Extending the generator belongs to the catalog lane.
+3. No engine behavior, format shape, or agent-protocol change. New how-to pages are procedures. They do not add a second source of truth for the numbers in `regia_render`.
+Consequences: `book/SUMMARY.md` does not yet link `book/how-to/picture/`. The catalog lane adds those lines. `cargo xtask book-check` fails on unlinked pages until then. `cargo xtask manual` and `cargo xtask llms-txt` stay lead commands.
+Release fragment `docs/releases/v0.1.28-manual-picture.md`.
+
+## ADR-10424: World manual pages state the voxel-core gap and the project weather
+Date: 2026-11-22   Status: proposed
+Context: the v0.7.1 manual lane `manual-world` writes the terrain, streaming, and procedural how-tos and updates the world user-guide chapters (`docs/manual/PLAN.md` lane E). Two chapters on the v0.7.0 candidate contradicted the tree. `book/user-guide/sky-lab.md` said the engine had no weather system. Spec 99, `regia_scene::weather`, and `book/agents/weather-precipitation.md` describe precipitation, surface wetness, snow, and scene wind, off unless `assets/config/weather.ron` enables them. `book/user-guide/volume-mesh.md` documented dual contouring and volume mesh layers and did not say that `docs/specs/122-voxel-core.md` (`regia_voxel_core`, the `.voxfield` file, the operation log) is absent. The inventory's trusted-partial row keeps voxel terrain partial until that page matches the spec. The catalog lane must not print voxel terrain as built from the spec-122 row alone.
+Decision:
+1. The volume-mesh chapter keeps the dual-contouring mesher and the ADR-10071 volume mesh layer, and it states that spec 122 is not in this tree. Voxel terrain stays partial.
+2. The Sky Lab chapter stays the cloud-layer sample. Project weather is documented there from spec 99 and the agent page, including the effects that are off by default and the items spec 99 § 16 leaves out.
+3. Water bodies, swell, the FFT ocean band, the water-finish queries, and the water extras (off by default) are summarized on the terrain chapter and linked to `book/agents/water.md`. Outline-shaped lakes stay unbuilt, as `docs/specs/water.md` § 5 records.
+4. No engine behavior, content-format shape, or agent-protocol method changes. `book/SUMMARY.md`, the catalog, the glossary, and the index stay with the catalog lane. This lane sends that lane its contents lines, terms, and the status corrections.
+Consequences: an agent that reads the world chapters will not invent a voxel core, a bundled weather that always runs, or a finished outline lake. The lead still runs `cargo xtask book-check` and `cargo xtask manual`. Specs untouched.
+Release fragment `docs/releases/v0.1.28-manual-world.md`.
+
+## ADR-10427: The platform manual states the shipping limits beside the commands
+Date: 2026-11-22   Status: proposed
+Context: The platform, packaging, licensing, doctor, SBOM, hygiene, product-viewer, and OpenXR pages are what a person or an agent reads before shipping a game. The code already refuses several things those readers might invent: an OpenXR loader (`xr_no_loader`; `XrBackendKind::OpenXr` and `Auto` stay Off), a macOS release or dedicated-server package (`--format app` is rejected; `--server` is Linux and Windows, otherwise `server_platform_unsupported`), a general web game (parked in `docs/versions.md`; `regia_web` is the product viewer, WebGPU and WebGL2), a bundled vendor SDK, and a shipped container image of the game (`regia package --container` builds the binary inside a pinned toolchain image; the artifact is still a tar, a directory, or an AppImage). `regia package parity` (ADR-8428) had a CLI and an agent page, and the inventory still marked the command undocumented because the packaging chapter did not name it. ADR-10417 keeps one mdBook and assigns this lane the platform pages.
+Decision:
+1. `book/user-guide/linux.md` is the Linux platform page. Install commands stay on `book/start/install.md`, which this lane does not edit. The page links that chapter.
+2. `book/how-to/platforms/package-a-game.md` is the packaging procedure, with a finished check. The flag reference stays `book/user-guide/packaging.md`, which now names `regia package parity`, `--verify-paks`, and the build-container limit.
+3. The product-viewer page states that WebGPU and WebGL2 belong to that viewer. A general web game target stays parked.
+4. The OpenXR page keeps `xr_no_loader`. `runtime_json` is stored for a binding this version does not read. The simulator is the backend that creates a session.
+5. The platform matrix for `book/manual/known-issues.md` is in the lane report. The platform pages do not each carry a copy of that table, so they cannot drift apart.
+Consequences: no engine behavior, content-format shape, public API, or agent-protocol change. Lane manual-map adds the SUMMARY lines, glossary terms, FAQ bullets, and the matrix. The lead runs `cargo xtask book-check`, `cargo xtask manual`, `cargo xtask manual --check`, `cargo xtask llms-txt`, and `cargo xtask check-formats --update`.
+Release fragment `docs/releases/v0.1.28-manual-ship.md`.
+
+## ADR-10418: The manual's index, glossary and feature catalog are generated
+Date: 2026-11-22   Status: proposed
+Context: the user manual is the mdBook in `book/` plus the single-file `docs/manual/manual.html`
+that `cargo xtask manual` renders from `book/SUMMARY.md`. A reader (a person or an assistant) needs
+a table of contents, an index, a glossary and a feature list. The table of contents is already the
+summary and the HTML sidebar. The other three were not generated, so they would drift from the
+pages the moment a lane added a chapter. Hand-editing `book/reference/*.md` is forbidden: those
+pages are `cargo xtask manual` output.
+Decision:
+1. `cargo xtask manual` also writes three navigation pages, and `--check` fails when any of them
+   differs from the tree (the same `write_or_check` path the other generated pages use).
+   `stale_generated_pages` reports them too.
+2. **Index** (`book/reference/index.md`). Every book page contributes terms. An HTML comment
+   `<!-- index: term, other term -->` anywhere outside a code fence adds those terms (comma
+   separated; a double-quoted term may contain a comma; a comment may span lines; whitespace inside
+   a term collapses to one space). Each page's H1 and H2 headings are fallback terms, so the index
+   is useful before authors add markers. A term's links are every page that marks it, sorted by
+   page path then heading anchor. The anchor is included only when that heading's slug is unique on
+   the page, the plain-text slug is the same string, and both are non-empty. That is the slug
+   `book-check` accepts and the slug the HTML manual uses for the heading. A repeated slug links to
+   the page with no fragment. Terms merge on a case-folded, whitespace-collapsed key. The displayed
+   spelling is the first one in sorted page order, then document order. Sections are Other, then
+   0-9, then A–Z, then any other letter, and only the sections that have terms. The index does not
+   scan `SUMMARY.md`, `book/build/`, or the three navigation pages (their letter headings would
+   list themselves).
+3. **Glossary** (`docs/manual/glossary.ron` → `book/reference/glossary.md`). Each term has a short
+   definition, optional see-also names and an optional book page (relative to `book/`, with an
+   optional `#heading`). The page sorts terms A–Z. A see-also name that is not a term, a duplicate
+   folded term, an empty term, a term that contains `#` or a newline, two terms that would share a
+   heading slug, or a path that is absolute or contains `..` is an error. See-also links are
+   same-page `#slug` anchors, which `book-check` resolves because each term is an H3. Unknown RON
+   fields are rejected (`deny_unknown_fields`): adding a field is a schema change.
+4. **Feature catalog** (`docs/manual/features.ron` → `book/reference/feature-catalog.md`). One
+   markdown table per area, columns Feature, Status, Page, Crate, Spec. Areas and rows stay in
+   source order so another lane can append rows without reordering. Status is a free string. The
+   words this lane uses are `shipped`, `partial` and `planned`; any other word is printed as
+   written. An empty page, crate or spec cell is an em dash. A spec path is named in code, not linked:
+   those files are outside the manual, and a markdown link the HTML renderer cannot turn into an
+   anchor fails the single-file manual's link check. The generator refuses a spec path that is not
+   a file. An empty area still gets a heading.
+   The same path checks and `deny_unknown_fields` apply. This lane seeds the areas and a few rows.
+   Filling the inventory is the manual-audit lane's job.
+5. **PDF.** `docs/03-workspace-and-dependencies.md` lists no PDF crate. This lane does not add one.
+   The index page tells the reader to open `docs/manual/manual.html` and use the browser's print
+   dialog (Save as PDF). `book/theme/brand.css` already has a print style that shows every chapter
+   and hides the sidebar. The HTML sidebar is the clickable table of contents; the new pages appear
+   in it once `SUMMARY.md` lists them.
+6. No engine behavior, content format, wire format or agent-protocol method changes. Rule 8's
+   agent-method surface, `book/agents/` page and `book/COVERAGE.md` row are for a runtime feature.
+   This is an xtask docs generator, so it adds none of those.
+7. Generated pages are written by a temp file in the same directory and a rename, so a reader does
+   not see a half-written page.
+Consequences: `GENERATED_PAGES` grows from three paths to six. A tree that has not run
+`cargo xtask manual` fails `manual --check`. Adding an index marker is a one-line HTML comment in
+the page that owns the term. Adding a glossary term or a catalog row is an append to the RON
+source, then `cargo xtask manual`. `llms.txt` lists the new summary chapters and must be
+regenerated with `cargo xtask llms-txt`. The index is heading-heavy until pages grow markers.
+Release fragment `docs/releases/v0.1.28-manual-index-tooling.md`.
+
+## ADR-10434: Hub relay drain bound, rate zero, and the v1 migrator
+Date: 2026-11-23   Status: proposed
+Context: The review of NL-11 (ADR-10397, spec 89 § 16.8) at `503109bba4` left five
+behaviors that disagree with the spec and with `docs/formats/hub-toml.md`.
+`relay.per_address_per_sec = 0` is documented as no limit and
+`RelayCore::set_source_rate` already admits every request, but `check_relay`
+rejected 0. A version-1 `[relay]` table that omits `enabled` loads with the
+relay off, then `migrate_hub_toml` bumped the version without writing
+`enabled = false`, so a reload turned the relay on. TOML spellings `+1` and
+`0x1` load as version 1, and the migrator rewrote only a leading run of decimal
+digits, so `+1` gained a second `format_version` key and `0x1` became `2x1`.
+`regia-hub.service` used `TimeoutStopSec=10` while the drain window is 30 s, so
+systemd SIGKILL arrived before an issued allocation could exit 0. The dedicated
+server unit stays at 10 s. `HubProcess::finished_draining` required
+`HubHost::finished_draining`, which also waits until unconfirmed and dormant
+peers are empty. A handshake during the drain is refused with `hub_draining`
+and allocates no session, and the peer stays unconfirmed until `idle_ms` after
+it joined, so the 30 s window was not an upper bound.
+Decision:
+1. `relay.per_address_per_sec` of 0 is valid and means no limit, including when
+   `relay.enabled` is false. The hub's own `limits.per_address_per_sec` still
+   refuses 0.
+2. `migrate_hub_toml` rewrites every TOML integer spelling of version 1 to 2
+   and does not prepend a second key. When a version-1 `[relay]` table omits
+   `enabled`, the migrator writes `enabled = false` into that table and keeps
+   the other keys. A missing `[relay]` table still appends the whole table with
+   `enabled = false`. A version-2 file that omits `enabled` still turns the
+   relay on. An explicit `enabled` wins. A second pass returns the same text.
+3. `regia-hub.service` `TimeoutStopSec` is `HUB_RELAY_DRAIN_MS / 1000 + 10`
+   (40 s). `regia-server.service` stays at 10 s. `ExecStart` and the relay port
+   stay as ADR-10397 left them.
+4. `HubProcess::finished_draining` is true when the process is draining, hub
+   sessions are gone, and either the relay holds nothing or
+   `HUB_RELAY_DRAIN_MS` of the process clock have passed.
+   `HubHost::finished_draining` still waits for unconfirmed and dormant peers.
+   A refused handshake does not hold the process past the window.
+Consequences: The five review tests pass without a changed assertion.
+`docs/formats/hub-toml.md` states that only a version-1 file that omits
+`relay.enabled` leaves the relay off. Operators who already installed a
+generated `regia-hub.service` with `TimeoutStopSec=10` need a new package (or
+to edit the unit) before systemd will wait out the drain. No new public type,
+field, or agent method. No format version bump: the migrator output for a v1
+file that already had a `[relay]` table without `enabled`, and for a non-decimal
+spelling of version 1, changes. The schema fingerprint is unchanged.
+
+## ADR-10444: Keep the hub-relay review fixes already on the v0.7.1 line
+Date: 2026-11-23   Status: proposed
+Context: lane v071-net-hub-relay-ff reported DONE at `0b8b57ceb1` (ADR-10434). That branch was not
+on origin (the lane cannot push); the commit was in the local object store, based on the review at
+`503109bba4`. The same five review findings were already fixed on this line by `95a68f40e5`
+(ADR-10419), and `docs/releases/v0.7.1.md` already describes that fix. The two implementations
+disagree in three places: the hub unit stop timeout (45 s here, 40 s on the fix lane), whether a
+refused unconfirmed link holds `finished_draining` until the 30 s window when the relay holds
+nothing (this line waits; the fix lane returns at once), and an inline or dotted version-1 relay
+table that omits `enabled` (this line refuses it; the fix lane writes `relay.enabled = false`).
+Decision: merge `0b8b57ceb1`. Where the code differs, keep ADR-10419. 45 s is longer than 40 s, so
+`hub_unit_stop_timeout_covers_the_relay_drain` (the timeout must be greater than the drain) still
+passes, and a unit generated from this line still outlasts the window. A refused link is still
+waited for, and never past the window, which is what
+`a_refused_handshake_does_not_hold_the_drain_past_the_window` asserts. The migrator still rewrites
+the whole integer token, so `+1`, `0x1`, `0o1` and `0b1` become version 2, and it still refuses an
+inline or dotted table. No test assertion was changed. The version is not bumped.
+Consequences: `docs/releases/v0.7.1.md` keeps its 45 s sentence. The book pages name 45 s.
+ADR-10434 stays as the fix lane's record. The format doc's spelling list from that lane stays,
+because this line's token rewrite covers those spellings.
+
+## ADR-10435: The manual publishes the inventory catalog and also the short navigation pages
+Date: 2026-11-23   Status: proposed
+Context: the manual-map lane (ADR-10420) generates `book/manual/catalog.md` from `docs/manual/feature-inventory.csv` and `book/manual/index.md` from index markers and level-2 and level-3 headings. The manual-index-tooling lane (ADR-10418) generates `book/reference/glossary.md`, `book/reference/feature-catalog.md` and `book/reference/index.md` from `docs/manual/glossary.ron`, `docs/manual/features.ron` and heading markers. Both lanes edit `xtask/src/manual.rs` and `book/SUMMARY.md`. The inventory has thousands of rows. The RON feature list is a short seed. Publishing only the short list would hide inventoried features. Publishing only the map pages would drop the index-tooling tests and the generated glossary.
+Decision: `cargo xtask manual` writes all eight pages. The contents' Feature catalog, Glossary and Index are the inventory catalog, the hand-written glossary and the marker index under `book/manual/`. The RON pages stay in the reference section under distinct titles (Heading index, Glossary (generated), Feature list (short)) so a reader can tell the short list from the inventory. `GENERATED_PAGES` lists all eight. The hand-written glossary is not overwritten.
+Consequences: docs and xtask only. No engine behavior, format shape, CLI flag or agent-protocol change. A tree that has not run `cargo xtask manual` fails `manual --check` on any of the eight pages. The short feature list is not the coverage check for the inventory.
+Release fragment `docs/releases/v0.1.28-manual-review-g.md`.
+
+## ADR-10484: v0.7.1 release commit on the candidate, before the gate
+Date: 2026-11-23   Status: proposed
+Context: The v0.7.1 candidate is integ-d `15d5fc8eec` plus the reviewed manual `98b6057051`. The runbook
+(`docs/releases/v0.5.0-runbook.md` § 3 steps 5, 6, 6a) puts the version and the note on the candidate before
+its gate, the way v0.6.1 and v0.7.0 did. The workspace version is 0.7.0. `RELEASE_LINES` already ends at
+`ReleaseLine::pre_1_0(7)`. N110 (`KI-NT-053`, ADR-10373) shipped as an owner-ruled known issue. A search of
+`queue/` found no later lead note that retires it. The manual-review generator and the index-tooling generator
+both edit `xtask/src/manual.rs`; ADR-10435 already keeps the eight-page generator.
+Decision:
+1. The workspace version is 0.7.1. There is no new `ReleaseLine`. A patch stays on line 0.7, as v0.6.1 stayed
+   on line 0.6. `engine_version`'s test still requires the last line to be `CURRENT.line()`.
+2. `docs/releases/v0.7.1.md` is the note. Fragments added since tag v0.7.0 move to
+   `docs/releases/fragments/v0.7.1/` under the same file names. The README table row waits for the tag, because
+   this commit cannot hold its own hash.
+3. N110 stays a known issue with the bar and the ignore unchanged. `net_relevance_n214` stays the v0.6.0 perf
+   red. Its budgets are not changed.
+4. The manual upgrade page names the `hub.toml` format-2 migration. It no longer says this release changes no
+   content format.
+Consequences: `regia --version` prints `regia 0.7.1`. `regia engine info` reports line 0.7. A v0.7.0 client
+still completes the hub handshake (protocol 1) against a v0.7.1 hub. `cargo xtask manual`, `adr-index`,
+`api-snapshot`, `agent-snapshot`, `notices`, `demo-notices`, and `llms-txt` are regenerated in this commit.
+Release fragment `docs/releases/v0.1.28-v071-release-commit.md`.
+
 ## ADR-10544: Release binaries find the engine checkout at run time; `regia new` outside a checkout pins the public tag
 Date: 2026-11-23   Status: proposed
 Context: The public v0.7.0 release ships prebuilt `regia` and `regia-editor` archives. `regia new` (and `regia engine
@@ -84840,4 +85662,133 @@ the first time cargo fetches it); release binaries pass the host-string gate wit
 A release-profile build run from a target directory outside its checkout needs `REGIA_ENGINE_DIR` or the flags.
 Host-visible API: `regia_cli::new_project::build_checkout` is gone (use `engine_checkout`, which returns
 `Option`); new `engine_checkout`, `find_engine_checkout`, `create_with_engine`. Book pages `reference/cli.md`,
-`agents/samples.md`, `agents/editor-extensions.md` updated.
+`agents/samples.md`, `agents/editor-extensions.md` updated. Release fragment `docs/releases/v0.1.28-public-v070-prep.md`.
+
+## ADR-10616: v0.7.2, the public patch: plain Windows engine paths, launcher docs, the public scrub in the source, release commit
+Date: 2026-11-23   Status: proposed
+Context: The owner cancelled v0.7.1 (its gate was stopped; it was never tagged) and made v0.7.2 the next release:
+everything in the v0.7.1 release commit `fb88cf9083` plus the fixes the public v0.7.0 tree needs. (a) A public
+Windows 11 user ran `regia new "My Game" --template quick --path %USERPROFILE%\RegiaProjects` with the engine
+cloned to `%LOCALAPPDATA%\Regia\e`; the project's `Cargo.toml` got
+`regia = { path = "//?/C:/Users/<user>/AppData/Local/Regia/e/crates/regia" }` and `cargo build` failed with
+"invalid path url". The engine checkout is canonicalized, and `canonicalize` returns the verbatim `\\?\C:\…` form
+on Windows; the `\` to `/` rewrite then made it `//?/C:/…`. `regia_asset_pipeline::generators::plain_path` already
+stripped that prefix for external tools, in the wrong crate for the CLI, the editor and the engine pin. (b) The
+docs told every agent to warm a new project with `cargo build -p <name>_launcher`, which fails for `quick` and
+`net_game`: only `blank`, `first_person`, `third_person` and `top_down` ship `launcher/Cargo.toml.tmpl`. (c) The
+public v0.7.0 tree (`88de50320d`) was scrubbed of owner machine names by hand (eight edits); the source still had
+them, so the next export would need the same hand edits. (d) ADR-10544's run-time checkout lookup was made on the
+public-prep lane and never reached the dev line.
+Decision:
+1. `regia_core::project_path::strip_verbatim` (plain text, every host: `\\?\C:\x` becomes `C:\x`; verbatim UNC,
+   Unix and non-UTF-8 paths unchanged) and `canonicalize_plain` (canonicalize, then strip). `generators::plain_path`
+   is its text form. The CLI's and the editor's `find_engine_checkout` return `canonicalize_plain`; `create` /
+   `create_with_engine` strip the engine text again before writing it; `distribution::slash_path` strips it, so
+   every engine-pin path (`regia engine pin path:…`, `regia new --engine-source path:…`, `source_version`, the
+   "Cargo.lock: seeded from" message) is written plain. Other `canonicalize` calls compare canonical paths with
+   canonical paths and stay as they are: mixing a plain path into those compares would break `starts_with` on
+   Windows.
+2. The onboarding page, the getting-started and running pages, the first agent check, the public root
+   `AGENTS.md` and the `regia-new-project` skill name the four launcher templates and give plain `cargo build`
+   for `quick` and `net_game`. An xtask test reads the launcher list from the template folders and checks the
+   three agent-facing docs against it. `regia run` in a quick app or a net_game project, and `regia editor` in a
+   quick app, refuse with what to run instead (`commands::run::not_runnable_hint`): a quick app is a Cargo
+   package that depends on `regia` and has no `Regia.toml`; a net_game project has a `Regia.toml`, no
+   `launcher/` and a `server/` and `client/` crate. Other folders keep today's behavior.
+3. The source carries the scrub: `det-golden`'s default Windows host is `windows-host`; `player-sweep` reads
+   `REGIA_BUILDHOST` (the old variable name is still read after it, for one release); the `owner_only_tests` icacls
+   fixture names `GAME-PC`; the `net_match` client-spec test uses `player@winhost`; the package-hygiene tests
+   unmask the private names at test time and `host_strings.rs` no longer spells them in comments; the hygiene book
+   page drops one name; the `windows-old-host` evidence folders are `windows-rtx3080ti`, as in the public tree.
+   Lane v08-private-names-source does the same on the v0.8 line.
+4. Release commit "Release v0.7.2" on top of `fb88cf9083` plus this lane: workspace version 0.7.2, no new
+   `ReleaseLine`, `docs/releases/v0.7.2.md` covers every change since v0.7.0 and says v0.7.1 was never released;
+   `docs/releases/v0.7.1.md` stays with a note at the top. The fragments since the v0.7.1 release commit move to
+   `docs/releases/fragments/v0.7.2/`. The hub comments that named "a v0.7.1 hub" name v0.7.2.
+Consequences: `regia new` on Windows writes `path = "C:/…/crates/regia"`, which Cargo builds. A project created
+by v0.7.0 on Windows with a `//?/` path still fails; `regia upgrade-project --engine path:<checkout> --write`
+rewrites it (the path is stripped now), or the user edits the line. New public functions in `regia_core::project_path`. `REGIA_BUILDHOST_OLD`
+users keep working for v0.7.2. Release fragment `docs/releases/v0.1.28-v072-public-patch.md`.
+
+## ADR-10723: v0.7.2 gate reds: four source fixes; the rest are the test machine host differences
+Date: 2026-11-24   Status: proposed
+Context: The v0.7.2 merge gate v072rc3 on `a460616333` ("Release v0.7.2") failed its CPU/lavapipe stage. It was
+the first gate whose CPU stage ran on the test machine (whole-host tooling, `tools/gaterig/host-remote.sh` on the
+v08-gate-the test machine-host line); every earlier gate ran that stage on the build server. Each red was rerun alone on the
+the test machine with the gate's own binaries (its spooled argv, cwd and env) and on the build server at `a460616333`.
+Decision:
+1. Red on both hosts (defects in the release), fixed at the source:
+   - `cargo xtask book-check` compared the generated reference pages with `?`: since the v0.7.1 manual index work
+     the comparison renders from `docs/manual/feature-inventory.csv`, the glossary and the catalog, so a book
+     without them (every xtask `book` and `agent_coverage` fixture) failed with an IO error instead of a verdict.
+     Only a missing source is advisory: an error whose chain holds `io::ErrorKind::NotFound` is a warning, so
+     the fixtures get their verdict. Any other error to render (an inventory that is present and does not parse,
+     a glossary that fails its checks, a feature-catalog spec path that is not a file, a malformed index marker)
+     is a book-check error and fails the check. Amended after review (lane v072-gate-reds-review-g, test
+     `xtask/tests/book.rs` `a_broken_feature_inventory_fails_book_check`): the first fix warned on every render
+     error, and the gate runs `book-check`, not `cargo xtask manual --check`, so a broken source passed the gate.
+   - `.github/workflows/nightly.yml`: the comment added with the read-both change named `FERRITE_GPU_RUNNER` and
+     `FERRITE_DO27_CONTENT` bare; it names `vars.FERRITE_…`, which the rename keep list already protects.
+   - `gltf_texture_dedupe::book_two_chunk_example_places_shared_images_and_checks_requires` read the first TOML
+     block of `book/user-guide/content-chunks.md`; the v0.7.1 manual rewrite put the general chunk-rules example
+     first. The test reads the first block of the page's "Shared glTF images and content chunks" section, the
+     example it was written for; its assertions are unchanged.
+   - `editor_launch::android_launch_attaches_the_apps_agent_through_adb_forward` read the fake adb's argv log as
+     soon as the launch was `running`, which is entered right after logcat is spawned and before the fake script
+     has run (failed 2 of 3 alone on the rig). It now waits for the fake logcat's first line, as the other logcat
+     tests in the file do; assertions unchanged.
+2. Red only on the test machine: host differences, no source or assertion change. The pixel pins and goldens were
+   taken on the build server's lavapipe (Mesa 26.1.6, LLVM 19.1.7); the rig has Arch's Mesa 26.2.7 / LLVM 23.1.4. With
+   the build server's lavapipe libraries loaded on the rig, the same gate binaries pass `feature_cost_pins`,
+   `do27_lighting` and `planet_frames`. `package_e2e --ignored` needs Xvfb, which the rig does not have.
+   `gltf_extensions` needs five Khronos extension samples that `cargo xtask fetch-test-assets` never fetches; the
+   rig's CPU stage sets `REGIA_REQUIRE_ASSETS=1`, the build server's did not. The timeouts follow from 32 threads, four
+   pooled binaries and `LP_NUM_THREADS=2` against the build server-sized 1200 s limit. These go to the
+   v08-gate-the test machine-host lane (reference lavapipe ICD, Xvfb, the sample set, the timeout model).
+Consequences: no test assertion, pin, golden or bar moved. The v0.7.2 release commit is rebuilt with the four
+fixes. Until the rig runs the reference lavapipe, a CPU stage there cannot pass the lavapipe pins. Release
+fragment `docs/releases/fragments/v0.7.2/v0.1.28-v072-gate-reds.md`.
+
+## ADR-8885: The N214 allocation budget on Linux: a regression, not a platform gap (loopback frame budget, bench fill)
+Date: 2026-11-20   Status: proposed
+Context: `cargo xtask perf-budgets --counts-only --enforce` failed two rows on Linux at the v0.6 freeze and at
+integ-v061a (92cd068dd): `net_relevance_n214_allocs` 38,677 allocations per send tick against 37,000 and `_p99` 46,387
+against 38,000. The budgets came from ADR-8031's MacBook M5 run (35,392 / 36,180). The counts are deterministic (same
+value on every run, at 8 workers, on the test machine, the build server and the Mac), so the same command was run at older commits
+on Linux: v0.5.0 (bench backported without rate tiers) 39,892 / 40,748; ADR-8031's base 55eff2751 (backported)
+39,898 / 40,754 on the build server, the same as the Mac's 39,898 / 40,754; the budget commit e786d7cf2 35,392 / 36,180 on the
+the test machine and on the build server, the same as the Mac. Linux was never higher than the Mac: the counts grew after the budget
+commit. Bisect on integ-v06s-net's first parent: ef1bdf2a7 and e33ecaf8b keep 35,392 / 36,180; 8019959b0 (that line's
+head) has 38,677 / 46,387. Two causes, both found with a sampled allocation-site profile and a per-send-tick series:
+(a) `StateLink::payload_bytes` (0c9fd5101, ADR-8419's lane) builds a default `Connection` on every call when the link has
+no transport frame size (loopback, standalone replication, this bench) just to read its unreliable payload; once
+net-v2-streams (ADR-8302) gave `Connection::new` stream tables, that cost about 6 allocations per connection and send
+tick (768 per send tick at 128 connections). (b) ADR-8419 (5) applies the byte test to spawns as well, merged into this
+line with net-extrapolation-gate (7ee1ef11a, which carried net-replication-oversize's c64a22283). The bench's warm-up
+("fill every connection first") was 6 ticks at `spawns_per_send` 100,000, enough while spawns ignored the bytes; at
+1,638 bytes per send tick the ~2,142 spawns of each view now take dozens of send ticks, so the first ~80 measured send
+ticks were a join flood (about 46,000 allocations each) and only the rest was the steady N214 load (about 28,500).
+Decision: (1) The frame budget of a link without a transport size is computed once per process
+(`default_transport_frame_bytes`, a `OnceLock`), with the same expression; a transport size still wins. (2) The n214
+bench's fill runs until no connection has a spawn pending (`ConnSendCounters::spawns_pending`), at least the 6 ticks it
+always ran, and prints how many it took; at the budget commit it still stops after 6 ticks, so the measured scenario is
+the one ADR-8031 set the budgets on. At the lane head the fill takes 77 ticks and the rows measure 28,302 / 30,501
+(the build server); the budgets (37,000 / 38,000) and the Mac numbers are unchanged, and no per-host budget is needed. (3) `crates/regia_net/tests/state_send_alloc.rs` counts what one more loopback connection allocates per send
+tick (16 against 32 connections, counting allocator): 18.29 with (1), 24.25 without; the limit is 21.
+Consequences: no API, wire or format change. The join flood is no longer inside the steady-state rows; a join-flood
+allocation row (per send tick while a full view spawns) is a possible follow-up for spec 120 § 8.4, not added here.
+
+## ADR-10770: v0.7.2 carries the N214 allocation fix (ADR-8885)
+Date: 2026-11-24   Status: proposed
+Context: The v0.7.2 re-gate v072rc4 (whole gate on the test machine) passed every test and failed only
+`cargo xtask perf-budgets --counts-only --enforce` on `net_relevance_n214_allocs` (38,690.96 against 37,000) and
+`net_relevance_n214_allocs_p99` (46,387 against 38,000), the known issue carried since v0.6.0. The build server gate never
+enforced perf budgets; the test machine gate does. The fix, ADR-8885 (lane net-relevance-n214-linux-budget, `a33e940ca7`),
+was already on the v0.8 line (`c9a2d39e25` plus the SPDX line `dcf72df0ed`).
+Decision: merge `a33e940ca7` into the v0.7.2 release with the v0.8 line's conflict resolution (the `state_channel.rs`
+test module keeps both v0.7.0's ADR-10051 ring tests and ADR-8885's default-frame-budget test; the SPDX line on
+`crates/regia_net/tests/state_send_alloc.rs`), regenerate the ADR index, and squash it into a new "Release v0.7.2"
+commit on `f56401c30b`. The budgets are unchanged. `docs/releases/v0.7.2.md` names the fix under Fixed and drops the
+N214 known issue; the ADR-8885 fragment moves to `docs/releases/fragments/v0.7.2/`.
+Consequences: no API, wire, format or settings change; the v0.7.2 gate can enforce perf budgets. The v0.8 line
+already holds the same code, so merging v0.7.2 forward conflicts only in the release notes and the ADR index.

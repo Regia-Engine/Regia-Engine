@@ -1,5 +1,12 @@
 # Importing assets
 
+<!-- index: Import -->
+<!-- index: glTF -->
+<!-- index: FBX -->
+<!-- index: OBJ -->
+<!-- index: USDA -->
+<!-- index: .meta | see: Asset id -->
+
 Drop a source file under your project's `assets/` folder and `regia cook` turns it into the form the
 game loads. The editor's Content Browser **Import...** button copies a file in first. A file the cook
 has no importer for stops with `unsupported source extension: <ext>`. This chapter lists every importer
@@ -53,7 +60,7 @@ return the same report without writing anything.
 
 | Extensions | Produces | Settings (`.meta`) | Limits and errors | Agent page |
 |---|---|---|---|---|
-| `.png`, `.jpg`, `.jpeg`, `.tga`, `.bmp` | A texture with a full mip chain, block-compressed for the platform (BC on desktop, ASTC on Android). TGA and BMP are decoded and then cooked like a PNG | `usage` (`color`, `linear`, `normal`, `mask`, `ui`), `max_size`, `compress`, `quality` (`high`, `low`), `stream`, `stream_min_px` | Default usage comes from the material slot that uses the image, else from its file name; a malformed settings string is logged and the defaults apply | [Texture compression](../agents/texture-compression.md), [Texture sets](../agents/texture-sets.md) |
+| `.png`, `.jpg`, `.jpeg`, `.tga`, `.bmp` | A texture with a full mip chain, block-compressed for the platform (BC on Linux, Windows, and macOS; ASTC on Android). TGA and BMP are decoded and then cooked like a PNG | `usage` (`color`, `linear`, `normal`, `mask`, `ui`), `max_size`, `compress`, `quality` (`high`, `low`), `stream`, `stream_min_px` | Default usage comes from the material slot that uses the image, else from its file name; a malformed settings string is logged and the defaults apply | [Texture compression](../agents/texture-compression.md), [Texture sets](../agents/texture-sets.md) |
 | `.dds` | BC1, BC3, BC4, BC5 and BC7 with two or more mips keep their blocks (ASTC on Android); a single level, BC2, BC1 with punch-through alpha and 32-bit uncompressed formats decode to RGBA8 and cook like a PNG | `max_size` drops leading mip levels | Edge up to 32,768. Refused: cube maps, volumes, arrays, signed BC4 and BC5, BC6H and unlisted formats. `dds_bad_header`, `dds_unsupported`, `dds_truncated` | [Loudness and the other importers](../agents/loudness-import.md#importers) |
 | `.exr`, `.hdr` | A linear float texture (KTX2) with a full mip chain. NaN and infinite samples become 0 (one warning per file), negatives clamp to 0, values above 65,504 clamp | `hdr_encoding` (`auto`, `bc6h`, `rgba16f`, `astc_hdr`), `compress`, `cube_face_px` (4 to 8192: cook an equirect source into a six-face cube map) | At most 67,108,864 texels. `hdr_decode`, `hdr_size`, `hdr_settings`, `hdr_ktx2` | [Texture compression](../agents/texture-compression.md) |
 
@@ -91,11 +98,54 @@ return the same report without writing anything.
 Anything under an extension's own `ext://` folder is cooked by that extension's loader, and extensions can
 register importers for file types the built-ins do not take.
 
-## Importers not on this build
+## More source formats the cook accepts
 
-Importers for USD, PLY, STL, PSD, Aseprite, LDtk, MaterialX and SVG files are not in this build. A file
-with one of those extensions stops with `unsupported source extension`. Convert it to a format in the
-tables above (glTF for models, PNG for images).
+These cook in the current `regia` binary. The pipeline crate's default features include
+`fbx_import`, `usd_import`, and `svg_import`. A build of the pipeline with one of those
+features off refuses that extension with `unsupported source extension`. PLY, STL, PSD,
+Aseprite, LDtk, and MaterialX are not behind those features.
+
+| Extensions | Cooks as | Detail |
+|---|---|---|
+| `.ply`, `.stl` | An in-memory glTF, then the glTF importer. One mesh, no material. | [PLY, STL and PSD import](../agents/mesh-image-import.md) |
+| `.psd` | An RGBA8 image, then the PNG texture path. | [PLY, STL and PSD import](../agents/mesh-image-import.md) |
+| `.usda`, `.usdc`, `.usd`, `.usdz` | A composed stage, then an in-memory glTF. | [FBX and OBJ import](../agents/fbx-import.md#usd) |
+| `.svg` | Pixels at cook time. The pak holds the raster, not the SVG. | [SVG import](../agents/svg-import.md) |
+| `.mtlx` | A material graph, then the material-graph cook. | [MaterialX import](../agents/materialx-import.md) |
+| `.aseprite`, `.ase` | Sprite-atlas strips. | [Import reports: Aseprite and LDtk](../agents/import-report.md) |
+| `.ldtk` | A cooked tilemap. | [Import reports: Aseprite and LDtk](../agents/import-report.md) |
+
+`regia import` also reads `.usda`, `.usdc`, `.usd`, and `.usdz` (plus `.fbx` and `.obj`) and
+can write the converted `.glb` with `--out`. USD refusals use the `usd_*` codes on the FBX
+page (`usd_not_usd`, `usd_parse`, `usd_no_mesh`, and the rest of that table).
+
+## Export a glTF binary to USDA
+
+`regia export usda` reads a `.glb` and writes one USDA stage for a DCC tool. It does not
+import USDA. Cooking a `.usda` is the section above. The stage is not a Regia content
+format: no `format_version`, and `regia upgrade-project` does not migrate it.
+
+```console
+$ regia export usda --glb assets/models/crate.glb --out build/exchange/crate.usda
+```
+
+Success prints `wrote <path> (<bytes> bytes, <nodes> nodes, <meshes> meshes)` and exits 0.
+The file is `#usda 1.0`, default prim `World`, `metersPerUnit` 1, `upAxis` Y. Each glTF
+node becomes an `Xform`. Each triangle primitive becomes a `Mesh` (points, face counts,
+indices, normals when the primitive has them, and the first UV set). Materials, textures,
+skins, animation, cameras, lights, and morph targets are not written. The UV `t` coordinate
+is copied as stored. A primitive that is not a triangle is skipped.
+
+| Code | Meaning |
+|---|---|
+| `usda_glb_missing` | `--glb` does not exist. |
+| `usda_glb_invalid` | Not a glTF 2 binary, or a value cannot be written (non-finite number, bad index, a node cycle). |
+| `usda_empty` | No triangle mesh. The output path is left as it was. |
+| `usda_write` | The stage could not be written or renamed. |
+
+The stage text is written beside the destination and renamed into place. The field list is
+on [Exporting a glTF binary to USDA](../agents/export-usda.md). The task steps, including
+FBX and OBJ, are in [Import a model](../how-to/create/import-a-model.md).
 
 ## Practical advice
 
@@ -105,8 +155,9 @@ tables above (glTF for models, PNG for images).
 - **Keep textures beside the model.** FBX and OBJ look for textures in the model's own directory only
   (the relative path, then the bare file name). A path with `..` or an absolute path is never followed. A
   texture that is not found drops its slot with a warning and the import succeeds.
-- **Check before you cook.** `regia import model.fbx --json` and `editor.bvh_inspect` read a file and report
-  what they found (joints, frames, triangles, warnings) without touching the project.
+- **Check before you cook.** `regia import model.fbx --json`, `regia import model.obj --json`,
+  `regia import model.usda --json`, and `editor.bvh_inspect` read a file and report what they
+  found without cooking the project. `--out` is what writes a `.glb`.
 - **Pixel art stays sharp.** Set `compress: Some(false)` so the image stays RGBA8, and keep `stream: Some(false)`
   for a texture that must never show a low mip.
 - **Fix a unit or axis mistake in settings, not in the file.** BVH libraries in centimeters or Z-up need

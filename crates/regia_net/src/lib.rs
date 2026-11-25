@@ -22,7 +22,7 @@
 //! | [`relay`] / [`join_code`] / [`port_map`] / [`upnp`] / [`discovery`] | Rendezvous and forwarding, join codes, PCP / NAT-PMP / UPnP IGD, LAN announce |
 //! | [`status`] | `net.status` / `net.peers` data, the diagnostics overlay and the agent bridge resource |
 //! | [`socket`] | Real UDP (buffer read-back and DSCP EF, ADR-7998) and an in-memory loopback network |
-//! | `server_host` | The dedicated-server host of spec 76: `server.toml`, pacing, console, health, signals |
+//! | `server_host` | The dedicated-server host of spec 76: `server.toml`, pacing, console, health, signals. `join`, `relay_path` and `TestClock` also build without `ecs` (ADR-10376) |
 //! | [`lobby`] | Lobbies, matchmaking and the lobby-to-session launch of spec 89 (`Lobbies`, `LobbyPlugin`) |
 //! | `recorder` | The network recorder of spec 103: a virtual connection, `.netdemo` files, a memory ring |
 //! | `voice` | Feature `voice`: voice chat relay and client transport (specs/59, ADR-1911) |
@@ -125,7 +125,12 @@ mod scalar;
 pub mod send;
 pub mod send_clock;
 pub mod server;
+// Both cfgs, so the API snapshot keeps every `ecs` signature and records the ecs-free relay
+// helpers as additions (ADR-10376). One declaration would drop `#[cfg(feature = "ecs")]` from
+// those signatures.
 #[cfg(feature = "ecs")]
+pub mod server_host;
+#[cfg(not(feature = "ecs"))]
 pub mod server_host;
 pub mod session;
 pub mod settings;

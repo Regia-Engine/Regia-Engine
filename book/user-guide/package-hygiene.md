@@ -1,5 +1,9 @@
 # Package hygiene
 
+<!-- index: Package hygiene -->
+<!-- index: package_hygiene -->
+<!-- index: Allowance -->
+
 Shipping packages can reject staged files that contain strings, patterns or terms you list in
 `Regia.toml`. The same check runs for an extracted package:
 
@@ -11,6 +15,11 @@ A clean audit exits 0. A rejected package exits 1 and prints one JSON object. Fi
 stable rule id, a path, `content` or `name`, and a byte offset. They do not include the rule
 text or the bytes that matched. `hygiene.policy_digest` is a `b3:` digest of the rules that
 are actually in force.
+
+This audit does not compare a development run with a packaged run. That is
+`regia package parity` on [Packaging](packaging.md) and in
+[Package a game](../how-to/platforms/package-a-game.md). Pak hashes are
+`regia doctor --verify-paks` ([Doctor](doctor.md)).
 
 ## Rules with stable ids
 

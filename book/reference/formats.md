@@ -101,7 +101,7 @@ Regia Engine's content formats are **frozen**: a format's serde shape may only c
 | `grass-density` | — | `—` | 1 | — | — |
 | `hlod-voxels` | — | `—` | 1 | — | — |
 | `hoverhull` | — | `—` | 1 | — | — |
-| `hub-toml` | — | `—` | 1 | — | — |
+| `hub-toml` | — | `—` | 2 | v1 → v2 | — |
 | `hull-set` | — | `—` | 1 | — | — |
 | `ies-profile` | — | `—` | 1 | — | — |
 | `impactbank` | — | `—` | 1 | — | — |

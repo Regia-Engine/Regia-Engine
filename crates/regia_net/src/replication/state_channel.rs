@@ -101,6 +101,19 @@ const MIN_STATE_PAYLOAD: usize = 128;
 pub const MIN_STATE_MTU_BYTES: u32 = (STATE_PACKET_RESERVE + STATE_HEADER_BYTES + MIN_STATE_PAYLOAD) as u32;
 // `settings` validates `config/net.ron` without the `ecs` feature, so it keeps its own copy.
 const _: () = assert!(MIN_STATE_MTU_BYTES == crate::settings::MIN_STATE_MTU_BYTES);
+
+/// The unreliable payload of a default sealed endpoint, less the game lane and `NetFrame`'s flag and
+/// `u16` length: the frame budget of standalone and loopback replication, which has no transport to
+/// ask. Worked out once per process: building a `Connection` to read it allocates its queues and
+/// stream tables, and the send path needs it for every connection on every send tick (ADR-8885).
+fn default_transport_frame_bytes() -> usize {
+    static BYTES: std::sync::OnceLock<usize> = std::sync::OnceLock::new();
+    *BYTES.get_or_init(|| {
+        crate::connection::Connection::new(crate::connection::LinkConfig::default())
+            .max_unreliable_bytes(crate::crypto::SEALED_RESERVED_HEADER_BYTES)
+            .saturating_sub(4)
+    })
+}
 /// A record unacknowledged this long is sent again even without a loss verdict (the acks stopped),
 /// until the connection has a round-trip sample; then [`StateLink::in_flight_timeout_ticks`]
 /// follows the measured round trip (spec 120 § 8.1, ADR-8419).
@@ -478,12 +491,9 @@ impl StateLink {
 
     /// The largest record that fits one unreliable frame.
     pub(super) fn payload_bytes(&self, mtu: u32) -> usize {
-        let transport = self.transport_frame_bytes.unwrap_or_else(|| {
-            // Standalone/loopback replication uses the default sealed endpoint budget.
-            crate::connection::Connection::new(crate::connection::LinkConfig::default())
-                .max_unreliable_bytes(crate::crypto::SEALED_RESERVED_HEADER_BYTES)
-                .saturating_sub(4) // game lane and NetFrame's flag + u16 length
-        });
+        let transport = self
+            .transport_frame_bytes
+            .unwrap_or_else(default_transport_frame_bytes);
         (mtu as usize)
             .saturating_sub(STATE_PACKET_RESERVE)
             .min(transport)
@@ -2704,5 +2714,33 @@ mod tests {
         let bytes = std::mem::size_of::<ClientVersion>();
         println!("state-ring: size_of::<ClientVersion>() = {bytes} bytes");
         assert!(bytes <= 192, "a stored version is {bytes} bytes");
+    }
+
+    /// ADR-8885: a link without a transport frame size (standalone and loopback replication) reads
+    /// the default sealed endpoint's payload from the once-computed value, which equals what a
+    /// freshly built default `Connection` reports; a transport size still wins.
+    #[test]
+    fn the_default_frame_budget_matches_a_default_connection() {
+        let fresh = crate::connection::Connection::new(crate::connection::LinkConfig::default())
+            .max_unreliable_bytes(crate::crypto::SEALED_RESERVED_HEADER_BYTES)
+            .saturating_sub(4);
+        assert_eq!(default_transport_frame_bytes(), fresh);
+        assert_eq!(
+            default_transport_frame_bytes(),
+            fresh,
+            "the second read is the same value"
+        );
+        let link = StateLink::default();
+        assert_eq!(link.transport_frame_bytes, None);
+        let mtu = 100_000u32;
+        assert_eq!(
+            link.payload_bytes(mtu),
+            fresh.min(mtu as usize - STATE_PACKET_RESERVE) - STATE_HEADER_BYTES
+        );
+        let small = StateLink {
+            transport_frame_bytes: Some(600),
+            ..StateLink::default()
+        };
+        assert_eq!(small.payload_bytes(mtu), 600 - STATE_HEADER_BYTES);
     }
 }

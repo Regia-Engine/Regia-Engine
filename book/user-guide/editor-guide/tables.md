@@ -1,5 +1,7 @@
 # Tables
 
+Panel id: `tables`.
+
 The **Tables** tab opens three kinds of gameplay data table from the project's `assets/` folder and edits them:
 **Curves** (`.curves.ron`, `.curves.csv`: named curves of keys), **Chooser** (`.chooser.ron`: a table of rows and
 columns that picks a result from a context) and **Data** (`.table.ron`, `.table.csv`: typed rows of one struct,

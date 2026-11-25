@@ -1,6 +1,8 @@
 # Packaging the demo
 
-`cargo xtask demo-package` turns the showcase's free-camera demo (`showcase --demo`) into something you can hand out or upload. It builds the `shipping` profile (`panic = "abort"`) for Windows and Linux, adds the cooked scene, the credits and the notices, and lays out a Steam depot and plain archives with checksums. It uploads nothing and reads no credential.
+<!-- index: Demo package -->
+
+`cargo xtask demo-package` turns the showcase's free-camera demo (`showcase --demo`) into something you can hand out or upload. It builds the `shipping` profile (`panic = "abort"`) for Windows and Linux, adds the cooked scene, the credits and the notices, and lays out a Steam depot and plain archives with checksums. It uploads nothing and reads no credential. The owner creates the Steam app. A game you ship yourself uses [Package a game](../how-to/platforms/package-a-game.md), not this command.
 
 ```text
 cargo xtask demo-package --scene samples/showcase/example_scene --app-id 1234560

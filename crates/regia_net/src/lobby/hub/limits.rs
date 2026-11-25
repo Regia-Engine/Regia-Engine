@@ -123,3 +123,111 @@ fn allow(window: &mut VecDeque<u64>, now_ms: u64, limit: u32) -> bool {
     window.push_back(now_ms);
     true
 }
+
+/// How long one AskReach stamp counts (spec 89 § 16.5).
+pub(crate) const ASK_WINDOW_MS: u64 = 10_000;
+/// Asks one player key may make inside [`ASK_WINDOW_MS`]. `HubSettings::sanitized` does not raise this.
+pub(crate) const ASK_PER_IDENTITY_CAP: u32 = 4;
+/// Asks one source address may make inside [`ASK_WINDOW_MS`].
+pub(crate) const ASK_PER_ADDRESS_CAP: u32 = 16;
+/// Open asks (`Asked` or `Planned`) one player key may hold.
+pub(crate) const ASK_INFLIGHT_PER_IDENTITY_CAP: u32 = 2;
+/// Open asks the hub may hold.
+pub(crate) const ASK_INFLIGHT_HUB_CAP: u32 = 64;
+
+const ASK_IDLE_MS: u64 = 20_000;
+const ASK_TRACK_CAP: usize = 4_096;
+
+/// AskReach windows on the hub core (NL-09). Separate from [`AdmitGate`]'s one-second buckets.
+///
+/// The address window is checked first. A refusal there does not stamp the key. A missing address
+/// skips the address window. A missing player key skips the key window. One stamp is recorded per
+/// window only when the ask is admitted.
+#[derive(Debug, Clone, Default)]
+pub(crate) struct AskWindows {
+    addresses: BTreeMap<IpAddr, VecDeque<u64>>,
+    keys: BTreeMap<PlayerKey, VecDeque<u64>>,
+}
+
+impl AskWindows {
+    /// Admits one ask at `now_ms`.
+    ///
+    /// # Errors
+    ///
+    /// [`HubError::AskRateLimited`] when the address window or the key window is full.
+    pub(crate) fn admit(
+        &mut self,
+        addr: Option<IpAddr>,
+        key: Option<PlayerKey>,
+        now_ms: u64,
+        per_address: u32,
+        per_key: u32,
+    ) -> Result<(), HubError> {
+        self.evict(now_ms);
+        if let Some(addr) = addr
+            && !fits(self.addresses.get(&addr), now_ms, per_address)
+        {
+            return Err(HubError::AskRateLimited);
+        }
+        if let Some(key) = key
+            && !fits(self.keys.get(&key), now_ms, per_key)
+        {
+            return Err(HubError::AskRateLimited);
+        }
+        if let Some(addr) = addr {
+            stamp(self.addresses.entry(addr).or_default(), now_ms);
+        }
+        if let Some(key) = key {
+            stamp(self.keys.entry(key).or_default(), now_ms);
+        }
+        self.evict(now_ms);
+        Ok(())
+    }
+
+    /// A rough byte count for [`HubServer::state_bytes`](super::HubServer::state_bytes).
+    pub(crate) fn bytes_estimate(&self) -> usize {
+        (self.addresses.len() + self.keys.len()) * 48
+    }
+
+    fn evict(&mut self, now_ms: u64) {
+        let keep = now_ms.saturating_sub(ASK_IDLE_MS);
+        self.addresses
+            .retain(|_, window| window.back().is_some_and(|t| *t >= keep));
+        self.keys
+            .retain(|_, window| window.back().is_some_and(|t| *t >= keep));
+        while self.addresses.len() > ASK_TRACK_CAP {
+            let Some(key) = self.addresses.keys().next().copied() else {
+                break;
+            };
+            self.addresses.remove(&key);
+        }
+        while self.keys.len() > ASK_TRACK_CAP {
+            let Some(key) = self.keys.keys().next().copied() else {
+                break;
+            };
+            self.keys.remove(&key);
+        }
+    }
+}
+
+/// True when `window` holds fewer than `limit` stamps inside the AskReach window.
+fn fits(window: Option<&VecDeque<u64>>, now_ms: u64, limit: u32) -> bool {
+    let Some(window) = window else {
+        return true;
+    };
+    let live = window
+        .iter()
+        .filter(|t| now_ms.saturating_sub(**t) < ASK_WINDOW_MS)
+        .count();
+    live < usize::try_from(limit).unwrap_or(usize::MAX)
+}
+
+fn stamp(window: &mut VecDeque<u64>, now_ms: u64) {
+    while window
+        .front()
+        .is_some_and(|t| now_ms.saturating_sub(*t) >= ASK_WINDOW_MS)
+    {
+        window.pop_front();
+    }
+    window.push_back(now_ms);
+}

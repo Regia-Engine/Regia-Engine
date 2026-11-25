@@ -1,8 +1,15 @@
 # Display calibration
 
+<!-- index: Display calibration -->
+<!-- index: Paper white -->
+<!-- index: HDR10 -->
+
 Regia Engine's look is judged on a good monitor in a dim room. Players see it on dim laptop panels, TVs
 that crush their first code values, phones in daylight and HDR TVs. Display calibration lets the
 player correct for their screen without changing the content, the way a TV's picture settings do.
+Vsync and the window's present mode are display settings (`GameSettings.display.vsync`,
+`PresentMode::{Vsync, VsyncRelaxed, Immediate}`), documented on
+[Rendering](rendering.md#present-modes). Calibration does not change them.
 
 ## What it changes
 

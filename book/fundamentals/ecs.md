@@ -1,7 +1,14 @@
 # The ECS: entities, components, systems
 
+<!-- index: Entity -->
+<!-- index: Component -->
+<!-- index: System -->
+<!-- index: Resource -->
+<!-- index: Message -->
+<!-- index: ECS | see: Entity -->
+
 Everything in a running Regia Engine game lives in one **world** organized as an Entity Component
-System. Regia Engine uses `bevy_ecs` for this, through its own facade crate `regia_ecs`: game code
+System. Spec: `docs/specs/10-core.md`. Regia Engine uses `bevy_ecs` for this, through its own facade crate `regia_ecs`: game code
 imports from `regia::prelude` (or `regia_ecs::prelude`) and never names `bevy_ecs` directly,
 which lets the engine pin and upgrade it in one place.
 

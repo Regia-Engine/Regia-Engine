@@ -7,6 +7,25 @@
 use regia::prelude::*;
 use vehicle_lab::{LabScript, VehicleLabPlugin};
 
+/// Project directory of this sample, resolved at runtime (ADR-10370).
+///
+/// `cargo run` exports `CARGO_MANIFEST_DIR`. A binary under `target/<profile>`
+/// walks up to `samples/vehicle_lab`. A packaged game finds neither and returns
+/// `None`. The compile-time `env!("CARGO_MANIFEST_DIR")` is not remapped by rustc.
+fn sample_project_dir() -> Option<std::path::PathBuf> {
+    if let Some(dir) = std::env::var_os("CARGO_MANIFEST_DIR") {
+        return Some(dir.into());
+    }
+    let root = std::env::current_exe()
+        .ok()?
+        .parent()?
+        .parent()?
+        .parent()?
+        .to_path_buf();
+    let project = root.join("samples").join("vehicle_lab");
+    project.is_dir().then_some(project)
+}
+
 fn main() -> std::process::ExitCode {
     let scripted = !std::env::args().any(|arg| arg == "--no-script");
     let exit = regia::run_with(VehicleLabPlugin, move |app| {
@@ -17,7 +36,7 @@ fn main() -> std::process::ExitCode {
             },
         });
         app.insert_resource(regia::agent::AgentSettings {
-            project_dir: Some(env!("CARGO_MANIFEST_DIR").into()),
+            project_dir: sample_project_dir(),
         });
         if scripted {
             app.insert_resource(LabScript);

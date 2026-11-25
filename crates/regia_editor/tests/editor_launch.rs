@@ -1268,6 +1268,10 @@ fn android_launch_attaches_the_apps_agent_through_adb_forward() {
     assert_eq!(answer["app"], "on the device");
     assert_eq!(answered.join().expect("app thread"), "app.ping");
 
+    // `running` is entered as soon as logcat is spawned, before the fake script has run; it
+    // appends its argv before its first line, so wait for that line as the other logcat tests
+    // do (ADR-10723).
+    assert!(wait_line(&world, "fake logcat line one"), "logcat never streamed");
     let calls = argv(&root);
     let position = |needle: &str| {
         calls

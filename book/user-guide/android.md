@@ -1,8 +1,29 @@
 # Android
 
+<!-- index: Android -->
+<!-- index: API 29 -->
+<!-- index: APK -->
+<!-- index: Android App Bundle -->
+
 Regia Engine runs on Android phones (aarch64, API 29+, Vulkan). This page is the state of that port as
 of batch v020 (v0.1.21) and the steps to re-run the real-device pass on your own phone. Numbers are from the
 Pixel 6 (GrapheneOS, Mali-G78) on 2026-10-08 unless a row says otherwise.
+
+`min_sdk` in `Regia.toml` defaults to 29. The manifest check refuses a value under 24
+([Android device bring-up](android-bringup.md)). The package is an APK or an AAB
+([Package a game](../how-to/platforms/package-a-game.md)). Google Play
+services are parked and are not part of that package. A dedicated server is not an Android target
+(`server_platform_unsupported`, exit 2). The game renderer uses Vulkan. It does not fall back to
+OpenGL. The browser [product viewer](../agents/web-player.md) is a different program: its WebGL2
+path is for that viewer, not for a packaged game.
+
+Surfaces drop on suspend and are created again on resume. That is what the code specifies (the table
+below). `docs/versions.md` (2026-11-08) still recorded a failed lifecycle acceptance, and this page
+does not re-run that pass. Treat a lifecycle claim beyond the specified suspend and resume behavior
+as not accepted here.
+
+Phone setup from a bare machine is [Android device bring-up](android-bringup.md). The desktop host
+is [Linux](linux.md).
 
 ## Build, install, attach
 

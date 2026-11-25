@@ -1,10 +1,14 @@
 # Binary size
 
+<!-- index: Binary size -->
+<!-- index: apk-size -->
+
 The executable (or the Android `.so`) is the biggest single file of most games. It sets the Steam
 download, the install size on a phone and how long the final link takes. `regia apk-size` splits an
 Android archive by kind of entry; `cargo xtask binary-size` goes one level deeper and tells you which
 crates and which generic functions make the native code large, then keeps a budget so the size does not
-grow by accident.
+grow by accident. A shipped package strips the game binary and keeps symbols beside it
+([Packaging](packaging.md)). `cargo xtask binary-size` measures the build before that strip.
 
 ```console
 $ cargo xtask binary-size                       # blank and third_person on this machine

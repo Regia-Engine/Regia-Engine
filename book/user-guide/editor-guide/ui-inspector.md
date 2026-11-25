@@ -1,5 +1,7 @@
 # UI Inspector
 
+Panel id: `ui_inspector`.
+
 The **UI Inspector** tab answers "why does this widget look like this, and which widget is that?"
 for the interface of a running game. It shows the live UI tree, a map of every node's rectangle,
 and for the selected node its resolved properties, where each value came from (the theme, the node

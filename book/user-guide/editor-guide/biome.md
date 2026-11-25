@@ -1,5 +1,7 @@
 # Biome
 
+Panel id: `biome`.
+
 The **Biome** tab edits a biome definition (`.biome.ron`): what the procedural tools grow in an area and how. It shows
 the file as forms: the biome's name, color, map key and priority; its layers (rank, sharing, the candidate source and
 its density noise, channels and their rules, child depth); each layer's entries (what spawns, its weight, the channels

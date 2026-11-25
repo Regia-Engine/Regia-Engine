@@ -1,5 +1,7 @@
 # Terrain
 
+Panel id: `terrain`.
+
 The **Terrain** tab shows the terrain the open level names, exports and imports heightmaps, sets
 the grass density target and edits scatter rules. The viewport's terrain tool (`T`) sculpts and
 paints it; see [Viewport](viewport.md). Depth: [Terrain editing (agents)](../../agents/terrain-editing.md)

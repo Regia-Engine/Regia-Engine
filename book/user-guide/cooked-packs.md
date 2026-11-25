@@ -1,5 +1,9 @@
 # Cooked packs
 
+<!-- index: Cooked pack | see: Pak -->
+<!-- index: Pak -->
+<!-- index: GPU-ready mesh | see: Cooked pack -->
+
 A shipped Regia Engine game never parses glTF, never decodes PNG or JPEG and never transcodes a
 texture at runtime. Everything it loads comes out of `.fpak` files in the form the GPU (or the CPU
 system that owns it) consumes. This page shows how to build those paks, how to check them, and

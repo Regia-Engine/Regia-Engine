@@ -1,5 +1,8 @@
 # Reflection
 
+<!-- index: Reflection -->
+<!-- index: Canonical RON | see: Reflection -->
+
 Reflection lets the engine look inside your types at runtime: list a component's fields, read and
 write them by name, and turn them into text and back. Regia Engine uses `bevy_reflect` for this
 (through `regia_ecs`), and almost every tool in the engine depends on it:

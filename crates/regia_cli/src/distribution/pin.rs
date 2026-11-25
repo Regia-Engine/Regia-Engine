@@ -787,6 +787,29 @@ regia_platform = { features = [\"a\", \"b\"], path = \"/eng/old/crates/regia_pla
         std::fs::remove_dir_all(&dir).ok();
     }
 
+    /// ADR-10616: a path source in Windows' verbatim form (what `canonicalize` returns there) is
+    /// pinned as `C:/…`; `//?/C:/…` makes Cargo fail with "invalid path url".
+    #[test]
+    fn verbatim_windows_path_sources_are_pinned_without_the_prefix() {
+        let dir = project(&[(
+            "Cargo.toml",
+            "[package]\nname = \"q\"\n[dependencies]\nregia = { path = \"/x/crates/regia\" }\n",
+        )]);
+        let source = EngineSource::Path(r"\\?\C:\Users\me\AppData\Local\Regia\e".into());
+        assert_eq!(source.to_string(), "path:C:/Users/me/AppData/Local/Regia/e");
+        let edits = rewrite_pin(&dir, &source).expect("rewrite");
+        assert_eq!(edits.len(), 1);
+        assert!(
+            edits[0]
+                .text
+                .contains("regia = { path = \"C:/Users/me/AppData/Local/Regia/e/crates/regia\" }"),
+            "{}",
+            edits[0].text
+        );
+        assert!(!edits[0].text.contains("//?/"), "{}", edits[0].text);
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
     #[test]
     fn registry_sources_pin_the_exact_version() {
         let dir = project(&[(

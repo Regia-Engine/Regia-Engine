@@ -366,7 +366,8 @@ O(lobbies × filters + n log n) and only runs on `request_list`. No GPU work; no
 Voice chat; persistent parties and friends-list presence beyond `JoinRequested` / invites; skill or rating based
 matchmaking (games add a number filter or near filter on their own key); server browsers for dedicated servers
 (ISteamMatchmakingServers); Steam game-server login (spec 76 follow-up); host migration; console and mobile platform
-lobbies; lobby UI widgets.
+lobbies; lobby UI widgets. The Steam dedicated-server browser stays out. A hub directory row that only adds a
+listen-or-dedicated kind, with no address, is § 16.
 
 ## 15. Self-hosted lobby hub (ADR-8559, NL-04)
 
@@ -431,3 +432,438 @@ caller may not enter answers `lobby_not_found`, as a missing id does (lobby ids 
 anyone probe which private lobbies exist); the hub's refusal counter keeps `hub_invite_only` and `hub_friends_only`. A
 chat line dropped at a member's outbox cap is replayed by the resync from the first dropped line on (kept lines only, in
 order, once), and a join plan dropped at the cap is sent again by the resync, to the member and to the owner.
+
+## 16. Delegated sessions, relay-only reach, and the ECS-free join surface (ADR-10375)
+
+NL-06 is the packaged hub process (ADR-8648), already built. The rows below continue the lobby series in this
+spec. Spec 10's "v0.6 NL-07" is peer logging (ADR-8149) and is not one of these rows. v0.7's `HUB_WIRE_VERSION`
+is 1 (`crates/regia_net/src/lobby/hub/wire.rs`). These rows bump it to 2. A version-1 peer is refused at the
+handshake with `protocol_mismatch` (spec 120 § 12.1). No cross-version decode.
+
+The hub still never carries game datagrams. A datagram whose first bytes are the session magic (`RGN1`) or the
+relay magic (`RGNR`), received on the hub socket, is dropped. Game datagrams move only on the members' game
+sockets, or through `RelayServer` when a plan's path is the relay. Acceptance is not a clean loopback: the
+join tests drive `SimNat` and a `TestClock` (`now_ms` on the sans-IO core). No test sleeps or asserts on wall
+time.
+
+### 16.1 Current state at the v0.7 freeze (what is reused, what is absent)
+
+Reused, not duplicated: `HubServer`, `HubHost`, `HubLobbyBackend`, invites and presence (NL-04, ADR-8559);
+`ReachOffer`, `AskReach`, owner approval, `broker_reach`, `JoinPlan`, `ReachDone` (NL-05, ADR-8607); `nat`;
+`relay`; `crypto` (`PlayerKey` is X25519, proven by one Noise `X` message); `server_host` (dedicated runtime,
+`bans.ron`, password gate); `ticket::JoinTicketCheck`.
+
+(a) A standalone ownerless `server_host` does not register a public lobby. `crates/regia_net/src/server_host/`
+has no `HubServer`, `HubHost`, `HubLobbyBackend` or `LobbySpec` use. `regia-lobby-hub`
+(`crates/regia_cli/src/bin/regia-lobby-hub.rs`) runs `HubProcess` only. Any hub client may call `create` today,
+but the dedicated runtime never does. NL-07 adds that registration.
+
+(b) Offering only a relay does not give relay-only hosting in either direction. `broker_reach`
+(`lobby/hub/join.rs`) returns `Mapped` when a mapped candidate exists, `Relay` only when both NAT classes are
+known and `predict` is `NeedsRelay` and a relay and join code are set, and otherwise `Punch` whenever a relay
+or any candidate is present. `HubServer::approve` then copies the owner's candidates into the member's
+`JoinPlan` and the member's candidates into the owner's `JoinPlan` (`lobby/hub/server.rs`, `approve_inner`).
+`JoinPath` gathers local candidates and, unless `relay_first`, asks the relay to introduce both sides
+(`server_host/relay_path.rs`). An empty candidate list on the offer therefore still plans a punch, and the
+other side's candidates still travel. NL-08 adds an explicit flag.
+
+(c) Addresses leak past the directory, into member lobby data. `public_data` drops `regia.server` from
+directory cards (`lobby/hub/mod.rs`). `PresenceRow` has no address field. `InviteCard` has no address field.
+`confirm_session` stores `LobbyServer` on the room and pushes `HubEvent::ServerSet` with that address to
+every member (`lobby/hub/server.rs`); `room_state` copies `room.server` and the data map, which holds
+`regia.server`. The test `the_session_address_goes_to_members_only_and_moves_presence` asserts both: members
+receive the address, an outsider's events do not contain those bytes, and the card omits `regia.server`.
+There is no per-`AskReach` limit and no hub ban list. `AdmitGate` limits every request to 30 per second per
+address and 20 per second per identity (`lobby/hub/config.rs`). Those stay. NL-09 adds the tighter AskReach
+windows, the in-flight cap, the ban check, and removes addresses from lobby data.
+
+(d) ECS gates, and why:
+
+| Piece | ECS-gated? | Where | Why |
+|---|---|---|---|
+| `relay`, `nat`, `crypto`, `ticket::JoinTicketCheck` | No | `lib.rs` (`pub mod relay`, `pub mod nat`, `pub mod crypto`; `pub use ticket::…`) | Core. `JoinTicketCheck` is the store hook, not `server_host::JoinTicket`. |
+| `HubServer`, `HubHost`, `HubLobbyBackend`, `ReachOffer`, `JoinPlan`, `broker_reach` | No | `lobby/hub/mod.rs` re-exports them with no `cfg` | The hub core is sans-IO and has no ECS import. |
+| `HubReach` | Yes | `lobby/hub/mod.rs` `#[cfg(feature = "ecs")] mod reach` | `reach.rs` calls `server_host::{JoinPath, JoinRoute, JoinSocket}`. |
+| `server_host` (the module) | Yes | `lib.rs` `#[cfg(feature = "ecs")] pub mod server_host` | `server_host/mod.rs` imports `regia_app::App` and `regia_ecs` at the top, so every file in the module is compiled only with `ecs`. |
+| `relay_split`, `JoinPath`, `JoinSocket` | Yes, only because of that module gate | `server_host/relay_path.rs` | The file uses `DatagramSocket` and does not import the ECS, `regia_app`, or `link`. |
+| `JoinTicket` | Yes, same module gate | `server_host/join.rs` | The ticket type itself is bytes and a `SocketAddr`. The same file names `crate::link::LinkSocket`. |
+| `RelayRegistrar` | Yes, two reasons | `server_host/join.rs` | The module gate, and the socket field is `LinkSocket`. `LinkSocket` is `Box<dyn DatagramSocket + Send>` (`link.rs`), and `pub mod link` is `#[cfg(feature = "ecs")]` because the link is App glue. |
+| Running a `JoinPlan` on a caller-owned socket | Yes | `HubReach::new` | That is the only executor, and it is behind `ecs`. The plan type itself is core. |
+
+(e) `HubHost` and `RelayServer` are not runnable together as a deployable process. Tests construct both in
+one process (`tests/lobby_hub_join.rs`). The shipped binary does not construct a `RelayServer`. NL-11 adds
+that process. Remote admin stays on the dedicated host (`server_host`, `[admin] token_file`) and is named
+out in § 16.6.
+
+### 16.2 Wire version 2 and bounds
+
+`HUB_WIRE_VERSION` becomes 2. Every new list and string is bounded before the decoder allocates. A count
+above its cap is `WireError` and allocates nothing. Fixed-size blobs are read into a stack array of that
+size. Timers on the wire are `u32` milliseconds, never a length-prefixed blob. Caps below are the wire caps;
+`HubSettings::sanitized` may clamp a configured value lower and must not raise it above the wire cap.
+
+| Field | Cap | Read before allocation |
+|---|---|---|
+| Binding proofs on one `RegisterServer` | 8 (`MAX_BINDING_OWNERS`) | `u8` count; reject `> 8`, then `Vec` of that count |
+| One binding proof | 145 bytes (`BINDING_PROOF_BYTES`) | exact length, stack buffer; not a `u16` length |
+| Binding payload inside the proof | 49 bytes | fixed layout, no string |
+| Game version | 32 bytes | `str_u8(32)` |
+| Ban keys, one lobby | 64 | `u8` count; reject `> 64` |
+| Ban keys, one server presence | 256 | `u16` count; reject `> 256` |
+| Hub operator ban file | 4096 lines, 64 bytes each | line cap before the line is stored |
+| Revocation set | 4096 entries | insert refused at the cap (`hub_revoke_full`); never evict a live revocation |
+| Grace | `0` or `1..=86_400_000` ms | `u32`; a larger value is clamped to 24 h at `RegisterServer` |
+| Expiry | `0` (none) or `<= now + 366 days` | `u64` in the fixed payload; a farther expiry is `hub_binding_invalid` |
+| Candidates | `NAT_MAX_CANDIDATES` (8), existing | existing `decode_candidates` |
+| Ticket | `MAX_TICKET_BYTES` (128), existing | existing `bytes_u16` |
+| Join code | `JOIN_CODE_LEN` (6) after normalize, existing | existing |
+| In-flight joins stored | 2 per player key, 64 on the hub | counter check before `joins.insert` |
+| `AskReach` windows | 4 per player key per 10 s; 16 per source address per 10 s | timestamp deques, one stamp per admitted ask, no per-ask allocation beyond the stamp |
+
+`ReachOffer` gains `relay_only: bool` (wire `u8`, only `0` or `1`; any other byte is `hub reach flag`).
+Directory cards and room snapshots gain `kind` (`0` listen, `1` dedicated) and `relay_only` (`0` or `1`)
+and, for a dedicated card, `capacity` and `load` as `u16`. They do not gain an address. `RoomState.server`
+and `HubEvent::ServerSet { server }` leave the version-2 layout. A confirmed session is
+`HubEvent::SessionConfirmed { lobby, confirmed: bool }` with no address. `LobbyInfo.server` from
+`HubLobbyBackend` is always `None`. The local (in-process) backend is unchanged.
+
+New requests, all on the reliable hub channel, same `HubMessage` envelope, trailing bytes still an error:
+
+- `RegisterServer { server_proof, proofs, capacity, load, protocol, game_version, relay_only, grace_ms }`.
+  `server_proof` is one Noise `X` message of `PLAYER_PROOF_BYTES` (128), prologue
+  `regia.lobby_hub.server_presence v1`, payload the hub link's handshake hash. Same length check as a player
+  proof, before `snow` runs.
+- `RevokeBinding { server_key, serial }`.
+- `CreateDelegated { spec, server_key }`. `spec` uses the existing lobby-spec bounds. A `regia.server`
+  value in `spec.data` is `hub_address_in_data` and the lobby is not created.
+- `SetReachMode { lobby, relay_only }`.
+- `SetBans { lobby, keys }`. Owner only. Replaces that lobby's ban set.
+- `CloseLobby { lobby }`. Owner of a delegated lobby, or the server session of an ownerless lobby.
+- Existing `Offer`, `AskReach`, `Approve`, `ReachDone`, with the new `relay_only` byte on each offer.
+
+New events:
+
+- `ServerOnline` / `ServerOffline` to each bound owner of that server, and to the server session. Fields:
+  server key, capacity, load, protocol, game version, relay-only, grace, owner count. No address.
+- `LobbyAssigned { lobby, owner }` to the server session when a delegated lobby names it.
+- `GraceStarted { lobby, deadline_ms }` and `GraceEnded { lobby }` to the members and the server.
+  `deadline_ms` is `0` when grace is indefinite.
+- `BindingChanged { server_key, serial, state }` to the owner who presented or revoked it (`live`,
+  `expired`, `revoked`).
+- Directory pages gain a server-card list, count-capped with `MAX_PAGE_ROWS` before allocation. A server
+  card is: server key, capacity, load, protocol, game version, relay-only, owner count. No address, and no
+  owner-key list (owner keys are not a directory field).
+
+`public_data` still drops `regia.server`. In addition, `set_data`, `set_member_data` and create refuse a value that
+is an address spelling, with `hub_address_in_data`. The spelling is a `SocketAddr` (every form that parser
+accepts), a bracketed IPv4 or IPv6 with a port (a zone is split off, so a named zone counts), `udp:` or
+`udp://` in any ASCII case plus one of those, or `steam:` in any ASCII case plus digits. A bare address with
+no port, a hostname and a port alone are not a spelling. A handle that is a spelling is not stored: the
+session opens under a stand-in that is not an address, so a presence row, a directory card, a room member
+name and an invite do not carry it.
+Free-text chat is not a listing and is not scanned. The acceptance scan covers directory pages, lobby
+queries, presence events, room snapshots, `LobbyInfo` and invite cards.
+
+### 16.3 NL-07 — delegated sessions and server presence
+
+**Binding.** `PlayerKey` stays the X25519 key NL-05 already proves. This row does not add an Ed25519 key.
+A binding is one Noise `X` message (`Noise_X_25519_ChaChaPoly_BLAKE2s`, Noise revision 34 § 7.4) to the
+hub's `ServerKey`, prologue `regia.lobby_hub.server_binding v1`, made with `snow` the same way
+`PlayerIdentity::prove` is. The payload is fixed:
+
+`version u8 = 1 || server_key [32] || expiry_ms u64 || serial u64`
+
+`expiry_ms == 0` means no expiry. Any other expiry must be `<= now_ms + 366 days` at verification or the
+proof is `hub_binding_invalid`. `serial` is the owner's revocation id for this proof. The ciphertext is
+readable only by the hub static key it was made for, so a proof made for another hub fails, and a low-order
+static or ephemeral key fails `hub_binding_invalid` under the same all-zero X25519 check as
+`verify_player_proof` (RFC 7748 § 6.1, ADR-8665). The hub records `(player_key, server_key, serial, expiry)`.
+
+One owner key may bind many server keys. One server key may carry up to 8 owner proofs (a clan server).
+One bad proof fails the whole `RegisterServer`. An empty proof list is the ownerless server (§ 16.3
+ownerless). The server does not need the hub's private key to store the bytes; only the hub verifies.
+
+**Server presence state.** `Offline → Handshaking → Online → Draining → Offline`. `RegisterServer` is
+accepted only after the server-presence proof matches `NetServer::peer_handshake_hash` for that link. The
+session identity is the `ServerKey`, not a `PlayerKey`. A second link under the same server key takes the
+session back and the old link is dropped (`hub_server_in_use` on the old link), same reconnect rule as a
+player key. `capacity` is `1..=4096`, `load <= capacity`, or `hub_server_invalid` and no session. Heartbeats
+use the existing `idle_ms`. Silence moves the server to `Offline`, clears its offer, and closes lobbies
+that name it (members get `Left`). `Draining` is the hub's drain: new `RegisterServer` and new lobbies are
+refused `hub_draining`; online servers stay until their links end.
+
+**Delegated lobby state.** `WaitingOffer → Open → Brokering → Grace → Closed`, plus `Closed` from `Close`
+at any state. `CreateDelegated` from a proven player key, while the server is `Online`, with a live binding
+of that key to that server, creates a lobby whose kind is `dedicated`, whose `relay_only` starts as the
+server's flag, and whose stored address is empty. Otherwise:
+
+| Condition | Code | When |
+|---|---|---|
+| Server not online | `hub_server_offline` | create |
+| No live binding for this owner and server | `hub_binding_unbound` | create |
+| Binding expiry in the past | `hub_binding_expired` | create, and the row flips to expired |
+| Binding serial in the revocation set | `hub_binding_revoked` | create |
+| Server has owners and this key is not one | `hub_binding_not_owner` | create |
+| Caller is not a player session | `hub_not_a_player` | create |
+| Owner calls `confirm_session` or `set_data("regia.server")` on it | `hub_address_in_data` | any |
+| Owner calls `offer_reach` on it | `hub_not_session` | any |
+
+The server session is the only caller of `offer_reach` and `approve` for that lobby. `LobbyAssigned` tells
+it to offer. The owner's `auto_approve` does not approve a delegated ask. The server approves from its own
+policy, in order: `load < capacity`, the player key is not in the ban set it published and not in
+`bans.ron`, the password gate would accept (a missing password fails closed when the server has a password),
+then `JoinTicketCheck` when the ask carries a store ticket. A refusal is `Approve(false)` and
+`ReachDenied`, with no plan. The owner keeps kick, mute, close, settings, visibility, invites and an
+explicit transfer. Transfer to a player key that is also a live owner of that server succeeds. Transfer to
+the server key, or to a key that is not an owner, is `hub_binding_not_owner` and changes nothing.
+Ownership is never assigned to the server session.
+
+**Revocation.** `RevokeBinding` from the proven owner inserts `(player_key, server_key, serial)` into the
+revocation set in that call, before the call returns. The next `CreateDelegated` by that owner for that
+server returns `hub_binding_revoked` and creates nothing. Lobbies that owner already created stay up (the
+acceptance row closes new-lobby rights, not the match). The set is capped at 4096. At the cap the call is
+`hub_revoke_full` and the new serial is not added. A revocation whose expiry is already in the past may be
+dropped to make room; a no-expiry revocation is not dropped. The process writes `revocations.ron` in the
+log dir by the existing temp-and-rename rule and loads it before it accepts sessions. A restart keeps the
+set.
+
+**Owner leaves.** This amends the NL-04 hand-off for delegated lobbies only. Listen lobbies still hand
+ownership to the earliest remaining member and still withdraw a confirmed session (ADR-8633). When the
+owning player session of a delegated lobby disconnects or idles out:
+
+- `leave_inner` does not run the hand-off and does not emit `OwnerChanged`.
+- The lobby's owner remains that `PlayerKey`. The member id is empty until the same key reconnects
+  (NL-05 reconnect restores the session).
+- State becomes `Grace`. The server's `grace_ms` is the deadline. `0` means no deadline (indefinite):
+  `expire` does not close it. Any other value is the clamp from § 16.2. The default a server omits is
+  `600_000` (ten minutes): long enough for the owner's client to restart, short enough that an abandoned
+  lobby does not sit in the directory. `86_400_000` is the 24 h wire cap so a `u32` cannot pin a lobby for
+  49 days.
+- The server's offer, the members, and brokering stay. New asks still run.
+- `CloseLobby` from the owner, a server `Offline`, or the grace deadline moves the lobby to `Closed`:
+  members get `Left`, the server gets `GraceEnded`, the room is deleted. The game process is the server's.
+  The hub does not stop it and does not make the server the owner. The server's own default after
+  `GraceEnded` is to keep the match and refuse new hub joins.
+
+**Ownerless public server.** `RegisterServer` with zero proofs is online and ownerless. That server session
+may `create` one or more public lobbies (kind `dedicated`, owner displayed as the server's handle, no
+player owner). It may `CloseLobby` those lobbies. It may not `CreateDelegated`. A later `RegisterServer`
+that adds owner proofs is `hub_binding_invalid` until the ownerless lobbies are closed (a server does not
+change from community-public to clan-owned under the same key while lobbies are up). This is the path
+request 1.7 asks for. It does not exist on `server_host` today (§ 16.1 a).
+
+**Failure.** A refused create, offer, ask or revoke leaves the previous state in place and pushes no plan
+and no candidate bytes. `HubHost` counts the code on `HubReport::refused` as it does for every other
+`HubError`.
+
+### 16.4 NL-08 — relay-only reach
+
+`relay_only` is set on the server presence, on the lobby (`SetReachMode`, owner or the bound server), or on
+one side's `ReachOffer`. The lobby flag and the server flag apply to every member. A member's own
+`relay_only` applies to that member's exchange only, so one member can hide an address while another member
+of the same listen lobby still punches.
+
+When the effective flag is set for an exchange, `broker_reach` returns `Relay` if the session's offer has a
+relay and a join code, and `NoReach` otherwise. It does not return `Mapped` or `Punch`. `build_plans` (the
+function `approve_inner` calls) then:
+
+- puts no candidates and no mapped address on either plan;
+- does not copy the member's candidates to the session, or the session's candidates to the member;
+- rewrites the member's ticket to `JoinTicket::from_game_socket(server_key)` (unspecified address, port 0,
+  the same server key) so the ticket bytes carry no `SocketAddr`;
+- leaves the relay address and the join code on the member's plan (the relay is the community relay, not
+  the session);
+- leaves the session's ticket empty, as today.
+
+`HubReach` runs that plan with `JoinPath::relay_first` (no introduction, allocation at once). The session's
+`RelayRegistrar`, when the lobby is relay-only or the member's plan said so, does not put host, reflexive
+or mapped candidates in `Register`, does not send a punch introduction, and does not answer connectivity
+checks for that member. The member's `JoinPath` does not send local candidates. The relay address may appear.
+The session's address and the member's address may not.
+
+A listen lobby with no flag keeps today's order: mapped, then punch with the relay at 1.5 s, then relay when
+both NAT classes are known and `predict` is `NeedsRelay`.
+
+The wire test records the `Plan` datagrams and the relay control datagrams (`Register`, `PunchIntro`, check
+datagrams) and fails if the other side's address bytes appear. Asserting on the struct fields alone does
+not pass it.
+
+### 16.5 NL-09 — address exposure, AskReach limits, bans
+
+**Where an address may exist.** Only in the brokering exchange between one member and one session: that
+member's `ReachAsk` / `Plan` and that session's `Plan`, and only when the effective `relay_only` flag is
+clear. Directory pages, lobby queries, presence rows, server cards, room snapshots, `SessionConfirmed`,
+invites, `HubReport` and `lobby()` data have no `SocketAddr`. `regia.server` is not stored. Listen reach
+uses the plan's candidates, not lobby data. The existing outsider byte scan in
+`the_session_address_goes_to_members_only_and_moves_presence` stays; the member half of that test becomes
+the stronger assertion (members also see no address bytes) and presence still moves when the session is
+confirmed. The lane must not delete the outsider assertion to make the new one true.
+
+**AskReach limits.** Checked at the start of `ask_inner`, before any candidate is cloned into an event.
+Order: hub-operator ban, lobby ban, server ban, server full (`load >= capacity` → `hub_server_full`),
+not a member (`not_in_lobby` / `lobby_not_found` as today), lobby not visible to a non-member
+(`lobby_not_found`, no existence oracle), lobby not joinable or at `max_members` for a non-member
+(`hub_lobby_closed` / `hub_lobby_full`), in-flight caps, then the 10 s windows. A member who already joined
+a listen lobby that later filled or closed may still ask. A dedicated server at `load >= capacity` refuses
+everyone, members included. A refusal pushes no `ReachAsk` and no `Plan`.
+
+| Limit | Value | Rationale |
+|---|---|---|
+| Per player key | 4 asks / 10 s | Two joins and two retries inside the window. Walking all 256 listed lobbies would take 640 s, and each ask still requires a join the existing caps already bound. |
+| Per source address | 16 asks / 10 s | Four player keys behind one NAT, each at the key budget. Checked first, so many keys on one address share this budget. |
+| In-flight per key | 2 | One open exchange plus one retry. An exchange is a join in `Asked` or `Planned`. |
+| In-flight on the hub | 64 | Bounds stored candidate lists. Past it, `hub_ask_inflight`. |
+| Existing `AdmitGate` | 30/s per address, 20/s per identity | Unchanged, and still in front of the core for every request. |
+
+Windows are deques of `now_ms` on `HubServer`, so the sans-IO test advances time by passing `now_ms`. No
+thread sleep. The address key is the `IpAddr` `AdmitGate` already uses; a missing address skips the
+address window and still takes the key window.
+
+**Bans.** A `PlayerKey` banned by the lobby owner (`SetBans`), by the server (the key list on
+`RegisterServer`, refreshed by a later register, matched against `bans.ron` on the server before it
+publishes) or by the hub operator (the ban file) is `hub_banned` at `AskReach`, before any candidate bytes
+are written. The same operator ban and lobby ban are checked again in `approve_inner`, with the dedicated
+server-seat ban and `load >= capacity`. A ban or a full server that lands while the ask is open is
+`ReachDenied` and `Ok(None)`, and no `Plan` is built. Address bans stay on the dedicated host's `bans.ron`
+and are not a hub directory field. The hub file is player keys only, so a ban list cannot publish an address.
+
+### 16.6 NL-07 admin path (out)
+
+Remote admin is not a hub message and not a relay allocation in this row. The dedicated host already
+authenticates an operator with `admin.token` (`server_host`, `[admin] token_file`) on the server's own
+link. The owner who deployed the server uses that path. The hub does not carry admin commands, does not
+learn the admin port, and does not open a second stream. A later row may broker a separate relay allocation
+for admin. It must still not put admin bytes on the hub socket.
+
+### 16.7 NL-10 — ECS-free hub, relay and join surface
+
+Move the socket-agnostic pieces out of the `ecs` module so `cargo check -p regia_net --no-default-features`
+links none of `regia_ecs`, `regia_app`, `regia_scene`, `regia_asset` or `regia_platform` and still exports:
+
+- `relay_split`, `JoinPath`, `JoinSocket`, `JoinRoute`, `fresh_allocation_key` (today `relay_path.rs`);
+- `JoinTicket`, `JoinError`, and `RelayRegistrar<S: DatagramSocket + Send>` (today `join.rs`, where the
+  socket field is `LinkSocket`);
+- `HubReach<S: DatagramSocket>` and `ReachSocket` (today `reach.rs`).
+
+`RelayRegistrar` is generic over the socket. `LinkSocket` stays the App alias and is one allowed `S`.
+`server_host` re-exports the moved types at the old paths so existing call sites keep compiling.
+`server_host/mod.rs` keeps `regia_app` and `regia_ecs`; the dedicated runtime stays behind `ecs`. The new
+module (`regia_net::join_exec`, name fixed by the lane) imports `socket`, `nat`, `relay`, `crypto`,
+`host_check` and `port_map` only. Those are already core.
+
+`HubReach::new(socket, &plan, client_key)` is the member's executor on a caller-owned game socket. The
+game polls `update(now_ms)` and `take_socket`. No `World`, no `App`, no plugin. `JoinTicketCheck` stays
+where it is (already core). A relay-only plan still uses `relay_first` and sends no candidate bytes (§ 16.4).
+
+### 16.8 NL-11 — one process for the hub and the relay
+
+Extend `regia-lobby-hub`. Do not add a second binary. `hub.toml` `format_version` becomes 2. A v1 file
+migrates by appending the defaults below (the build lane adds the migrator, `regia upgrade-project`
+support, and the format doc; this spec lane does not edit the frozen file). Unknown keys remain a named
+field error and exit 2.
+
+```toml
+format_version = 2
+# v1 keys unchanged: bind, port, key_path, caps, limits.per_address_per_sec,
+# limits.per_identity_per_sec, status.
+
+[limits]
+ask_per_identity_per_10s = 4
+ask_per_address_per_10s = 16
+ask_inflight_per_identity = 2
+ask_inflight_hub = 64
+
+[relay]
+enabled = true
+bind = "0.0.0.0"
+port = 7812
+allocation_cap = 256
+per_address_per_sec = 30
+
+[bans]
+path = "hub-bans.txt"
+
+[log]
+dir = "logs"
+```
+
+`relay.enabled = false` is the v1 behavior after migration (the migrator writes `false` so an existing hub
+does not open a new port until the operator turns it on). A fresh package writes `true`. The relay port is
+not the hub port. `RelayServer` is polled from the same `TestClock` / process tick as `HubHost`. SIGTERM or
+SIGINT calls the existing hub drain and stops new relay allocations; refresh of allocations already issued
+continues until they are gone or 30 s of that clock have passed, then the process exits 0. `GET /health`
+and `lobby.hub_status` gain `relay_allocations`, `servers_online` and `draining`. HTTP 503 while draining,
+as today.
+
+**Key rotation.** Clients keep pinning one hub `ServerKey` (`HubLobbyBackend::connect` still refuses an
+unpinned key). The process has one Noise static key (the `snow` builder takes one local static). Rotation
+is two processes, not two keys in one handshake: bring up the new key on a new port, ship a game config
+whose pin list tries the new hex key and then the old one, wait the adoption window, stop the old process,
+drop the old hex key from the next game config. The private key stays in `key_path` outside any project
+(NL-06). The hex public key is what a game ships; it is not a secret. Overlap longer than 7 days is an
+operator choice, not a wire field. A client that pins a key the process does not hold ends the link with
+`hub_key_mismatch` and allocates no session.
+
+### 16.9 Agent surface and codes
+
+Build lanes add the methods. This spec does not register them.
+
+- `lobby.hub_servers`: server cards as in § 16.2 (no address). Errors `hub_bad_params`, `hub_unknown`.
+- `lobby.hub_bindings`: the caller's own bindings (server key, serial, expiry, state). Not the directory.
+- `lobby.hub_status` gains `servers_online`, `relay_allocations`, `ask_refusals`.
+- `lobby.hub_join_status` gains `relay_only` and `grace` per lobby.
+
+Book page for the build lanes: `book/agents/net-delegated-sessions.md`, with a `book/SUMMARY.md` link and
+`book/COVERAGE.md` rows appended at the end of the relevant tables. Fuzz target `net.lobby_hub_msg` grows
+the new messages; `net.hub_toml` grows format v2. Neither target is weakened.
+
+New `HubError` codes, each `lowercase` digits and `_` only: `hub_binding_unbound`, `hub_binding_expired`,
+`hub_binding_revoked`, `hub_binding_not_owner`, `hub_binding_invalid`, `hub_server_offline`,
+`hub_server_in_use`, `hub_server_invalid`, `hub_server_full`, `hub_not_session`, `hub_not_a_player`,
+`hub_ask_rate_limited`, `hub_ask_inflight`, `hub_banned`, `hub_address_in_data`, `hub_lobby_closed`,
+`hub_lobby_full`, `hub_revoke_full`.
+
+### 16.10 Acceptance
+
+Tests use `TestClock` or the core's `now_ms`, and `SimNat` where a path is claimed. A passing loopback with
+no NAT does not satisfy a row that names a path. The seven rows from the request:
+
+1. Delegated lobby: owner A binds server S; A creates a lobby on S; member B joins through the hub; B's sealed handshake completes with S's pinned ServerKey by each path (mapped, punch, relay; SimNat matrix); B never learns A's address.
+2. Binding failures: unbound server, expired binding, server bound to another owner are refused at lobby creation; a revoked binding closes that owner's new-lobby rights at once.
+3. Relay-only: member receives no host candidates and host receives no member candidates; checked on the wire bytes, not just the API.
+4. Listings: no listing, query, presence event or lobby-data read contains an address.
+5. Rate limits and bans: the AskReach rate limit and in-flight cap hold under a flood from one key and from many keys on one address; a banned key gets no candidates.
+6. Owner leaves mid-match: the session continues for the grace period.
+7. ECS-free build: compiles with `default-features = false` and no `ecs`, and runs a JoinPlan on a caller-owned socket.
+
+Added:
+
+8. An ownerless server registers a public lobby. A member joins it. The directory card has kind `dedicated` and no address bytes.
+9. A restarted hub loads `revocations.ron` and refuses that owner's next `CreateDelegated`.
+10. A version-1 client and a version-2 hub refuse each other with `protocol_mismatch` before a session exists.
+11. `AskReach` on a full dedicated server, a closed lobby (non-member) and an invisible lobby (non-member) returns no candidate bytes. A member already inside a closed listen lobby still receives a plan.
+12. An `RGN1` datagram on the hub socket is not forwarded. An `RGNR` datagram on the hub socket is not forwarded.
+13. A binding proof whose static key is a low-order point is `hub_binding_invalid`.
+14. Of two owner proofs on one server, owner B creates a lobby and owner C, who has no proof, is `hub_binding_not_owner`.
+15. `grace_ms = 0` keeps the delegated lobby after the owner disconnects, with no `OwnerChanged`, until `CloseLobby` or the server goes offline.
+16. A relay-only member plan's ticket bytes contain no address. The session's plan bytes contain no address of the member.
+17. `cargo tree -p regia_net --no-default-features -e normal` does not list `regia_ecs`, `regia_app`, `regia_scene`, `regia_asset` or `regia_platform`.
+
+Lane ownership of these rows is in the lane report for ADR-10375.
+
+## 17. Sources
+
+Public sources for § 16. No other engine's source was read.
+
+- T. Perrin, "The Noise Protocol Framework", revision 34, § 7.4 pattern `X` and § 11.2 channel binding.
+  https://noiseprotocol.org/noise.html
+- RFC 7748 (X25519, low-order check § 6.1). https://www.rfc-editor.org/rfc/rfc7748
+- RFC 8445 (ICE: candidates, connectivity checks, nomination; a response comes from the address the check
+  used). https://www.rfc-editor.org/rfc/rfc8445
+- RFC 8489 (STUN). https://www.rfc-editor.org/rfc/rfc8489
+- RFC 8656 (TURN-style relay allocations and permissions). https://www.rfc-editor.org/rfc/rfc8656
+- RFC 4787 § 4.1 and § 5 (mapping and filtering), already the model behind `relay::simulate_hole_punch`.
+  https://www.rfc-editor.org/rfc/rfc4787
+
+`PlayerKey` is X25519. RFC 8032 (Ed25519) is not the binding construction. The proof is a Noise `X` message
+to the hub static key, which is the primitive `crypto` already uses.

@@ -92,6 +92,22 @@ fn a_complete_book_passes() {
     let _ = std::fs::remove_dir_all(&root);
 }
 
+/// A fixture with no `docs/manual/` is the case ADR-10723 warns about. A feature inventory
+/// that is present and does not parse is a broken source: `book-check` is the gate step
+/// (`cargo xtask preflight` does not run `manual --check`), so the check must fail with a
+/// verdict instead of warning and exiting 0.
+#[test]
+fn a_broken_feature_inventory_fails_book_check() {
+    let root = write_book("", &coverage_full());
+    write(
+        &root,
+        "docs/manual/feature-inventory.csv",
+        "name,area,status,documented,kind\n\"unclosed\n",
+    );
+    assert_eq!(book::run(&root).expect("run"), ExitCode::FAILURE);
+    let _ = std::fs::remove_dir_all(&root);
+}
+
 #[test]
 fn a_dead_link_fails() {
     let root = write_book("", &coverage_full());

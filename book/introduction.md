@@ -6,6 +6,26 @@ explains each fundamental concept and every engine system in turn, then builds a
 step by step. The reference chapters at the end list the command-line tools, the content formats,
 the render settings and every agent-protocol method.
 
+## Where to start
+
+<!-- index: Where to start -->
+
+Three doors. Each one is a short list. The [feature catalog](manual/catalog.md) says whether a
+feature is in this version. The [glossary](manual/glossary.md) and the [index](manual/index.md)
+are the map of terms.
+
+- **A person making a game.** [Install the tools](start/install.md), follow the
+  [quickstart](start/quickstart-human.md) through a running game, then the longer
+  [first project](getting-started.md) and the [editor tour](start/editor-tour.md).
+- **A programmer linking the crates.** The crate table under
+  [What Regia Engine is](#what-regia-engine-is), then
+  [App, plugins and schedules](fundamentals/app-and-plugins.md) and
+  [The ECS](fundamentals/ecs.md). A game is a Rust crate that path-depends on this checkout.
+- **An agent driving a project.** The [agent quickstart](start/quickstart-agent.md) (stdio MCP,
+  the HTTP option, and one worked call), then
+  [Agent protocol and MCP](user-guide/agent-protocol.md) and the
+  [method reference](reference/agent-methods.md).
+
 ## What Regia Engine is
 
 Regia Engine is a 3D game engine written entirely in Rust. A game is a Rust crate: you write your
@@ -77,17 +97,22 @@ APK or AAB, plus a Steam depot layout ([Packaging](user-guide/packaging.md)).
 ## How this manual is organized
 
 1. **Getting started**: install the tools, create a project, tour the editor, run and package
-   your game.
-2. **Fundamentals**: the ECS, apps and plugins, scenes, assets and the cook, reflection, input.
+   your game. The two quickstarts are the short paths; the first-project chapter is the longer tour.
+2. **Using this manual**: the [feature catalog](manual/catalog.md), the
+   [glossary](manual/glossary.md), the [index](manual/index.md),
+   [troubleshooting](manual/troubleshooting.md), the [FAQ](manual/faq.md),
+   [known limits](manual/known-issues.md), [upgrade notes](manual/upgrade.md), and
+   [how to print](manual/print.md).
+3. **Fundamentals**: the ECS, apps and plugins, scenes, assets and the cook, reflection, input.
    Read these in order; every later chapter assumes them.
-3. **Engine systems**: one chapter per system: rendering, materials, terrain, lighting, VFX,
+4. **Engine systems**: one chapter per system: rendering, materials, terrain, lighting, VFX,
    physics, animation, audio, UI, navigation and AI, the gameplay framework, the sim bridge, hot
    reload, the editor, the agent protocol, packaging, and profiling.
-4. **Tutorials**: build a small third-person game from the template, then study the arena sample
+5. **Tutorials**: build a small third-person game from the template, then study the arena sample
    (bots, weapons, match rules) and test it through the agent protocol.
-5. **Reference**: CLI, content formats with their versions and migrators, render settings, and
+6. **Reference**: CLI, content formats with their versions and migrators, render settings, and
    every agent method.
-6. **Agent guide**: task-oriented pages for AI agents driving the protocol. The same pages are
+7. **Agent guide**: task-oriented pages for AI agents driving the protocol. The same pages are
    the exact method parameters and examples.
 
 Every code block marked `rust` in this book is compiled against the engine by

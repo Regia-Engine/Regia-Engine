@@ -9,9 +9,9 @@ agents through `video.*` (specs/50, ADR-1593, ADR-1670).
 machine, clocks (including the exact `Lockstep` rule), seek, loop, playlists, the CPU YUV reference and
 frame hashes, the PCM feed to the mixer with its bus source, and the agent surface. It decodes the two reference codecs
 (raw I420 video `V_UNCOMPRESSED`, float PCM audio `A_PCM/FLOAT/IEEE`) that the fixture muxer writes.
-With the `regia` feature `media-codecs` it also decodes AV1 video and Opus and Vorbis audio
-([Video codecs](video-codecs.md), ADR-1869); without it those files are refused with
-`video_codec_unsupported` and a hint naming the feature. `VideoFramePlugin` publishes the picture
+Compressed codecs are off by default. The `regia` feature `media-codecs` is not part of the default features. Turn it on to decode AV1 video and Opus and Vorbis audio
+([Video codecs](video-codecs.md), ADR-1869). Without it those files are refused with
+`video_codec_unsupported` and a hint naming the feature. The editor **Video** tab (panel id `video`, [Video](../user-guide/editor-guide/video.md)) uses this same build: a file the runtime refuses is refused there too (`video_panel_codec_unsupported`). `VideoFramePlugin` publishes the picture
 as a `DynamicTexture`. `video.frame_hash` still hashes the CPU reference conversion. Fullscreen
 drawing is on [Boot movies, cues and the decode pool](video-boot-and-cues.md) and
 [Video on screen](media-render.md): with `VideoOverlayPlugin`, `layer >= 0` draws above the UI and

@@ -1,5 +1,9 @@
 # Material graphs
 
+<!-- index: Material graph -->
+<!-- index: Triplanar -->
+<!-- index: Vertex offset -->
+
 A **material graph** (`.matgraph.ron`) describes a surface as a graph of nodes (texture samples,
 math, triplanar projection, height blends, Fresnel) instead of fixed parameters. `regia_matgraph`
 compiles the graph into the forward pass's `material_surface` WGSL function. The graph decides
@@ -9,7 +13,13 @@ single hand-written code path, so a graph material is lit exactly like a standar
 
 Use a standard `.material.ron` ([Materials](../user-guide/materials.md)) for ordinary PBR
 surfaces; reach for a graph when a surface needs logic: dust that settles on upward faces, wear on
-edges, a blend between rock and snow by height, a pulsing emissive.
+edges, a blend between rock and snow by height, a pulsing emissive. The task that chooses
+between a `.material.ron`, a graph, and a shading model is
+[Materials](../how-to/picture/materials.md).
+
+Graph materials stay fully resident. They do not take the mip-streaming ramp that standard
+surfaces use. The tier still caps which forward shader runs: Mobile Low and Mobile High ask for
+the lite shader on a tile GPU.
 
 ## A graph
 

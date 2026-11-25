@@ -128,6 +128,11 @@ pub const RELAY_INTRO_REQUEST_BYTES: usize = 800;
 /// The byte after a `Register`'s cookie that starts its candidate list (protocol 1 and 2 relays
 /// read zero padding there and stop).
 pub const RELAY_CANDIDATES_EXT: u8 = 0xCA;
+/// The byte after a `Register`'s cookie that tells the relay not to publish this lobby's address
+/// (ADR-10399). Protocol 1 and 2 relays read zero padding there and stop, so they ignore it.
+/// A relay that understands it answers `HostInfo`, `Allocated` and `ClientJoined` with an
+/// unspecified address. The UDP source is still the lobby's real endpoint, used only to forward.
+pub const RELAY_HIDE_ADDR_EXT: u8 = 0xA1;
 /// Least protocol an allocation operation needs.
 pub const RELAY_ALLOCATION_MIN_VERSION: u8 = 2;
 /// Least protocol the host check (port-forward probe, uplink measurement) needs (spec 120 § 10.7).
@@ -403,6 +408,30 @@ pub fn encode_register_with_candidates(
     Ok(padded(w, RELAY_REGISTER_REQUEST_BYTES))
 }
 
+/// `Register` that asks the relay not to publish this socket's address (ADR-10399).
+///
+/// The hide byte follows the cookie. No candidates are written: a hidden lobby has none to
+/// hand out. An older relay treats the byte as padding and still registers the UDP source.
+/// Fails when the token is too large.
+pub fn encode_register_hidden(
+    lifetime_s: u16,
+    token: &[u8],
+    cookie: Option<&[u8; RELAY_COOKIE_BYTES]>,
+) -> Result<Vec<u8>, WireError> {
+    let mut w = control(RelayTag::Register);
+    w.u16(lifetime_s);
+    w.bytes_u16(token, RELAY_TOKEN_MAX_BYTES)?;
+    match cookie {
+        Some(c) => {
+            w.u8(1);
+            w.raw(c);
+        }
+        None => w.u8(0),
+    }
+    w.u8(RELAY_HIDE_ADDR_EXT);
+    Ok(padded(w, RELAY_REGISTER_REQUEST_BYTES))
+}
+
 /// Protocol 3 `PunchIntro` that resolves a join code (spec 120 § 10.7): the relay answers with a
 /// [`RelayReply::Introduced`] for the client (the host's address, ticket, bind key, candidates and
 /// a session key) and sends the host one for this client. `None` when `code` is not a join code.
@@ -528,7 +557,8 @@ pub enum RelayReply {
     RegisterChallenge([u8; RELAY_COOKIE_BYTES]),
     /// A looked-up host.
     HostInfo {
-        /// Its reflexive address.
+        /// Its reflexive address. Unspecified, port 0, when the lobby registered with
+        /// [`RELAY_HIDE_ADDR_EXT`].
         addr: SocketAddr,
         /// The opaque token it deposited.
         token: Vec<u8>,
@@ -553,7 +583,7 @@ pub enum RelayReply {
     Allocated {
         /// The allocation's port on the relay.
         port: u16,
-        /// The other side.
+        /// The other side. Unspecified when the lobby hid its address.
         peer: SocketAddr,
     },
     /// Protocol 2, to the host: `client` has allocation `port`; it reaches you from
@@ -562,7 +592,7 @@ pub enum RelayReply {
     ClientJoined {
         /// The allocation's port on the relay.
         port: u16,
-        /// The client's address as the relay sees it.
+        /// The client's address as the relay sees it. Unspecified when the lobby hid its address.
         client: SocketAddr,
         /// The key that moves the host side of this allocation.
         host_key: [u8; RELAY_ALLOCATION_KEY_BYTES],
@@ -729,6 +759,14 @@ struct Lobby {
     expires_ms: u64,
     /// The host's NAT traversal candidates (protocol 3 `Register` extension).
     candidates: Vec<Candidate>,
+    /// `Register` carried [`RELAY_HIDE_ADDR_EXT`]. Replies name no address. Forwarding still
+    /// uses `host`.
+    hide_addr: bool,
+}
+
+/// An address that names nobody. Hidden replies publish this instead of a UDP source.
+fn unpublished_addr() -> SocketAddr {
+    SocketAddr::from((Ipv4Addr::UNSPECIFIED, 0))
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -895,6 +933,24 @@ impl RelayCore {
         }
     }
 
+    /// Stops reserving a new allocation. A client key that already holds a port can still
+    /// `Allocate` again (a lost answer) and `Refresh` is unchanged. A new key is answered
+    /// [`RelayReply::Full`] (NL-11). The relay does not drop allocations it already issued.
+    pub fn stop_new_allocations(&mut self) {
+        self.alloc.stop_new();
+    }
+
+    /// Replaces the per-source control limit. `0` admits every request. The hub's `hub.toml`
+    /// sets this from `relay.per_address_per_sec` (default 30). The relay's own default stays
+    /// [`RELAY_SOURCE_REQUESTS_PER_SECOND`].
+    pub fn set_source_rate(&mut self, per_sec: u32) {
+        self.sources = SourceLimiter::new(
+            per_sec,
+            RELAY_MAX_TRACKED_SOURCES,
+            blake3::derive_key("regia_net relay limiter v1", &self.secret),
+        );
+    }
+
     /// The versions this relay announces to a version probe from outside a flow: this build's
     /// wire version, no game (ADR-7985).
     pub fn probe_responder(&self) -> &ProbeResponder {
@@ -920,6 +976,35 @@ impl RelayCore {
     fn lobby_of(&self, host: SocketAddr, now_ms: u64) -> Option<&Lobby> {
         let lobby = self.lobbies.get(self.hosts.get(&host)?)?;
         (lobby.expires_ms > now_ms).then_some(lobby)
+    }
+
+    /// The live hidden lobby whose bind key is `bind_key`.
+    ///
+    /// Every lobby's key is compared, so the time taken does not say which key was close.
+    /// The last match wins. A lobby that did not ask to hide its address is not returned:
+    /// an unspecified `Allocate` must not resolve a lobby that published its address.
+    fn hidden_lobby(&self, bind_key: &[u8; RELAY_BIND_KEY_BYTES], now_ms: u64) -> Option<&Lobby> {
+        let mut found = None;
+        for lobby in self.lobbies.values() {
+            if constant_time_eq(&lobby.bind_key, bind_key) && lobby.hide_addr && lobby.expires_ms > now_ms {
+                found = Some(lobby);
+            }
+        }
+        found
+    }
+
+    /// The lobby an `Allocate` names. An unspecified address resolves through [`Self::hidden_lobby`].
+    fn allocate_lobby(
+        &self,
+        asked: SocketAddr,
+        bind_key: &[u8; RELAY_BIND_KEY_BYTES],
+        now_ms: u64,
+    ) -> Option<&Lobby> {
+        if asked.ip().is_unspecified() {
+            self.hidden_lobby(bind_key, now_ms)
+        } else {
+            self.lobby_of(asked, now_ms)
+        }
     }
 
     fn remove_lobby(&mut self, code: &str) {
@@ -1096,11 +1181,25 @@ impl RelayCore {
                     Ok(1) => r.array::<RELAY_COOKIE_BYTES>().ok(),
                     _ => None,
                 };
-                // The candidates extension (protocol 3): a malformed list counts as none.
-                let candidates = match r.u8() {
-                    Ok(RELAY_CANDIDATES_EXT) => decode_candidates(&mut r).ok(),
-                    _ => None,
-                };
+                // Extensions after the cookie. `0xA1` hides the address, `0xCA` is the candidate
+                // list. Anything else (padding 0, or a byte this build does not know) ends the
+                // list, which is what a relay that only knew padding did. A hidden lobby keeps
+                // no candidates, even if a list followed the hide byte.
+                let mut hide_addr = false;
+                let mut candidates = None;
+                loop {
+                    match r.u8() {
+                        Ok(RELAY_HIDE_ADDR_EXT) => hide_addr = true,
+                        Ok(RELAY_CANDIDATES_EXT) => {
+                            candidates = decode_candidates(&mut r).ok();
+                            break;
+                        }
+                        _ => break,
+                    }
+                }
+                if hide_addr {
+                    candidates = None;
+                }
                 if cookie.is_none_or(|c| self.cookies.verify_addr(from, 0, &c, now_ms).is_none()) {
                     // Nothing is stored for an address that has not proved it can read this. The
                     // cookie binds the port too: lobbies are keyed by the exact address, so a cookie
@@ -1128,7 +1227,12 @@ impl RelayCore {
                 {
                     lobby.token = token.to_vec();
                     lobby.expires_ms = expires_ms;
-                    if let Some(c) = candidates {
+                    // A renewal that omits the hide byte publishes again. One that sets it
+                    // drops any candidates a previous register stored.
+                    lobby.hide_addr = hide_addr;
+                    if hide_addr {
+                        lobby.candidates.clear();
+                    } else if let Some(c) = candidates {
                         lobby.candidates = c;
                     }
                     let mut w = control_v(RelayTag::JoinCode, version);
@@ -1155,6 +1259,7 @@ impl RelayCore {
                         bind_key,
                         expires_ms,
                         candidates: candidates.unwrap_or_default(),
+                        hide_addr,
                     },
                 );
                 self.hosts.insert(from, code.clone());
@@ -1178,8 +1283,9 @@ impl RelayCore {
                 {
                     Some(lobby) => {
                         let host = lobby.host;
+                        let published = if lobby.hide_addr { unpublished_addr() } else { host };
                         let mut w = control_v(RelayTag::HostInfo, version);
-                        encode_addr(&mut w, host);
+                        encode_addr(&mut w, published);
                         // The token was size-checked on registration.
                         let _ = w.bytes_u16(&lobby.token, RELAY_TOKEN_MAX_BYTES);
                         w.raw(&lobby.bind_key);
@@ -1213,6 +1319,12 @@ impl RelayCore {
                         .is_some_and(|(host, until)| *host == from && *until > now_ms);
                 if !client_side && !host_side {
                     return error(RelayError::NotAHost);
+                }
+                // A hidden lobby's introduction would name one side to the other. Say nothing.
+                let hidden = self.lobby_of(peer, now_ms).is_some_and(|l| l.hide_addr)
+                    || self.lobby_of(from, now_ms).is_some_and(|l| l.hide_addr);
+                if hidden {
+                    return Vec::new();
                 }
                 let notice = |addr: SocketAddr| {
                     let mut w = control_v(RelayTag::PunchPeer, version);
@@ -1325,7 +1437,8 @@ impl RelayCore {
             w.u8(RelayError::UnknownCode as u8);
             return vec![(w.finish(), from)];
         };
-        if lobby.host == from {
+        if lobby.host == from || lobby.hide_addr {
+            // A hidden lobby's introduction names both sides. Send nothing.
             return Vec::new();
         }
         let key = blake3::derive_key("regia_net relay intro session v1", &self.secret);
@@ -1493,6 +1606,21 @@ impl<S: DatagramSocket> RelayServer<S> {
     /// The relay state.
     pub fn core(&self) -> &RelayCore {
         &self.core
+    }
+
+    /// The relay state, mutable (a drain, or `relay.per_address_per_sec`).
+    pub fn core_mut(&mut self) -> &mut RelayCore {
+        &mut self.core
+    }
+
+    /// Stops new allocations. See [`RelayCore::stop_new_allocations`].
+    pub fn stop_new_allocations(&mut self) {
+        self.core.stop_new_allocations();
+    }
+
+    /// Sets `relay.per_address_per_sec`. See [`RelayCore::set_source_rate`].
+    pub fn set_source_rate(&mut self, per_sec: u32) {
+        self.core.set_source_rate(per_sec);
     }
 
     /// What the relay holds and what it refused.
@@ -2187,6 +2315,71 @@ mod tests {
             RelayReply::JoinCode(_)
         ));
         assert_eq!(relay.lobby_count(), 2);
+    }
+
+    /// ADR-10399: a register that asks to hide its address publishes none. `HostInfo` and the
+    /// allocation replies omit the host the relay saw and the member. Forwarding still uses
+    /// those endpoints.
+    #[test]
+    fn a_hidden_register_publishes_no_address() {
+        let mut relay = RelayCore::with_secret(1, [9; 32]);
+        relay.add_allocation_ports(50_000..50_004);
+        let host = SocketAddr::from(([198, 51, 100, 7], 7777));
+        let member = SocketAddr::from(([203, 0, 113, 20], 5000));
+        let host_octets = [198, 51, 100, 7];
+        let member_octets = [203, 0, 113, 20];
+        let names = |bytes: &[u8]| {
+            bytes.windows(4).any(|window| window == host_octets)
+                || bytes.windows(4).any(|window| window == member_octets)
+        };
+        let first = relay.handle(
+            host,
+            &encode_register_hidden(60, b"ticket", None).expect("fits"),
+            0,
+        );
+        let RelayReply::RegisterChallenge(cookie) = reply(&first) else {
+            panic!("expected a challenge");
+        };
+        let again = encode_register_hidden(60, b"ticket", Some(&cookie)).expect("fits");
+        let RelayReply::JoinCode(code) = reply(&relay.handle(host, &again, 1)) else {
+            panic!("expected a code");
+        };
+        let info = relay.handle(member, &encode_lookup(&code).expect("code"), 2);
+        let RelayReply::HostInfo { addr, bind_key, .. } = reply(&info) else {
+            panic!("expected host info");
+        };
+        assert!(addr.ip().is_unspecified() && addr.port() == 0);
+        assert!(!names(&info[0].0), "HostInfo named a side");
+        let client_key = [3u8; RELAY_ALLOCATION_KEY_BYTES];
+        let asked = unpublished_addr();
+        let challenge = relay.handle(member, &encode_allocate(asked, &bind_key, &client_key, None), 3);
+        let RelayReply::Challenge(cookie) = reply(&challenge) else {
+            panic!("expected an allocate challenge");
+        };
+        let granted = relay.handle(
+            member,
+            &encode_allocate(asked, &bind_key, &client_key, Some(&cookie)),
+            4,
+        );
+        assert_eq!(granted.len(), 2, "Allocated and ClientJoined");
+        for (bytes, _) in &granted {
+            assert!(!names(bytes), "an allocation reply named a side");
+        }
+        assert_eq!(relay.allocation_count(), 1);
+        let port = granted
+            .iter()
+            .find_map(|(bytes, _)| match RelayReply::decode(bytes) {
+                Ok(Some(RelayReply::Allocated { port, peer })) => {
+                    assert!(peer.ip().is_unspecified());
+                    Some(port)
+                }
+                _ => None,
+            });
+        let port = port.expect("allocated");
+        assert_eq!(
+            relay.handle_allocation(port, member, b"play", 5),
+            vec![(b"play".to_vec(), host)]
+        );
     }
 
     /// Review: a renewal keeps the code and the key. A client that looked the host up before the

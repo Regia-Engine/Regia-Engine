@@ -1,7 +1,22 @@
 # Audio
 
+<!-- index: Audio -->
+<!-- index: Audio bus -->
+<!-- index: Audio snapshot -->
+<!-- index: Sound cue -->
+<!-- index: Spatial audio -->
+<!-- index: Master limiter -->
+<!-- index: Voice chat -->
+<!-- index: Convolution reverb -->
+
 `regia_audio` is a runtime audio layer over kira, with buses, snapshots, event cues, parametric
-patches, spatial audio and voice capture.
+patches, spatial audio and voice capture. The model and budgets are
+[spec 16](../../docs/specs/16-audio.md). Loudness measurement is
+[the loudness spec](../../docs/specs/audio-loudness.md) and the
+[Loudness](loudness.md) page. Importing measured loudness is
+[spec 95](../../docs/specs/95-loudness-importers.md). Player-to-player voice is
+[spec 59](../../docs/specs/59-voice-chat.md). A HUD-and-cue procedure is
+[UI and audio](../how-to/play/ui-and-audio.md).
 
 ## Buses and snapshots
 

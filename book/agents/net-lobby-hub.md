@@ -87,3 +87,6 @@ owner's open asks, and a directory snapshot; since ADR-10069 (KI-NT-045) also th
 most `chat_history`) from the first one the cap dropped on, in order and once, and a join plan the cap dropped (to the
 member, and the owner's copy to the owner). Only a session that cannot drain is dropped (`expired`). When a lobby's owner
 leaves, the session address it confirmed is withdrawn for everyone.
+
+Codec generation 2 (ADR-10378) adds `hub_needs_wire_v2` and `hub_not_ready` to this `refused` map.
+See [Delegated hub sessions](net-delegated-sessions.md). The handshake protocol stays 1.

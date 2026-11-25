@@ -1,5 +1,7 @@
 # Look-dev
 
+Panel id: `lookdev`.
+
 The **Look-dev** tab traces the open level with the reference path tracer and shows the result: the
 ground truth a real-time frame can be compared against. The trace takes the same inputs the
 real-time path uses (the runtime extraction of the level), with the editor camera or the level's own

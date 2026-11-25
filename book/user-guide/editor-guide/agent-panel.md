@@ -1,5 +1,7 @@
 # Agent
 
+Panel id: `agent`.
+
 The **Agent** tab runs an agent program you choose, inside the editor, and lets you talk to it. The editor installs no
 agent, no provider and no credentials: you configure the command of an agent you already have, and the panel starts
 it in the open project's folder and connects it to the editor's agent protocol. A mode decides what the agent may do:

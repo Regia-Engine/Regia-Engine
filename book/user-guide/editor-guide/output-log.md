@@ -1,5 +1,7 @@
 # Output Log
 
+Panel id: `output_log`.
+
 The **Output Log** tab shows the engine's log: every record the editor, the engine and a running
 game write, with a level filter, a target filter and a text search. The records are the same ring an
 agent reads with `logs.read`, so the tab and an agent see the same lines. A `path:line` or an asset

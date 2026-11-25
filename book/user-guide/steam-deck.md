@@ -1,8 +1,19 @@
 # Steam Deck
 
-The Deck is a first-class Regia Engine target: a 7" 1280×800 handheld that runs native Linux games in
-the Steam Linux Runtime ([Steam](steam.md), [Packaging](packaging.md)). This page has two parts:
-what the engine does for the Deck, and the **test steps the owner runs on the real device**.
+<!-- index: Steam Deck -->
+<!-- index: Deck -->
+<!-- index: Deck preset -->
+<!-- index: gamescope -->
+
+The Deck is a Regia Engine target: a 7" 1280×800 handheld that runs native Linux games in
+the Steam Linux Runtime ([Linux](linux.md), [Steam](steam.md), [Packaging](packaging.md)). The
+package is the Linux one, linked against glibc 2.31. The quality tier is `Deck`. This page has two
+parts: what the engine does for the Deck, and the **test steps the owner runs on the real device**.
+
+The floating on-screen keyboard backend reports `Unavailable`. Steam's own floating keyboard is the
+path that exists today (`ShowFloatingGamepadTextInput` on the [Steam](steam.md) page). Sockets and
+lobbies are on the Steam pages. A two-account session is owner-run. The device steps on this page
+do not include one.
 
 ## What the engine does
 

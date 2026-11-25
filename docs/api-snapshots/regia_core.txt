@@ -1768,6 +1768,7 @@ project_path::ProjectPathError impl Eq	derive(Eq)
 project_path::ProjectPathError impl Error	derive(Error)
 project_path::ProjectPathError impl PartialEq	derive(PartialEq)
 project_path::ProjectPathError::code	pub fn code(&self) -> &'static str
+project_path::canonicalize_plain	pub fn canonicalize_plain(_: &Path) -> std::io::Result<PathBuf>
 project_path::check_relative	pub fn check_relative(_: &str) -> Result<PathBuf, ProjectPathError>
 project_path::check_under_root	pub fn check_under_root(_: &Path, _: &Path) -> Result<(), ProjectPathError>
 project_path::is_remote_form	pub fn is_remote_form(_: &str) -> bool
@@ -1775,6 +1776,7 @@ project_path::read_regular_capped	pub fn read_regular_capped(_: &Path, _: u64) -
 project_path::resolve_in_roots	pub fn resolve_in_roots(_: &[PathBuf], _: &str) -> Result<PathBuf, ProjectPathError>
 project_path::resolve_read	pub fn resolve_read(_: &Path, _: &str) -> Result<PathBuf, ProjectPathError>
 project_path::resolve_write	pub fn resolve_write(_: &Path, _: &str) -> Result<PathBuf, ProjectPathError>
+project_path::strip_verbatim	pub fn strip_verbatim(_: &Path) -> PathBuf
 residency	pub mod residency
 residency::MemorySqueeze	pub struct MemorySqueeze { .. }
 residency::MemorySqueeze impl Drop	impl Drop for MemorySqueeze

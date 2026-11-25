@@ -1,10 +1,12 @@
 # Tests
 
-The **Tests** tab lists the functional tests placed in the open level, runs them inside
+<!-- index: Functional test -->
+
+Panel id: `tests`. The **Tests** tab lists the functional tests placed in the open level, runs them inside
 play-in-editor, and shows each test's verdict and step-by-step report. A functional test is an
 entity with a `FunctionalTest` component whose body (a script or Rust code) plays the game and
 checks the outcome, so a level carries its own gameplay checks. The tab is the human view of
-the same run an agent starts with `editor.tests_panel_run`. Depth: [Functional tests (agents)](../../agents/functional-tests.md).
+the same run an agent starts with `editor.tests_panel_run`. Spec: `docs/specs/41-functional-tests-and-session-harness.md`. Depth: [Functional tests (agents)](../../agents/functional-tests.md).
 
 ## Open it
 

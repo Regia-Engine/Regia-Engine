@@ -1,5 +1,7 @@
 # Abilities
 
+Panel id: `abilities`.
+
 The **Abilities** tab inspects one entity's gameplay-ability data: its attributes (base value, current value and
 how the current value was reached), the effects live on it, and the abilities it has been granted. It reads the
 play world while a play session runs and the edit world otherwise, so the same tab shows a level being authored

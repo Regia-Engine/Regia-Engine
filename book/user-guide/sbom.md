@@ -1,7 +1,17 @@
 # Bill of materials and licence audit
 
+<!-- index: SBOM -->
+<!-- index: CycloneDX -->
+<!-- index: THIRD_PARTY_NOTICES -->
+
 A game that ships on Regia Engine carries third-party code and binary assets. This page shows how to
 list them, and how the repository keeps that list honest. Decision record: ADR-2760.
+
+`regia package` also writes `sbom.json` into the package (names, versions, and licence identifiers
+of the crates that platform resolves). That file is the copy that ships. `cargo xtask sbom` is the
+CycloneDX document you archive for the engine or for one game's feature set. Both are described
+below and on [Packaging](packaging.md). The licence of the engine itself is
+[Licensing](licensing.md).
 
 ## The bill of materials
 

@@ -1,5 +1,7 @@
 # UI designer
 
+Panel ids: `ui_designer` and `ui_anim`.
+
 The **UI Designer** tab edits a game UI document (`.ui.ron`) as you see it: a widget palette, a
 hierarchy, a live preview, an inspector for the selected widget, bindings, components and a lint
 list. The **UI Animation** tab (also opened by the designer's **Animations** button) edits a

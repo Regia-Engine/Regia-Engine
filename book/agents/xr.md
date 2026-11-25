@@ -1,10 +1,28 @@
 # XR (OpenXR seam)
 
+<!-- index: OpenXR -->
+<!-- index: xr_no_loader -->
+<!-- index: XR simulator -->
+
 `regia_platform::xr` is the engine's side of a head-mounted display: a backend-agnostic trait
 (`XrBackend`), the session state machine, per-eye poses and fields of view with the projection
 math, late-latch pose prediction, controller poses and actions, and a scripted `NullXr` backend for
 tests and headless runs. No OpenXR SDK is linked in this version (ADR-1571): a real runtime
 binding implements `XrBackend` later, and everything here stays the same.
+
+## What runs in this version
+
+`regia_xr` runs the configuration, the action manifest, comfort options, the scripted simulator, and
+stereo rendering on that simulator. `XrBackendKind::Simulator` is the backend that creates a session.
+
+`XrBackendKind::OpenXr` and `Auto` do not. They start in app state `Off` with `last_error.code`
+`xr_no_loader`. No loader, instance, or swapchain is linked (ADR-1571). `xr.set_option` with
+`runtime_json` stores a path. This version has no binding that reads it, so the option does not open
+a headset. The error text says the binding is not built. It does not mean the player's install is
+missing a file you can add.
+
+Sentences below that say "a real runtime" describe the seam. That runtime is not in this tree. Use
+the simulator.
 
 | Method | Permission | What it does |
 |---|---|---|

@@ -233,9 +233,29 @@ fn main() {
             rep.ack_all_state(*p);
         }
     };
-    for _ in 0..6 {
+    // The fill runs until no connection has a spawn left to send (at least 6 ticks): since every
+    // record takes the byte test (ADR-8419), the spawns of a full view take several send ticks at
+    // the bench rate, and a measurement started before they are out would time the join flood
+    // instead of the steady load (ADR-8885).
+    let mut fill_ticks = 0usize;
+    loop {
         tick(&mut world);
+        fill_ticks += 1;
+        let pending: u64 = world
+            .resource::<NetInterest>()
+            .peers
+            .values()
+            .map(|p| u64::from(p.send.counters.spawns_pending))
+            .sum();
+        if fill_ticks >= 6 && pending == 0 {
+            break;
+        }
+        if fill_ticks >= 2000 {
+            println!("fill stopped after {fill_ticks} ticks with {pending} spawns still pending");
+            break;
+        }
     }
+    println!("fill: {fill_ticks} ticks until every connection held its view");
     settings.replication.spawns_per_send = 24;
     let every = settings.replication.send_every_ticks.max(1) as usize;
     world.insert_resource(settings);

@@ -58,3 +58,12 @@ Controls: WASD move, mouse look, E use, F5 quicksave, F9 quickload, Esc pause, F
 New scripts go in `game/src/scripts/` and are registered at the `// REGIA:SCRIPTS` marker
 (`editor.create_script`, or by hand). Hot reload of that crate is the editor host in
 `docs/specs/20-hot-reload.md`.
+
+## Release builds
+
+`regia new` writes `.cargo/config.toml` so a plain `cargo build` does not embed this
+machine's directories in the game binary (ADR-10370). It appends this machine's home
+directory as the last `--remap-path-prefix`. If you set `RUSTFLAGS`, restate those
+flags there, with the home directory last. Read the project directory from the
+`CARGO_MANIFEST_DIR` environment variable; the compile-time `env!("CARGO_MANIFEST_DIR")`
+embeds the absolute path.

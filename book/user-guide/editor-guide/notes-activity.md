@@ -1,5 +1,7 @@
 # Notes and Activity
 
+Panel ids: `notes` and `activity`.
+
 Two tabs for reviewing a level together. **Notes** holds review notes pinned in the world: a note is a marker in the
 open level with a text, its author, replies and a resolved flag, saved with the level and stripped from cooked and
 packaged levels. **Activity** is the session's timeline of who changed what: every agent call and every user edit,

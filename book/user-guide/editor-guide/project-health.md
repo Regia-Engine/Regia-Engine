@@ -1,5 +1,7 @@
 # Project Health
 
+Panel id: `project_health`.
+
 The **Project Health** tab gathers the checks the project already has into one ranked list: validator findings,
 budgets, missing references, large assets nothing uses, cook warnings, toolchain problems from `regia doctor` and
 autosaves a crash left behind. Each row says what was found, recommends an action and links to where you fix it.

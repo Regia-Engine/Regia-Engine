@@ -77,3 +77,12 @@ code, play and leave, at fixed ticks.
 - The book page "Build a networked game" walks through every piece.
 
 Strip points are marked `TODO(template)`.
+
+## Release builds
+
+`regia new` writes `.cargo/config.toml` so a plain `cargo build` does not embed this
+machine's directories in the game binary (ADR-10370). It appends this machine's home
+directory as the last `--remap-path-prefix`. If you set `RUSTFLAGS`, restate those
+flags there, with the home directory last. Read the project directory from the
+`CARGO_MANIFEST_DIR` environment variable; the compile-time `env!("CARGO_MANIFEST_DIR")`
+embeds the absolute path.

@@ -1,5 +1,7 @@
 # Bulk Edit
 
+Panel id: `bulk_edit`.
+
 The Bulk Edit panel edits many objects at once as a spreadsheet. Each row is an entity (or a data
 asset); each column is a field of one component (or of the asset's type).
 

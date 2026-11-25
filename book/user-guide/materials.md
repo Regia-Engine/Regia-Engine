@@ -1,7 +1,15 @@
 # Materials, textures and import
 
+<!-- index: Material -->
+<!-- index: Standard shader -->
+<!-- index: ORM map -->
+<!-- index: Subsurface scattering -->
+<!-- index: Transmission -->
+
 Materials are `shader + parameters`, stored as `.material.ron`. Meshes, textures and materials are
 authored in neutral formats (glTF, PNG, WAV) and **cooked** to platform data by the import pipeline.
+The task procedure (a material, streaming, a graph, skin and eyes, a skeleton) is
+[Materials](../how-to/picture/materials.md). Shading models and skinning stay on their own pages.
 
 ## A material
 
@@ -213,6 +221,24 @@ v3 file loads as v4 with no film. `docs/formats/material-v4.example.ron` is a fe
 `mix(thickness_min, thickness_max, thickness_map.g)` nanometers thick, or `thickness_max` without a
 map. A block that omits a field takes the extension's default: factor 0, IOR 1.3, 100 to 400 nm.
 [Thin film](../agents/thin-film.md) has the details and what the film does not combine with.
+
+## Weather response (format version 5)
+
+<!-- index: Material weather -->
+
+Version 5 adds an optional `weather` block (spec 99): how rain and snow change this material. A
+v4 file loads as v5 with the default response. Leaving the block out is that default: porosity
+derived from roughness and metallic, wetness and snow at full strength, no puddles. A bare
+`weather: ()` is the same response. The frozen sample is `docs/formats/material-v5.example.ron`.
+
+| Field | Default | Effect |
+|---|---|---|
+| `porosity` | derived | `0..=1`. How much a wet surface darkens. Absent derives `(1 - metallic) · clamp((roughness - 0.25) / 0.5, 0, 1)`. |
+| `wet` | 1 | Scales wetness. 0 means rain never wets the surface. |
+| `snow` | 1 | Scales snow cover. 0 means snow never settles. |
+| `puddles` | false | Flat, upward parts may hold puddles. |
+
+Every authored number has to be finite and in `0..=1`.
 
 ## Subsurface scattering (format version 6)
 

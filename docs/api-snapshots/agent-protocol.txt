@@ -5124,7 +5124,7 @@ method: lobby.hub_status
   mutating: false
   cost: light
   param: hub string optional
-  result: { hubs: [{ label, sessions, lobbies, listed, invites, generations: { directory, presence }, state_bytes, bytes_sent: { directory, chat, other }, expired, refused, players: [{ member, handle, presence, lobby? }], games: [{ id, owner, owner_handle, visibility, max_members, member_count, joinable, data }] }] }
+  result: { hubs: [{ label, sessions, lobbies, listed, invites, generations: { directory, presence }, state_bytes, bytes_sent: { directory, chat, other }, expired, refused, relay_allocations, servers_online, draining, players: [{ member, handle, presence, lobby? }], games: [{ id, owner, owner_handle, visibility, max_members, member_count, joinable, data }] }] }
   errors: hub_bad_params hub_unknown
 
 method: lobby.join

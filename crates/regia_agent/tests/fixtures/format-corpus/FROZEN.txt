@@ -125,6 +125,7 @@ grass/v1.ron 1407 6304a9db3f124ff4
 hlod-voxels/v1.bin 101 3b4b21e836b05c31
 hoverhull/v1.ron 48 ad9069434e8fd967
 hub-toml/v1.toml 379 15b282021c29edc5
+hub-toml/v2.toml 528 7ed0dc01a659a1f8
 hull-set/v1.bin 164 4f7a717bbf13d421
 ies-profile/v1.ron 792 209d0521ad022d05
 impactbank/v1.ron 1366 b9b87a369495c3cc

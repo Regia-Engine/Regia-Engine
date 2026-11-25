@@ -20,7 +20,7 @@ Compare a dev run with an extracted package along one scripted path.
 
 Examples:
   regia package parity --dev-trace dev.log --dev-root . --package-trace pkg.log --package-root out/pkg
-  regia package parity --dev-command 'regia play --headless' --package-command 'regia play --headless' --dev-root . --package-root out/pkg --script path.script --json
+  regia package parity --dev-command 'regia run' --package-command './my_game' --dev-root . --package-root out/pkg --json
   regia package parity --classify --trace run.strace --root out/pkg
 
 Exit codes:

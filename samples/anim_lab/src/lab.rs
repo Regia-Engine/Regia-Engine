@@ -115,8 +115,33 @@ fn run_lab() -> Result<String, String> {
     ))
 }
 
+/// This sample's directory, resolved at runtime (ADR-10370).
+///
+/// `env!("CARGO_MANIFEST_DIR")` would embed the build machine. `cargo run` exports
+/// the variable. A binary under `target/<profile>` walks up to `samples/anim_lab`.
+fn anim_lab_dir() -> Result<PathBuf, String> {
+    if let Some(dir) = std::env::var_os("CARGO_MANIFEST_DIR") {
+        return Ok(PathBuf::from(dir));
+    }
+    if let Ok(exe) = std::env::current_exe()
+        && let Some(root) = exe
+            .parent()
+            .and_then(|dir| dir.parent())
+            .and_then(|dir| dir.parent())
+    {
+        let project = root.join("samples").join("anim_lab");
+        if project.is_dir() {
+            return Ok(project);
+        }
+    }
+    Err(
+        "anim_lab: CARGO_MANIFEST_DIR is unset and samples/anim_lab was not found beside the executable"
+            .into(),
+    )
+}
+
 fn cache_dir() -> Result<PathBuf, String> {
-    let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../target/anim_cache");
+    let dir = anim_lab_dir()?.join("../../target/anim_cache");
     std::fs::create_dir_all(&dir).map_err(|e| format!("create {}: {e}", dir.display()))?;
     Ok(dir)
 }
@@ -141,7 +166,7 @@ fn ensure_glb(dir: &Path, file: &str, url: &str) -> Result<PathBuf, String> {
 }
 
 fn load_example() -> Result<AnimGraph, String> {
-    let path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/formats/locomotion.animgraph.ron");
+    let path = anim_lab_dir()?.join("../../docs/formats/locomotion.animgraph.ron");
     let text = std::fs::read_to_string(&path).map_err(|e| format!("read {}: {e}", path.display()))?;
     AnimGraph::from_ron_str(&text).map_err(|e| format!("parse {}: {e}", path.display()))
 }

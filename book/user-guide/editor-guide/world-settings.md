@@ -1,5 +1,7 @@
 # World Settings
 
+Panel id: `world_settings`.
+
 The **World Settings** tab edits the open level's `LevelSettings`: gravity, the environment asset,
 the game rules, the ambient audio bed, streaming, the atmosphere and sky, the look (exposure, color
 grade), the audio medium, the terrain and the baked light a level names. The settings are saved with

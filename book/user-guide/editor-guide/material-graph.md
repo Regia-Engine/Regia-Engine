@@ -1,5 +1,7 @@
 # Material graph
 
+Panel ids: `material` and `material_graph`.
+
 The **Material Graph** tab edits a `.matgraph.ron` as a node canvas: a box per node with a pin
 per input, a **Surface** box with the surface outputs (base color, alpha, metallic, roughness,
 normal, occlusion, emissive, world position offset), a live preview sphere, and each compile

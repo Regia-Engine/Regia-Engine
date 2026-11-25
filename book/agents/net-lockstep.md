@@ -1,9 +1,15 @@
 # Net lockstep (agents)
 
+<!-- index: Lockstep -->
+<!-- index: Rollback -->
+<!-- index: Desync -->
+<!-- index: Host migration -->
+
 `regia_net::lockstep` is the engine's lockstep mode (spec 120 § 7.1-7.5, ADR-8146 and ADR-8212): one host decides one frame
 per tick, every seat sends its inputs stamped for a later tick and steps its simulation only from frames. This page is
 what an agent reads to check a lockstep match: the `net.lockstep` method, what its numbers mean, and how to verify the
-behaviors. The player-facing description is in [Networking](../user-guide/networking.md).
+behaviors. The player-facing description is in [Networking](../user-guide/networking.md). The task
+procedure is [Lockstep and rollback](../how-to/online/lockstep-and-rollback.md).
 
 ## `net.lockstep`
 

@@ -425,6 +425,9 @@ html.pxx-manual .pager {
 }
 html.pxx-manual .pager .next { margin-left: auto; text-align: right; }
 
+/* Printed from the single-file manual. Hidden on screen. */
+html.pxx-manual .print-toc { display: none; }
+
 @media (max-width: 900px) {
   html.pxx-manual #sidebar {
     transform: translateX(-100%);
@@ -445,6 +448,8 @@ html.pxx-manual .pager .next { margin-left: auto; text-align: right; }
   html.pxx-manual body {
     background: #f3eee2 !important;
     color: rgba(26, 26, 26, 0.9) !important;
+    font-size: 11pt;
+    line-height: 1.45;
   }
   html.pxx-manual #sidebar,
   html.pxx-manual #menu,
@@ -453,7 +458,36 @@ html.pxx-manual .pager .next { margin-left: auto; text-align: right; }
   html.pxx-manual #theme,
   html.pxx-manual #results { display: none !important; }
   html.pxx-manual main { margin: 0 !important; padding: 0 !important; max-width: none !important; }
-  html.pxx-manual.js .chapter { display: block !important; page-break-before: always; }
+  html.pxx-manual .print-toc {
+    display: block !important;
+    break-after: page;
+    page-break-after: always;
+  }
+  html.pxx-manual .print-toc .print-toc-title {
+    font-family: "Space Mono", ui-monospace, monospace;
+    font-size: 18pt;
+    font-weight: 700;
+    margin: 0 0 1rem;
+  }
+  html.pxx-manual .print-toc ul { list-style: none; margin: 0; padding: 0; }
+  html.pxx-manual .print-toc li { margin: 0.15rem 0; }
+  html.pxx-manual .print-toc li.depth1 { margin-left: 1.25rem; }
+  html.pxx-manual .print-toc li.depth2,
+  html.pxx-manual .print-toc li.depth3 { margin-left: 2.5rem; }
+  html.pxx-manual .print-toc li.part {
+    margin-top: 0.85rem;
+    font-family: "Space Mono", ui-monospace, monospace;
+    font-weight: 700;
+  }
+  html.pxx-manual.js .chapter { display: block !important; }
+  html.pxx-manual section.chapter[data-depth="0"] { break-before: page; page-break-before: always; }
+  html.pxx-manual section.chapter[data-depth="0"]:first-of-type { break-before: auto; page-break-before: auto; }
+  html.pxx-manual pre,
+  html.pxx-manual table,
+  html.pxx-manual blockquote { break-inside: avoid; page-break-inside: avoid; }
+  html.pxx-manual h1,
+  html.pxx-manual h2,
+  html.pxx-manual h3 { break-after: avoid; page-break-after: avoid; }
   html.pxx-manual .chapter,
   html.pxx-manual h1,
   html.pxx-manual h2,

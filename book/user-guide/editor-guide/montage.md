@@ -1,5 +1,7 @@
 # Montage
 
+Panel id: `montage`.
+
 The **Montage** tab is the timeline of a `.montage.ron` (or a child `.montagevar.ron`): one lane
 per slot track with its clip segments, then lanes for sections, notifies and warp windows, a
 playhead, and a pose preview of one section chain or the whole timeline. Every control writes the

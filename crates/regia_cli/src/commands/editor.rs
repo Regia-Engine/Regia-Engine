@@ -15,9 +15,7 @@
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-#[cfg(not(unix))]
-use anyhow::bail;
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, bail};
 use clap::Args;
 
 /// Arguments of `regia editor`.
@@ -114,6 +112,19 @@ pub fn editor_argv(args: &EditorArgs, project: &Path) -> Vec<String> {
     argv
 }
 
+/// Refuses a `quick` app, which the editor cannot open, saying what to run instead (ADR-10616);
+/// warns for any other folder without a `Regia.toml`, which the editor opens as a plain folder.
+fn check_editor_project(project: &Path) -> Result<()> {
+    if project.join("Regia.toml").is_file() {
+        return Ok(());
+    }
+    if let Some(hint) = super::run::not_runnable_hint(project) {
+        bail!("`regia editor` cannot open {}: {hint}", project.display());
+    }
+    tracing::warn!(target: "regia_cli", "{} has no Regia.toml; the editor opens it as a plain folder", project.display());
+    Ok(())
+}
+
 /// Runs `regia editor`. On Unix this only returns on failure (the editor replaced the process).
 ///
 /// # Errors
@@ -131,9 +142,7 @@ pub fn run(args: &EditorArgs) -> Result<()> {
     let project = raw
         .canonicalize()
         .with_context(|| format!("project directory {} not found", raw.display()))?;
-    if !project.join("Regia.toml").is_file() {
-        tracing::warn!(target: "regia_cli", "{} has no Regia.toml; the editor opens it as a plain folder", project.display());
-    }
+    check_editor_project(&project)?;
     let sibling = std::env::current_exe()
         .ok()
         .and_then(|exe| exe.parent().map(Path::to_path_buf));
@@ -176,6 +185,33 @@ pub fn run(args: &EditorArgs) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// ADR-10616: `regia editor` in a quick app says what to run instead; a project and a plain
+    /// folder still open.
+    #[test]
+    fn the_editor_refuses_a_quick_app_with_what_to_run_instead() {
+        let parent = regia_test_utils::unique_temp_dir("editor-quick");
+        let request = |template: &str| regia_cli::new_project::NewProjectRequest {
+            name: format!("Ed {template}"),
+            template: template.into(),
+            parent: parent.clone(),
+        };
+        let quick = regia_cli::new_project::create_with_engine(&request("quick"), "/engine").expect("quick");
+        let error = check_editor_project(&quick.root)
+            .expect_err("refused")
+            .to_string();
+        assert!(
+            error.contains("`regia editor` cannot open") && error.contains("`cargo run`"),
+            "{error}"
+        );
+        let full =
+            regia_cli::new_project::create_with_engine(&request("first_person"), "/engine").expect("full");
+        check_editor_project(&full.root).expect("a project opens");
+        let plain = parent.join("plain");
+        std::fs::create_dir_all(&plain).expect("plain");
+        check_editor_project(&plain).expect("a plain folder opens");
+        let _ = std::fs::remove_dir_all(&parent);
+    }
 
     fn args() -> EditorArgs {
         EditorArgs {

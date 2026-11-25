@@ -1,10 +1,13 @@
 # Project settings
 
+Panel ids: `project_settings` and `preferences`.
+
 The **Project Settings** tab (**Edit ▸ Project settings…**) edits the project's `Regia.toml`
 and keeps every key it does not show: name, id, version, build number, organization, the
 default level, the platform targets and their quality presets, the content chunk rules, and the
 input maps of `config/input.ron`. The **Preferences** tab (**Edit ▸ Preferences…**) holds your
-own editor settings and the keymap; it saves as you change it. **Edit ▸ World settings…** opens
+own editor settings and the keymap; it saves as you change it. Chords, scopes and presets are on
+[Keymap](keymap.md). **Edit ▸ World settings…** opens
 the level's world settings. Walk-through: [Package a build](../../tutorials/package-a-build.md).
 Depth: [Editor preferences, keymap, layout and project settings](../../agents/editor-preferences.md),
 [Content Chunks panel](../../agents/content-chunks-panel.md), [Project structure](../project-structure.md).

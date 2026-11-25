@@ -1,5 +1,14 @@
 # Licensing
 
+<!-- index: MPL-2.0 -->
+<!-- index: MIT-0 -->
+<!-- index: CC0 -->
+<!-- index: CC-BY-4.0 -->
+<!-- index: CLA -->
+<!-- index: Trademark -->
+<!-- index: Engine credit -->
+<!-- index: Made with Regia Engine -->
+
 Regia Engine is open source under the **Mozilla Public License 2.0** (MPL-2.0). This page says in plain English what
 that means for you. It is not legal advice; the licence text in `LICENSE` is what counts.
 
@@ -11,7 +20,7 @@ that means for you. It is not legal advice; the licence text in `LICENSE` is wha
 | Ship that game | Tell players where Regia Engine's source code is. `regia package` writes this for you. |
 | Change one of Regia Engine's own files and ship it | Share the source of the files you changed (under the MPL), and point the notice at it. |
 | Copy code or assets from a template or sample | Nothing. Template and sample code is MIT-0 and their assets are CC0: no conditions, no credit needed. |
-| Quote or adapt this book | Credit it. The documentation is CC-BY-4.0. |
+| Quote or adapt this book | Credit it. The documentation is CC-BY-4.0 (`book/LICENSE-CC-BY-4.0.txt`). |
 | Use the name "Regia Engine" | "Made with Regia Engine" is welcome; see **Trademarks** below. |
 
 There is no fee, no royalty, no revenue report and nothing to sign or accept to use the engine.
@@ -88,9 +97,10 @@ In short:
 
 ## Contributing
 
-Contributions to Regia Engine itself are welcome under a contributor licence agreement: you keep your copyright and
+Contributions to Regia Engine itself are welcome under a contributor licence agreement (CLA): you keep your copyright and
 grant the licensor, Sphenisca Regia LLC, the right to relicense your contribution. See `CONTRIBUTING.md` and `CLA.md`
-in the repository. The engine's source is at https://github.com/Regia-Engine/Regia-Engine.
+in the repository. The engine's source is at https://github.com/Regia-Engine/Regia-Engine. The decision record is
+ADR-10225, written up in `docs/07-licensing.md`.
 
 ## Where the details are
 

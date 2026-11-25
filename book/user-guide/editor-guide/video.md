@@ -1,6 +1,9 @@
 # Video
 
-The **Video** tab opens a `.webm`, `.mkv` or `.video.ron` from the project, shows the decoded
+<!-- index: Video panel -->
+<!-- index: media-codecs -->
+
+Panel id: `video`. The **Video** tab opens a `.webm`, `.mkv` or `.video.ron` from the project, shows the decoded
 picture, plays, pauses, scrubs and steps single frames, lists the file's streams and decode
 counters, and edits the boot movie list of the project's `Regia.toml`. It opens a file the way a game's
 video player does, so what the tab shows is what the runtime decodes. Depth:
@@ -52,6 +55,7 @@ The tab handles no keys of its own; reach its controls with Tab and press them w
 
 ## Known limits
 
+- Compressed codecs are off unless the build turns them on. Cargo feature `media-codecs` (AV1 video, Opus and Vorbis audio) is off by default. Without it the tab refuses those files, the same refusal the runtime uses (`video_panel_codec_unsupported`, and `video_codec_unsupported` on `video.open`). Every build still decodes the reference codecs: uncompressed I420 video (`V_UNCOMPRESSED`) and float PCM audio (`A_PCM/FLOAT/IEEE`). See [Video playback](../../agents/video-playback.md).
 - A project must be open to open a video or edit the boot list.
 - Caption and subtitle cues are read as the decoder reaches them, so step or play to the end to see
   them all.

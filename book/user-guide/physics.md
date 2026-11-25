@@ -1,7 +1,24 @@
 # Physics
 
+<!-- index: Physics -->
+<!-- index: Rigid body -->
+<!-- index: Collider -->
+<!-- index: Physics material -->
+<!-- index: Physics query -->
+<!-- index: Character controller -->
+<!-- index: Ragdoll -->
+<!-- index: Destruction level 2 -->
+<!-- index: Destruction level 3 | see: Known issues -->
+<!-- index: Continuous collision detection | see: Swept CCD -->
+
 `regia_physics` is a thin Rust layer over the rapier3d solver, driven by ECS components and synced
 both ways. Add `regia::physics::PhysicsPlugin` yourself (`DefaultPlugins` does not install it; the dedicated server does) and give entities rigid bodies and colliders.
+
+The behavior is [spec 15](../../docs/specs/15-physics.md). That file still opens on the early
+milestone (cosmetic debris only). The rest of the spec, and this chapter, are what ships:
+bodies, events, queries, joints, the character controller, CCD, and destruction level 2.
+Character capsule rules are [spec 93](../../docs/specs/93-character-physics.md). Continuous
+sweeps are [Continuous collision detection](../systems/physics-ccd.md).
 
 ## Bodies and colliders
 
@@ -116,6 +133,46 @@ platform keeps its velocity; the reported velocity is the motion achieved. Ragdo
 limits from the bind pose (`RagdollProfile::humanoid_limited`, `.ragdoll.ron`), report when they
 have settled (face up or down) and stay within a per-tier budget (`RagdollSettings`). See
 `docs/specs/93-character-physics.md` and [character physics (agents)](../agents/character-physics.md).
+
+## Destruction level 2
+
+Level 2 breaks a structure that was fractured ahead of time. Chunks, masses, and bonds live in a
+`.destructible.ron` (version 2; version 1 migrates). Cook it from a `.fracture.ron` with
+`regia fracture`, or build a box grid. The format is `docs/formats/destructible.md`. Level 1
+cosmetic debris (`DebrisSpawner`) is unchanged and is not this system.
+
+At runtime `DestructionWorld` applies hits (explosion, projectile, impulse) once per fixed tick,
+in queue order. A chunk shares the impulse across intact bonds. Bonds at their threshold break,
+up to `max_breaks_per_tick`. A chunk with no intact path to a support chunk collapses. Those
+decisions use only exact `f32` operations on plain arrays, so the same hits produce the same
+`structure_hash` on every platform. They do not read the rapier solver. Debris motion after a
+chunk detaches is cosmetic: a pooled dynamic body, capped by `max_spawns_per_tick` and
+`max_active_chunks`.
+
+Place one in a level as a `DestructibleSource { asset, seed }` entity. `DestructionPlugin`
+defines it at play, outside the fixed tick. The server decides breaks. Replicas replay the break
+events to the same hash. Agent methods are `physics.destruction_define`,
+`physics.destruction_damage`, `physics.destruction_state`, and `physics.destruction_budget`.
+The call shapes, error strings (`destruction_invalid_asset`, `destruction_replica`, and the
+rest), and the wall-and-bridge sample are on
+[Destruction level 2 (agents)](../agents/destruction.md).
+
+Support chunks are marked in the Fracture editor panel (clicks, a box, or `support_below_y` on
+the asset meta). A test break there uses the same `DestructionWorld` as the game.
+
+Structural load, a falling section as one piece, and contact-driven impact damage are opt-in.
+Without `load` settings, a structure that is still connected to a support does not fail under its
+own weight. Without `falling` settings, a collapsing section breaks into chunks. Impact damage
+reads rapier contacts, so it matches the rapier step on one platform and never runs on a replica.
+Those limits are spelled out on the agent page.
+
+**Destruction level 3 is not in this version.** Runtime fracture, carving, and deformation, with
+collider, navmesh, and network sync, are parked for a later release (`docs/versions.md`, the v1.2
+rung). Do not document them as available.
+
+A lockstep game does not read rapier, and it does not treat destruction debris as simulated
+gameplay. Break decisions can still be replayed from `BreakEvent`s. The pose of a debris body
+cannot.
 
 ## Determinism
 

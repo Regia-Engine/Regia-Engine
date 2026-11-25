@@ -1,9 +1,11 @@
 # Play-in-editor
 
+<!-- index: Play in editor -->
+
 The play toolbar above the dock runs the level inside the editor. Play copies the edit world
 into a fresh play world, so nothing you do while playing changes the level; Stop drops the play
-world and the edit world is exactly as before. The **Net** tab plays with a listen server or a
-dedicated server and several clients. Walk-through: [Your first scene in the editor
+world and the edit world is exactly as before. The **Net** tab (panel id `net`, [Net](net.md)) plays with a listen server or a
+dedicated server and several clients. A separate process shown in the dock uses panel id `game_view` ([Game tabs](#game-tabs)). Walk-through: [Your first scene in the editor
 § 5](../../tutorials/editor-first-scene.md#step-5-play-in-the-editor). Depth: [Editor
 surface](../../agents/editor.md), [PIE with several clients and net stats](../../agents/pie-net.md),
 [Hot reload](../hot-reload.md).
@@ -32,8 +34,7 @@ this guide's review the toolbar had no resume: while paused, **⏸ Pause** staye
 nothing and **▶ Play** started a new session. The toolbar now shows **▶ Resume** while paused
 ([Editor accessibility](accessibility.md), finding E-1).
 
-Separate play windows and play modes are on the branches `lane/sprint-post05-editor-pie` and
-`lane/sprint-post05w3-editor-play-window` ([Play window](play-window.md)).
+The separate play window is [Play window](play-window.md). Several clients are [Net](net.md).
 
 ## Game tabs
 

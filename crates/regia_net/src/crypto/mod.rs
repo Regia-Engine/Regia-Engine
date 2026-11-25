@@ -31,6 +31,7 @@
 //! An unpinned client resists a passive listener only. See `book/agents/net-crypto.md` for what
 //! this does and does not protect.
 
+pub mod binding;
 mod identity;
 mod link;
 mod pending;
